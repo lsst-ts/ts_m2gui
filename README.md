@@ -7,8 +7,9 @@
 
 ## Needed Package
 
-- pyside2
-- [black](https://github.com/psf/black) (optional)
+- pyside2 (install by `conda`)
+- mesa-libGL.x86_64 (install by `yum`)
+- [black](https://github.com/psf/black) (19.10b0, optional)
 - [documenteer](https://github.com/lsst-sqre/documenteer) (optional)
 
 ## Code Format
@@ -36,3 +37,14 @@ xhost +
 IP=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
 docker run -it --rm -e DISPLAY=${IP}:0 -v ${path_to_this_package}:${path_of_package_in_container} -v /tmp/.X11-unix:/tmp/.X11-unix ${docker_image}:${image_tag}
 ```
+
+## Run GUI without the LSST Docker Image on MacOS
+
+You need to setup the QT environment with:
+
+```bash
+export QT_MAC_WANTS_LAYER=1
+export QT_MAC_USE_NSWINDOW=1
+```
+
+You may need to setup the **PYTHONPATH** to point to `python/` directory as well.
