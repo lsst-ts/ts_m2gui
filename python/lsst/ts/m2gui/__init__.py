@@ -29,6 +29,7 @@ else:
     except ImportError:
         __version__ = "?"
 
+from .enums import *
 from .utils import *
 from .model import *
 from .main_window import *

@@ -23,7 +23,7 @@ __all__ = ["Model"]
 
 import logging
 
-from .utils import LocalMode
+from .enums import LocalMode
 
 
 class Model(object):

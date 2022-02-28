@@ -18,26 +18,32 @@
 # GNU General Public License for more details.
 #
 
-import argparse
+import sys
+
+from PySide2.QtCore import QCommandLineParser, QCommandLineOption
 from PySide2.QtWidgets import QApplication
 
 from lsst.ts.m2gui import MainWindow
 
-# Set the parser
-parser = argparse.ArgumentParser(description="Run M2 graphical user interface (GUI).")
-
-parser.add_argument(
-    "--verbose", default=False, action="store_true", help="Output the log on screen.",
-)
-
-# Get the arguments
-args = parser.parse_args()
-
 # You need one (and only one) QApplication instance per application.
-app = QApplication([])
+app = QApplication(sys.argv)
+app.setApplicationName("M2 EUI")
+
+# Set the parser
+parser = QCommandLineParser()
+parser.setApplicationDescription("Run M2 graphical user interface (GUI).")
+parser.addHelpOption()
+
+option_verbose = QCommandLineOption(["v", "verbose"], "Output the log on screen.")
+parser.addOption(option_verbose)
+
+parser.process(app)
+
+# Get the argument
+is_verbose = parser.isSet(option_verbose)
 
 # Create a Qt main window, which will be our window.
-window_main = MainWindow(args.verbose)
+window_main = MainWindow(is_verbose)
 window_main.show()
 
 # Start the event loop.

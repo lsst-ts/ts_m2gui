@@ -19,36 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["set_button"]
+__all__ = ["LocalMode"]
 
-from functools import partial
-from PySide2.QtWidgets import QPushButton
+from enum import IntEnum, auto
 
 
-def set_button(name, callback, *args, is_checkable=False):
-    """Set the button.
-
-    Parameters
-    ----------
-    name : `str`
-        Button name.
-    callback : `func`
-        Callback function object to use in future partial calls.
-    *args : `args`
-        Tuple of callback arguments to future partial calls.
-    is_checkable : `bool`, optional
-        The button is checkable or not. (the default is False)
-
-    Returns
-    -------
-    button : `PySide2.QtWidgets.QPushButton`
-        button.
-    """
-
-    button = QPushButton(name)
-    if is_checkable:
-        button.setCheckable(is_checkable)
-
-    button.clicked.connect(partial(callback, *args))
-
-    return button
+class LocalMode(IntEnum):
+    Standby = 1
+    Diagnostic = auto()
+    Enable = auto()

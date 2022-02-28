@@ -24,7 +24,8 @@ __all__ = ["LayoutLocalMode"]
 from PySide2 import QtCore
 from PySide2.QtWidgets import QVBoxLayout
 
-from ..utils import set_button, LocalMode
+from ..utils import set_button
+from ..enums import LocalMode
 
 
 class LayoutLocalMode(object):
