@@ -23,54 +23,44 @@ import logging
 import pytest
 
 from PySide2 import QtCore
-from PySide2.QtWidgets import QWidget, QVBoxLayout
 
 from lsst.ts.m2gui import ControlTabs
-
-
-class MockWidget(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        log = logging.getLogger(type(self).__name__)
-        self.control_tabs = ControlTabs(log)
-
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.control_tabs.list_widget)
 
 
 @pytest.fixture
 def widget(qtbot):
 
-    widget = MockWidget()
+    log = logging.getLogger()
+    widget = ControlTabs(log)
+
     qtbot.addWidget(widget)
 
     return widget
 
 
 def test_init(qtbot, widget):
-    assert widget.control_tabs.list_widget.count() == 9
+    assert widget.count() == 9
 
 
 def test_get_tab(qtbot, widget):
-    tab = widget.control_tabs.get_tab("None")
+    tab = widget.get_tab("None")
     assert tab is None
 
     name = "Overview"
-    tab = widget.control_tabs.get_tab(name)
+    tab = widget.get_tab(name)
     assert tab.text() == name
 
 
 def test_flag(qtbot, widget):
 
     name = "Overview"
-    tab = widget.control_tabs.get_tab(name)
+    tab = widget.get_tab(name)
     assert tab.isSelected() is False
 
-    rect = widget.control_tabs.list_widget.visualItemRect(tab)
+    rect = widget.visualItemRect(tab)
     center = rect.center()
     qtbot.mouseClick(
-        widget.control_tabs.list_widget.viewport(), QtCore.Qt.LeftButton, pos=center
+        widget.viewport(), QtCore.Qt.LeftButton, pos=center
     )
 
     assert tab.isSelected() is True

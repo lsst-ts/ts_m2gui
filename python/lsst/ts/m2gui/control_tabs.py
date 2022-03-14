@@ -22,17 +22,16 @@
 __all__ = ["ControlTabs"]
 
 from PySide2.QtWidgets import QListWidget
+from PySide2.QtCore import Qt
 
 
-class ControlTabs(object):
+class ControlTabs(QListWidget):
     """Control tables.
 
     Parameters
     ----------
     log : `logging.Logger`
         A logger.
-    list_widget : `PySide2.QtWidgets.QListWidget`
-        List widget that has the control tables.
 
     Attributes
     ----------
@@ -41,23 +40,25 @@ class ControlTabs(object):
     """
 
     def __init__(self, log):
-        self.log = log
+        super().__init__()
 
-        self.list_widget = QListWidget()
+        self.log = log
 
         self._setup_list_widget()
 
     def _setup_list_widget(self):
         """Setup the list widget."""
-        self.list_widget.addItem("Overview")
-        self.list_widget.addItem("Actuator Control")
-        self.list_widget.addItem("Configuration View")
-        self.list_widget.addItem("Cell Status")
-        self.list_widget.addItem("Utility View")
-        self.list_widget.addItem("Rigid Body Position")
-        self.list_widget.addItem("Detailed Force")
-        self.list_widget.addItem("Diagnostics")
-        self.list_widget.addItem("Alarms/Warnings")
+
+        # self.addItem() is from the upstream
+        self.addItem("Overview")
+        self.addItem("Actuator Control")
+        self.addItem("Configuration View")
+        self.addItem("Cell Status")
+        self.addItem("Utility View")
+        self.addItem("Rigid Body Position")
+        self.addItem("Detailed Force")
+        self.addItem("Diagnostics")
+        self.addItem("Alarms/Warnings")
 
     def get_tab(self, name):
         """Get the table.
@@ -72,10 +73,7 @@ class ControlTabs(object):
         `PySide2.QtWidgets.QListWidgetItem` or None
             Table object. None if nothing.
         """
-        count = self.list_widget.count()
-        for idx in range(0, count):
-            item = self.list_widget.item(idx)
-            if item.text() == name.strip():
-                return item
 
-        return None
+        # self.findItems() is from the upstream
+        item = self.findItems(name, Qt.MatchExactly)
+        return item[0] if item != [] else None

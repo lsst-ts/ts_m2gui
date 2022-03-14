@@ -114,10 +114,10 @@ class MainWindow(QMainWindow):
         """
 
         layout = QVBoxLayout()
-        layout.addItem(self._layout_control.layout)
-        layout.addItem(self._layout_local_mode.layout)
-        layout.addItem(self._layout_control_mode.layout)
-        layout.addWidget(self._control_tabs.list_widget)
+        layout.addLayout(self._layout_control.layout)
+        layout.addLayout(self._layout_local_mode.layout)
+        layout.addLayout(self._layout_control_mode.layout)
+        layout.addWidget(self._control_tabs)
 
         button_exit = set_button("Exit", self._callback_exit)
         layout.addWidget(button_exit)
