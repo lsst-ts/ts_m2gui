@@ -25,7 +25,7 @@ from PySide2 import QtCore
 
 
 class SignalControl(QtCore.QObject):
-    """Control signal to send the information that the commandable SAL
-    component (CSC) is the commander or not."""
+    """Control signal to send the event that the control is updated or
+    not."""
 
-    is_csc_commander = QtCore.Signal(bool)
+    is_control_updated = QtCore.Signal(bool)

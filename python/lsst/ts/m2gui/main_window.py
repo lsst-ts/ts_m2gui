@@ -32,7 +32,7 @@ from PySide2.QtWidgets import (
 )
 
 from .utils import set_button
-from . import Model
+from . import Model, ControlTabs
 from .signal import SignalControl
 from .layout import LayoutControl, LayoutLocalMode, LayoutControlMode
 
@@ -90,6 +90,9 @@ class MainWindow(QMainWindow):
             self.model, self.log, self._signal_control
         )
 
+        # Control tables
+        self._control_tabs = ControlTabs(self.log)
+
         # Set the main window of application
         self.setWindowTitle("M2 Control")
 
@@ -114,6 +117,7 @@ class MainWindow(QMainWindow):
         layout.addItem(self._layout_control.layout)
         layout.addItem(self._layout_local_mode.layout)
         layout.addItem(self._layout_control_mode.layout)
+        layout.addWidget(self._control_tabs.list_widget)
 
         button_exit = set_button("Exit", self._callback_exit)
         layout.addWidget(button_exit)

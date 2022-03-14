@@ -25,6 +25,7 @@ from PySide2 import QtCore
 from PySide2.QtWidgets import QVBoxLayout
 
 from ..utils import set_button
+from ..enums import LocalMode
 
 
 class LayoutControlMode(object):
@@ -37,8 +38,7 @@ class LayoutControlMode(object):
     log : `logging.Logger`
         A logger.
     signal_control : `SignalControl`
-        Control signal to know the commandable SAL component (CSC) is commander
-        or not.
+        Signal to know the control is updated or not.
 
     Attributes
     ----------
@@ -55,11 +55,8 @@ class LayoutControlMode(object):
         self.model = model
         self.log = log
 
-        # Received control signal to know the CSC is commander or not
-        self._receive_signal_control = signal_control
-        self._receive_signal_control.is_csc_commander.connect(
-            self._callback_signal_control
-        )
+        self._signal_control = signal_control
+        self._signal_control.is_control_updated.connect(self._callback_signal_control)
 
         # Open-loop button
         self._button_open_loop = None
@@ -70,39 +67,28 @@ class LayoutControlMode(object):
         self.layout = self._set_layout()
 
     @QtCore.Slot()
-    def _callback_signal_control(self, is_csc_commander):
+    def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
         Parameters
         ----------
-        is_csc_commander : `bool`
-            Commandable SAL component (CSC) is the commander or not.
+        is_control_updated : `bool`
+            Control is updated or not.
         """
-        if is_csc_commander:
-            self._prohibit_control_mode()
+        if self.model.local_mode == LocalMode.Enable:
+            self._update_buttons()
         else:
-            self._update_buttons(self.model.force_balance_system_status)
+            self._prohibit_control_mode()
+
+    def _update_buttons(self):
+        """Update the buttons."""
+        self._button_open_loop.setEnabled(self.model.is_closed_loop)
+        self._button_closed_loop.setEnabled(not self.model.is_closed_loop)
 
     def _prohibit_control_mode(self):
         """Prohibit the control mode."""
         self._button_open_loop.setEnabled(False)
         self._button_closed_loop.setEnabled(False)
-
-    def _update_buttons(self, status):
-        """Update the buttons.
-
-        Parameters
-        ----------
-        status : `bool`
-            True if the force balance system is on. Otherwise, False.
-
-        Raises
-        ------
-        ValueError
-            If the input local mode is not supported.
-        """
-        self._button_open_loop.setEnabled(status)
-        self._button_closed_loop.setEnabled(not status)
 
     def _set_layout(self):
         """Set the layout.
@@ -144,17 +130,11 @@ class LayoutControlMode(object):
         Parameters
         ----------
         status : `bool`
-            True if turn on the force balance system. Otherwise, False.
-
-        Returns
-        -------
-        result : `bool`
-            True if succeeds. Otherwise, False.
+            True if turn on the force balance system, which means the system is
+            going to do the closed-loop control. Otherwise, False.
         """
 
-        self.model.force_balance_system_status = status
-        self._update_buttons(status)
+        self.model.is_closed_loop = status
+        self._signal_control.is_control_updated.emit(True)
 
-        self.log.info(
-            f"Force balance system status: {self.model.force_balance_system_status}"
-        )
+        self.log.info(f"Force balance system status: {status}")

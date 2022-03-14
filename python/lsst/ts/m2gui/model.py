@@ -43,8 +43,8 @@ class Model(object):
         Commandable SAL component (CSC) is the commander or not.
     local_mode : `LocalMode`
         Local model.
-    force_balance_system_status : `bool`
-        Force balance system is on or off.
+    is_closed_loop : `bool`
+        Closed-loop control is on or not.
     """
 
     def __init__(self, log=None):
@@ -57,4 +57,4 @@ class Model(object):
 
         self.is_csc_commander = False
         self.local_mode = LocalMode.Standby
-        self.force_balance_system_status = False
+        self.is_closed_loop = False

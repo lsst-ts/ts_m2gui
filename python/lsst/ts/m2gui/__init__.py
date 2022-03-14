@@ -32,4 +32,5 @@ else:
 from .enums import *
 from .utils import *
 from .model import *
+from .control_tabs import *
 from .main_window import *

@@ -38,8 +38,7 @@ class LayoutLocalMode(object):
     log : `logging.Logger`
         A logger.
     signal_control : `SignalControl`
-        Control signal to know the commandable SAL component (CSC) is commander
-        or not.
+        Signal to know the control is updated or not.
 
     Attributes
     ----------
@@ -56,11 +55,8 @@ class LayoutLocalMode(object):
         self.model = model
         self.log = log
 
-        # Received control signal to know the CSC is commander or not
-        self._receive_signal_control = signal_control
-        self._receive_signal_control.is_csc_commander.connect(
-            self._callback_signal_control
-        )
+        self._signal_control = signal_control
+        self._signal_control.is_control_updated.connect(self._callback_signal_control)
 
         # Standby button
         self._button_standby = None
@@ -74,38 +70,29 @@ class LayoutLocalMode(object):
         self.layout = self._set_layout()
 
     @QtCore.Slot()
-    def _callback_signal_control(self, is_csc_commander):
+    def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
         Parameters
         ----------
-        is_csc_commander : `bool`
-            Commandable SAL component (CSC) is the commander or not.
+        is_control_updated : `bool`
+            Control is updated or not.
         """
-        if is_csc_commander:
-            self._prohibit_transition()
+        if (not self.model.is_csc_commander) and (not self.model.is_closed_loop):
+            self._update_buttons()
         else:
-            self._update_buttons(self.model.local_mode)
+            self._prohibit_transition()
 
-    def _prohibit_transition(self):
-        """Prohibit the transition of local mode."""
-        self._button_standby.setEnabled(False)
-        self._button_diagnostic.setEnabled(False)
-        self._button_enable.setEnabled(False)
-
-    def _update_buttons(self, local_mode):
+    def _update_buttons(self):
         """Update the buttons.
-
-        Parameters
-        ----------
-        local_mode : `LocalMode`
-            Local mode.
 
         Raises
         ------
         ValueError
             If the input local mode is not supported.
         """
+        local_mode = self.model.local_mode
+
         if local_mode == LocalMode.Standby:
             self._button_standby.setEnabled(False)
             self._button_diagnostic.setEnabled(True)
@@ -123,6 +110,12 @@ class LayoutLocalMode(object):
 
         else:
             raise ValueError(f"Input local mode: {local_mode} is not supported.")
+
+    def _prohibit_transition(self):
+        """Prohibit the transition of local mode."""
+        self._button_standby.setEnabled(False)
+        self._button_diagnostic.setEnabled(False)
+        self._button_enable.setEnabled(False)
 
     def _set_layout(self):
         """Set the layout.
@@ -177,6 +170,6 @@ class LayoutLocalMode(object):
         """
 
         self.model.local_mode = local_mode
-        self._update_buttons(local_mode)
+        self._signal_control.is_control_updated.emit(True)
 
         self.log.info(f"Local mode: {self.model.local_mode!r}")
