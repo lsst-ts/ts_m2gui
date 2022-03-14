@@ -21,8 +21,7 @@
 
 __all__ = ["ControlTabs"]
 
-from PySide2 import QtCore
-from PySide2.QtWidgets import QListWidgetItem, QListWidget
+from PySide2.QtWidgets import QListWidget
 
 
 class ControlTabs(object):
@@ -50,34 +49,15 @@ class ControlTabs(object):
 
     def _setup_list_widget(self):
         """Setup the list widget."""
-        self._create_item("Overview")
-        self._create_item("Actuator Control")
-        self._create_item("Configuration View")
-        self._create_item("Cell Status")
-        self._create_item("Utility View")
-        self._create_item("Rigid Body Position")
-        self._create_item("Detailed Force")
-        self._create_item("Diagnostics")
-        self._create_item("Alarms/Warnings")
-
-    def _create_item(self, name):
-        """Create a standard list widget item, for option panel.
-
-        Parameters
-        ----------
-        name : `str`
-            Name of the option button
-
-        Returns
-        -------
-        item : `PySide2.QtWidgets.QListWidgetItem`
-            Created option button
-        """
-        item = QListWidgetItem(self.list_widget)
-        item.setText(name)
-        item.setTextAlignment(QtCore.Qt.AlignLeft)
-        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        return item
+        self.list_widget.addItem("Overview")
+        self.list_widget.addItem("Actuator Control")
+        self.list_widget.addItem("Configuration View")
+        self.list_widget.addItem("Cell Status")
+        self.list_widget.addItem("Utility View")
+        self.list_widget.addItem("Rigid Body Position")
+        self.list_widget.addItem("Detailed Force")
+        self.list_widget.addItem("Diagnostics")
+        self.list_widget.addItem("Alarms/Warnings")
 
     def get_tab(self, name):
         """Get the table.
