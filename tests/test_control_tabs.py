@@ -19,13 +19,46 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["SignalControl"]
+import logging
+import pytest
 
 from PySide2 import QtCore
 
+from lsst.ts.m2gui import ControlTabs
 
-class SignalControl(QtCore.QObject):
-    """Control signal to send the event that the control is updated or
-    not."""
 
-    is_control_updated = QtCore.Signal(bool)
+@pytest.fixture
+def widget(qtbot):
+
+    log = logging.getLogger()
+    widget = ControlTabs(log)
+
+    qtbot.addWidget(widget)
+
+    return widget
+
+
+def test_init(qtbot, widget):
+    assert widget.count() == 9
+
+
+def test_get_tab(qtbot, widget):
+    tab = widget.get_tab("None")
+    assert tab is None
+
+    name = "Overview"
+    tab = widget.get_tab(name)
+    assert tab.text() == name
+
+
+def test_flag(qtbot, widget):
+
+    name = "Overview"
+    tab = widget.get_tab(name)
+    assert tab.isSelected() is False
+
+    rect = widget.visualItemRect(tab)
+    center = rect.center()
+    qtbot.mouseClick(widget.viewport(), QtCore.Qt.LeftButton, pos=center)
+
+    assert tab.isSelected() is True

@@ -25,6 +25,7 @@ from PySide2 import QtCore
 from PySide2.QtWidgets import QVBoxLayout
 
 from ..utils import set_button
+from ..enums import LocalMode
 
 
 class LayoutControl(object):
@@ -37,8 +38,7 @@ class LayoutControl(object):
     log : `logging.Logger`
         A logger.
     signal_control : `SignalControl`
-        Control signal to broadcast the commandable SAL component (CSC) is
-        commander or not.
+        Signal to know the control is updated or not.
 
     Attributes
     ----------
@@ -55,8 +55,8 @@ class LayoutControl(object):
         self.model = model
         self.log = log
 
-        # Send control signal to broadcast the CSC is commander or not
-        self._send_signal_control = signal_control
+        self._signal_control = signal_control
+        self._signal_control.is_control_updated.connect(self._callback_signal_control)
 
         # Remote button
         self._button_remote = None
@@ -65,6 +65,30 @@ class LayoutControl(object):
         self._button_local = None
 
         self.layout = self._set_layout()
+
+    @QtCore.Slot()
+    def _callback_signal_control(self, is_control_updated):
+        """Callback of the control signal.
+
+        Parameters
+        ----------
+        is_control_updated : `bool`
+            Control is updated or not.
+        """
+        if self.model.local_mode == LocalMode.Standby:
+            self._update_buttons()
+        else:
+            self._prohibit_control()
+
+    def _update_buttons(self):
+        """Update the buttons."""
+        self._button_remote.setEnabled(not self.model.is_csc_commander)
+        self._button_local.setEnabled(self.model.is_csc_commander)
+
+    def _prohibit_control(self):
+        """Prohibit the control."""
+        self._button_remote.setEnabled(False)
+        self._button_local.setEnabled(False)
 
     def _set_layout(self):
         """Set the layout.
@@ -108,12 +132,6 @@ class LayoutControl(object):
         """
 
         self.model.is_csc_commander = is_commander
+        self._signal_control.is_control_updated.emit(True)
 
-        # Only CSC or GUI can control in a single time
-        self._button_remote.setEnabled(not is_commander)
-        self._button_local.setEnabled(is_commander)
-
-        # Broadcast the control source
-        self._send_signal_control.is_csc_commander.emit(is_commander)
-
-        self.log.info(f"CSC is the commander: {self.model.is_csc_commander}")
+        self.log.info(f"CSC is the commander: {is_commander}")

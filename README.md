@@ -8,9 +8,12 @@
 ## Needed Package
 
 - pyside2 (install by `conda`)
-- mesa-libGL.x86_64 (install by `yum`)
+- qt5-qtbase-devel (install by `yum`)
 - [black](https://github.com/psf/black) (19.10b0, optional)
 - [documenteer](https://github.com/lsst-sqre/documenteer) (optional)
+- pytest (optional, install by `conda`)
+- pytest-flake8 (optional, install by `conda -c conda-forge`)
+- pytest-qt (optional, install by `conda -c conda-forge`)
 
 ## Code Format
 
@@ -48,3 +51,16 @@ export QT_MAC_USE_NSWINDOW=1
 ```
 
 You may need to setup the **PYTHONPATH** to point to `python/` directory as well.
+
+## Executable
+
+The executable (`run_m2gui.py`) is under the `bin/` directory.
+Use the argument of `-h` to know the available options.
+
+## Unit Tests
+
+You can run the unit tests by:
+
+```bash
+pytest tests/
+```
