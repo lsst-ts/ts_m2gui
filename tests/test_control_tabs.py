@@ -59,8 +59,6 @@ def test_flag(qtbot, widget):
 
     rect = widget.visualItemRect(tab)
     center = rect.center()
-    qtbot.mouseClick(
-        widget.viewport(), QtCore.Qt.LeftButton, pos=center
-    )
+    qtbot.mouseClick(widget.viewport(), QtCore.Qt.LeftButton, pos=center)
 
     assert tab.isSelected() is True

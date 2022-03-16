@@ -75,5 +75,7 @@ class ControlTabs(QListWidget):
         """
 
         # self.findItems() is from the upstream
-        item = self.findItems(name, Qt.MatchExactly)
-        return item[0] if item != [] else None
+        try:
+            return self.findItems(name, Qt.MatchExactly)[0]
+        except IndexError:
+            return None
