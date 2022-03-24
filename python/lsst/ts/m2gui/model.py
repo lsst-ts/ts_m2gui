@@ -21,8 +21,6 @@
 
 __all__ = ["Model"]
 
-import logging
-
 from .enums import LocalMode
 
 
@@ -31,9 +29,8 @@ class Model(object):
 
     Parameters
     ----------
-    log : `logging.Logger` or None, optional
-        A logger. If None, a logger will be instantiated. (the default is
-        None)
+    log : `logging.Logger`
+        A logger.
 
     Attributes
     ----------
@@ -45,15 +42,13 @@ class Model(object):
         Local model.
     is_closed_loop : `bool`
         Closed-loop control is on or not.
+    signal_message : `SignalMessage`
+        Signal of the new message.
     """
 
-    def __init__(self, log=None):
+    def __init__(self, log):
 
-        # Set the logger
-        if log is None:
-            self.log = logging.getLogger(type(self).__name__)
-        else:
-            self.log = log.getChild(type(self).__name__)
+        self.log = log
 
         self.is_csc_commander = False
         self.local_mode = LocalMode.Standby

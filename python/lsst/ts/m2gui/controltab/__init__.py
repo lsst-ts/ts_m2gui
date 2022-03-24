@@ -19,19 +19,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
-
-if typing.TYPE_CHECKING:
-    __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
-
-from .enums import *
-from .utils import *
-from .log_window_handler import *
-from .model import *
-from .control_tabs import *
-from .main_window import *
+from .tab_default import *
+from .tab_actuator_control import *
+from .tab_alarm_warn import *
+from .tab_cell_status import *
+from .tab_config_view import *
+from .tab_detailed_force import *
+from .tab_diagnostics import *
+from .tab_overview import *
+from .tab_rigid_body_pos import *
+from .tab_utility_view import *

@@ -32,9 +32,9 @@ from PySide2.QtWidgets import (
 )
 
 from .utils import set_button
-from . import Model, ControlTabs
-from .signal import SignalControl
+from .signal import SignalMessage, SignalControl
 from .layout import LayoutControl, LayoutLocalMode, LayoutControlMode
+from . import Model, ControlTabs, LogWindowHandler
 
 
 class MainWindow(QMainWindow):
@@ -59,18 +59,12 @@ class MainWindow(QMainWindow):
     def __init__(self, is_output_log_on_screen, log=None):
         super().__init__()
 
-        # Set the logger
-        if log is None:
-            self.log = logging.getLogger(type(self).__name__)
-        else:
-            self.log = log.getChild(type(self).__name__)
+        # Signal of message
+        self._signal_message = SignalMessage()
 
-        if is_output_log_on_screen:
-            logging.basicConfig(
-                level=logging.INFO,
-                handlers=[logging.StreamHandler(sys.stdout)],
-                format="%(asctime)s, %(name)s, %(levelname)s, %(message)s",
-            )
+        # Set the logger
+        message_format = "%(asctime)s, %(levelname)s, %(message)s"
+        self.log = self._set_log(message_format, is_output_log_on_screen, log=log)
 
         self.model = Model(self.log)
 
@@ -78,20 +72,17 @@ class MainWindow(QMainWindow):
         self._signal_control = SignalControl()
 
         # Layout of the control panel
-        self._layout_control = LayoutControl(self.model, self.log, self._signal_control)
+        self._layout_control = LayoutControl(self.model, self._signal_control)
 
         # Layout of the local mode
-        self._layout_local_mode = LayoutLocalMode(
-            self.model, self.log, self._signal_control
-        )
+        self._layout_local_mode = LayoutLocalMode(self.model, self._signal_control)
 
         # Layout of the control mode
-        self._layout_control_mode = LayoutControlMode(
-            self.model, self.log, self._signal_control
-        )
+        self._layout_control_mode = LayoutControlMode(self.model, self._signal_control)
 
         # Control tables
-        self._control_tabs = ControlTabs(self.log)
+        self._control_tabs = ControlTabs()
+        self._set_control_tabs()
 
         # Set the main window of application
         self.setWindowTitle("M2 Control")
@@ -103,6 +94,48 @@ class MainWindow(QMainWindow):
 
         # Set the default conditions
         self._layout_control.set_csc_commander(True)
+
+    def _set_log(self, message_format, is_output_log_on_screen, log=None):
+        """Set the logger.
+
+        Parameters
+        ----------
+        message_format : `str`
+            Format of the message.
+        is_output_log_on_screen : `bool`
+            Is outputting the log messages on screen or not.
+        log : `logging.Logger` or None, optional
+            A logger. If None, a logger will be instantiated. (the default is
+            None)
+
+        Returns
+        -------
+        log : `logging.Logger`
+            A logger.
+        """
+
+        if log is None:
+            log = logging.getLogger(type(self).__name__)
+        else:
+            log = log.getChild(type(self).__name__)
+
+        log.addHandler(LogWindowHandler(self._signal_message, message_format))
+
+        if is_output_log_on_screen:
+            logging.basicConfig(
+                level=logging.INFO,
+                handlers=[logging.StreamHandler(sys.stdout)],
+                format=message_format,
+            )
+
+        return log
+
+    def _set_control_tabs(self):
+        """Set the control tables"""
+        tab_overview = self._control_tabs.get_tab("Overview")[1]
+        tab_overview.set_model(self.model)
+        tab_overview.set_signal_control(self._signal_control)
+        tab_overview.set_signal_message(self._signal_message)
 
     def _create_layout(self):
         """Create the layout.
@@ -117,7 +150,7 @@ class MainWindow(QMainWindow):
         layout.addLayout(self._layout_control.layout)
         layout.addLayout(self._layout_local_mode.layout)
         layout.addLayout(self._layout_control_mode.layout)
-        layout.addWidget(self._control_tabs)
+        layout.addLayout(self._control_tabs.layout)
 
         button_exit = set_button("Exit", self._callback_exit)
         layout.addWidget(button_exit)

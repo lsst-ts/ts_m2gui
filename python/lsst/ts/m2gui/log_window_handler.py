@@ -19,19 +19,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
+__all__ = ["LogWindowHandler"]
 
-if typing.TYPE_CHECKING:
-    __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
+import logging
 
-from .enums import *
-from .utils import *
-from .log_window_handler import *
-from .model import *
-from .control_tabs import *
-from .main_window import *
+
+class LogWindowHandler(logging.Handler):
+    """Log window handler.
+
+    Parameters
+    ----------
+    signal_message : `SignalMessage`
+        Signal of the new message.
+    message_format : `str`
+        Format of the message.
+    """
+
+    def __init__(self, signal_message, message_format):
+        super().__init__()
+
+        self._signal_message = signal_message
+        self._formatter = logging.Formatter(message_format)
+
+    def emit(self, record):
+        self._signal_message.message.emit(self._formatter.format(record))

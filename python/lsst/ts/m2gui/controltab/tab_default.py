@@ -19,19 +19,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
+__all__ = ["TabDefault"]
 
-if typing.TYPE_CHECKING:
-    __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
+from PySide2.QtWidgets import QDockWidget, QWidget
 
-from .enums import *
-from .utils import *
-from .log_window_handler import *
-from .model import *
-from .control_tabs import *
-from .main_window import *
+
+class TabDefault(QDockWidget):
+    """Default table.
+
+    Parameters
+    ----------
+    title : `str`
+        Table's title.
+
+    Attributes
+    ----------
+    widget : `PySide2.QtWidgets.QWidget`
+        Widget.
+    """
+
+    def __init__(self, title):
+        super().__init__()
+        self.setWindowTitle(title)
+
+        self.widget = QWidget()
+        self.setWidget(self.widget)

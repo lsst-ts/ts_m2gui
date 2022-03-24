@@ -19,19 +19,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
+__all__ = ["TabAlarmWarn"]
 
-if typing.TYPE_CHECKING:
-    __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
+from . import TabDefault
 
-from .enums import *
-from .utils import *
-from .log_window_handler import *
-from .model import *
-from .control_tabs import *
-from .main_window import *
+
+class TabAlarmWarn(TabDefault):
+    """Table of the alarms and warnings.
+
+    Parameters
+    ----------
+    title : `str`
+        Table's title.
+    """
+
+    def __init__(self, title):
+        super().__init__(title)

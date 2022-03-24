@@ -35,8 +35,6 @@ class LayoutControl(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     signal_control : `SignalControl`
         Signal to know the control is updated or not.
 
@@ -44,16 +42,13 @@ class LayoutControl(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     layout : `PySide2.QtWidgets.QVBoxLayout`
         Layout.
     """
 
-    def __init__(self, model, log, signal_control):
+    def __init__(self, model, signal_control):
 
         self.model = model
-        self.log = log
 
         self._signal_control = signal_control
         self._signal_control.is_control_updated.connect(self._callback_signal_control)
@@ -133,5 +128,3 @@ class LayoutControl(object):
 
         self.model.is_csc_commander = is_commander
         self._signal_control.is_control_updated.emit(True)
-
-        self.log.info(f"CSC is the commander: {is_commander}")
