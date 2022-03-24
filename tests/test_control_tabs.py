@@ -19,46 +19,103 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import logging
 import pytest
 
 from PySide2 import QtCore
+from PySide2.QtWidgets import QWidget
 
 from lsst.ts.m2gui import ControlTabs
+
+
+class MockWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.layout_control_tabs = ControlTabs()
+
+        self.setLayout(self.layout_control_tabs.layout)
 
 
 @pytest.fixture
 def widget(qtbot):
 
-    log = logging.getLogger()
-    widget = ControlTabs(log)
-
+    widget = MockWidget()
     qtbot.addWidget(widget)
 
     return widget
 
 
 def test_init(qtbot, widget):
-    assert widget.count() == 9
+    assert widget.layout_control_tabs._list_widget.count() == 9
 
 
 def test_get_tab(qtbot, widget):
-    tab = widget.get_tab("None")
-    assert tab is None
+    tab_item, control_tab = widget.layout_control_tabs.get_tab("None")
+    assert tab_item is None
+    assert control_tab is None
 
     name = "Overview"
-    tab = widget.get_tab(name)
-    assert tab.text() == name
+    tab_item, control_tab = widget.layout_control_tabs.get_tab(name)
+    assert tab_item.text() == name
+    assert control_tab.windowTitle() == name
+
+
+def test_flag_default(qtbot, widget):
+
+    name = "Overview"
+    tab_item = widget.layout_control_tabs.get_tab(name)[0]
+    assert tab_item.isSelected() is True
 
 
 def test_flag(qtbot, widget):
 
-    name = "Overview"
-    tab = widget.get_tab(name)
-    assert tab.isSelected() is False
+    name = "Diagnostics"
+    tab_item, control_tab = widget.layout_control_tabs.get_tab(name)
+    assert tab_item.isSelected() is False
+    assert control_tab.isVisible() is False
 
-    rect = widget.visualItemRect(tab)
+    rect = widget.layout_control_tabs._list_widget.visualItemRect(tab_item)
     center = rect.center()
-    qtbot.mouseClick(widget.viewport(), QtCore.Qt.LeftButton, pos=center)
+    qtbot.mouseClick(
+        widget.layout_control_tabs._list_widget.viewport(),
+        QtCore.Qt.LeftButton,
+        pos=center,
+    )
 
-    assert tab.isSelected() is True
+    assert tab_item.isSelected() is True
+    assert control_tab.isVisible() is False
+
+
+def test_show(qtbot, widget):
+
+    names = [
+        "Overview",
+        "Actuator Control",
+        "Configuration View",
+        "Cell Status",
+        "Utility View",
+        "Rigid Body Position",
+        "Detailed Force",
+        "Diagnostics",
+        "Alarms/Warnings",
+    ]
+
+    for name in names:
+
+        tab_item, control_tab = widget.layout_control_tabs.get_tab(name)
+        assert control_tab.isVisible() is False
+
+        rect = widget.layout_control_tabs._list_widget.visualItemRect(tab_item)
+        center = rect.center()
+        qtbot.mouseClick(
+            widget.layout_control_tabs._list_widget.viewport(),
+            QtCore.Qt.LeftButton,
+            pos=center,
+        )
+
+        qtbot.mouseClick(
+            widget.layout_control_tabs._button_show, QtCore.Qt.LeftButton,
+        )
+
+        assert tab_item.isSelected() is True
+        assert control_tab.isVisible() is True
