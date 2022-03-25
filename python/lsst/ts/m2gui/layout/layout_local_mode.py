@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutLocalMode"]
 
-from PySide2 import QtCore
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout
 
 from ..utils import set_button
@@ -64,7 +64,7 @@ class LayoutLocalMode(object):
 
         self.layout = self._set_layout()
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
@@ -132,19 +132,19 @@ class LayoutLocalMode(object):
 
         return layout
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_standby(self):
         """Callback of the standby button. The system will transition to the
         standby state."""
         self.set_local_mode(LocalMode.Standby)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_diagnostic(self):
         """Callback of the diagnostic button. The system will transition to the
         diagnostic state."""
         self.set_local_mode(LocalMode.Diagnostic)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_enable(self):
         """Callback of the enable button. The system will transition to the
         enable state."""

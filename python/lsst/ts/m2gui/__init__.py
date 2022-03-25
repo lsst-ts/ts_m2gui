@@ -29,9 +29,9 @@ else:
     except ImportError:
         __version__ = "?"
 
-from .enums import *
-from .utils import *
-from .log_window_handler import *
-from .model import *
-from .control_tabs import *
-from .main_window import *
+from .enums import LocalMode
+from .utils import set_button
+from .log_window_handler import LogWindowHandler
+from .model import Model
+from .control_tabs import ControlTabs
+from .main_window import MainWindow

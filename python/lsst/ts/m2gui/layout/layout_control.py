@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutControl"]
 
-from PySide2 import QtCore
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout
 
 from ..utils import set_button
@@ -61,7 +61,7 @@ class LayoutControl(object):
 
         self.layout = self._set_layout()
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
@@ -102,13 +102,13 @@ class LayoutControl(object):
 
         return layout
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_remote(self):
         """Callback of the remote button. The commander will be the commandable
         SAL component (CSC)"""
         self.set_csc_commander(True)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_local(self):
         """Callback of the local button. The commander will be the graphical
         use interface (GUI)."""

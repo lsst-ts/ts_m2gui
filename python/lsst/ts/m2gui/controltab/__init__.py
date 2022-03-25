@@ -19,13 +19,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .tab_default import *
-from .tab_actuator_control import *
-from .tab_alarm_warn import *
-from .tab_cell_status import *
-from .tab_config_view import *
-from .tab_detailed_force import *
-from .tab_diagnostics import *
-from .tab_overview import *
-from .tab_rigid_body_pos import *
-from .tab_utility_view import *
+from .tab_default import TabDefault
+from .tab_actuator_control import TabActuatorControl
+from .tab_alarm_warn import TabAlarmWarn
+from .tab_cell_status import TabCellStatus
+from .tab_config_view import TabConfigView
+from .tab_detailed_force import TabDetailedForce
+from .tab_diagnostics import TabDiagnostics
+from .tab_overview import TabOverview
+from .tab_rigid_body_pos import TabRigidBodyPos
+from .tab_utility_view import TabUtilityView

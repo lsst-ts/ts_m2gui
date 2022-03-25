@@ -21,9 +21,8 @@
 
 __all__ = ["ControlTabs"]
 
-from PySide2 import QtCore
 from PySide2.QtWidgets import QListWidget, QVBoxLayout
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot, Qt
 
 from .utils import set_button
 from .controltab import (
@@ -100,7 +99,7 @@ class ControlTabs(object):
 
         return layout
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_show(self):
         """Callback of the show button."""
         item = self._list_widget.currentItem()

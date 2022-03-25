@@ -21,7 +21,7 @@
 
 __all__ = ["TabOverview"]
 
-from PySide2 import QtCore
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout, QLabel, QPlainTextEdit
 
 from ..utils import set_button
@@ -98,7 +98,7 @@ class TabOverview(TabDefault):
 
         return layout
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_clear(self):
         self._window_log.clear()
 
@@ -126,7 +126,7 @@ class TabOverview(TabDefault):
         self._signal_message = signal_message
         self._signal_message.message.connect(self._callback_signal_message)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_signal_message(self, message):
         """Callback of the message signal.
 
@@ -166,7 +166,7 @@ class TabOverview(TabDefault):
         self._signal_control = signal_control
         self._signal_control.is_control_updated.connect(self._callback_signal_control)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
