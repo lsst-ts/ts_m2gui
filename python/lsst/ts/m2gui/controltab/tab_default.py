@@ -19,37 +19,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["Model"]
+__all__ = ["TabDefault"]
 
-from .enums import LocalMode
+from PySide2.QtWidgets import QDockWidget, QWidget
 
 
-class Model(object):
-    """Model class of the application.
+class TabDefault(QDockWidget):
+    """Default table.
 
     Parameters
     ----------
-    log : `logging.Logger`
-        A logger.
+    title : `str`
+        Table's title.
 
     Attributes
     ----------
-    log : `logging.Logger`
-        A logger.
-    is_csc_commander : `bool`
-        Commandable SAL component (CSC) is the commander or not.
-    local_mode : `LocalMode`
-        Local model.
-    is_closed_loop : `bool`
-        Closed-loop control is on or not.
-    signal_message : `SignalMessage`
-        Signal of the new message.
+    widget : `PySide2.QtWidgets.QWidget`
+        Widget.
     """
 
-    def __init__(self, log):
+    def __init__(self, title):
+        super().__init__()
+        self.setWindowTitle(title)
 
-        self.log = log
-
-        self.is_csc_commander = False
-        self.local_mode = LocalMode.Standby
-        self.is_closed_loop = False
+        self.widget = QWidget()
+        self.setWidget(self.widget)

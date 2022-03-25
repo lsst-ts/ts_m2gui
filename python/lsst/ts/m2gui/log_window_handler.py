@@ -19,37 +19,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["Model"]
+__all__ = ["LogWindowHandler"]
 
-from .enums import LocalMode
+import logging
 
 
-class Model(object):
-    """Model class of the application.
+class LogWindowHandler(logging.Handler):
+    """Log window handler.
 
     Parameters
     ----------
-    log : `logging.Logger`
-        A logger.
-
-    Attributes
-    ----------
-    log : `logging.Logger`
-        A logger.
-    is_csc_commander : `bool`
-        Commandable SAL component (CSC) is the commander or not.
-    local_mode : `LocalMode`
-        Local model.
-    is_closed_loop : `bool`
-        Closed-loop control is on or not.
     signal_message : `SignalMessage`
         Signal of the new message.
+    message_format : `str`
+        Format of the message.
     """
 
-    def __init__(self, log):
+    def __init__(self, signal_message, message_format):
+        super().__init__()
 
-        self.log = log
+        self._signal_message = signal_message
+        self._formatter = logging.Formatter(message_format)
 
-        self.is_csc_commander = False
-        self.local_mode = LocalMode.Standby
-        self.is_closed_loop = False
+    def emit(self, record):
+        self._signal_message.message.emit(self._formatter.format(record))

@@ -19,37 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["Model"]
+__all__ = ["SignalMessage"]
 
-from .enums import LocalMode
+from PySide2 import QtCore
 
 
-class Model(object):
-    """Model class of the application.
+class SignalMessage(QtCore.QObject):
+    """Message signal to send the message event."""
 
-    Parameters
-    ----------
-    log : `logging.Logger`
-        A logger.
-
-    Attributes
-    ----------
-    log : `logging.Logger`
-        A logger.
-    is_csc_commander : `bool`
-        Commandable SAL component (CSC) is the commander or not.
-    local_mode : `LocalMode`
-        Local model.
-    is_closed_loop : `bool`
-        Closed-loop control is on or not.
-    signal_message : `SignalMessage`
-        Signal of the new message.
-    """
-
-    def __init__(self, log):
-
-        self.log = log
-
-        self.is_csc_commander = False
-        self.local_mode = LocalMode.Standby
-        self.is_closed_loop = False
+    message = QtCore.Signal(str)

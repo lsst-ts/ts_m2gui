@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.0.3:
+
+-------------
+0.0.2
+-------------
+
+* Add the framework of control tables.
+* Implement the overview table.
+* Remove the debug messages that are not needed anymore.
+
 .. _lsst.ts.m2gui-0.0.2:
 
 -------------

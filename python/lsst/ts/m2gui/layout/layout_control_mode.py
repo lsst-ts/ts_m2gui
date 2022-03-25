@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutControlMode"]
 
-from PySide2 import QtCore
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout
 
 from ..utils import set_button
@@ -35,8 +35,6 @@ class LayoutControlMode(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     signal_control : `SignalControl`
         Signal to know the control is updated or not.
 
@@ -44,16 +42,13 @@ class LayoutControlMode(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     layout : `PySide2.QtWidgets.QVBoxLayout`
         Layout.
     """
 
-    def __init__(self, model, log, signal_control):
+    def __init__(self, model, signal_control):
 
         self.model = model
-        self.log = log
 
         self._signal_control = signal_control
         self._signal_control.is_control_updated.connect(self._callback_signal_control)
@@ -66,7 +61,7 @@ class LayoutControlMode(object):
 
         self.layout = self._set_layout()
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
@@ -112,13 +107,13 @@ class LayoutControlMode(object):
 
         return layout
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_open_loop(self):
         """Callback of the open-loop button. The system will turn off the force
         balance system."""
         self.switch_force_balance_system(False)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_closed_loop(self):
         """Callback of the closed-loop button. The system will turn off the
         force balance system."""
@@ -136,5 +131,3 @@ class LayoutControlMode(object):
 
         self.model.is_closed_loop = status
         self._signal_control.is_control_updated.emit(True)
-
-        self.log.info(f"Force balance system status: {status}")

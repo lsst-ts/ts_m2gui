@@ -21,6 +21,8 @@
 
 import pytest
 
+import logging
+
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
 
@@ -33,9 +35,9 @@ class MockWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        model = Model()
+        model = Model(logging.getLogger())
         signal_control = SignalControl()
-        self.layout_control = LayoutControl(model, model.log, signal_control)
+        self.layout_control = LayoutControl(model, signal_control)
 
         self.setLayout(self.layout_control.layout)
 

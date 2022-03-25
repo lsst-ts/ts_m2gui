@@ -19,37 +19,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["Model"]
-
-from .enums import LocalMode
-
-
-class Model(object):
-    """Model class of the application.
-
-    Parameters
-    ----------
-    log : `logging.Logger`
-        A logger.
-
-    Attributes
-    ----------
-    log : `logging.Logger`
-        A logger.
-    is_csc_commander : `bool`
-        Commandable SAL component (CSC) is the commander or not.
-    local_mode : `LocalMode`
-        Local model.
-    is_closed_loop : `bool`
-        Closed-loop control is on or not.
-    signal_message : `SignalMessage`
-        Signal of the new message.
-    """
-
-    def __init__(self, log):
-
-        self.log = log
-
-        self.is_csc_commander = False
-        self.local_mode = LocalMode.Standby
-        self.is_closed_loop = False
+from .tab_default import TabDefault
+from .tab_actuator_control import TabActuatorControl
+from .tab_alarm_warn import TabAlarmWarn
+from .tab_cell_status import TabCellStatus
+from .tab_config_view import TabConfigView
+from .tab_detailed_force import TabDetailedForce
+from .tab_diagnostics import TabDiagnostics
+from .tab_overview import TabOverview
+from .tab_rigid_body_pos import TabRigidBodyPos
+from .tab_utility_view import TabUtilityView

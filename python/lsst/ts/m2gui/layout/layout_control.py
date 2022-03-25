@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutControl"]
 
-from PySide2 import QtCore
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout
 
 from ..utils import set_button
@@ -35,8 +35,6 @@ class LayoutControl(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     signal_control : `SignalControl`
         Signal to know the control is updated or not.
 
@@ -44,16 +42,13 @@ class LayoutControl(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     layout : `PySide2.QtWidgets.QVBoxLayout`
         Layout.
     """
 
-    def __init__(self, model, log, signal_control):
+    def __init__(self, model, signal_control):
 
         self.model = model
-        self.log = log
 
         self._signal_control = signal_control
         self._signal_control.is_control_updated.connect(self._callback_signal_control)
@@ -66,7 +61,7 @@ class LayoutControl(object):
 
         self.layout = self._set_layout()
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
@@ -107,13 +102,13 @@ class LayoutControl(object):
 
         return layout
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_remote(self):
         """Callback of the remote button. The commander will be the commandable
         SAL component (CSC)"""
         self.set_csc_commander(True)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_local(self):
         """Callback of the local button. The commander will be the graphical
         use interface (GUI)."""
@@ -133,5 +128,3 @@ class LayoutControl(object):
 
         self.model.is_csc_commander = is_commander
         self._signal_control.is_control_updated.emit(True)
-
-        self.log.info(f"CSC is the commander: {is_commander}")

@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutLocalMode"]
 
-from PySide2 import QtCore
+from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout
 
 from ..utils import set_button
@@ -35,8 +35,6 @@ class LayoutLocalMode(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     signal_control : `SignalControl`
         Signal to know the control is updated or not.
 
@@ -44,16 +42,13 @@ class LayoutLocalMode(object):
     ----------
     model : `Model`
         Model class.
-    log : `logging.Logger`
-        A logger.
     layout : `PySide2.QtWidgets.QVBoxLayout`
         Layout.
     """
 
-    def __init__(self, model, log, signal_control):
+    def __init__(self, model, signal_control):
 
         self.model = model
-        self.log = log
 
         self._signal_control = signal_control
         self._signal_control.is_control_updated.connect(self._callback_signal_control)
@@ -69,7 +64,7 @@ class LayoutLocalMode(object):
 
         self.layout = self._set_layout()
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
@@ -137,19 +132,19 @@ class LayoutLocalMode(object):
 
         return layout
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_standby(self):
         """Callback of the standby button. The system will transition to the
         standby state."""
         self.set_local_mode(LocalMode.Standby)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_diagnostic(self):
         """Callback of the diagnostic button. The system will transition to the
         diagnostic state."""
         self.set_local_mode(LocalMode.Diagnostic)
 
-    @QtCore.Slot()
+    @Slot()
     def _callback_enable(self):
         """Callback of the enable button. The system will transition to the
         enable state."""
@@ -171,5 +166,3 @@ class LayoutLocalMode(object):
 
         self.model.local_mode = local_mode
         self._signal_control.is_control_updated.emit(True)
-
-        self.log.info(f"Local mode: {self.model.local_mode!r}")
