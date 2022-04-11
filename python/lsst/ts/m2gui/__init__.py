@@ -30,7 +30,7 @@ else:
         __version__ = "?"
 
 from .enums import LocalMode
-from .utils import set_button
+from .utils import set_button, get_rgb_from_hex, colors
 from .log_window_handler import LogWindowHandler
 from .model import Model
 from .control_tabs import ControlTabs

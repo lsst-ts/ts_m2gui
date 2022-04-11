@@ -35,11 +35,17 @@ from .controltab import (
     TabOverview,
     TabRigidBodyPos,
     TabUtilityView,
+    TabLimitSwitchStatus,
 )
 
 
 class ControlTabs(object):
     """Control tables.
+
+    Parameters
+    ----------
+    model : `Model`
+        Model class.
 
     Attributes
     ----------
@@ -47,7 +53,7 @@ class ControlTabs(object):
         Layout.
     """
 
-    def __init__(self):
+    def __init__(self, model):
 
         # Show the selected table or not
         self._button_show = None
@@ -58,26 +64,33 @@ class ControlTabs(object):
         # Widget to have the list of control tables
         self._list_widget = QListWidget()
 
-        self._setup_tabs_and_list_widget()
+        self._setup_tabs_and_list_widget(model)
 
         self.layout = self._set_layout()
 
         # Set the default selection
         self._list_widget.setCurrentItem(self.get_tab("Overview")[0])
 
-    def _setup_tabs_and_list_widget(self):
-        """Setup the tables and list widget."""
+    def _setup_tabs_and_list_widget(self, model):
+        """Setup the tables and list widget.
+
+        Parameters
+        ----------
+        model : `Model`
+            Model class.
+        """
 
         self._tabs = [
-            TabOverview("Overview"),
-            TabActuatorControl("Actuator Control"),
-            TabConfigView("Configuration View"),
-            TabCellStatus("Cell Status"),
-            TabUtilityView("Utility View"),
-            TabRigidBodyPos("Rigid Body Position"),
-            TabDetailedForce("Detailed Force"),
-            TabDiagnostics("Diagnostics"),
-            TabAlarmWarn("Alarms/Warnings"),
+            TabOverview("Overview", model),
+            TabActuatorControl("Actuator Control", model),
+            TabConfigView("Configuration View", model),
+            TabCellStatus("Cell Status", model),
+            TabUtilityView("Utility View", model),
+            TabRigidBodyPos("Rigid Body Position", model),
+            TabDetailedForce("Detailed Force", model),
+            TabDiagnostics("Diagnostics", model),
+            TabAlarmWarn("Alarms/Warnings", model),
+            TabLimitSwitchStatus("Limit Switch Status", model),
         ]
 
         for tab in self._tabs:
