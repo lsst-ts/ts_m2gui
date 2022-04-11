@@ -31,7 +31,9 @@ class TabDetailedForce(TabDefault):
     ----------
     title : `str`
         Table's title.
+    model : `Model`
+        Model class.
     """
 
-    def __init__(self, title):
-        super().__init__(title)
+    def __init__(self, title, model):
+        super().__init__(title, model)

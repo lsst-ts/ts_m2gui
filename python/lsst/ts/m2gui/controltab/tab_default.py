@@ -31,16 +31,22 @@ class TabDefault(QDockWidget):
     ----------
     title : `str`
         Table's title.
+    model : `Model`
+        Model class.
 
     Attributes
     ----------
     widget : `PySide2.QtWidgets.QWidget`
         Widget.
+    model : `Model`
+        Model class.
     """
 
-    def __init__(self, title):
+    def __init__(self, title, model):
         super().__init__()
         self.setWindowTitle(title)
 
         self.widget = QWidget()
         self.setWidget(self.widget)
+
+        self.model = model

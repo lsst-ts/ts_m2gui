@@ -19,13 +19,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["TabCellStatus"]
+__all__ = ["TabLimitSwitchStatus"]
 
 from . import TabDefault
 
 
-class TabCellStatus(TabDefault):
-    """Table of the cell status.
+class TabLimitSwitchStatus(TabDefault):
+    """Table of the limit switch status.
 
     Parameters
     ----------
