@@ -19,6 +19,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .signal_control import SignalControl
-from .signal_message import SignalMessage
-from .signal_error import SignalError
+__all__ = ["SignalError"]
+
+from PySide2 import QtCore
+
+
+class SignalError(QtCore.QObject):
+    """Error signal to send the error code."""
+
+    # New error codes
+    error_codes_new = QtCore.Signal(object)
+
+    # Cleared error codes
+    error_codes_cleared = QtCore.Signal(object)
