@@ -1,0 +1,34 @@
+@startuml
+package "layout" #DDDDDD {
+  class LayoutDefault
+}
+
+package "signal" #DDDDDD {
+  class SignalControl
+  class SignalMessage
+  class SignalError
+}
+
+package "controltab" #DDDDDD {
+  class TabDefault
+}
+
+MainWindow *-- Model
+MainWindow *-- ControlTabs
+MainWindow "1" *-- "3" LayoutDefault
+MainWindow *-- SignalControl
+MainWindow *-- SignalMessage
+MainWindow ..> LogWindowHandler
+
+Model *-- SignalError
+
+LayoutDefault *-- Model
+LayoutDefault *-- SignalControl
+
+LogWindowHandler *-- SignalMessage
+
+ControlTabs ..> Model
+ControlTabs "1" *-- "10" TabDefault
+
+TabDefault *-- Model
+@enduml
