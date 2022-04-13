@@ -19,34 +19,55 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["TabDefault"]
+__all__ = ["LayoutDefault"]
 
-from PySide2.QtWidgets import QDockWidget, QWidget
+from PySide2.QtCore import Slot
 
 
-class TabDefault(QDockWidget):
-    """Default table.
+class LayoutDefault(object):
+    """Layout of the default panel.
 
     Parameters
     ----------
-    title : `str`
-        Table's title.
     model : `Model`
         Model class.
+    signal_control : `SignalControl`
+        Signal to know the control is updated or not.
 
     Attributes
     ----------
-    widget : `PySide2.QtWidgets.QWidget`
-        Widget.
     model : `Model`
         Model class.
+    layout : `PySide2.QtWidgets.QVBoxLayout`
+        Layout.
     """
 
-    def __init__(self, title, model):
-        super().__init__()
-        self.setWindowTitle(title)
-
-        self.widget = QWidget()
-        self.setWidget(self.widget)
+    def __init__(self, model, signal_control):
 
         self.model = model
+
+        self._signal_control = signal_control
+        self._signal_control.is_control_updated.connect(self._callback_signal_control)
+
+        self.layout = self._set_layout()
+
+    @Slot()
+    def _callback_signal_control(self, is_control_updated):
+        """Callback of the control signal.
+
+        Parameters
+        ----------
+        is_control_updated : `bool`
+            Control is updated or not.
+        """
+        raise NotImplementedError("Child class needs to realize this function.")
+
+    def _set_layout(self):
+        """Set the layout.
+
+        Returns
+        -------
+        layout : `PySide2.QtWidgets.QVBoxLayout`
+            Layout.
+        """
+        raise NotImplementedError("Child class needs to realize this function.")

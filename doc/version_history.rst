@@ -6,10 +6,20 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.0.4:
+
+-------------
+0.0.4
+-------------
+
+* Add the UML class diagrams.
+* Add the **LayoutDefault** and **TabDefault** classes.
+* Implement the alarms/warnings table.
+
 .. _lsst.ts.m2gui-0.0.3:
 
 -------------
-0.0.2
+0.0.3
 -------------
 
 * Add the framework of control tables.

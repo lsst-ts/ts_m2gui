@@ -22,6 +22,7 @@
 __all__ = ["Model"]
 
 from .enums import LocalMode
+from .signal import SignalError
 
 
 class Model(object):
@@ -42,8 +43,8 @@ class Model(object):
         Local model.
     is_closed_loop : `bool`
         Closed-loop control is on or not.
-    signal_message : `SignalMessage`
-        Signal of the new message.
+    signal_error : `SignalError`
+        Signal to report the new or cleared errors.
     """
 
     def __init__(self, log):
@@ -53,3 +54,20 @@ class Model(object):
         self.is_csc_commander = False
         self.local_mode = LocalMode.Standby
         self.is_closed_loop = False
+
+        self.signal_error = SignalError()
+
+    def reset_errors(self):
+        """Reset errors."""
+
+        self.log.info("Reset all errors.")
+
+    def enable_open_loop_max_limit(self):
+        """Enable the maximum limit in open-loop control."""
+
+        if (self.local_mode == LocalMode.Enable) and not self.is_closed_loop:
+            self.log.info("Enable the maximum limit in open-loop control.")
+        else:
+            self.log.info(
+                "Failed to enable the maximum limit. Only allow in Enabled state and open-loop control."
+            )

@@ -20,7 +20,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-
 import logging
 
 from PySide2 import QtCore
@@ -33,8 +32,7 @@ from lsst.ts.m2gui.controltab import TabOverview
 @pytest.fixture
 def widget(qtbot):
 
-    widget = TabOverview("Overview")
-    widget.set_model(Model(logging.getLogger()))
+    widget = TabOverview("Overview", Model(logging.getLogger()))
     widget.set_signal_message(SignalMessage())
     qtbot.addWidget(widget)
 

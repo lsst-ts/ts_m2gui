@@ -19,10 +19,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["set_button"]
+__all__ = ["set_button", "get_rgb_from_hex", "colors"]
 
 from functools import partial
 from PySide2.QtWidgets import QPushButton
+from PySide2.QtGui import QColor
+
+colors = {
+    "Red": "#FF0000",
+    "Green": "#00FF00",
+    "Blue": "#0000FF",
+    "Black": "#000000",
+    "White": "#FFFFFF",
+    "Electric Green": "#41CD52",
+    "Dark Blue": "#222840",
+    "Yellow": "#F9E56d",
+}
 
 
 def set_button(name, callback, *args, is_checkable=False):
@@ -52,3 +64,23 @@ def set_button(name, callback, *args, is_checkable=False):
     button.clicked.connect(partial(callback, *args))
 
     return button
+
+
+def get_rgb_from_hex(code):
+    """Get RGB color from hexadecimal code.
+
+    Parameters
+    ----------
+    code : `str`
+        Hexadecimal code.
+
+    Returns
+    -------
+    `PySide2.QtGui.QColor`
+        Color.
+    """
+
+    code_hex = code.replace("#", "")
+    rgb = tuple(int(code_hex[idx : idx + 2], 16) for idx in (0, 2, 4))
+
+    return QColor.fromRgb(rgb[0], rgb[1], rgb[2])

@@ -19,6 +19,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .signal_control import SignalControl
-from .signal_message import SignalMessage
-from .signal_error import SignalError
+__all__ = ["TabLimitSwitchStatus"]
+
+from . import TabDefault
+
+
+class TabLimitSwitchStatus(TabDefault):
+    """Table of the limit switch status.
+
+    Parameters
+    ----------
+    title : `str`
+        Table's title.
+    model : `Model`
+        Model class.
+    """
+
+    def __init__(self, title, model):
+        super().__init__(title, model)

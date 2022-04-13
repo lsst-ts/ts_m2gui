@@ -19,6 +19,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .signal_control import SignalControl
-from .signal_message import SignalMessage
-from .signal_error import SignalError
+import unittest
+
+from lsst.ts.m2gui import get_rgb_from_hex
+
+
+class TestUtils(unittest.TestCase):
+    """Test the functions in utils."""
+
+    def test_get_rgb_from_hex(self):
+
+        color = get_rgb_from_hex("#021406")
+        self.assertEqual(color.getRgb(), (2, 20, 6, 255))
+
+
+if __name__ == "__main__":
+
+    # Do the unit test
+    unittest.main()

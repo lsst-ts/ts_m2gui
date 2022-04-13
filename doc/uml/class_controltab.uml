@@ -1,0 +1,12 @@
+@startuml
+TabDefault <|-- TabActuatorControl
+TabDefault <|-- TabAlarmWarn
+TabDefault <|-- TabCellStatus
+TabDefault <|-- TabConfigView
+TabDefault <|-- TabDetailedForce
+TabDefault <|-- TabDiagnostics
+TabDefault <|-- TabOverview
+TabDefault <|-- TabRigidBodyPos
+TabDefault <|-- TabUtilityView
+TabDefault <|-- TabLimitSwitchStatus
+@enduml

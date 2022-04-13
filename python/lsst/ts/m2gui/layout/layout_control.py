@@ -24,11 +24,12 @@ __all__ = ["LayoutControl"]
 from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout
 
+from . import LayoutDefault
 from ..utils import set_button
 from ..enums import LocalMode
 
 
-class LayoutControl(object):
+class LayoutControl(LayoutDefault):
     """Layout of the control panel.
 
     Parameters
@@ -48,28 +49,16 @@ class LayoutControl(object):
 
     def __init__(self, model, signal_control):
 
-        self.model = model
-
-        self._signal_control = signal_control
-        self._signal_control.is_control_updated.connect(self._callback_signal_control)
-
         # Remote button
         self._button_remote = None
 
         # Local button
         self._button_local = None
 
-        self.layout = self._set_layout()
+        super().__init__(model, signal_control)
 
     @Slot()
     def _callback_signal_control(self, is_control_updated):
-        """Callback of the control signal.
-
-        Parameters
-        ----------
-        is_control_updated : `bool`
-            Control is updated or not.
-        """
         if self.model.local_mode == LocalMode.Standby:
             self._update_buttons()
         else:
@@ -86,13 +75,6 @@ class LayoutControl(object):
         self._button_local.setEnabled(False)
 
     def _set_layout(self):
-        """Set the layout.
-
-        Returns
-        -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
-            Layout.
-        """
         self._button_remote = set_button("Remote", self._callback_remote)
         self._button_local = set_button("Local", self._callback_local)
 

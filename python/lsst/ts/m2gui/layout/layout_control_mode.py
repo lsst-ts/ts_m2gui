@@ -24,11 +24,12 @@ __all__ = ["LayoutControlMode"]
 from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout
 
+from . import LayoutDefault
 from ..utils import set_button
 from ..enums import LocalMode
 
 
-class LayoutControlMode(object):
+class LayoutControlMode(LayoutDefault):
     """Layout of the control mode.
 
     Parameters
@@ -48,28 +49,16 @@ class LayoutControlMode(object):
 
     def __init__(self, model, signal_control):
 
-        self.model = model
-
-        self._signal_control = signal_control
-        self._signal_control.is_control_updated.connect(self._callback_signal_control)
-
         # Open-loop button
         self._button_open_loop = None
 
         # Closed-loop button
         self._button_closed_loop = None
 
-        self.layout = self._set_layout()
+        super().__init__(model, signal_control)
 
     @Slot()
     def _callback_signal_control(self, is_control_updated):
-        """Callback of the control signal.
-
-        Parameters
-        ----------
-        is_control_updated : `bool`
-            Control is updated or not.
-        """
         if self.model.local_mode == LocalMode.Enable:
             self._update_buttons()
         else:
@@ -86,14 +75,6 @@ class LayoutControlMode(object):
         self._button_closed_loop.setEnabled(False)
 
     def _set_layout(self):
-        """Set the layout.
-
-        Returns
-        -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
-            Layout.
-        """
-
         self._button_open_loop = set_button(
             "Enter open-loop control", self._callback_open_loop
         )

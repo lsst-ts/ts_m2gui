@@ -35,6 +35,8 @@ class TabOverview(TabDefault):
     ----------
     title : `str`
         Table's title.
+    model : `Model`
+        Model class.
 
     Attributes
     ----------
@@ -42,10 +44,8 @@ class TabOverview(TabDefault):
         Model class.
     """
 
-    def __init__(self, title):
-        super().__init__(title)
-
-        self.model = None
+    def __init__(self, title, model):
+        super().__init__(title, model)
 
         # Message signal
         self._signal_message = None
@@ -69,8 +69,16 @@ class TabOverview(TabDefault):
 
         self.widget.setLayout(self._layout)
 
+        self._update_control_status()
+
     def _set_window_log(self):
-        """Set the log window."""
+        """Set the log window.
+
+        Returns
+        -------
+        window_log : `PySide2.QtWidgets.QPlainTextEdit`
+            Log message(s) window/widget.
+        """
 
         window_log = QPlainTextEdit()
         window_log.setPlaceholderText("Log Message")
@@ -100,19 +108,9 @@ class TabOverview(TabDefault):
 
     @Slot()
     def _callback_clear(self):
-        self._window_log.clear()
-
-    def set_model(self, model):
-        """Set the model.
-
-        Parameters
-        ----------
-        model : `Model`
-            Model class.
+        """Callback of the clear button - removes all log messages from widget.
         """
-
-        self.model = model
-        self._update_control_status()
+        self._window_log.clear()
 
     def set_signal_message(self, signal_message):
         """Set the message signal.

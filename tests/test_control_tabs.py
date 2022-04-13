@@ -20,18 +20,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import logging
 
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
 
-from lsst.ts.m2gui import ControlTabs
+from lsst.ts.m2gui import Model, ControlTabs
 
 
 class MockWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.layout_control_tabs = ControlTabs()
+        self.layout_control_tabs = ControlTabs(Model(logging.getLogger()))
 
         self.setLayout(self.layout_control_tabs.layout)
 
@@ -46,7 +47,7 @@ def widget(qtbot):
 
 
 def test_init(qtbot, widget):
-    assert widget.layout_control_tabs._list_widget.count() == 9
+    assert widget.layout_control_tabs._list_widget.count() == 10
 
 
 def test_get_tab(qtbot, widget):
@@ -98,6 +99,7 @@ def test_show(qtbot, widget):
         "Detailed Force",
         "Diagnostics",
         "Alarms/Warnings",
+        "Limit Switch Status",
     ]
 
     for name in names:

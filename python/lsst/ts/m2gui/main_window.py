@@ -23,6 +23,7 @@ __all__ = ["MainWindow"]
 
 import logging
 import sys
+import pathlib
 
 from PySide2 import QtCore
 from PySide2.QtWidgets import (
@@ -81,7 +82,7 @@ class MainWindow(QMainWindow):
         self._layout_control_mode = LayoutControlMode(self.model, self._signal_control)
 
         # Control tables
-        self._control_tabs = ControlTabs()
+        self._control_tabs = ControlTabs(self.model)
         self._set_control_tabs()
 
         # Set the main window of application
@@ -132,10 +133,27 @@ class MainWindow(QMainWindow):
 
     def _set_control_tabs(self):
         """Set the control tables"""
+
+        self._set_tab_overview()
+        self._set_tab_alarm_warn()
+
+    def _set_tab_overview(self):
+        """Set the table of overview."""
+
         tab_overview = self._control_tabs.get_tab("Overview")[1]
-        tab_overview.set_model(self.model)
         tab_overview.set_signal_control(self._signal_control)
         tab_overview.set_signal_message(self._signal_message)
+
+    def _set_tab_alarm_warn(self):
+        """Set the table of alarms and warnings."""
+
+        policy_dir = (
+            pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "policy"
+        )
+        filepath = policy_dir / "error_code_m2.tsv"
+
+        tab_alarm_warn = self._control_tabs.get_tab("Alarms/Warnings")[1]
+        tab_alarm_warn.read_error_list_file(filepath)
 
     def _create_layout(self):
         """Create the layout.

@@ -64,3 +64,8 @@ You can run the unit tests by:
 ```bash
 pytest tests/
 ```
+
+## Class Diagrams
+
+The class diagrams are in [here](doc/uml).
+You can use the [PlantUML](https://plantuml.com) to read them.
