@@ -77,7 +77,7 @@ class TabOverview(TabDefault):
         Returns
         -------
         window_log : `PySide2.QtWidgets.QPlainTextEdit`
-            Window of the log messages.
+            Log message(s) window/widget.
         """
 
         window_log = QPlainTextEdit()
@@ -108,7 +108,8 @@ class TabOverview(TabDefault):
 
     @Slot()
     def _callback_clear(self):
-        """Callback of the clear button to clear the log messages."""
+        """Callback of the clear button - removes all log messages from widget.
+        """
         self._window_log.clear()
 
     def set_signal_message(self, signal_message):
