@@ -19,20 +19,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
+__all__ = ["SignalLimitSwitch"]
 
-if typing.TYPE_CHECKING:
-    __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
+from PySide2 import QtCore
 
-from .enums import LocalMode, LimitSwitchType, Ring
-from .utils import set_button
-from .log_window_handler import LogWindowHandler
-from .fault_manager import FaultManager
-from .model import Model
-from .control_tabs import ControlTabs
-from .main_window import MainWindow
+
+class SignalLimitSwitch(QtCore.QObject):
+    """Status signal to send the event of limit switch status."""
+
+    # The type_name_status should be a tuple: (type, name, status). The data
+    # type of "type" is integer (enum "LimitSwitchType"), the data type of
+    # "name" is string, and the data type of "status" is bool. If the limit
+    # switch is triggered, put the "status" as True, otherwise, False.
+    type_name_status = QtCore.Signal(object)

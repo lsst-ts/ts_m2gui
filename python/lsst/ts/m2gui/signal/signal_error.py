@@ -28,7 +28,7 @@ class SignalError(QtCore.QObject):
     """Error signal to send the error code."""
 
     # New error codes
-    error_codes_new = QtCore.Signal(object)
+    error_new = QtCore.Signal(int)
 
     # Cleared error codes
-    error_codes_cleared = QtCore.Signal(object)
+    error_cleared = QtCore.Signal(int)

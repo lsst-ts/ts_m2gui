@@ -22,3 +22,5 @@
 from .signal_control import SignalControl
 from .signal_message import SignalMessage
 from .signal_error import SignalError
+from .signal_status import SignalStatus
+from .signal_limit_switch import SignalLimitSwitch
