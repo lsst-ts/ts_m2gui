@@ -19,13 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .tab_default import TabDefault
-from .tab_actuator_control import TabActuatorControl
-from .tab_alarm_warn import TabAlarmWarn
-from .tab_cell_status import TabCellStatus
-from .tab_config_view import TabConfigView
-from .tab_detailed_force import TabDetailedForce
-from .tab_diagnostics import TabDiagnostics
-from .tab_overview import TabOverview
-from .tab_rigid_body_pos import TabRigidBodyPos
-from .tab_utility_view import TabUtilityView
+__all__ = ["SignalStatus"]
+
+from PySide2 import QtCore
+
+
+class SignalStatus(QtCore.QObject):
+    """Status signal to send the event of system status."""
+
+    # The name_status should be a tuple: (name, status). The data type of name
+    # is string and the data type of status is bool.
+    name_status = QtCore.Signal(object)

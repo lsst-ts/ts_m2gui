@@ -117,12 +117,14 @@ class LayoutLocalMode(LayoutDefault):
     def _callback_standby(self):
         """Callback of the standby button. The system will transition to the
         standby state."""
+        self.model.disable_open_loop_max_limit()
         self.set_local_mode(LocalMode.Standby)
 
     @Slot()
     def _callback_diagnostic(self):
         """Callback of the diagnostic button. The system will transition to the
         diagnostic state."""
+        self.model.disable_open_loop_max_limit()
         self.set_local_mode(LocalMode.Diagnostic)
 
     @Slot()

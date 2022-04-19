@@ -98,6 +98,7 @@ class LayoutControlMode(LayoutDefault):
     def _callback_closed_loop(self):
         """Callback of the closed-loop button. The system will turn off the
         force balance system."""
+        self.model.disable_open_loop_max_limit()
         self.switch_force_balance_system(True)
 
     def switch_force_balance_system(self, status):

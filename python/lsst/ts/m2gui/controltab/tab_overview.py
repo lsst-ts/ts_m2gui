@@ -21,8 +21,9 @@
 
 __all__ = ["TabOverview"]
 
-from PySide2.QtCore import Slot
+from PySide2.QtCore import Slot, Qt
 from PySide2.QtWidgets import QVBoxLayout, QLabel, QPlainTextEdit
+from PySide2.QtGui import QPalette
 
 from ..utils import set_button
 from . import TabDefault
@@ -58,6 +59,9 @@ class TabOverview(TabDefault):
         self._label_control_mode = QLabel()
         self._label_local_mode = QLabel()
 
+        # Indicators of the system status
+        self._indicators_status = self._set_indicators_status()
+
         # Window to show the log message
         self._window_log = self._set_window_log()
 
@@ -70,6 +74,80 @@ class TabOverview(TabDefault):
         self.widget.setLayout(self._layout)
 
         self._update_control_status()
+
+        self._set_signal_status(self.model.signal_status)
+
+    def _set_indicators_status(self):
+        """Set the indicators of system status.
+
+        Returns
+        -------
+        indicators_status : `dict`
+            Indicators of the system status.
+        """
+
+        indicators_status = dict()
+        for name in self.model.system_status.keys():
+            indicators_status[name] = set_button(name, None, is_indicator=True)
+
+        # Adjust the width of indicators and fill the default color
+        width_max = 0
+        for indicator in indicators_status.values():
+            indicator.adjustSize()
+            width_indicator = indicator.width()
+            if width_max < indicator.width():
+                width_max = width_indicator
+
+            self._update_indicator_color(indicator, False)
+
+        for indicator in indicators_status.values():
+            indicator.setMaximumWidth(width_max)
+
+        return indicators_status
+
+    def _update_indicator_color(self, indicator, is_status_on):
+        """Update the color of indicator.
+
+        Parameters
+        ----------
+        indicator : `PySide2.QtWidgets.QPushButton`
+            Indicator.
+        is_status_on : `bool`
+            The status is on or off.
+        """
+
+        palette = indicator.palette()
+
+        if is_status_on:
+            palette.setColor(
+                QPalette.Button, self._get_indicator_color_status_on(indicator)
+            )
+        else:
+            palette.setColor(QPalette.Button, Qt.gray)
+
+        indicator.setPalette(palette)
+
+    def _get_indicator_color_status_on(self, indicator):
+        """Get the indicator color of the "ON" status.
+
+        This function is to handle the condition that some indicators need the
+        different color than others.
+
+        Parameters
+        ----------
+        indicator : `PySide2.QtWidgets.QPushButton`
+            Indicator.
+
+        Returns
+        -------
+        `PySide2.QtCore.Qt.GlobalColor`
+            Color of indicator.
+        """
+
+        if indicator.text() == "isAlarmWarningOn":
+            return Qt.red
+        else:
+            return Qt.green
 
     def _set_window_log(self):
         """Set the log window.
@@ -101,6 +179,10 @@ class TabOverview(TabDefault):
         layout.addWidget(self._label_control)
         layout.addWidget(self._label_control_mode)
         layout.addWidget(self._label_local_mode)
+
+        for indicator in self._indicators_status.values():
+            layout.addWidget(indicator)
+
         layout.addWidget(self._window_log)
         layout.addWidget(self._button_clear)
 
@@ -108,8 +190,8 @@ class TabOverview(TabDefault):
 
     @Slot()
     def _callback_clear(self):
-        """Callback of the clear button - removes all log messages from widget.
-        """
+        """Callback of the clear button - removes all log messages from the
+        widget."""
         self._window_log.clear()
 
     def set_signal_message(self, signal_message):
@@ -151,6 +233,32 @@ class TabOverview(TabDefault):
             else "Control Loop: Open-Loop Control"
         )
         self._label_local_mode.setText(text_local_mode)
+
+    def _set_signal_status(self, signal_status):
+        """Set the status signal.
+
+        Parameters
+        ----------
+        signal_status : `SignalStatus`
+            Signal to know the system status is updated or not.
+        """
+
+        signal_status.name_status.connect(self._callback_signal_status)
+
+    @Slot()
+    def _callback_signal_status(self, name_status):
+        """Callback of the status signal.
+
+        Parameters
+        ----------
+        name_status : `tuple`
+            A tuple: (name, status). The data type of name is string and the
+            data type of status is bool.
+        """
+
+        self._update_indicator_color(
+            self._indicators_status[name_status[0]], name_status[1]
+        )
 
     def set_signal_control(self, signal_control):
         """Set the control signal.
