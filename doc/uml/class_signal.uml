@@ -2,4 +2,6 @@
 class SignalControl
 class SignalMessage
 class SignalError
+class SignalStatus
+class SignalLimitSwitch
 @enduml

@@ -7,6 +7,8 @@ package "signal" #DDDDDD {
   class SignalControl
   class SignalMessage
   class SignalError
+  class SignalStatus
+  class SignalLimitSwitch
 }
 
 package "controltab" #DDDDDD {
@@ -20,7 +22,10 @@ MainWindow *-- SignalControl
 MainWindow *-- SignalMessage
 MainWindow ..> LogWindowHandler
 
-Model *-- SignalError
+Model *-- FaultManager
+Model *-- SignalStatus
+FaultManager *-- SignalError
+FaultManager *-- SignalLimitSwitch
 
 LayoutDefault *-- Model
 LayoutDefault *-- SignalControl
@@ -28,7 +33,7 @@ LayoutDefault *-- SignalControl
 LogWindowHandler *-- SignalMessage
 
 ControlTabs ..> Model
-ControlTabs "1" *-- "10" TabDefault
+ControlTabs "1" *-- "9" TabDefault
 
 TabDefault *-- Model
 @enduml

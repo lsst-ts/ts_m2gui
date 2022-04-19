@@ -8,5 +8,4 @@ TabDefault <|-- TabDiagnostics
 TabDefault <|-- TabOverview
 TabDefault <|-- TabRigidBodyPos
 TabDefault <|-- TabUtilityView
-TabDefault <|-- TabLimitSwitchStatus
 @enduml
