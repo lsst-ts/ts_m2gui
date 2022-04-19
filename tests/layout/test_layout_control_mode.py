@@ -80,9 +80,20 @@ def test_switch_force_balance_system(qtbot, widget):
     assert widget.layout_control_mode._button_open_loop.isEnabled() is False
     assert widget.layout_control_mode._button_closed_loop.isEnabled() is True
 
+    widget.layout_control_mode.model.enable_open_loop_max_limit()
+    assert (
+        widget.layout_control_mode.model.system_status["isOpenLoopMaxLimitsEnabled"]
+        is True
+    )
+
     qtbot.mouseClick(
         widget.layout_control_mode._button_closed_loop, QtCore.Qt.LeftButton
     )
     assert widget.layout_control_mode.model.is_closed_loop is True
     assert widget.layout_control_mode._button_open_loop.isEnabled() is True
     assert widget.layout_control_mode._button_closed_loop.isEnabled() is False
+
+    assert (
+        widget.layout_control_mode.model.system_status["isOpenLoopMaxLimitsEnabled"]
+        is False
+    )

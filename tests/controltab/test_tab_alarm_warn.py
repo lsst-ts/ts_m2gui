@@ -23,10 +23,11 @@ import pytest
 import logging
 import pathlib
 
-from lsst.ts.m2gui import Model
-from lsst.ts.m2gui.controltab import TabAlarmWarn
-
 from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette
+
+from lsst.ts.m2gui import Model, LimitSwitchType, Ring
+from lsst.ts.m2gui.controltab import TabAlarmWarn
 
 
 def get_error_list_file():
@@ -54,6 +55,19 @@ def test_init(qtbot, widget):
     assert widget._text_error_cause.placeholderText() == "Possible Error Cause"
     assert widget._text_error_cause.isReadOnly() is True
 
+    for limit_switch_status in (
+        widget._indicators_limit_switch_retract,
+        widget._indicators_limit_switch_extend,
+    ):
+        for indicator in limit_switch_status.values():
+            assert indicator.isEnabled() is False
+            assert indicator.autoFillBackground() is True
+
+            palette = indicator.palette()
+            color = palette.color(QPalette.Button)
+
+            assert color == Qt.green
+
 
 def test_callback_selection_changed(qtbot, widget):
 
@@ -62,7 +76,9 @@ def test_callback_selection_changed(qtbot, widget):
     # Select the first error code
     center = _get_widget_item_center(widget, "6054")
     qtbot.mouseClick(
-        widget._table_error.viewport(), Qt.LeftButton, pos=center,
+        widget._table_error.viewport(),
+        Qt.LeftButton,
+        pos=center,
     )
 
     assert (
@@ -73,7 +89,9 @@ def test_callback_selection_changed(qtbot, widget):
     # Select the second error code
     center = _get_widget_item_center(widget, "6052")
     qtbot.mouseClick(
-        widget._table_error.viewport(), Qt.LeftButton, pos=center,
+        widget._table_error.viewport(),
+        Qt.LeftButton,
+        pos=center,
     )
 
     assert (
@@ -84,7 +102,9 @@ def test_callback_selection_changed(qtbot, widget):
     # There should be no change of text
     center = _get_widget_item_center(widget, "Actuator ILC Read Error")
     qtbot.mouseClick(
-        widget._table_error.viewport(), Qt.LeftButton, pos=center,
+        widget._table_error.viewport(),
+        Qt.LeftButton,
+        pos=center,
     )
 
     assert (
@@ -102,18 +122,15 @@ def _get_widget_item_center(widget, item_text):
 
 def test_callback_signal_error_new(qtbot, widget):
 
-    widget.model.signal_error.error_codes_new.emit([1, 6051, 6052])
-    assert widget._errors == {1, 6051, 6052}
+    widget.model.add_error(6051)
 
     color_6051 = _get_widget_item_color(widget, "6051")
-    assert color_6051.getRgb() == (255, 0, 0, 255)
+    assert color_6051 == Qt.red
+
+    widget.model.add_error(6052)
 
     color_6052 = _get_widget_item_color(widget, "6052")
-    assert color_6052.getRgb() == (249, 229, 109, 255)
-
-    # Test the errors should be unique
-    widget.model.signal_error.error_codes_new.emit([1, 6052, 6054, 6055])
-    assert widget._errors == {1, 6051, 6052, 6054, 6055}
+    assert color_6052 == Qt.yellow
 
 
 def _get_widget_item_color(widget, item_text):
@@ -124,23 +141,13 @@ def _get_widget_item_color(widget, item_text):
 
 def test_callback_signal_error_cleared(qtbot, widget):
 
-    # Nothing is cleared
-    widget.model.signal_error.error_codes_cleared.emit([1, 6051, 6052])
-    assert widget._errors == set()
+    widget.model.add_error(6051)
 
-    # Internal errors list is updated
-    widget.model.signal_error.error_codes_new.emit([1, 6051, 6052])
-
-    widget.model.signal_error.error_codes_cleared.emit([6051, 6052])
-    assert widget._errors == {1}
+    widget.model.clear_error(6051)
 
     # Color should be white
     color_6051 = _get_widget_item_color(widget, "6051")
-    assert color_6051.getRgb() == (255, 255, 255, 255)
-
-    # Internal errors list is updated again
-    widget.model.signal_error.error_codes_cleared.emit([1, 6051, 6052])
-    assert widget._errors == set()
+    assert color_6051 == Qt.white
 
 
 def test_callback_reset(qtbot, widget):
@@ -148,24 +155,53 @@ def test_callback_reset(qtbot, widget):
     # Update the text of error cause
     center = _get_widget_item_center(widget, "6054")
     qtbot.mouseClick(
-        widget._table_error.viewport(), Qt.LeftButton, pos=center,
+        widget._table_error.viewport(),
+        Qt.LeftButton,
+        pos=center,
     )
 
     # Highlight the error
-    widget.model.signal_error.error_codes_new.emit([6051])
+    widget.model.add_error(6051)
+
+    # Trigger the limit switch
+    widget.model.fault_manager.update_limit_switch_status(
+        LimitSwitchType.Extend, Ring.C, 3, True
+    )
 
     # Click the reset button
     qtbot.mouseClick(widget._button_reset, Qt.LeftButton)
 
+    # Check the text of error cause should be cleared
     assert widget._text_error_cause.toPlainText() == ""
 
+    # Check the color of error code should be default
     color_6051 = _get_widget_item_color(widget, "6051")
-    assert color_6051.getRgb() == (255, 255, 255, 255)
+    assert color_6051 == Qt.white
 
-    assert widget._errors == set()
+    assert widget.model.fault_manager.errors == set()
+
+    # Check the color of limit switch should be default
+    indicator = widget._indicators_limit_switch_extend["C3"]
+    palette = indicator.palette()
+    color = palette.color(QPalette.Button)
+
+    assert color == Qt.green
 
 
 def test_set_error_item_color_error(qtbot, widget):
 
     with pytest.raises(ValueError):
         widget._set_error_item_color(None, "wrong_status")
+
+
+def test_callback_signal_limit_switch(qtbot, widget):
+
+    widget.model.fault_manager.update_limit_switch_status(
+        LimitSwitchType.Extend, Ring.C, 3, True
+    )
+
+    indicator = widget._indicators_limit_switch_extend["C3"]
+    palette = indicator.palette()
+    color = palette.color(QPalette.Button)
+
+    assert color == Qt.red

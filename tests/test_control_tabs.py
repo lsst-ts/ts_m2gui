@@ -47,7 +47,7 @@ def widget(qtbot):
 
 
 def test_init(qtbot, widget):
-    assert widget.layout_control_tabs._list_widget.count() == 10
+    assert widget.layout_control_tabs._list_widget.count() == 9
 
 
 def test_get_tab(qtbot, widget):
@@ -99,7 +99,6 @@ def test_show(qtbot, widget):
         "Detailed Force",
         "Diagnostics",
         "Alarms/Warnings",
-        "Limit Switch Status",
     ]
 
     for name in names:
@@ -116,7 +115,8 @@ def test_show(qtbot, widget):
         )
 
         qtbot.mouseClick(
-            widget.layout_control_tabs._button_show, QtCore.Qt.LeftButton,
+            widget.layout_control_tabs._button_show,
+            QtCore.Qt.LeftButton,
         )
 
         assert tab_item.isSelected() is True
