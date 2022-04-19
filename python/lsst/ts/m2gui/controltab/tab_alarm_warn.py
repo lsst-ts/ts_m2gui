@@ -30,9 +30,15 @@ from PySide2.QtWidgets import (
     QTableWidgetItem,
     QHeaderView,
     QPlainTextEdit,
+    QLabel,
+    QWidget,
+    QHBoxLayout,
+    QScrollArea,
 )
+from PySide2.QtGui import QPalette
 
-from ..utils import set_button, get_rgb_from_hex, colors
+from ..utils import set_button
+from ..enums import LimitSwitchType, Ring
 from . import TabDefault
 
 
@@ -64,6 +70,14 @@ class TabAlarmWarn(TabDefault):
         # Text of the possible error cause
         self._text_error_cause = self._set_text_error_cause()
 
+        # Indicators of the limit switch
+        self._indicators_limit_switch_retract = self._set_indicators_limit_switch(
+            LimitSwitchType.Retract
+        )
+        self._indicators_limit_switch_extend = self._set_indicators_limit_switch(
+            LimitSwitchType.Extend
+        )
+
         # Reset all alarms and warnings
         self._button_reset = None
 
@@ -75,10 +89,9 @@ class TabAlarmWarn(TabDefault):
 
         self.widget.setLayout(self._layout)
 
-        # Highlighted errors
-        self._errors = set()
-
-        self._set_signal_error(self.model.signal_error)
+        # Set the callbacks of signals
+        self._set_signal_error(self.model.fault_manager.signal_error)
+        self._set_signal_limit_switch(self.model.fault_manager.signal_limit_switch)
 
     def _set_table(self):
         """Set the table widget.
@@ -135,6 +148,63 @@ class TabAlarmWarn(TabDefault):
 
         return text_error_cause
 
+    def _set_indicators_limit_switch(self, limit_switch_type):
+        """Set the indicators of limit switch.
+
+        Parameters
+        ----------
+        limit_switch_type : enum `LimitSwitchType`
+            Type of limit switch.
+
+        Returns
+        -------
+        indicators : `dict`
+            Indicators of limit switch.
+
+        Raises
+        ------
+        ValueError
+            Unsupported limit switch type.
+        """
+
+        if limit_switch_type == LimitSwitchType.Retract:
+            limit_switch_status = self.model.fault_manager.limit_switch_status_retract
+        elif limit_switch_type == LimitSwitchType.Extend:
+            limit_switch_status = self.model.fault_manager.limit_switch_status_extend
+        else:
+            raise ValueError(f"Unsupported limit switch type: {limit_switch_type!r}.")
+
+        indicators = dict()
+        for name in limit_switch_status.keys():
+            indicator = set_button(name, None, is_indicator=True)
+            indicator.adjustSize()
+
+            self._update_indicator_color(indicator, False)
+
+            indicators[name] = indicator
+
+        return indicators
+
+    def _update_indicator_color(self, indicator, is_fault):
+        """Update the color of indicator.
+
+        Parameters
+        ----------
+        indicator : `PySide2.QtWidgets.QPushButton`
+            Indicator.
+        is_fault : `bool`
+            Is in fault or not.
+        """
+
+        palette = indicator.palette()
+
+        if is_fault:
+            palette.setColor(QPalette.Button, Qt.red)
+        else:
+            palette.setColor(QPalette.Button, Qt.green)
+
+        indicator.setPalette(palette)
+
     def _set_layout(self):
         """Set the layout.
 
@@ -146,14 +216,80 @@ class TabAlarmWarn(TabDefault):
 
         self._button_reset = set_button("Reset All Items", self._callback_reset)
         self._button_enable_open_loop_max_limit = set_button(
-            "Enable OL Max Limits", self._callback_enable_open_loop_max_limit
+            "Enable Open-Loop Max Limits", self._callback_enable_open_loop_max_limit
         )
 
         layout = QVBoxLayout()
         layout.addWidget(self._table_error)
         layout.addWidget(self._text_error_cause)
+        layout.addWidget(QLabel("Limit Switch Status"))
+        layout.addWidget(self._get_widget_limit_switch())
         layout.addWidget(self._button_reset)
         layout.addWidget(self._button_enable_open_loop_max_limit)
+
+        return layout
+
+    def _get_widget_limit_switch(self):
+        """Get the widget of limit switch.
+
+        Returns
+        -------
+        scroll_area : `PySide2.QtWidgets.QScrollArea`
+            Widget of limit switch.
+        """
+
+        widget = QWidget()
+
+        layout = QHBoxLayout(widget)
+        for ring in (Ring.B, Ring.C, Ring.D, Ring.A):
+            layout.addLayout(
+                self._get_layout_limit_switch_specific_ring(
+                    LimitSwitchType.Retract, ring
+                )
+            )
+            layout.addLayout(
+                self._get_layout_limit_switch_specific_ring(
+                    LimitSwitchType.Extend, ring
+                )
+            )
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(widget)
+
+        return scroll_area
+
+    def _get_layout_limit_switch_specific_ring(self, limit_switch_type, ring):
+        """Get the layout of limit switch in specific ring.
+
+        Parameters
+        ----------
+        limit_switch_type : enum `LimitSwitchType`
+            Type of limit switch.
+        ring : enum `Ring`
+            Name of ring.
+
+        Returns
+        -------
+        layout : `PySide2.QtWidgets.QVBoxLayout`
+            Layout of limit switch.
+        """
+
+        if limit_switch_type == LimitSwitchType.Retract:
+            indicators = self._indicators_limit_switch_retract
+            label = QLabel("Retract")
+        elif limit_switch_type == LimitSwitchType.Extend:
+            indicators = self._indicators_limit_switch_extend
+            label = QLabel("Extent")
+        else:
+            raise ValueError(f"Unsupported limit switch type: {limit_switch_type!r}.")
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+
+        layout.addWidget(label)
+        for name, indicator in indicators.items():
+            if name.startswith(ring.name):
+                layout.addWidget(indicator)
 
         return layout
 
@@ -164,25 +300,6 @@ class TabAlarmWarn(TabDefault):
         self._text_error_cause.clear()
 
         self.model.reset_errors()
-
-        self._deemphasize_errors(self._errors)
-        self._errors = set()
-
-    def _deemphasize_errors(self, error_codes):
-        """Deemphasize errors.
-
-        Parameters
-        ----------
-        error_codes : `set [int]`
-            Error codes.
-        """
-
-        default_color = get_rgb_from_hex(colors["White"])
-        for error_code in error_codes:
-            items = self._table_error.findItems(str(error_code), Qt.MatchExactly)
-            if len(items) != 0:
-                item = items[0]
-                item.setBackground(default_color)
 
     @Slot()
     def _callback_enable_open_loop_max_limit(self):
@@ -199,39 +316,25 @@ class TabAlarmWarn(TabDefault):
             Signal of the error.
         """
 
-        signal_error.error_codes_new.connect(self._callback_signal_error_new)
-        signal_error.error_codes_cleared.connect(self._callback_signal_error_cleared)
+        signal_error.error_new.connect(self._callback_signal_error_new)
+        signal_error.error_cleared.connect(self._callback_signal_error_cleared)
 
     @Slot()
-    def _callback_signal_error_new(self, error_codes):
-        """Callback of the error signal for the new errors.
+    def _callback_signal_error_new(self, error_code):
+        """Callback of the error signal for the new error. This function will
+        highlight the error.
 
         Parameters
         ----------
-        error_codes : `list [int]`
-            New error codes.
+        error_code : `int`
+            New error code.
         """
 
-        new_errors = set(error_codes).difference(self._errors)
-        self._highlight_errors(new_errors)
-
-        self._errors.update(new_errors)
-
-    def _highlight_errors(self, error_codes):
-        """highlight the errors.
-
-        Parameters
-        ----------
-        error_codes : `set [int]`
-            Error codes.
-        """
-
-        for error_code in error_codes:
-            items = self._table_error.findItems(str(error_code), Qt.MatchExactly)
-            if len(items) != 0:
-                error_detail = self._error_list[str(error_code)]
-                status = error_detail[1].strip()
-                self._set_error_item_color(items[0], status)
+        items = self._table_error.findItems(str(error_code), Qt.MatchExactly)
+        if len(items) != 0:
+            error_detail = self._error_list[str(error_code)]
+            status = error_detail[1].strip()
+            self._set_error_item_color(items[0], status)
 
     def _set_error_item_color(self, item, status):
         """Set the error/warning item with specific color.
@@ -250,26 +353,60 @@ class TabAlarmWarn(TabDefault):
         """
 
         if status == "Fault":
-            item.setBackground(get_rgb_from_hex(colors["Red"]))
+            item.setBackground(Qt.red)
         elif status == "Warning":
-            item.setBackground(get_rgb_from_hex(colors["Yellow"]))
+            item.setBackground(Qt.yellow)
         else:
             raise ValueError(f"Unsupported status: {status} to highlight the error.")
 
     @Slot()
-    def _callback_signal_error_cleared(self, error_codes):
-        """Callback of the error signal for the cleared errors.
+    def _callback_signal_error_cleared(self, error_code):
+        """Callback of the error signal for the cleared error. This function
+        will deemphasize the error.
 
         Parameters
         ----------
-        error_codes : `list [int]`
-            Cleared error codes.
+        error_code : `int`
+            Cleared error code.
         """
 
-        cleared_errors = self._errors.intersection(error_codes)
-        self._deemphasize_errors(cleared_errors)
+        items = self._table_error.findItems(str(error_code), Qt.MatchExactly)
+        if len(items) != 0:
+            item = items[0]
+            item.setBackground(Qt.white)
 
-        self._errors.difference_update(cleared_errors)
+    def _set_signal_limit_switch(self, signal_limit_switch):
+        """Set the limit switch signal with callback function.
+
+        Parameters
+        ----------
+        signal_limit_switch : `SignalLimitSwitch`
+            Signal of the limit switch.
+        """
+
+        signal_limit_switch.type_name_status.connect(self._callback_signal_limit_switch)
+
+    @Slot()
+    def _callback_signal_limit_switch(self, type_name_status):
+        """Callback of the limit switch signal.
+
+        Parameters
+        ----------
+        type_name_status : `tuple`
+            A tuple: (type, name, status). The data type of type is integer
+            (enum `LimitSwitchType`), the data type of name is string, and the
+            data type of status is bool.
+        """
+
+        limit_switch_type = LimitSwitchType(type_name_status[0])
+        if limit_switch_type == LimitSwitchType.Retract:
+            indicators = self._indicators_limit_switch_retract
+        elif limit_switch_type == LimitSwitchType.Extend:
+            indicators = self._indicators_limit_switch_extend
+
+        name = type_name_status[1]
+        is_fault = type_name_status[2]
+        self._update_indicator_color(indicators[name], is_fault)
 
     def read_error_list_file(self, filepath):
         """Read the tsv file of error list.
