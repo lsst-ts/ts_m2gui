@@ -9,7 +9,7 @@
 
 - pyside2 (install by `conda`)
 - qt5-qtbase-devel (install by `yum`)
-- [black](https://github.com/psf/black) (19.10b0, optional)
+- [black](https://github.com/psf/black) (22.3.0, optional)
 - [documenteer](https://github.com/lsst-sqre/documenteer) (optional)
 - pytest (optional, install by `conda`)
 - pytest-flake8 (optional, install by `conda -c conda-forge`)
