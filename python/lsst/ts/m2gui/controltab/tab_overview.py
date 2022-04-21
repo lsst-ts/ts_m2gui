@@ -71,7 +71,8 @@ class TabOverview(TabDefault):
         # Internal layout
         self._layout = self._set_layout()
 
-        self.widget.setLayout(self._layout)
+        widget = self.widget()
+        widget.setLayout(self._layout)
 
         self._update_control_status()
 

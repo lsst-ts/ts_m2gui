@@ -36,8 +36,6 @@ class TabDefault(QDockWidget):
 
     Attributes
     ----------
-    widget : `PySide2.QtWidgets.QWidget`
-        Widget.
     model : `Model`
         Model class.
     """
@@ -46,7 +44,6 @@ class TabDefault(QDockWidget):
         super().__init__()
         self.setWindowTitle(title)
 
-        self.widget = QWidget()
-        self.setWidget(self.widget)
+        self.setWidget(QWidget())
 
         self.model = model

@@ -87,7 +87,8 @@ class TabAlarmWarn(TabDefault):
         # Internal layout
         self._layout = self._set_layout()
 
-        self.widget.setLayout(self._layout)
+        widget = self.widget()
+        widget.setLayout(self._layout)
 
         # Set the callbacks of signals
         self._set_signal_error(self.model.fault_manager.signal_error)
