@@ -33,9 +33,8 @@ from PySide2.QtWidgets import (
 )
 
 from .utils import set_button
-from .signal import SignalMessage, SignalControl
 from .layout import LayoutControl, LayoutLocalMode, LayoutControlMode
-from . import Model, ControlTabs, LogWindowHandler
+from . import Model, ControlTabs, LogWindowHandler, SignalMessage, SignalControl
 
 
 class MainWindow(QMainWindow):

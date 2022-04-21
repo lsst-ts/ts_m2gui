@@ -22,8 +22,7 @@
 __all__ = ["Model"]
 
 from .enums import LocalMode, LimitSwitchType, Ring
-from .signal import SignalStatus
-from . import FaultManager
+from . import SignalStatus, FaultManager
 
 
 class Model(object):

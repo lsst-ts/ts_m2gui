@@ -19,9 +19,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["SignalError"]
+__all__ = [
+    "SignalControl",
+    "SignalError",
+    "SignalLimitSwitch",
+    "SignalMessage",
+    "SignalStatus",
+]
 
 from PySide2 import QtCore
+
+
+class SignalControl(QtCore.QObject):
+    """Control signal to send the event that the control is updated or
+    not."""
+
+    is_control_updated = QtCore.Signal(bool)
 
 
 class SignalError(QtCore.QObject):
@@ -32,3 +45,27 @@ class SignalError(QtCore.QObject):
 
     # Cleared error codes
     error_cleared = QtCore.Signal(int)
+
+
+class SignalLimitSwitch(QtCore.QObject):
+    """Status signal to send the event of limit switch status."""
+
+    # The type_name_status should be a tuple: (type, name, status). The data
+    # type of "type" is integer (enum "LimitSwitchType"), the data type of
+    # "name" is string, and the data type of "status" is bool. If the limit
+    # switch is triggered, put the "status" as True, otherwise, False.
+    type_name_status = QtCore.Signal(object)
+
+
+class SignalMessage(QtCore.QObject):
+    """Message signal to send the message event."""
+
+    message = QtCore.Signal(str)
+
+
+class SignalStatus(QtCore.QObject):
+    """Status signal to send the event of system status."""
+
+    # The name_status should be a tuple: (name, status). The data type of name
+    # is string and the data type of status is bool.
+    name_status = QtCore.Signal(object)

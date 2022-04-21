@@ -3,14 +3,6 @@ package "layout" #DDDDDD {
   class LayoutDefault
 }
 
-package "signal" #DDDDDD {
-  class SignalControl
-  class SignalMessage
-  class SignalError
-  class SignalStatus
-  class SignalLimitSwitch
-}
-
 package "controltab" #DDDDDD {
   class TabDefault
 }

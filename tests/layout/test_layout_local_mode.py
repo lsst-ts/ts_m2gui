@@ -26,8 +26,7 @@ import logging
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
 
-from lsst.ts.m2gui import Model, LocalMode
-from lsst.ts.m2gui.signal import SignalControl
+from lsst.ts.m2gui import Model, LocalMode, SignalControl
 from lsst.ts.m2gui.layout import LayoutLocalMode
 
 

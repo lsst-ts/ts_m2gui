@@ -25,8 +25,7 @@ import logging
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 
-from lsst.ts.m2gui import Model, LocalMode
-from lsst.ts.m2gui.signal import SignalMessage
+from lsst.ts.m2gui import Model, LocalMode, SignalMessage
 from lsst.ts.m2gui.controltab import TabOverview
 
 
