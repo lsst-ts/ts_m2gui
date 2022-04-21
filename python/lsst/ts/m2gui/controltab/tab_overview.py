@@ -88,12 +88,13 @@ class TabOverview(TabDefault):
 
         indicators_status = dict()
         for name in self.model.system_status.keys():
-            indicators_status[name] = set_button(name, None, is_indicator=True)
+            indicators_status[name] = set_button(
+                name, None, is_indicator=True, is_adjust_size=True
+            )
 
         # Adjust the width of indicators and fill the default color
         width_max = 0
         for indicator in indicators_status.values():
-            indicator.adjustSize()
             width_indicator = indicator.width()
             if width_max < indicator.width():
                 width_max = width_indicator

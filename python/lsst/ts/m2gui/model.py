@@ -160,8 +160,8 @@ class Model(object):
         self._check_error_and_update_status()
 
     def _check_error_and_update_status(self):
-        """Check the error is on or not, and update the internal related
-        status."""
+        """Check whenever the error is triggered, and update the related
+        internal status."""
 
         is_error_on = self.fault_manager.has_error()
         self.update_system_status("isAlarmWarningOn", is_error_on)

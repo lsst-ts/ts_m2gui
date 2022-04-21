@@ -28,7 +28,9 @@ from PySide2.QtWidgets import QPushButton
 from PySide2.QtGui import QPalette
 
 
-def set_button(name, callback, *args, is_checkable=False, is_indicator=False):
+def set_button(
+    name, callback, *args, is_checkable=False, is_indicator=False, is_adjust_size=False
+):
     """Set the button.
 
     Parameters
@@ -46,6 +48,8 @@ def set_button(name, callback, *args, is_checkable=False, is_indicator=False):
     is_indicator : `bool`, optional
         The button is indicator or not. Put the callback to be None if the
         value is True. (the default is False)
+    is_adjust_size : `bool`, optional
+        Adjust the size of button or not. (the default is False)
 
     Returns
     -------
@@ -68,5 +72,8 @@ def set_button(name, callback, *args, is_checkable=False, is_indicator=False):
         palette.setColor(QPalette.ButtonText, Qt.black)
 
         button.setPalette(palette)
+
+    if is_adjust_size:
+        button.adjustSize()
 
     return button

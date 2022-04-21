@@ -71,10 +71,10 @@ class TabAlarmWarn(TabDefault):
         self._text_error_cause = self._set_text_error_cause()
 
         # Indicators of the limit switch
-        self._indicators_limit_switch_retract = self._set_indicators_limit_switch(
+        self._indicators_limit_switch_retract = self._create_indicators_limit_switch(
             LimitSwitchType.Retract
         )
-        self._indicators_limit_switch_extend = self._set_indicators_limit_switch(
+        self._indicators_limit_switch_extend = self._create_indicators_limit_switch(
             LimitSwitchType.Extend
         )
 
@@ -148,8 +148,8 @@ class TabAlarmWarn(TabDefault):
 
         return text_error_cause
 
-    def _set_indicators_limit_switch(self, limit_switch_type):
-        """Set the indicators of limit switch.
+    def _create_indicators_limit_switch(self, limit_switch_type):
+        """Creates indicators for limit switches.
 
         Parameters
         ----------
@@ -176,8 +176,7 @@ class TabAlarmWarn(TabDefault):
 
         indicators = dict()
         for name in limit_switch_status.keys():
-            indicator = set_button(name, None, is_indicator=True)
-            indicator.adjustSize()
+            indicator = set_button(name, None, is_indicator=True, is_adjust_size=True)
 
             self._update_indicator_color(indicator, False)
 
