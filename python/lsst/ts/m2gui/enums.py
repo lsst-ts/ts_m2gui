@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["LocalMode"]
+__all__ = ["LocalMode", "LimitSwitchType", "Ring"]
 
 from enum import IntEnum, auto
 
@@ -28,3 +28,15 @@ class LocalMode(IntEnum):
     Standby = 1
     Diagnostic = auto()
     Enable = auto()
+
+
+class LimitSwitchType(IntEnum):
+    Retract = 1
+    Extend = auto()
+
+
+class Ring(IntEnum):
+    A = 1
+    B = auto()
+    C = auto()
+    D = auto()

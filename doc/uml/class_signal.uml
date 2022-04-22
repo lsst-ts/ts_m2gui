@@ -1,5 +1,0 @@
-@startuml
-class SignalControl
-class SignalMessage
-class SignalError
-@enduml

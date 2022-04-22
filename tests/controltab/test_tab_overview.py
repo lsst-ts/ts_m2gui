@@ -22,10 +22,10 @@
 import pytest
 import logging
 
-from PySide2 import QtCore
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette
 
-from lsst.ts.m2gui import Model, LocalMode
-from lsst.ts.m2gui.signal import SignalMessage
+from lsst.ts.m2gui import Model, LocalMode, SignalMessage
 from lsst.ts.m2gui.controltab import TabOverview
 
 
@@ -47,6 +47,15 @@ def test_init(qtbot, widget):
 
     assert widget._window_log.isReadOnly() is True
     assert widget._window_log.placeholderText() == "Log Message"
+
+    for indicator in widget._indicators_status.values():
+        assert indicator.isEnabled() is False
+        assert indicator.autoFillBackground() is True
+
+        palette = indicator.palette()
+        color = palette.color(QPalette.Button)
+
+        assert color == Qt.gray
 
 
 def test_update_control_status(qtbot, widget):
@@ -76,6 +85,39 @@ def test_callback_clear(qtbot, widget):
     message = "This is a test"
     widget._signal_message.message.emit(message)
 
-    qtbot.mouseClick(widget._button_clear, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(widget._button_clear, Qt.LeftButton)
 
     assert widget._window_log.toPlainText() == ""
+
+
+def test_callback_signal_status(qtbot, widget):
+
+    name = "isTelemetryActive"
+    widget.model.update_system_status(name, True)
+
+    palette = widget._indicators_status[name].palette()
+    color = palette.color(QPalette.Button)
+
+    assert color == Qt.green
+
+
+def test_callback_signal_status_is_alarm_warning_on(qtbot, widget):
+
+    # Default color
+    assert _get_color_is_alarm_warning_on(widget) == Qt.gray
+
+    # There is the error
+    widget.model.add_error(3)
+
+    assert _get_color_is_alarm_warning_on(widget) == Qt.red
+
+    # The error is cleared
+    widget.model.reset_errors()
+
+    assert _get_color_is_alarm_warning_on(widget) == Qt.gray
+
+
+def _get_color_is_alarm_warning_on(widget):
+
+    palette = widget._indicators_status["isAlarmWarningOn"].palette()
+    return palette.color(QPalette.Button)

@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.0.5:
+
+-------------
+0.0.5
+-------------
+
+* Add the system status and limit switch indicators.
+* Add the **FaultManager** class.
+* Adapt black v22.3.0.
+
 .. _lsst.ts.m2gui-0.0.4:
 
 -------------

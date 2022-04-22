@@ -35,7 +35,6 @@ from .controltab import (
     TabOverview,
     TabRigidBodyPos,
     TabUtilityView,
-    TabLimitSwitchStatus,
 )
 
 
@@ -90,7 +89,6 @@ class ControlTabs(object):
             TabDetailedForce("Detailed Force", model),
             TabDiagnostics("Diagnostics", model),
             TabAlarmWarn("Alarms/Warnings", model),
-            TabLimitSwitchStatus("Limit Switch Status", model),
         ]
 
         for tab in self._tabs:

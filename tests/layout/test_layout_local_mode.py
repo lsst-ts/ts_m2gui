@@ -26,8 +26,7 @@ import logging
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
 
-from lsst.ts.m2gui import Model, LocalMode
-from lsst.ts.m2gui.signal import SignalControl
+from lsst.ts.m2gui import Model, LocalMode, SignalControl
 from lsst.ts.m2gui.layout import LayoutLocalMode
 
 
@@ -97,6 +96,12 @@ def test_set_local_mode(qtbot, widget):
     assert widget.layout_local_mode._button_diagnostic.isEnabled() is True
     assert widget.layout_local_mode._button_enable.isEnabled() is False
 
+    widget.layout_local_mode.model.enable_open_loop_max_limit()
+    assert (
+        widget.layout_local_mode.model.system_status["isOpenLoopMaxLimitsEnabled"]
+        is True
+    )
+
     qtbot.mouseClick(widget.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton)
     qtbot.mouseClick(widget.layout_local_mode._button_standby, QtCore.Qt.LeftButton)
     assert widget.layout_local_mode.model.local_mode == LocalMode.Standby
@@ -104,3 +109,8 @@ def test_set_local_mode(qtbot, widget):
     assert widget.layout_local_mode._button_standby.isEnabled() is False
     assert widget.layout_local_mode._button_diagnostic.isEnabled() is True
     assert widget.layout_local_mode._button_enable.isEnabled() is True
+
+    assert (
+        widget.layout_local_mode.model.system_status["isOpenLoopMaxLimitsEnabled"]
+        is False
+    )
