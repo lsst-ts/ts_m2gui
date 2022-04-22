@@ -69,10 +69,7 @@ class TabOverview(TabDefault):
         self._button_clear = None
 
         # Internal layout
-        self._layout = self._set_layout()
-
-        widget = self.widget()
-        widget.setLayout(self._layout)
+        self.widget().setLayout(self._create_layout())
 
         self._update_control_status()
 
@@ -166,8 +163,8 @@ class TabOverview(TabDefault):
 
         return window_log
 
-    def _set_layout(self):
-        """Set the layout.
+    def _create_layout(self):
+        """Create the layout.
 
         Returns
         -------

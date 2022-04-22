@@ -85,10 +85,7 @@ class TabAlarmWarn(TabDefault):
         self._button_enable_open_loop_max_limit = None
 
         # Internal layout
-        self._layout = self._set_layout()
-
-        widget = self.widget()
-        widget.setLayout(self._layout)
+        self.widget().setLayout(self._create_layout())
 
         # Set the callbacks of signals
         self._set_signal_error(self.model.fault_manager.signal_error)
@@ -205,8 +202,8 @@ class TabAlarmWarn(TabDefault):
 
         indicator.setPalette(palette)
 
-    def _set_layout(self):
-        """Set the layout.
+    def _create_layout(self):
+        """Create the layout.
 
         Returns
         -------
