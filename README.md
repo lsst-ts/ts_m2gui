@@ -69,3 +69,5 @@ pytest tests/
 
 The class diagrams are in [here](doc/uml).
 You can use the [PlantUML](https://plantuml.com) to read them.
+QT is an event-based framework and the signal plays an important role among classes.
+The `emit()` and `connect()` in the class diagrams mean the class **emits** a specific siganl or **connects** it to a specific callback function.
