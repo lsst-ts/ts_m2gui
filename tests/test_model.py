@@ -120,3 +120,19 @@ def test_update_system_status_exception(model):
 
     with pytest.raises(ValueError):
         model.update_system_status("wrong_name", True)
+
+
+def test_report_config(qtbot, model):
+
+    file_configuration = "test"
+
+    with qtbot.waitSignal(model.signal_config.config, timeout=TIMEOUT):
+        config = model.report_config(file_configuration=file_configuration)
+
+    assert config.file_configuration == file_configuration
+
+
+def test_report_config_exception(model):
+
+    with pytest.raises(KeyError):
+        model.report_config(wrong_name=0)

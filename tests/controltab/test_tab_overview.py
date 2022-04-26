@@ -33,7 +33,6 @@ from lsst.ts.m2gui.controltab import TabOverview
 def widget(qtbot):
 
     widget = TabOverview("Overview", Model(logging.getLogger()))
-    widget.set_signal_message(SignalMessage())
     qtbot.addWidget(widget)
 
     return widget
@@ -74,16 +73,22 @@ def test_callback_signal_message(qtbot, widget):
 
     assert widget._window_log.toPlainText() == ""
 
+    signal_message = SignalMessage()
+    widget.set_signal_message(signal_message)
+
     message = "This is a test"
-    widget._signal_message.message.emit(message)
+    signal_message.message.emit(message)
 
     assert widget._window_log.toPlainText() == message
 
 
 def test_callback_clear(qtbot, widget):
 
+    signal_message = SignalMessage()
+    widget.set_signal_message(signal_message)
+
     message = "This is a test"
-    widget._signal_message.message.emit(message)
+    signal_message.message.emit(message)
 
     qtbot.mouseClick(widget._button_clear, Qt.LeftButton)
 
