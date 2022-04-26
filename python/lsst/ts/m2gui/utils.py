@@ -19,12 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["set_button"]
+__all__ = ["set_button", "create_label"]
 
 from functools import partial
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QPushButton
+from PySide2.QtWidgets import QPushButton, QLabel
 from PySide2.QtGui import QPalette
 
 
@@ -77,3 +77,37 @@ def set_button(
         button.adjustSize()
 
     return button
+
+
+def create_label(name="", point_size=None, is_bold=False):
+    """Create the label.
+
+    Parameters
+    ----------
+    name : `str`, optional
+        Label name. (the default is "")
+    point_size : `int` or None, optional
+        Point size of label. The value should be greater than 0. Put None if
+        use the system default. (the default is None)
+    is_bold : `bool`
+        Is the bold format or not. (the default is False)
+
+    Returns
+    -------
+    label : `PySide2.QtWidgets.QLabel`
+        label.
+    """
+    label = QLabel(name)
+
+    # Set the specific font
+    font = label.font()
+
+    if point_size is not None:
+        font.setPointSize(point_size)
+
+    if is_bold:
+        font.setBold(True)
+
+    label.setFont(font)
+
+    return label

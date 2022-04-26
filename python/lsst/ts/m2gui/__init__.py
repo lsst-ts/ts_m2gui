@@ -30,16 +30,18 @@ else:
         __version__ = "?"
 
 from .enums import LocalMode, LimitSwitchType, Ring
-from .utils import set_button
+from .utils import set_button, create_label
 from .signals import (
     SignalControl,
     SignalMessage,
     SignalError,
     SignalStatus,
     SignalLimitSwitch,
+    SignalConfig,
 )
 from .log_window_handler import LogWindowHandler
 from .fault_manager import FaultManager
+from .config import Config
 from .model import Model
 from .control_tabs import ControlTabs
 from .main_window import MainWindow

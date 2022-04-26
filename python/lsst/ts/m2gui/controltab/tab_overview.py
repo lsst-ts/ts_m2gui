@@ -22,10 +22,10 @@
 __all__ = ["TabOverview"]
 
 from PySide2.QtCore import Slot, Qt
-from PySide2.QtWidgets import QVBoxLayout, QLabel, QPlainTextEdit
+from PySide2.QtWidgets import QVBoxLayout, QPlainTextEdit
 from PySide2.QtGui import QPalette
 
-from ..utils import set_button
+from ..utils import set_button, create_label
 from . import TabDefault
 
 
@@ -48,16 +48,10 @@ class TabOverview(TabDefault):
     def __init__(self, title, model):
         super().__init__(title, model)
 
-        # Message signal
-        self._signal_message = None
-
-        # Control signal
-        self._signal_control = None
-
         # Labels
-        self._label_control = QLabel()
-        self._label_control_mode = QLabel()
-        self._label_local_mode = QLabel()
+        self._label_control = create_label()
+        self._label_control_mode = create_label()
+        self._label_local_mode = create_label()
 
         # Indicators of the system status
         self._indicators_status = self._set_indicators_status()
@@ -202,8 +196,7 @@ class TabOverview(TabDefault):
             Signal of the new message.
         """
 
-        self._signal_message = signal_message
-        self._signal_message.message.connect(self._callback_signal_message)
+        signal_message.message.connect(self._callback_signal_message)
 
     @Slot()
     def _callback_signal_message(self, message):
@@ -268,8 +261,7 @@ class TabOverview(TabDefault):
             Signal to know the control is updated or not.
         """
 
-        self._signal_control = signal_control
-        self._signal_control.is_control_updated.connect(self._callback_signal_control)
+        signal_control.is_control_updated.connect(self._callback_signal_control)
 
     @Slot()
     def _callback_signal_control(self, is_control_updated):
