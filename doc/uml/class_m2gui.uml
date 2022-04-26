@@ -15,14 +15,16 @@ MainWindow *-- SignalMessage
 MainWindow ..> LogWindowHandler
 
 Model *-- FaultManager
-Model *-- SignalStatus
-FaultManager *-- SignalError
-FaultManager *-- SignalLimitSwitch
+Model *-- SignalStatus : emit()
+Model *-- SignalConfig : emit()
+Model ..> Config
+FaultManager *-- SignalError : emit()
+FaultManager *-- SignalLimitSwitch : emit()
 
 LayoutDefault *-- Model
-LayoutDefault *-- SignalControl
+LayoutDefault *-- SignalControl : emit()/connect()
 
-LogWindowHandler *-- SignalMessage
+LogWindowHandler *-- SignalMessage : emit()
 
 ControlTabs ..> Model
 ControlTabs "1" *-- "9" TabDefault
