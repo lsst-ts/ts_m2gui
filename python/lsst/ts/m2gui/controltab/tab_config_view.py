@@ -22,9 +22,9 @@
 __all__ = ["TabConfigView"]
 
 from PySide2.QtCore import Slot
-from PySide2.QtWidgets import QVBoxLayout, QGroupBox, QFormLayout
+from PySide2.QtWidgets import QVBoxLayout, QFormLayout
 
-from ..utils import create_label
+from ..utils import create_label, create_group_box
 from . import TabDefault
 
 
@@ -110,25 +110,21 @@ class TabConfigView(TabDefault):
             Group.
         """
 
-        group = QGroupBox("File Paths and Version")
-
         layout = QFormLayout()
         layout.addRow(
-            "File of Configuration: ", self._config_parameters["file_configuration"]
+            "Configuration File:", self._config_parameters["file_configuration"]
         )
         layout.addRow(
-            "Configuration Version: ", self._config_parameters["file_version"]
+            "Configuration Version:", self._config_parameters["file_version"]
         )
         layout.addRow(
-            "Control Parameters: ", self._config_parameters["file_control_parameters"]
+            "Control Parameters:", self._config_parameters["file_control_parameters"]
         )
         layout.addRow(
-            "Look-Up Table Parameters: ", self._config_parameters["file_lut_parameters"]
+            "Look-Up Table Parameters:", self._config_parameters["file_lut_parameters"]
         )
 
-        group.setLayout(layout)
-
-        return group
+        return create_group_box("File Paths and Version", layout)
 
     def _create_group_power_motor(self):
         """Create the group of motor power.
@@ -139,22 +135,18 @@ class TabConfigView(TabDefault):
             Group.
         """
 
-        group = QGroupBox("Power Supply Monitoring (Motor)")
-
         layout = QFormLayout()
         layout.addRow(
-            "24V Accuracy Warning: ", self._config_parameters["power_warning_motor"]
+            "24V Accuracy Warning:", self._config_parameters["power_warning_motor"]
         )
         layout.addRow(
-            "24V Accuracy Fault: ", self._config_parameters["power_fault_motor"]
+            "24V Accuracy Fault:", self._config_parameters["power_fault_motor"]
         )
         layout.addRow(
-            "Current Threshold: ", self._config_parameters["power_threshold_motor"]
+            "Current Threshold:", self._config_parameters["power_threshold_motor"]
         )
 
-        group.setLayout(layout)
-
-        return group
+        return create_group_box("Motor Power Supply Monitoring", layout)
 
     def _create_group_power_communication(self):
         """Create the group of communication power.
@@ -165,24 +157,20 @@ class TabConfigView(TabDefault):
             Group.
         """
 
-        group = QGroupBox("Power Supply Monitoring (Communication)")
-
         layout = QFormLayout()
         layout.addRow(
-            "24V Accuracy Warning: ",
+            "24V Accuracy Warning:",
             self._config_parameters["power_warning_communication"],
         )
         layout.addRow(
-            "24V Accuracy Fault: ", self._config_parameters["power_fault_communication"]
+            "24V Accuracy Fault:", self._config_parameters["power_fault_communication"]
         )
         layout.addRow(
-            "Current Threshold: ",
+            "Current Threshold:",
             self._config_parameters["power_threshold_communication"],
         )
 
-        group.setLayout(layout)
-
-        return group
+        return create_group_box("Communication Power Supply Monitoring", layout)
 
     def _create_group_in_position_flag(self):
         """Create the group of in-position flag.
@@ -193,18 +181,14 @@ class TabConfigView(TabDefault):
             Group.
         """
 
-        group = QGroupBox("In-Position Flag")
-
         layout = QFormLayout()
-        layout.addRow("Axial Threshold: ", self._config_parameters["in_position_axial"])
+        layout.addRow("Axial Threshold:", self._config_parameters["in_position_axial"])
         layout.addRow(
-            "Tangent Threshold: ", self._config_parameters["in_position_tangent"]
+            "Tangent Threshold:", self._config_parameters["in_position_tangent"]
         )
-        layout.addRow("Sample Window: ", self._config_parameters["in_position_sample"])
+        layout.addRow("Sample Window:", self._config_parameters["in_position_sample"])
 
-        group.setLayout(layout)
-
-        return group
+        return create_group_box("In-Position Flag", layout)
 
     def _create_group_communication_timeout(self):
         """Create the group of communication timeout.
@@ -215,23 +199,19 @@ class TabConfigView(TabDefault):
             Group.
         """
 
-        group = QGroupBox("Communication Timeout")
-
         layout = QFormLayout()
         layout.addRow(
-            "SAL Communication Timeout: ", self._config_parameters["timeout_sal"]
+            "SAL Communication Timeout:", self._config_parameters["timeout_sal"]
         )
         layout.addRow(
-            "cRIO Communication Timeout: ", self._config_parameters["timeout_crio"]
+            "cRIO Communication Timeout:", self._config_parameters["timeout_crio"]
         )
         layout.addRow(
-            "ILC Telemetry Receipt Error Persistance: ",
+            "ILC Telemetry Receipt Error Persistance:",
             self._config_parameters["timeout_ilc"],
         )
 
-        group.setLayout(layout)
-
-        return group
+        return create_group_box("Communication Timeout", layout)
 
     def _create_group_misc_inclinometer(self):
         """Create the group of miscellaneous of inclinometer.
@@ -242,17 +222,13 @@ class TabConfigView(TabDefault):
             Group.
         """
 
-        group = QGroupBox("Miscellaneous (Inclinometer)")
-
         layout = QFormLayout()
-        layout.addRow("Delta Range: ", self._config_parameters["misc_range_angle"])
+        layout.addRow("Delta Range:", self._config_parameters["misc_range_angle"])
         layout.addRow(
-            "Difference Enabled: ", self._config_parameters["misc_diff_enabled"]
+            "Difference Enabled:", self._config_parameters["misc_diff_enabled"]
         )
 
-        group.setLayout(layout)
-
-        return group
+        return create_group_box("Miscellaneous (Inclinometer)", layout)
 
     def _create_group_misc_temperature(self):
         """Create the group of miscellaneous of temperature.
@@ -263,17 +239,13 @@ class TabConfigView(TabDefault):
             Group.
         """
 
-        group = QGroupBox("Miscellaneous (Temperature)")
-
         layout = QFormLayout()
         layout.addRow(
-            "Cell Temperature Delta: ",
+            "Cell Temperature Delta:",
             self._config_parameters["misc_range_temperature"],
         )
 
-        group.setLayout(layout)
-
-        return group
+        return create_group_box("Miscellaneous (Temperature)", layout)
 
     def _set_signal_config(self, signal_config):
         """Set the config signal with callback function.

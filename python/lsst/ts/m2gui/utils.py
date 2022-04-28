@@ -19,12 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["set_button", "create_label"]
+__all__ = ["set_button", "create_label", "create_group_box"]
 
 from functools import partial
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QPushButton, QLabel
+from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox
 from PySide2.QtGui import QPalette
 
 
@@ -111,3 +111,25 @@ def create_label(name="", point_size=None, is_bold=False):
     label.setFont(font)
 
     return label
+
+
+def create_group_box(name, layout):
+    """Create the group box.
+
+    Parameters
+    ----------
+    name : `str`, optional
+        Name of the group box.
+    layout : Layout in `PySide2.QtWidgets`
+        Layout.
+
+    Returns
+    -------
+    group_box : `PySide2.QtWidgets.QGroupBox`
+        Group box.
+    """
+
+    group_box = QGroupBox(name)
+    group_box.setLayout(layout)
+
+    return group_box

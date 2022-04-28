@@ -30,7 +30,7 @@ else:
         __version__ = "?"
 
 from .enums import LocalMode, LimitSwitchType, Ring
-from .utils import set_button, create_label
+from .utils import set_button, create_label, create_group_box
 from .signals import (
     SignalControl,
     SignalMessage,
