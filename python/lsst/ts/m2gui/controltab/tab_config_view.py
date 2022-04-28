@@ -22,7 +22,7 @@
 __all__ = ["TabConfigView"]
 
 from PySide2.QtCore import Slot
-from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtWidgets import QVBoxLayout, QGroupBox, QFormLayout
 
 from ..utils import create_label
 from . import TabDefault
@@ -47,37 +47,31 @@ class TabConfigView(TabDefault):
     def __init__(self, title, model):
         super().__init__(title, model)
 
-        # Labels
-        self._label_file_configuration = create_label()
-        self._label_file_version = create_label()
-        self._label_file_control_parameters = create_label()
-        self._label_file_lut_parameters = create_label()
+        # Configuration parameters
+        self._config_parameters = {
+            "file_configuration": create_label(),
+            "file_version": create_label(),
+            "file_control_parameters": create_label(),
+            "file_lut_parameters": create_label(),
+            "power_warning_motor": create_label(),
+            "power_fault_motor": create_label(),
+            "power_threshold_motor": create_label(),
+            "power_warning_communication": create_label(),
+            "power_fault_communication": create_label(),
+            "power_threshold_communication": create_label(),
+            "in_position_axial": create_label(),
+            "in_position_tangent": create_label(),
+            "in_position_sample": create_label(),
+            "timeout_sal": create_label(),
+            "timeout_crio": create_label(),
+            "timeout_ilc": create_label(),
+            "misc_range_angle": create_label(),
+            "misc_diff_enabled": create_label(),
+            "misc_range_temperature": create_label(),
+        }
 
-        self._label_power_warning_motor = create_label()
-        self._label_power_fault_motor = create_label()
-        self._label_power_threshold_motor = create_label()
-
-        self._label_power_warning_communication = create_label()
-        self._label_power_fault_communication = create_label()
-        self._label_power_threshold_communication = create_label()
-
-        self._label_in_position_axial = create_label()
-        self._label_in_position_tangent = create_label()
-        self._label_in_position_sample = create_label()
-
-        self._label_timeout_sal = create_label()
-        self._label_timeout_crio = create_label()
-        self._label_timeout_ilc = create_label()
-
-        self._label_misc_range_angle = create_label()
-        self._label_misc_diff_enabled = create_label()
-
-        self._label_misc_range_temperature = create_label()
-
-        # Internal widget and layout
         self._set_widget_and_layout()
 
-        # Set the callback of signal
         self._set_signal_config(self.model.signal_config)
 
     def _set_widget_and_layout(self):
@@ -87,19 +81,8 @@ class TabConfigView(TabDefault):
         widget.setLayout(self._create_layout())
         self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
 
-    def _create_layout(
-        self, point_size_section=12, point_size_subsection=11, space_between_sections=30
-    ):
+    def _create_layout(self):
         """Create the layout.
-
-        Parameters
-        ----------
-        point_size_section : `int`, optional
-            Point size of the section. (the default is 12)
-        point_size_subsection : `int`, optional
-            Point size of the subsection. (the default is 11)
-        space_between_sections : `int`, optional
-            Space between the sections. (the default is 30)
 
         Returns
         -------
@@ -108,80 +91,189 @@ class TabConfigView(TabDefault):
         """
 
         layout = QVBoxLayout()
-
-        label_file_version = create_label(
-            name="File Paths and Version", point_size=point_size_section, is_bold=True
-        )
-        layout.addWidget(label_file_version)
-        layout.addWidget(self._label_file_configuration)
-        layout.addWidget(self._label_file_version)
-        layout.addWidget(self._label_file_control_parameters)
-        layout.addWidget(self._label_file_lut_parameters)
-
-        layout.addSpacing(space_between_sections)
-
-        label_power_supply = create_label(
-            name="Power Supply Monitoring", point_size=point_size_section, is_bold=True
-        )
-        layout.addWidget(label_power_supply)
-
-        label_power_motor = create_label(
-            name="Motor", point_size=point_size_subsection, is_bold=True
-        )
-        layout.addWidget(label_power_motor)
-        layout.addWidget(self._label_power_warning_motor)
-        layout.addWidget(self._label_power_fault_motor)
-        layout.addWidget(self._label_power_threshold_motor)
-
-        label_power_communication = create_label(
-            name="Communication", point_size=point_size_subsection, is_bold=True
-        )
-        layout.addWidget(label_power_communication)
-        layout.addWidget(self._label_power_warning_communication)
-        layout.addWidget(self._label_power_fault_communication)
-        layout.addWidget(self._label_power_threshold_communication)
-
-        layout.addSpacing(space_between_sections)
-
-        label_in_position_flag = create_label(
-            name="In-Position Flag", point_size=point_size_section, is_bold=True
-        )
-        layout.addWidget(label_in_position_flag)
-        layout.addWidget(self._label_in_position_axial)
-        layout.addWidget(self._label_in_position_tangent)
-        layout.addWidget(self._label_in_position_sample)
-
-        layout.addSpacing(space_between_sections)
-
-        label_communication_timeout = create_label(
-            name="Communication Timeout", point_size=point_size_section, is_bold=True
-        )
-        layout.addWidget(label_communication_timeout)
-        layout.addWidget(self._label_timeout_sal)
-        layout.addWidget(self._label_timeout_crio)
-        layout.addWidget(self._label_timeout_ilc)
-
-        layout.addSpacing(space_between_sections)
-
-        label_miscellaneous = create_label(
-            name="Miscellaneous", point_size=point_size_section, is_bold=True
-        )
-        layout.addWidget(label_miscellaneous)
-
-        label_inclinometer = create_label(
-            name="Inclinometer", point_size=point_size_subsection, is_bold=True
-        )
-        layout.addWidget(label_inclinometer)
-        layout.addWidget(self._label_misc_range_angle)
-        layout.addWidget(self._label_misc_diff_enabled)
-
-        label_temperature = create_label(
-            name="Temperature", point_size=point_size_subsection, is_bold=True
-        )
-        layout.addWidget(label_temperature)
-        layout.addWidget(self._label_misc_range_temperature)
+        layout.addWidget(self._create_group_file_version())
+        layout.addWidget(self._create_group_power_motor())
+        layout.addWidget(self._create_group_power_communication())
+        layout.addWidget(self._create_group_in_position_flag())
+        layout.addWidget(self._create_group_communication_timeout())
+        layout.addWidget(self._create_group_misc_inclinometer())
+        layout.addWidget(self._create_group_misc_temperature())
 
         return layout
+
+    def _create_group_file_version(self):
+        """Create the group of files and version.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        group = QGroupBox("File Paths and Version")
+
+        layout = QFormLayout()
+        layout.addRow(
+            "File of Configuration: ", self._config_parameters["file_configuration"]
+        )
+        layout.addRow(
+            "Configuration Version: ", self._config_parameters["file_version"]
+        )
+        layout.addRow(
+            "Control Parameters: ", self._config_parameters["file_control_parameters"]
+        )
+        layout.addRow(
+            "Look-Up Table Parameters: ", self._config_parameters["file_lut_parameters"]
+        )
+
+        group.setLayout(layout)
+
+        return group
+
+    def _create_group_power_motor(self):
+        """Create the group of motor power.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        group = QGroupBox("Power Supply Monitoring (Motor)")
+
+        layout = QFormLayout()
+        layout.addRow(
+            "24V Accuracy Warning: ", self._config_parameters["power_warning_motor"]
+        )
+        layout.addRow(
+            "24V Accuracy Fault: ", self._config_parameters["power_fault_motor"]
+        )
+        layout.addRow(
+            "Current Threshold: ", self._config_parameters["power_threshold_motor"]
+        )
+
+        group.setLayout(layout)
+
+        return group
+
+    def _create_group_power_communication(self):
+        """Create the group of communication power.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        group = QGroupBox("Power Supply Monitoring (Communication)")
+
+        layout = QFormLayout()
+        layout.addRow(
+            "24V Accuracy Warning: ",
+            self._config_parameters["power_warning_communication"],
+        )
+        layout.addRow(
+            "24V Accuracy Fault: ", self._config_parameters["power_fault_communication"]
+        )
+        layout.addRow(
+            "Current Threshold: ",
+            self._config_parameters["power_threshold_communication"],
+        )
+
+        group.setLayout(layout)
+
+        return group
+
+    def _create_group_in_position_flag(self):
+        """Create the group of in-position flag.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        group = QGroupBox("In-Position Flag")
+
+        layout = QFormLayout()
+        layout.addRow("Axial Threshold: ", self._config_parameters["in_position_axial"])
+        layout.addRow(
+            "Tangent Threshold: ", self._config_parameters["in_position_tangent"]
+        )
+        layout.addRow("Sample Window: ", self._config_parameters["in_position_sample"])
+
+        group.setLayout(layout)
+
+        return group
+
+    def _create_group_communication_timeout(self):
+        """Create the group of communication timeout.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        group = QGroupBox("Communication Timeout")
+
+        layout = QFormLayout()
+        layout.addRow(
+            "SAL Communication Timeout: ", self._config_parameters["timeout_sal"]
+        )
+        layout.addRow(
+            "cRIO Communication Timeout: ", self._config_parameters["timeout_crio"]
+        )
+        layout.addRow(
+            "ILC Telemetry Receipt Error Persistance: ",
+            self._config_parameters["timeout_ilc"],
+        )
+
+        group.setLayout(layout)
+
+        return group
+
+    def _create_group_misc_inclinometer(self):
+        """Create the group of miscellaneous of inclinometer.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        group = QGroupBox("Miscellaneous (Inclinometer)")
+
+        layout = QFormLayout()
+        layout.addRow("Delta Range: ", self._config_parameters["misc_range_angle"])
+        layout.addRow(
+            "Difference Enabled: ", self._config_parameters["misc_diff_enabled"]
+        )
+
+        group.setLayout(layout)
+
+        return group
+
+    def _create_group_misc_temperature(self):
+        """Create the group of miscellaneous of temperature.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        group = QGroupBox("Miscellaneous (Temperature)")
+
+        layout = QFormLayout()
+        layout.addRow(
+            "Cell Temperature Delta: ",
+            self._config_parameters["misc_range_temperature"],
+        )
+
+        group.setLayout(layout)
+
+        return group
 
     def _set_signal_config(self, signal_config):
         """Set the config signal with callback function.
@@ -204,66 +296,60 @@ class TabConfigView(TabDefault):
             New configuration.
         """
 
-        self._label_file_configuration.setText(
-            f"File of Configuration: {config.file_configuration}"
+        self._config_parameters["file_configuration"].setText(
+            f"{config.file_configuration}"
         )
-        self._label_file_version.setText(
-            f"Configuration Version: {config.file_version}"
+        self._config_parameters["file_version"].setText(f"{config.file_version}")
+        self._config_parameters["file_control_parameters"].setText(
+            f"{config.file_control_parameters}"
         )
-        self._label_file_control_parameters.setText(
-            f"Control Parameters: {config.file_control_parameters}"
-        )
-        self._label_file_lut_parameters.setText(
-            f"Look-Up Table Parameters: {config.file_lut_parameters}"
+        self._config_parameters["file_lut_parameters"].setText(
+            f"{config.file_lut_parameters}"
         )
 
-        self._label_power_warning_motor.setText(
-            f"24V Accuracy Warning: {config.power_warning_motor} %"
+        self._config_parameters["power_warning_motor"].setText(
+            f"{config.power_warning_motor} %"
         )
-        self._label_power_fault_motor.setText(
-            f"24V Accuracy Fault: {config.power_fault_motor} %"
+        self._config_parameters["power_fault_motor"].setText(
+            f"{config.power_fault_motor} %"
         )
-        self._label_power_threshold_motor.setText(
-            f"Current Threshold: {config.power_threshold_motor} A"
-        )
-
-        self._label_power_warning_communication.setText(
-            f"24V Accuracy Warning: {config.power_warning_communication} %"
-        )
-        self._label_power_fault_communication.setText(
-            f"24V Accuracy Fault: {config.power_fault_communication} %"
-        )
-        self._label_power_threshold_communication.setText(
-            f"Current Threshold: {config.power_threshold_communication} A"
+        self._config_parameters["power_threshold_motor"].setText(
+            f"{config.power_threshold_motor} A"
         )
 
-        self._label_in_position_axial.setText(
-            f"Axial Threshold: {config.in_position_axial} N"
+        self._config_parameters["power_warning_communication"].setText(
+            f"{config.power_warning_communication} %"
         )
-        self._label_in_position_tangent.setText(
-            f"Tangent Threshold: {config.in_position_tangent} N"
+        self._config_parameters["power_fault_communication"].setText(
+            f"{config.power_fault_communication} %"
         )
-        self._label_in_position_sample.setText(
-            f"Sample Window: {config.in_position_sample} s"
-        )
-
-        self._label_timeout_sal.setText(
-            f"SAL Communication Timeout: {config.timeout_sal} s"
-        )
-        self._label_timeout_crio.setText(
-            f"cRIO Communication Timeout: {config.timeout_crio} s"
-        )
-        self._label_timeout_ilc.setText(
-            f"ILC Telemetry Receipt Error Persistance: {int(config.timeout_ilc)} counts"
+        self._config_parameters["power_threshold_communication"].setText(
+            f"{config.power_threshold_communication} A"
         )
 
-        self._label_misc_range_angle.setText(
-            f"Delta Range: {config.misc_range_angle} degree"
+        self._config_parameters["in_position_axial"].setText(
+            f"{config.in_position_axial} N"
         )
-        self._label_misc_diff_enabled.setText(
-            f"Difference Enabled: {config.misc_diff_enabled}"
+        self._config_parameters["in_position_tangent"].setText(
+            f"{config.in_position_tangent} N"
+        )
+        self._config_parameters["in_position_sample"].setText(
+            f"{config.in_position_sample} s"
         )
 
-        self._label_misc_range_temperature.setText(
-            f"Cell Temperature Delta: {config.misc_range_temperature} degree C"
+        self._config_parameters["timeout_sal"].setText(f"{config.timeout_sal} s")
+        self._config_parameters["timeout_crio"].setText(f"{config.timeout_crio} s")
+        self._config_parameters["timeout_ilc"].setText(
+            f"{int(config.timeout_ilc)} counts"
+        )
+
+        self._config_parameters["misc_range_angle"].setText(
+            f"{config.misc_range_angle} degree"
+        )
+        self._config_parameters["misc_diff_enabled"].setText(
+            f"{config.misc_diff_enabled}"
+        )
+
+        self._config_parameters["misc_range_temperature"].setText(
+            f"{config.misc_range_temperature} degree C"
         )

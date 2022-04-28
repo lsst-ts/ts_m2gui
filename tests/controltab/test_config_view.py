@@ -59,39 +59,28 @@ def test_callback_signal_config(qtbot, widget):
         misc_range_temperature=3.2,
     )
 
-    assert widget._label_file_configuration.text() == "File of Configuration: a"
-    assert widget._label_file_version.text() == "Configuration Version: b"
-    assert widget._label_file_control_parameters.text() == "Control Parameters: c"
-    assert widget._label_file_lut_parameters.text() == "Look-Up Table Parameters: d"
+    assert widget._config_parameters["file_configuration"].text() == "a"
+    assert widget._config_parameters["file_version"].text() == "b"
+    assert widget._config_parameters["file_control_parameters"].text() == "c"
+    assert widget._config_parameters["file_lut_parameters"].text() == "d"
 
-    assert widget._label_power_warning_motor.text() == "24V Accuracy Warning: 1.1 %"
-    assert widget._label_power_fault_motor.text() == "24V Accuracy Fault: 1.2 %"
-    assert widget._label_power_threshold_motor.text() == "Current Threshold: 1.3 A"
+    assert widget._config_parameters["power_warning_motor"].text() == "1.1 %"
+    assert widget._config_parameters["power_fault_motor"].text() == "1.2 %"
+    assert widget._config_parameters["power_threshold_motor"].text() == "1.3 A"
 
-    assert (
-        widget._label_power_warning_communication.text()
-        == "24V Accuracy Warning: 1.4 %"
-    )
-    assert widget._label_power_fault_communication.text() == "24V Accuracy Fault: 1.5 %"
-    assert (
-        widget._label_power_threshold_communication.text() == "Current Threshold: 1.6 A"
-    )
+    assert widget._config_parameters["power_warning_communication"].text() == "1.4 %"
+    assert widget._config_parameters["power_fault_communication"].text() == "1.5 %"
+    assert widget._config_parameters["power_threshold_communication"].text() == "1.6 A"
 
-    assert widget._label_in_position_axial.text() == "Axial Threshold: 1.7 N"
-    assert widget._label_in_position_tangent.text() == "Tangent Threshold: 1.8 N"
-    assert widget._label_in_position_sample.text() == "Sample Window: 1.9 s"
+    assert widget._config_parameters["in_position_axial"].text() == "1.7 N"
+    assert widget._config_parameters["in_position_tangent"].text() == "1.8 N"
+    assert widget._config_parameters["in_position_sample"].text() == "1.9 s"
 
-    assert widget._label_timeout_sal.text() == "SAL Communication Timeout: 2.1 s"
-    assert widget._label_timeout_crio.text() == "cRIO Communication Timeout: 2.2 s"
-    assert (
-        widget._label_timeout_ilc.text()
-        == "ILC Telemetry Receipt Error Persistance: 3 counts"
-    )
+    assert widget._config_parameters["timeout_sal"].text() == "2.1 s"
+    assert widget._config_parameters["timeout_crio"].text() == "2.2 s"
+    assert widget._config_parameters["timeout_ilc"].text() == "3 counts"
 
-    assert widget._label_misc_range_angle.text() == "Delta Range: 3.1 degree"
-    assert widget._label_misc_diff_enabled.text() == "Difference Enabled: True"
+    assert widget._config_parameters["misc_range_angle"].text() == "3.1 degree"
+    assert widget._config_parameters["misc_diff_enabled"].text() == "True"
 
-    assert (
-        widget._label_misc_range_temperature.text()
-        == "Cell Temperature Delta: 3.2 degree C"
-    )
+    assert widget._config_parameters["misc_range_temperature"].text() == "3.2 degree C"
