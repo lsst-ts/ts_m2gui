@@ -118,7 +118,7 @@ def create_group_box(name, layout):
 
     Parameters
     ----------
-    name : `str`, optional
+    name : `str`
         Name of the group box.
     layout : Layout in `PySide2.QtWidgets`
         Layout.

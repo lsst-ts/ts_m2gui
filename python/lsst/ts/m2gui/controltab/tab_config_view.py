@@ -114,9 +114,7 @@ class TabConfigView(TabDefault):
         layout.addRow(
             "Configuration File:", self._config_parameters["file_configuration"]
         )
-        layout.addRow(
-            "Configuration Version:", self._config_parameters["file_version"]
-        )
+        layout.addRow("Configuration Version:", self._config_parameters["file_version"])
         layout.addRow(
             "Control Parameters:", self._config_parameters["file_control_parameters"]
         )
@@ -248,7 +246,8 @@ class TabConfigView(TabDefault):
         return create_group_box("Miscellaneous (Temperature)", layout)
 
     def _set_signal_config(self, signal_config):
-        """Set the config signal with callback function.
+        """Set the config signal with callback function. This signal provides
+        the details of configuration in the controller.
 
         Parameters
         ----------
