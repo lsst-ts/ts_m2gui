@@ -1,0 +1,13 @@
+@startuml
+package "m2gui" #DDDDDD {
+  Model *-- FaultManager
+  FaultManager *-- SignalError : emit()
+  FaultManager *-- SignalLimitSwitch : emit()
+}
+
+TabDefault *-- Model
+TabDefault <|-- TabAlarmWarn
+
+TabAlarmWarn --> SignalError : connect()
+TabAlarmWarn --> SignalLimitSwitch : connect()
+@enduml

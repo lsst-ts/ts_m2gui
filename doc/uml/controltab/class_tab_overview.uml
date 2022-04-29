@@ -1,0 +1,15 @@
+@startuml
+package "m2gui" #DDDDDD {
+  class SignalMessage
+  class SignalControl
+
+  Model *-- SignalStatus : emit()
+}
+
+TabDefault *-- Model
+TabDefault <|-- TabOverview
+
+TabOverview --> SignalMessage : connect()
+TabOverview --> SignalControl : connect()
+TabOverview --> SignalStatus : connect()
+@enduml

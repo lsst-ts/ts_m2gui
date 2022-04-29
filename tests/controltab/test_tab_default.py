@@ -19,29 +19,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
+import pytest
+import logging
 
-if typing.TYPE_CHECKING:
-    __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
+from PySide2.QtWidgets import QWidget, QScrollArea
 
-from .enums import LocalMode, LimitSwitchType, Ring
-from .utils import set_button, create_label, create_group_box
-from .signals import (
-    SignalControl,
-    SignalMessage,
-    SignalError,
-    SignalStatus,
-    SignalLimitSwitch,
-    SignalConfig,
-)
-from .log_window_handler import LogWindowHandler
-from .fault_manager import FaultManager
-from .config import Config
-from .model import Model
-from .control_tabs import ControlTabs
-from .main_window import MainWindow
+from lsst.ts.m2gui import Model
+from lsst.ts.m2gui.controltab import TabDefault
+
+
+@pytest.fixture
+def widget(qtbot):
+
+    widget = TabDefault("Default", Model(logging.getLogger()))
+    qtbot.addWidget(widget)
+
+    return widget
+
+
+def test_init(qtbot, widget):
+
+    assert widget.windowTitle() == "Default"
+
+
+def test_set_widget_scrollable(widget):
+
+    scroll_area = widget.set_widget_scrollable(QWidget())
+    assert type(scroll_area) is QScrollArea
+
+    scroll_area_resizable = widget.set_widget_scrollable(QWidget(), is_resizable=True)
+    assert scroll_area_resizable.widgetResizable() is True

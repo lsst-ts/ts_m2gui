@@ -22,7 +22,7 @@
 __all__ = ["Model"]
 
 from .enums import LocalMode, LimitSwitchType, Ring
-from . import SignalStatus, FaultManager
+from . import SignalStatus, SignalConfig, FaultManager, Config
 
 
 class Model(object):
@@ -45,6 +45,8 @@ class Model(object):
         Closed-loop control is on or not.
     signal_status : `SignalStatus`
         Signal to report the updated status of system.
+    signal_config : `SignalConfig`
+        Signal to send the configuration.
     system_status : `dict`
         System status.
     fault_manager : `FaultManager`
@@ -60,6 +62,7 @@ class Model(object):
         self.is_closed_loop = False
 
         self.signal_status = SignalStatus()
+        self.signal_config = SignalConfig()
 
         self.system_status = self._set_system_status()
 
@@ -226,3 +229,34 @@ class Model(object):
             raise ValueError(
                 f"{status_name} not in the {list(self.system_status.keys())}."
             )
+
+    def report_config(self, **kwargs):
+        """Report the configuration defined in `Config` class.
+
+        Parameters
+        ----------
+        **kwargs : `dict`, optional
+            Configuration key-value pairs. The available keys are defined in
+            `Config` class.
+
+        Returns
+        -------
+        config : `Config`
+            Configuration.
+
+        Raises
+        ------
+        KeyError
+            Key name does not exist in the Config class.
+        """
+
+        config = Config()
+        for name, value in kwargs.items():
+            if hasattr(config, name):
+                setattr(config, name, value)
+            else:
+                raise KeyError(f"{name} does not exist in the Config class.")
+
+        self.signal_config.config.emit(config)
+
+        return config

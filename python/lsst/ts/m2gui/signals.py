@@ -25,6 +25,7 @@ __all__ = [
     "SignalLimitSwitch",
     "SignalMessage",
     "SignalStatus",
+    "SignalConfig",
 ]
 
 from PySide2 import QtCore
@@ -69,3 +70,9 @@ class SignalStatus(QtCore.QObject):
     # The name_status should be a tuple: (name, status). The data type of name
     # is string and the data type of status is bool.
     name_status = QtCore.Signal(object)
+
+
+class SignalConfig(QtCore.QObject):
+    """Configuration Signal to send the configuration."""
+
+    config = QtCore.Signal(object)

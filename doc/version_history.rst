@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.0.6:
+
+-------------
+0.0.6
+-------------
+
+* Support the configuration view.
+* Add the class diagrams.
+
 .. _lsst.ts.m2gui-0.0.5:
 
 -------------

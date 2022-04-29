@@ -21,7 +21,7 @@
 
 __all__ = ["TabDefault"]
 
-from PySide2.QtWidgets import QDockWidget, QWidget
+from PySide2.QtWidgets import QDockWidget, QWidget, QScrollArea
 
 
 class TabDefault(QDockWidget):
@@ -47,3 +47,25 @@ class TabDefault(QDockWidget):
         self.setWidget(QWidget())
 
         self.model = model
+
+    def set_widget_scrollable(self, widget, is_resizable=False):
+        """Set the widget to be scrollable.
+
+        Parameters
+        ----------
+        widget : `PySide2.QtWidgets.QWidget`
+            Widget.
+        is_resizable : `bool`, optional
+            Is resizable or not. (the default is False)
+
+        Returns
+        -------
+        scroll_area : `PySide2.QtWidgets.QScrollArea`
+            Scrollable area.
+        """
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(widget)
+        scroll_area.setWidgetResizable(is_resizable)
+
+        return scroll_area

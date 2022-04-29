@@ -30,14 +30,12 @@ from PySide2.QtWidgets import (
     QTableWidgetItem,
     QHeaderView,
     QPlainTextEdit,
-    QLabel,
     QWidget,
     QHBoxLayout,
-    QScrollArea,
 )
 from PySide2.QtGui import QPalette
 
-from ..utils import set_button
+from ..utils import set_button, create_label
 from ..enums import LimitSwitchType, Ring
 from . import TabDefault
 
@@ -219,7 +217,7 @@ class TabAlarmWarn(TabDefault):
         layout = QVBoxLayout()
         layout.addWidget(self._table_error)
         layout.addWidget(self._text_error_cause)
-        layout.addWidget(QLabel("Limit Switch Status"))
+        layout.addWidget(create_label(name="Limit Switch Status", is_bold=True))
         layout.addWidget(self._get_widget_limit_switch())
         layout.addWidget(self._button_reset)
         layout.addWidget(self._button_enable_open_loop_max_limit)
@@ -250,10 +248,7 @@ class TabAlarmWarn(TabDefault):
                 )
             )
 
-        scroll_area = QScrollArea()
-        scroll_area.setWidget(widget)
-
-        return scroll_area
+        return self.set_widget_scrollable(widget)
 
     def _get_layout_limit_switch_specific_ring(self, limit_switch_type, ring):
         """Get the layout of limit switch in specific ring.
@@ -273,10 +268,10 @@ class TabAlarmWarn(TabDefault):
 
         if limit_switch_type == LimitSwitchType.Retract:
             indicators = self._indicators_limit_switch_retract
-            label = QLabel("Retract")
+            label = create_label(name="Retract")
         elif limit_switch_type == LimitSwitchType.Extend:
             indicators = self._indicators_limit_switch_extend
-            label = QLabel("Extent")
+            label = create_label(name="Extent")
         else:
             raise ValueError(f"Unsupported limit switch type: {limit_switch_type!r}.")
 
