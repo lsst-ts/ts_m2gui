@@ -1,0 +1,11 @@
+@startuml
+package "m2gui" #DDDDDD {
+  Model *-- UtilityMonitor
+  UtilityMonitor *-- SignalUtility : emit()
+}
+
+TabDefault *-- Model
+TabDefault <|-- TabUtilityView
+
+TabUtilityView --> SignalUtility : connect()
+@enduml

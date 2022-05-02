@@ -15,11 +15,15 @@ MainWindow *-- SignalMessage
 MainWindow ..> LogWindowHandler
 
 Model *-- FaultManager
+Model *-- UtilityMonitor
 Model *-- SignalStatus : emit()
 Model *-- SignalConfig : emit()
 Model ..> Config
+
 FaultManager *-- SignalError : emit()
 FaultManager *-- SignalLimitSwitch : emit()
+
+UtilityMonitor *-- SignalUtility : emit()
 
 LayoutDefault *-- Model
 LayoutDefault *-- SignalControl : emit()/connect()
