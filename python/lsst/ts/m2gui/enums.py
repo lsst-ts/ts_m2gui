@@ -19,7 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["LocalMode", "LimitSwitchType", "Ring"]
+__all__ = [
+    "LocalMode",
+    "LimitSwitchType",
+    "Ring",
+    "PowerType",
+    "TemperatureGroup",
+    "DisplacementSensorDirection",
+]
 
 from enum import IntEnum, auto
 
@@ -40,3 +47,21 @@ class Ring(IntEnum):
     B = auto()
     C = auto()
     D = auto()
+
+
+class PowerType(IntEnum):
+    Motor = 1
+    Communication = auto()
+
+
+class TemperatureGroup(IntEnum):
+    Intake = 1
+    Exhaust = auto()
+    LG2 = auto()
+    LG3 = auto()
+    LG4 = auto()
+
+
+class DisplacementSensorDirection(IntEnum):
+    Theta = 1
+    Delta = auto()

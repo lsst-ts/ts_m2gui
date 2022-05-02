@@ -95,6 +95,7 @@ class MainWindow(QMainWindow):
         # Set the default conditions
         self._layout_control.set_csc_commander(True)
         self.model.report_config()
+        self.model.utility_monitor.report_utility_status()
 
     def _set_log(self, message_format, is_output_log_on_screen, log=None):
         """Set the logger.
