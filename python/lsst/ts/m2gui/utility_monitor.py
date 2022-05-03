@@ -183,10 +183,7 @@ class UtilityMonitor(object):
 
         for direction in DisplacementSensorDirection:
             sensors = self.get_displacement_sensors(direction)
-
-            displacements = list()
-            for sensor in sensors:
-                displacements.append(self.displacements[sensor])
+            displacements = [self.displacements[sensor] for sensor in sensors]
 
             self.signal_utility.displacements.emit((direction, displacements))
 

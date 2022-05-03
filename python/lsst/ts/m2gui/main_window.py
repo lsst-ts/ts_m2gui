@@ -92,10 +92,7 @@ class MainWindow(QMainWindow):
         container.setLayout(self._create_layout())
         self.setCentralWidget(container)
 
-        # Set the default conditions
-        self._layout_control.set_csc_commander(True)
-        self.model.report_config()
-        self.model.utility_monitor.report_utility_status()
+        self._set_default()
 
     def _set_log(self, message_format, is_output_log_on_screen, log=None):
         """Set the logger.
@@ -182,3 +179,10 @@ class MainWindow(QMainWindow):
 
         app = QtCore.QCoreApplication.instance()
         app.quit()
+
+    def _set_default(self):
+        """Set the default condition."""
+
+        self._layout_control.set_csc_commander(True)
+        self.model.report_config()
+        self.model.utility_monitor.report_utility_status()

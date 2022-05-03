@@ -311,7 +311,7 @@ class TabUtilityView(TabDefault):
         layout : `PySide2.QtWidgets.QFormLayout`
             Layout.
         """
-        layout.addRow("", create_label())
+        layout.addRow(" ", None)
 
     def _create_group_displacements(self):
         """Create the group of displacement sensors.
