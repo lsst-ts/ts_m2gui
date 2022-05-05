@@ -19,10 +19,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from lsst.ts.m2gui import get_tor
+from lsst.ts.m2gui import get_tol
 
 
-def test_get_tor():
+def test_get_tol():
 
-    assert get_tor(1) == 0.1
-    assert get_tor(2) == 0.01
+    assert get_tol(1) == 0.1
+    assert get_tol(2) == 0.01

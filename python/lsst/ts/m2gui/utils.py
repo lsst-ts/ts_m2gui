@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["set_button", "create_label", "create_group_box", "get_tor"]
+__all__ = ["set_button", "create_label", "create_group_box", "get_tol"]
 
 from functools import partial
 
@@ -135,8 +135,8 @@ def create_group_box(name, layout):
     return group_box
 
 
-def get_tor(num_digit_after_decimal):
-    """Get the torrance.
+def get_tol(num_digit_after_decimal):
+    """Get the tolerance.
 
     Parameters
     ----------
@@ -146,7 +146,7 @@ def get_tor(num_digit_after_decimal):
     Returns
     -------
     `float`
-        Torrance.
+        Tolerance.
     """
 
     return 10 ** -int(num_digit_after_decimal)

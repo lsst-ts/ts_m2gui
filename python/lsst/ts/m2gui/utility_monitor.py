@@ -28,7 +28,7 @@ from . import (
     PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
-    get_tor,
+    get_tol,
 )
 
 
@@ -236,10 +236,9 @@ class UtilityMonitor(object):
         else:
             raise ValueError(f"Not supported power type: {power_type!r}.")
 
-        tor = self._get_tor()
-        if (
-            abs(power["voltage"] - new_voltage) >= tor
-            or abs(power["current"] - new_current) >= tor
+        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
+        if self._has_changed(power["voltage"], new_voltage, tol) or self._has_changed(
+            power["current"], new_current, tol
         ):
 
             power["voltage"] = round(new_voltage, self.NUM_DIGIT_AFTER_DECIMAL)
@@ -249,27 +248,25 @@ class UtilityMonitor(object):
                 (power["voltage"], power["current"])
             )
 
-    def _get_tor(self, is_displacement_sensor=False):
-        """Get the torrance.
-
-        This is used to decide to update the internal value and send the signal
-        or not.
+    def _has_changed(self, value_old, value_new, tol):
+        """The value has changed or not based on the tolerance.
 
         Parameters
         ----------
-        is_displacement_sensor : `bool`, optional
-            Is the displacement sensor or not. (the default is False)
+        value_old : `float`
+            Old value.
+        value_new : `float`
+            New value.
+        tol : `float`
+            tolerance.
 
         Returns
         -------
-        `float`
-            Torrance.
+        `bool`
+            True if the value is changed. Otherwise, False.
         """
-        return (
-            get_tor(self.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT)
-            if is_displacement_sensor
-            else get_tor(self.NUM_DIGIT_AFTER_DECIMAL)
-        )
+
+        return True if abs(value_old - value_new) >= tol else False
 
     def update_inclinometer_angle(self, new_angle):
         """Update the angle of inclinometer.
@@ -280,7 +277,8 @@ class UtilityMonitor(object):
             New angle value in degree.
         """
 
-        if abs(self.inclinometer_angle - new_angle) >= self._get_tor():
+        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
+        if self._has_changed(self.inclinometer_angle, new_angle, tol):
             self.inclinometer_angle = round(new_angle, self.NUM_DIGIT_AFTER_DECIMAL)
             self.signal_utility.inclinometer.emit(self.inclinometer_angle)
 
@@ -394,11 +392,11 @@ class UtilityMonitor(object):
                 f"Size of sensors (={size_sensors}) != size of values (={size_values})."
             )
 
-        tor = get_tor(num_digit_after_decimal)
+        tol = get_tol(num_digit_after_decimal)
 
         is_update_required = False
         for sensor, new_value in zip(sensors, new_values):
-            if abs(data[sensor] - new_value) >= tor:
+            if self._has_changed(data[sensor], new_value, tol):
                 is_update_required = True
                 break
 

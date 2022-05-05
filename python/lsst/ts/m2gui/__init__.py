@@ -37,7 +37,7 @@ from .enums import (
     TemperatureGroup,
     DisplacementSensorDirection,
 )
-from .utils import set_button, create_label, create_group_box, get_tor
+from .utils import set_button, create_label, create_group_box, get_tol
 from .signals import (
     SignalControl,
     SignalMessage,
