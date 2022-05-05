@@ -26,6 +26,7 @@ __all__ = [
     "SignalMessage",
     "SignalStatus",
     "SignalConfig",
+    "SignalUtility",
 ]
 
 from PySide2 import QtCore
@@ -76,3 +77,35 @@ class SignalConfig(QtCore.QObject):
     """Configuration Signal to send the configuration."""
 
     config = QtCore.Signal(object)
+
+
+class SignalUtility(QtCore.QObject):
+    """Utility signal to send the utility status."""
+
+    # The power should be a tuple: (voltage, current). The data type is float.
+    # The units are volt and ampere respectively.
+    power_motor = QtCore.Signal(object)
+    power_communication = QtCore.Signal(object)
+
+    # Unit is degree
+    inclinometer = QtCore.Signal(float)
+
+    # The breaker_status should be a tuple: (name, status). The data type of
+    # "name" is string, and the data type of "status" is bool. If the breaker
+    # is triggered, put the "status" as True, otherwise, False.
+    breaker_status = QtCore.Signal(object)
+
+    # The temperatures should be a tuple:
+    # (temperature_group, [temperture_1, temperture_2, ...]). The data type of
+    # "temperature_group" is the enum: `TemperatureGroup`. The data type of the
+    # temperature in "[temperture_1, temperture_2, ...]" is float. The unit is
+    # degree C. This list should have all the temperatures in the group.
+    temperatures = QtCore.Signal(object)
+
+    # The displacements should be a tuple:
+    # (sensor_direction, [displacement_1, displacement_2, ...]). The data type
+    # of "sensor_direction" is the enum: `DisplacementSensorDirection`. The
+    # data type of displacement in "[displacement_1, displacement_2, ...]" is
+    # float. The unit is mm. This list should have all the displacements in the
+    # direction.
+    displacements = QtCore.Signal(object)

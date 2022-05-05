@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["set_button", "create_label", "create_group_box"]
+__all__ = ["set_button", "create_label", "create_group_box", "get_tol"]
 
 from functools import partial
 
@@ -133,3 +133,20 @@ def create_group_box(name, layout):
     group_box.setLayout(layout)
 
     return group_box
+
+
+def get_tol(num_digit_after_decimal):
+    """Get the tolerance.
+
+    Parameters
+    ----------
+    num_digit_after_decimal : `int`
+        Number of digits after the decimal. This should be greater than 0.
+
+    Returns
+    -------
+    `float`
+        Tolerance.
+    """
+
+    return 10 ** -int(num_digit_after_decimal)

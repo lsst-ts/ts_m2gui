@@ -19,38 +19,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
+from lsst.ts.m2gui import get_tol
 
-if typing.TYPE_CHECKING:
-    __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
 
-from .enums import (
-    LocalMode,
-    LimitSwitchType,
-    Ring,
-    PowerType,
-    TemperatureGroup,
-    DisplacementSensorDirection,
-)
-from .utils import set_button, create_label, create_group_box, get_tol
-from .signals import (
-    SignalControl,
-    SignalMessage,
-    SignalError,
-    SignalStatus,
-    SignalLimitSwitch,
-    SignalConfig,
-    SignalUtility,
-)
-from .log_window_handler import LogWindowHandler
-from .fault_manager import FaultManager
-from .utility_monitor import UtilityMonitor
-from .config import Config
-from .model import Model
-from .control_tabs import ControlTabs
-from .main_window import MainWindow
+def test_get_tol():
+
+    assert get_tol(1) == 0.1
+    assert get_tol(2) == 0.01

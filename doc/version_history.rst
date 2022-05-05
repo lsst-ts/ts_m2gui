@@ -6,6 +6,17 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.0.7:
+
+-------------
+0.0.7
+-------------
+
+* Add the **UtilityMonitor** class.
+* Support the utility view.
+* Add the *class_tab_utility_view.uml*.
+* Rename the *test_config_view.py* to *test_tab_config_view.py*.
+
 .. _lsst.ts.m2gui-0.0.6:
 
 -------------

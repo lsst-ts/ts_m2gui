@@ -22,7 +22,7 @@
 __all__ = ["Model"]
 
 from .enums import LocalMode, LimitSwitchType, Ring
-from . import SignalStatus, SignalConfig, FaultManager, Config
+from . import SignalStatus, SignalConfig, FaultManager, Config, UtilityMonitor
 
 
 class Model(object):
@@ -51,6 +51,8 @@ class Model(object):
         System status.
     fault_manager : `FaultManager`
         Fault manager to record the system error.
+    utility_monitor : `UtilityMonitor`
+        Utility monitor to monitor the utility status.
     """
 
     def __init__(self, log):
@@ -67,6 +69,7 @@ class Model(object):
         self.system_status = self._set_system_status()
 
         self.fault_manager = FaultManager(self.get_actuator_default_status(False))
+        self.utility_monitor = UtilityMonitor()
 
     def _set_system_status(self):
         """Set the default system status.
