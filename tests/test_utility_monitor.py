@@ -23,6 +23,7 @@ import pytest
 
 from lsst.ts.m2gui import (
     UtilityMonitor,
+    ActuatorForce,
     PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
@@ -46,6 +47,8 @@ def test_report_utility_status(qtbot, utility_monitor):
         utility_monitor.signal_utility.breaker_status,
         utility_monitor.signal_utility.temperatures,
         utility_monitor.signal_utility.displacements,
+        utility_monitor.signal_detailed_force.hard_points,
+        utility_monitor.signal_detailed_force.forces,
     ]
     with qtbot.waitSignals(signals, timeout=TIMEOUT):
         utility_monitor.report_utility_status()
@@ -231,3 +234,50 @@ def test_update_displacements(qtbot, utility_monitor):
     sensors = utility_monitor.get_displacement_sensors(direction)
     for sensor, displacement in zip(sensors, displacements):
         assert utility_monitor.displacements[sensor] == displacement
+
+
+def test_update_hard_points(qtbot, utility_monitor):
+
+    axial = [1, 2, 3]
+    tangent = [72, 73, 74]
+    with qtbot.waitSignal(
+        utility_monitor.signal_detailed_force.hard_points, timeout=TIMEOUT
+    ):
+        utility_monitor.update_hard_points(axial, tangent)
+
+    assert utility_monitor.hard_points["axial"] == axial
+    assert utility_monitor.hard_points["tangent"] == tangent
+
+
+def test_update_hard_points_exception(utility_monitor):
+
+    with pytest.raises(ValueError):
+        utility_monitor.update_hard_points([1], [2])
+
+
+def test_update_forces(qtbot, utility_monitor):
+
+    # Current force is changed
+    actuator_force = ActuatorForce()
+    actuator_force.f_cur[1] = 100
+
+    signal = utility_monitor.signal_detailed_force.forces
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_forces(actuator_force)
+
+    assert id(utility_monitor.forces) != id(actuator_force)
+    assert utility_monitor.forces.f_cur == actuator_force.f_cur
+
+    # There should be no change
+    actuator_force.f_cur[1] = 100.001
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_forces(actuator_force)
+
+    # Current position is changed
+    actuator_force.position_in_mm[1] = 100
+
+    signal = utility_monitor.signal_detailed_force.forces
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_forces(actuator_force)
+
+    assert utility_monitor.forces.position_in_mm == actuator_force.position_in_mm
