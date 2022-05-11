@@ -74,7 +74,7 @@ class TabDetailedForce(TabDefault):
         # Detailed force
         self._forces = self._create_items_force()
 
-        # List of the force detatils
+        # List of the force details
         self._list_force_details = list(self._forces.keys())
 
         # Select the ring to show the detailed force
@@ -176,7 +176,7 @@ class TabDetailedForce(TabDefault):
             Table widget without the items.
 
         Returns
-        ----------
+        -------
         table : `PySide2.QtWidgets.QTableWidget`
             Table widget with the items.
         """
@@ -201,7 +201,7 @@ class TabDetailedForce(TabDefault):
             Table widget.
 
         Returns
-        ----------
+        -------
         table : `PySide2.QtWidgets.QTableWidget`
             Resized table widget.
         """
