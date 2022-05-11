@@ -79,6 +79,10 @@ class TabConfigView(TabDefault):
 
         widget = self.widget()
         widget.setLayout(self._create_layout())
+
+        # Resize the dock to have a similar size of layout
+        self.resize(widget.sizeHint())
+
         self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
 
     def _create_layout(self):

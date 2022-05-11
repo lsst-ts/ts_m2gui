@@ -19,13 +19,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["set_button", "create_label", "create_group_box", "get_tol"]
+__all__ = [
+    "NUM_ACTUATOR",
+    "set_button",
+    "create_label",
+    "create_group_box",
+    "create_table",
+    "get_tol",
+    "get_num_actuator_ring",
+]
 
 from functools import partial
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox
+from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox, QTableWidget
 from PySide2.QtGui import QPalette
+
+from . import Ring
+
+NUM_ACTUATOR = 78
 
 
 def set_button(
@@ -135,6 +147,35 @@ def create_group_box(name, layout):
     return group_box
 
 
+def create_table(header_text, is_disabled_selection=False):
+    """Create the table.
+
+    Parameters
+    ----------
+    header_text : `list`
+        Text of the header.
+    is_disabled_selection : `bool`, optional
+        The selection is disabled or not. (the default is False)
+
+    Returns
+    -------
+    table : `PySide2.QtWidgets.QTableWidget`
+        Table.
+    """
+
+    table = QTableWidget()
+
+    table.setColumnCount(len(header_text))
+    table.setHorizontalHeaderLabels(header_text)
+
+    if is_disabled_selection:
+        table.setEditTriggers(QTableWidget.NoEditTriggers)
+        table.setFocusPolicy(Qt.NoFocus)
+        table.setSelectionMode(QTableWidget.NoSelection)
+
+    return table
+
+
 def get_tol(num_digit_after_decimal):
     """Get the tolerance.
 
@@ -150,3 +191,34 @@ def get_tol(num_digit_after_decimal):
     """
 
     return 10 ** -int(num_digit_after_decimal)
+
+
+def get_num_actuator_ring(ring):
+    """Get the number of actuators on the specific ring.
+
+    Parameters
+    ----------
+    ring : enum `Ring`
+        Specific ring.
+
+    Returns
+    -------
+    `int`
+        Number of the actuators.
+
+    Raises
+    ------
+    `ValueError`
+        Not supported ring.
+    """
+
+    if ring == Ring.A:
+        return 6
+    elif ring == Ring.B:
+        return 30
+    elif ring == Ring.C:
+        return 24
+    elif ring == Ring.D:
+        return 18
+    else:
+        raise ValueError(f"Not supported ring: {ring!r}")

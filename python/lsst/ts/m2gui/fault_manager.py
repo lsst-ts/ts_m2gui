@@ -22,8 +22,7 @@
 __all__ = ["FaultManager"]
 
 
-from .enums import LimitSwitchType
-from . import SignalError, SignalLimitSwitch
+from . import LimitSwitchType, SignalError, SignalLimitSwitch
 
 
 class FaultManager(object):

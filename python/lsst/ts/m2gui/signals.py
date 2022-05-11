@@ -27,6 +27,7 @@ __all__ = [
     "SignalStatus",
     "SignalConfig",
     "SignalUtility",
+    "SignalDetailedForce",
 ]
 
 from PySide2 import QtCore
@@ -74,7 +75,7 @@ class SignalStatus(QtCore.QObject):
 
 
 class SignalConfig(QtCore.QObject):
-    """Configuration Signal to send the configuration."""
+    """Configuration signal to send the configuration."""
 
     config = QtCore.Signal(object)
 
@@ -109,3 +110,15 @@ class SignalUtility(QtCore.QObject):
     # float. The unit is mm. This list should have all the displacements in the
     # direction.
     displacements = QtCore.Signal(object)
+
+
+class SignalDetailedForce(QtCore.QObject):
+    """Detailed force signal to send the calculated and measured force details
+    contains the look-up table (LUT)."""
+
+    # List of the hard points. There should be 6 elements. The first three are
+    # the axial actuators and the last three are the tangential actuators.
+    hard_points = QtCore.Signal(object)
+
+    # Instance of the `ActuatorForce` class.
+    forces = QtCore.Signal(object)
