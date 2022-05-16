@@ -28,6 +28,7 @@ __all__ = [
     "SignalConfig",
     "SignalUtility",
     "SignalDetailedForce",
+    "SignalPosition",
 ]
 
 from PySide2 import QtCore
@@ -122,3 +123,10 @@ class SignalDetailedForce(QtCore.QObject):
 
     # Instance of the `ActuatorForce` class.
     forces = QtCore.Signal(object)
+
+
+class SignalPosition(QtCore.QObject):
+
+    # Rigid body position as a list: [x, y, z, rx, ry, rz]. The unit of x, y,
+    # and z is mm. The unit of rx, ry, and ry is urad.
+    position = QtCore.Signal(object)

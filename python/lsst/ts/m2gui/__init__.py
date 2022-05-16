@@ -55,6 +55,7 @@ from .signals import (
     SignalConfig,
     SignalUtility,
     SignalDetailedForce,
+    SignalPosition,
 )
 from .log_window_handler import LogWindowHandler
 from .fault_manager import FaultManager
