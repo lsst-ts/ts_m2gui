@@ -25,6 +25,7 @@ FaultManager *-- SignalLimitSwitch : emit()
 
 UtilityMonitor *-- SignalUtility : emit()
 UtilityMonitor *-- SignalDetailedForce : emit()
+UtilityMonitor *-- SignalPosition : emit()
 UtilityMonitor ..> ActuatorForce
 
 LayoutDefault *-- Model
