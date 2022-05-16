@@ -57,7 +57,7 @@ class TabDetailedForce(TabDefault):
         Model class.
     """
 
-    # These are contants used in the self._resize_table() before figuring out
+    # These are constants used in the self._resize_table() before figuring out
     # an easy way to resize the table smartly.
     MIN_WIDTH = 600
     MIN_HEIGHT = 400

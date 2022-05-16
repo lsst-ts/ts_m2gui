@@ -21,6 +21,7 @@
 
 __all__ = ["ActuatorForce"]
 
+from typing import List
 from dataclasses import dataclass, field
 
 from . import NUM_ACTUATOR
@@ -34,35 +35,35 @@ class ActuatorForce:
     # The unit of force is Newton.
 
     # Force component in the calculation of gravity LUT.
-    f_e: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_0: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_a: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_f: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_delta: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_e: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_0: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_a: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_f: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_delta: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Force component in the calculation of temperature LUT.
-    t_u: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    t_x: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    t_y: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    t_r: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    t_u: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    t_x: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    t_y: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    t_r: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Commanded force
-    f_cmd: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_cmd: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Current force
-    f_cur: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_cur: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Force of the hard point correction
-    f_hc: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_hc: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Force error
-    f_error: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_error: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Count of the encoder. The data type should be integer.
-    encoder_count: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    encoder_count: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Step of motor. The data type should be integer.
-    step: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    step: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Actuator position in millimeter
-    position_in_mm: list = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    position_in_mm: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
