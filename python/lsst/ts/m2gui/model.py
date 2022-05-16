@@ -21,8 +21,17 @@
 
 __all__ = ["Model"]
 
-from .enums import LocalMode, LimitSwitchType, Ring
-from . import SignalStatus, SignalConfig, FaultManager, Config, UtilityMonitor
+from . import (
+    LocalMode,
+    LimitSwitchType,
+    Ring,
+    SignalStatus,
+    SignalConfig,
+    FaultManager,
+    Config,
+    UtilityMonitor,
+    get_num_actuator_ring,
+)
 
 
 class Model(object):
@@ -110,31 +119,27 @@ class Model(object):
 
         collection = dict()
         collection = self._set_actuator_default_status_specific_ring(
-            Ring.B, 30, collection, status
+            Ring.B, collection, status
         )
         collection = self._set_actuator_default_status_specific_ring(
-            Ring.C, 24, collection, status
+            Ring.C, collection, status
         )
         collection = self._set_actuator_default_status_specific_ring(
-            Ring.D, 18, collection, status
+            Ring.D, collection, status
         )
         collection = self._set_actuator_default_status_specific_ring(
-            Ring.A, 6, collection, status
+            Ring.A, collection, status
         )
 
         return collection
 
-    def _set_actuator_default_status_specific_ring(
-        self, ring, number, collection, status
-    ):
+    def _set_actuator_default_status_specific_ring(self, ring, collection, status):
         """Set the default actuator status in specific ring.
 
         Parameters
         ----------
         ring : enum `Ring`
             Name of ring.
-        number : `int`
-            Number of actuator in the ring.
         collection : `dict`
             Collection of actuator status.
         status : `any`
@@ -146,6 +151,7 @@ class Model(object):
             Updated collection.
         """
 
+        number = get_num_actuator_ring(ring)
         for idx in range(1, number + 1):
             name = ring.name + str(idx)
             collection[name] = status
@@ -238,7 +244,7 @@ class Model(object):
 
         Parameters
         ----------
-        **kwargs : `dict`, optional
+        **kwargs : `dict`
             Configuration key-value pairs. The available keys are defined in
             `Config` class.
 

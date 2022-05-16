@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.0.8:
+
+-------------
+0.0.8
+-------------
+
+* Support the detailed force.
+
 .. _lsst.ts.m2gui-0.0.7:
 
 -------------

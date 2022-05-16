@@ -26,16 +26,15 @@ import csv
 from PySide2.QtCore import Slot, Qt
 from PySide2.QtWidgets import (
     QVBoxLayout,
-    QTableWidget,
     QTableWidgetItem,
-    QHeaderView,
     QPlainTextEdit,
     QWidget,
     QHBoxLayout,
+    QHeaderView,
 )
 from PySide2.QtGui import QPalette
 
-from ..utils import set_button, create_label
+from ..utils import set_button, create_label, create_table
 from ..enums import LimitSwitchType, Ring
 from . import TabDefault
 
@@ -63,10 +62,10 @@ class TabAlarmWarn(TabDefault):
         self._error_list = dict()
 
         # Table of the errors
-        self._table_error = self._set_table()
+        self._table_error = self._create_table_error()
 
         # Text of the possible error cause
-        self._text_error_cause = self._set_text_error_cause()
+        self._text_error_cause = self._create_text_error_cause()
 
         # Indicators of the limit switch
         self._indicators_limit_switch_retract = self._create_indicators_limit_switch(
@@ -85,12 +84,15 @@ class TabAlarmWarn(TabDefault):
         # Internal layout
         self.widget().setLayout(self._create_layout())
 
+        # Resize the dock to have a similar size of layout
+        self.resize(self.widget().sizeHint())
+
         # Set the callbacks of signals
         self._set_signal_error(self.model.fault_manager.signal_error)
         self._set_signal_limit_switch(self.model.fault_manager.signal_limit_switch)
 
-    def _set_table(self):
-        """Set the table widget.
+    def _create_table_error(self):
+        """Create the table widget of error code.
 
         Returns
         -------
@@ -98,11 +100,8 @@ class TabAlarmWarn(TabDefault):
             Table widget.
         """
 
-        table = QTableWidget()
-
         header_text = ["Error Code", "Error Reported"]
-        table.setColumnCount(len(header_text))
-        table.setHorizontalHeaderLabels(header_text)
+        table = create_table(header_text)
 
         header = table.horizontalHeader()
         header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
@@ -125,8 +124,8 @@ class TabAlarmWarn(TabDefault):
         except KeyError:
             pass
 
-    def _set_text_error_cause(self):
-        """Set the text of possible error cause.
+    def _create_text_error_cause(self):
+        """Create the text of possible error cause.
 
         Returns
         -------

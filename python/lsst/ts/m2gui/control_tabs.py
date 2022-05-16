@@ -24,7 +24,6 @@ __all__ = ["ControlTabs"]
 from PySide2.QtWidgets import QListWidget, QVBoxLayout
 from PySide2.QtCore import Slot, Qt
 
-from .utils import set_button
 from .controltab import (
     TabActuatorControl,
     TabAlarmWarn,
@@ -36,6 +35,7 @@ from .controltab import (
     TabRigidBodyPos,
     TabUtilityView,
 )
+from . import set_button
 
 
 class ControlTabs(object):

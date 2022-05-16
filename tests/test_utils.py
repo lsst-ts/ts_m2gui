@@ -19,10 +19,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from lsst.ts.m2gui import get_tol
+import pytest
+
+from lsst.ts.m2gui import get_tol, get_num_actuator_ring, Ring
 
 
 def test_get_tol():
 
     assert get_tol(1) == 0.1
     assert get_tol(2) == 0.01
+
+
+def test_get_num_actuator_ring():
+
+    assert get_num_actuator_ring(Ring.A) == 6
+    assert get_num_actuator_ring(Ring.B) == 30
+    assert get_num_actuator_ring(Ring.C) == 24
+    assert get_num_actuator_ring(Ring.D) == 18
+
+    with pytest.raises(ValueError):
+        get_num_actuator_ring("WrongRing")

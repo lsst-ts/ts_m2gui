@@ -7,6 +7,7 @@
 
 ## Needed Package
 
+- numpy (install by `conda`)
 - pyside2 (install by `conda`)
 - qt5-qtbase-devel (install by `yum`)
 - [black](https://github.com/psf/black) (22.3.0, optional)

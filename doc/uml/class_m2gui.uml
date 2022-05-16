@@ -24,6 +24,8 @@ FaultManager *-- SignalError : emit()
 FaultManager *-- SignalLimitSwitch : emit()
 
 UtilityMonitor *-- SignalUtility : emit()
+UtilityMonitor *-- SignalDetailedForce : emit()
+UtilityMonitor ..> ActuatorForce
 
 LayoutDefault *-- Model
 LayoutDefault *-- SignalControl : emit()/connect()

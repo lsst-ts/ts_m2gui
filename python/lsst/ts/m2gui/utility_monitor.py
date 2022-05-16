@@ -22,9 +22,13 @@
 __all__ = ["UtilityMonitor"]
 
 import re
+import numpy as np
+from copy import deepcopy
 
 from . import (
+    ActuatorForce,
     SignalUtility,
+    SignalDetailedForce,
     PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
@@ -39,6 +43,8 @@ class UtilityMonitor(object):
     ----------
     signal_utility : `SignalUtility`
         Signal to report the utility status.
+    signal_detailed_force : `SignalDetailedForce`
+        Signal to report the detailed force.
     power_motor : `dict`
         Motor power. The unit of voltage is volt and the unit of current is
         ampere.
@@ -56,6 +62,10 @@ class UtilityMonitor(object):
     displacements : `dict`
         Displacement sensors. The key is the displacement sensor name. The
         value is the reading in the unit of mm.
+    hard_points : `dict`
+        Hard points of the axial and tangential actuators.
+    forces : `ActuatorForce`
+        Detailed actuator forces.
     """
 
     # Number of digits after the decimal
@@ -70,6 +80,7 @@ class UtilityMonitor(object):
     def __init__(self):
 
         self.signal_utility = SignalUtility()
+        self.signal_detailed_force = SignalDetailedForce()
 
         self.power_motor = {"voltage": 0, "current": 0}
         self.power_communication = {"voltage": 0, "current": 0}
@@ -128,6 +139,10 @@ class UtilityMonitor(object):
             "A6-Delta_z": 0,
         }
 
+        self.hard_points = {"axial": [0, 0, 0], "tangent": [0, 0, 0]}
+
+        self.forces = ActuatorForce()
+
     def report_utility_status(self):
         """Report the utility status."""
 
@@ -144,6 +159,11 @@ class UtilityMonitor(object):
         self._report_temperatures()
 
         self._report_displacements()
+
+        self.signal_detailed_force.hard_points.emit(
+            self.hard_points["axial"] + self.hard_points["tangent"]
+        )
+        self.signal_detailed_force.forces.emit(self.forces)
 
     def _report_temperatures(self):
         """Report the temperatures."""
@@ -251,12 +271,15 @@ class UtilityMonitor(object):
     def _has_changed(self, value_old, value_new, tol):
         """The value has changed or not based on the tolerance.
 
+        If the input values are arrays, compare the maximum change in arrays
+        with the tolerance.
+
         Parameters
         ----------
-        value_old : `float`
+        value_old : `float` or `numpy.ndarray`
             Old value.
-        value_new : `float`
-            New value.
+        value_new : `float` or `numpy.ndarray`
+            New value. The data type should be the same as the "value_old".
         tol : `float`
             tolerance.
 
@@ -266,7 +289,7 @@ class UtilityMonitor(object):
             True if the value is changed. Otherwise, False.
         """
 
-        return True if abs(value_old - value_new) >= tol else False
+        return np.max(np.abs(value_old - value_new)) >= tol
 
     def update_inclinometer_angle(self, new_angle):
         """Update the angle of inclinometer.
@@ -432,3 +455,55 @@ class UtilityMonitor(object):
             self.signal_utility.displacements,
             direction,
         )
+
+    def update_hard_points(self, axial, tangent):
+        """Update the hard points.
+
+        Parameters
+        ----------
+        axial : `list`
+            List of the hard points in axial direction.
+        tangent : `list`
+            List of the hard points in tangent direction.
+
+        Raises
+        ------
+        `ValueError`
+            Lengths of the inputs are not right.
+        """
+
+        length_axial = len(self.hard_points["axial"])
+        length_tangent = len(self.hard_points["tangent"])
+        if len(axial) != length_axial or len(tangent) != length_tangent:
+            raise ValueError(
+                f"Length should be (axial, tangent) = ({length_axial}, {length_tangent})."
+            )
+
+        self.hard_points["axial"] = axial
+        self.hard_points["tangent"] = tangent
+
+        self.signal_detailed_force.hard_points.emit(
+            self.hard_points["axial"] + self.hard_points["tangent"]
+        )
+
+    def update_forces(self, actuator_force):
+        """Update the forces.
+
+        Parameters
+        ----------
+        actuator_force : `ActuatorForce`
+            Actuator force.
+        """
+
+        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
+        if self._has_changed(
+            np.array(self.forces.f_cur), np.array(actuator_force.f_cur), tol
+        ) or self._has_changed(
+            np.array(self.forces.position_in_mm),
+            np.array(actuator_force.position_in_mm),
+            tol,
+        ):
+            # Use the deepcopy() here to make sure the above comparison can
+            # always work
+            self.forces = deepcopy(actuator_force)
+            self.signal_detailed_force.forces.emit(self.forces)
