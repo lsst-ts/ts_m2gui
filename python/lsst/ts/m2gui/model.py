@@ -269,3 +269,46 @@ class Model(object):
         self.signal_config.config.emit(config)
 
         return config
+
+    def save_position(self):
+        """Save the rigid body position."""
+        self.log.info("Save the rigid body position.")
+
+    def go_to_position(self, x, y, z, rx, ry, rz):
+        """Go to the position.
+
+        Parameters
+        ----------
+        x : `float`
+            Position x in um.
+        y : `float`
+            Position y in um.
+        z : `float`
+            Position z in um.
+        rx : `float`
+            Rotation x in arcsec.
+        ry : `float`
+            Rotation y in arcsec.
+        rz : `float`
+            Rotation z in arcsec.
+        """
+
+        if self.is_enabled_and_closed_loop_control():
+            self.log.info(f"Move to the position: ({x}, {y}, {z}, {rx}, {ry}, {rz}).")
+        else:
+            self.log.info("This can only be done in the closed-loop control.")
+
+    def is_enabled_and_closed_loop_control(self):
+        """The system is in the Enabled state and closed-loop control or not.
+
+        Returns
+        -------
+        `bool`
+            True if the system is in the Enabled state and closed-loop control.
+            Otherwise, False.
+        """
+        return self.local_mode == LocalMode.Enable and self.is_closed_loop
+
+    def set_home(self):
+        """Set the home position."""
+        self.log.info("Set the home position.")

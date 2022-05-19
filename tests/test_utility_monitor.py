@@ -49,6 +49,7 @@ def test_report_utility_status(qtbot, utility_monitor):
         utility_monitor.signal_utility.displacements,
         utility_monitor.signal_detailed_force.hard_points,
         utility_monitor.signal_detailed_force.forces,
+        utility_monitor.signal_position.position,
     ]
     with qtbot.waitSignals(signals, timeout=TIMEOUT):
         utility_monitor.report_utility_status()
@@ -281,3 +282,17 @@ def test_update_forces(qtbot, utility_monitor):
         utility_monitor.update_forces(actuator_force)
 
     assert utility_monitor.forces.position_in_mm == actuator_force.position_in_mm
+
+
+def test_update_position(qtbot, utility_monitor):
+
+    signal = utility_monitor.signal_position.position
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_position(0.1, 0.23, 0.62, 3, 1.03, 1.06)
+
+    assert utility_monitor.position == [0.1, 0.2, 0.6, 3, 1, 1.1]
+
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_position(0.11, 0.23, 0.62, 3, 1.03, 1.06)
+
+    assert utility_monitor.position[0] == 0.1

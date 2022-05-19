@@ -136,3 +136,14 @@ def test_report_config_exception(model):
 
     with pytest.raises(KeyError):
         model.report_config(wrong_name=0)
+
+
+def test_is_enabled_and_closed_loop_control(model):
+
+    assert model.is_enabled_and_closed_loop_control() is False
+
+    model.local_mode = LocalMode.Enable
+    assert model.is_enabled_and_closed_loop_control() is False
+
+    model.is_closed_loop = True
+    assert model.is_enabled_and_closed_loop_control() is True

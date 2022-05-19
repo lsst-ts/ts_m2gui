@@ -29,6 +29,7 @@ from . import (
     ActuatorForce,
     SignalUtility,
     SignalDetailedForce,
+    SignalPosition,
     PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
@@ -45,6 +46,8 @@ class UtilityMonitor(object):
         Signal to report the utility status.
     signal_detailed_force : `SignalDetailedForce`
         Signal to report the detailed force.
+    signal_position : `SignalPosition`
+        Signal to report the rigid body position.
     power_motor : `dict`
         Motor power. The unit of voltage is volt and the unit of current is
         ampere.
@@ -66,6 +69,9 @@ class UtilityMonitor(object):
         Hard points of the axial and tangential actuators.
     forces : `ActuatorForce`
         Detailed actuator forces.
+    position : `list`
+        Rigid body position: [x, y, z, rx, ry, rz]. The unit of x, y, and z is
+        um. The unit of rx, ry, and ry is arcsec.
     """
 
     # Number of digits after the decimal
@@ -81,6 +87,7 @@ class UtilityMonitor(object):
 
         self.signal_utility = SignalUtility()
         self.signal_detailed_force = SignalDetailedForce()
+        self.signal_position = SignalPosition()
 
         self.power_motor = {"voltage": 0, "current": 0}
         self.power_communication = {"voltage": 0, "current": 0}
@@ -142,6 +149,7 @@ class UtilityMonitor(object):
         self.hard_points = {"axial": [0, 0, 0], "tangent": [0, 0, 0]}
 
         self.forces = ActuatorForce()
+        self.position = [0, 0, 0, 0, 0, 0]
 
     def report_utility_status(self):
         """Report the utility status."""
@@ -164,6 +172,8 @@ class UtilityMonitor(object):
             self.hard_points["axial"] + self.hard_points["tangent"]
         )
         self.signal_detailed_force.forces.emit(self.forces)
+
+        self.signal_position.position.emit(self.position)
 
     def _report_temperatures(self):
         """Report the temperatures."""
@@ -507,3 +517,37 @@ class UtilityMonitor(object):
             # always work
             self.forces = deepcopy(actuator_force)
             self.signal_detailed_force.forces.emit(self.forces)
+
+    def update_position(self, x, y, z, rx, ry, rz):
+        """Update the position of rigid body.
+
+        Parameters
+        ----------
+        x : `float`
+            Position x in um.
+        y : `float`
+            Position y in um.
+        z : `float`
+            Position z in um.
+        rx : `float`
+            Rotation x in arcsec.
+        ry : `float`
+            Rotation y in arcsec.
+        rz : `float`
+            Rotation z in arcsec.
+        """
+
+        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
+
+        is_changed = False
+        components = [x, y, z, rx, ry, rz]
+        for idx, component in enumerate(components):
+            if self._has_changed(self.position[idx], component, tol):
+                is_changed = True
+                break
+
+        if is_changed:
+            for idx, component in enumerate(components):
+                self.position[idx] = round(component, self.NUM_DIGIT_AFTER_DECIMAL)
+
+            self.signal_position.position.emit(self.position)

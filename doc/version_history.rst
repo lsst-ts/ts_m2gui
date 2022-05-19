@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.0.9:
+
+-------------
+0.0.9
+-------------
+
+* Support the rigid body position.
+
 .. _lsst.ts.m2gui-0.0.8:
 
 -------------
