@@ -332,7 +332,7 @@ class UtilityMonitor(object):
             self.signal_utility.breaker_status.emit((name, new_status))
 
     def reset_breakers(self):
-        """Reset the breaksers."""
+        """Reset the breakers."""
 
         for name in self.breakers.keys():
             self.update_breaker(name, False)

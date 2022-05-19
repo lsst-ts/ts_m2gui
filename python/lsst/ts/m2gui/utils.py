@@ -27,12 +27,14 @@ __all__ = [
     "create_table",
     "get_tol",
     "get_num_actuator_ring",
+    "prompt_dialog_warning",
+    "run_command",
 ]
 
 from functools import partial
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox, QTableWidget
+from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox, QTableWidget, QMessageBox
 from PySide2.QtGui import QPalette
 
 from . import Ring
@@ -222,3 +224,58 @@ def get_num_actuator_ring(ring):
         return 18
     else:
         raise ValueError(f"Not supported ring: {ring!r}")
+
+
+def prompt_dialog_warning(description, is_prompted=True):
+    """Prompt the warning dialog.
+
+    The user must react to this dialog. The rest of the GUI is blocked until
+    the dialog is dismissed.
+
+    Parameters
+    ----------
+    description : `str`
+        Description that will be shown in the dialog.
+    is_prompted : `bool`, optional
+        Dialog will be prompted or not. The value of False is used in the unit
+        test only. (the default is True)
+    """
+
+    dialog = QMessageBox()
+    dialog.setIcon(QMessageBox.Warning)
+    dialog.setText(description)
+
+    if is_prompted:
+        dialog.exec()
+
+
+def run_command(command, *args, is_prompted=True):
+    """Run the command.
+
+    If the command fails, there will be a prompt dialog to warn the users
+    by default.
+
+    Parameters
+    ----------
+    command : `func`
+        Command to execute.
+    *args : `args`
+        Arguments of the command.
+    is_prompted : `bool`, optional
+        Dialog will be prompted or not. The value of False is used in the
+        unit test only. (the default is True)
+
+    Returns
+    -------
+    `bool`
+        True if the command succeeds. Otherwise, False.
+    """
+
+    try:
+        command(*args)
+    except Exception as error:
+        prompt_dialog_warning(str(error), is_prompted=is_prompted)
+
+        return False
+
+    return True

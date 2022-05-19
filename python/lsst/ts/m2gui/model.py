@@ -201,12 +201,18 @@ class Model(object):
         self._check_error_and_update_status()
 
     def enable_open_loop_max_limit(self):
-        """Enable the maximum limit in open-loop control."""
+        """Enable the maximum limit in open-loop control.
+
+        Raises
+        ------
+        `RuntimeError`
+            Not in the open-loop control.
+        """
 
         if (self.local_mode == LocalMode.Enable) and not self.is_closed_loop:
             self.update_system_status("isOpenLoopMaxLimitsEnabled", True)
         else:
-            self.log.info(
+            raise RuntimeError(
                 "Failed to enable the maximum limit. Only allow in Enabled state and open-loop control."
             )
 
@@ -226,7 +232,7 @@ class Model(object):
 
         Raises
         ------
-        ValueError
+        `ValueError`
             Status name is not in the list.
         """
 
@@ -255,7 +261,7 @@ class Model(object):
 
         Raises
         ------
-        KeyError
+        `KeyError`
             Key name does not exist in the Config class.
         """
 
@@ -291,12 +297,17 @@ class Model(object):
             Rotation y in arcsec.
         rz : `float`
             Rotation z in arcsec.
+
+        Raises
+        ------
+        `RuntimeError`
+            Not in the closed-loop control.
         """
 
         if self.is_enabled_and_closed_loop_control():
             self.log.info(f"Move to the position: ({x}, {y}, {z}, {rx}, {ry}, {rz}).")
         else:
-            self.log.info("This can only be done in the closed-loop control.")
+            raise RuntimeError("This can only be done in the closed-loop control.")
 
     def is_enabled_and_closed_loop_control(self):
         """The system is in the Enabled state and closed-loop control or not.

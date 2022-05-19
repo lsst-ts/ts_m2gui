@@ -34,7 +34,7 @@ from PySide2.QtWidgets import (
 )
 from PySide2.QtGui import QPalette
 
-from ..utils import set_button, create_label, create_table
+from ..utils import set_button, create_label, create_table, run_command
 from ..enums import LimitSwitchType, Ring
 from . import TabDefault
 
@@ -296,7 +296,7 @@ class TabAlarmWarn(TabDefault):
     def _callback_enable_open_loop_max_limit(self):
         """Callback of the enable button to enable the maximum limit of
         open-loop control."""
-        self.model.enable_open_loop_max_limit()
+        run_command(self.model.enable_open_loop_max_limit)
 
     def _set_signal_error(self, signal_error):
         """Set the error signal with callback functions.
