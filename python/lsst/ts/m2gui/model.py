@@ -280,17 +280,17 @@ class Model(object):
         Parameters
         ----------
         x : `float`
-            Position x in mm.
+            Position x in um.
         y : `float`
-            Position y in mm.
+            Position y in um.
         z : `float`
-            Position z in mm.
+            Position z in um.
         rx : `float`
-            Rotation x in urad.
+            Rotation x in arcsec.
         ry : `float`
-            Rotation y in urad.
+            Rotation y in arcsec.
         rz : `float`
-            Rotation z in urad.
+            Rotation z in arcsec.
         """
 
         if self.is_enabled_and_closed_loop_control():

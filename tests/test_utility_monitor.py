@@ -288,11 +288,11 @@ def test_update_position(qtbot, utility_monitor):
 
     signal = utility_monitor.signal_position.position
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
-        utility_monitor.update_position(0.1, 0.0234, 0.0265, 3.0001, 1.003, 1.04)
+        utility_monitor.update_position(0.1, 0.23, 0.62, 3, 1.03, 1.06)
 
-    assert utility_monitor.position == [0.1, 0.023, 0.026, 3, 1.003, 1.04]
+    assert utility_monitor.position == [0.1, 0.2, 0.6, 3, 1, 1.1]
 
     with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
-        utility_monitor.update_position(0.1001, 0.0234, 0.0265, 3.0001, 1.003, 1.04)
+        utility_monitor.update_position(0.11, 0.23, 0.62, 3, 1.03, 1.06)
 
     assert utility_monitor.position[0] == 0.1

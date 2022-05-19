@@ -128,5 +128,5 @@ class SignalDetailedForce(QtCore.QObject):
 class SignalPosition(QtCore.QObject):
 
     # Rigid body position as a list: [x, y, z, rx, ry, rz]. The unit of x, y,
-    # and z is mm. The unit of rx, ry, and ry is urad.
+    # and z is um. The unit of rx, ry, and ry is arcsec.
     position = QtCore.Signal(object)

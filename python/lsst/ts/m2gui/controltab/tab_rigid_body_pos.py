@@ -44,14 +44,19 @@ class TabRigidBodyPos(TabDefault):
         Model class.
     """
 
-    # The following two maximum values come from the ts_mtm2 that originated
-    # by vendor. Need to figure out the details in a latter time.
+    # Axes of the position
+    AXES = ["x", "y", "z", "rx", "ry", "rz"]
 
-    # Maximum movement in x, y, or z direction in millimeter
-    MAX_DISTANCE_IN_MM = 4
+    # The following two maximum values (4 mm and 20000 urad) come from the
+    # ts_mtm2 that originated by vendor. Need to figure out the details in a
+    # latter time.
 
-    # Maximum rotation in rx, ry, or rz direction in microradian
-    MAX_ROTATION_IN_URAD = 20000
+    # Maximum movement in x, y, or z direction in micrometer (4 mm = 4000 um)
+    MAX_DISTANCE_IN_UM = 4000
+
+    # Maximum rotation in rx, ry, or rz direction in arcsec
+    # (20000 urad ~ 4125.296 arcsec)
+    MAX_ROTATION_IN_ARCSEC = 4125
 
     def __init__(self, title, model):
         super().__init__(title, model)
@@ -101,39 +106,26 @@ class TabRigidBodyPos(TabDefault):
             is the `PySide2.QtWidgets.QDoubleSpinBox`.
         """
 
-        num_digit_after_decimal = (
-            self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
-        )
+        num_digit_after_decimal = self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL
 
         position = dict()
-        for axis in self._get_axes():
+        for axis in self.AXES:
             double_spin_box = QDoubleSpinBox()
             double_spin_box.setDecimals(num_digit_after_decimal)
             double_spin_box.setSingleStep(get_tol(num_digit_after_decimal))
 
             if axis.startswith("r"):
                 double_spin_box.setRange(
-                    -self.MAX_ROTATION_IN_URAD, self.MAX_ROTATION_IN_URAD
+                    -self.MAX_ROTATION_IN_ARCSEC, self.MAX_ROTATION_IN_ARCSEC
                 )
             else:
                 double_spin_box.setRange(
-                    -self.MAX_DISTANCE_IN_MM, self.MAX_DISTANCE_IN_MM
+                    -self.MAX_DISTANCE_IN_UM, self.MAX_DISTANCE_IN_UM
                 )
 
             position[axis] = double_spin_box
 
         return position
-
-    def _get_axes(self):
-        """Get the axes of position.
-
-        Returns
-        -------
-        `list`
-            Axes of the position.
-        """
-
-        return ["x", "y", "z", "rx", "ry", "rz"]
 
     @Slot()
     def _callback_save_position(self):
@@ -207,7 +199,7 @@ class TabRigidBodyPos(TabDefault):
         """
 
         position = dict()
-        for axis in self._get_axes():
+        for axis in self.AXES:
             position[axis] = create_label()
 
         return position
@@ -254,11 +246,13 @@ class TabRigidBodyPos(TabDefault):
         """
 
         layout_position = QFormLayout()
-        for axis in self._get_axes():
+        for axis in self.AXES:
             if axis.startswith("r"):
-                layout_position.addRow(f"Rotation {axis} (urad):", self._position[axis])
+                layout_position.addRow(
+                    f"Rotation {axis} (arcsec):", self._position[axis]
+                )
             else:
-                layout_position.addRow(f"Position {axis} (mm):", self._position[axis])
+                layout_position.addRow(f"Position {axis} (um):", self._position[axis])
 
         layout = QVBoxLayout()
         layout.addLayout(layout_position)
@@ -291,14 +285,14 @@ class TabRigidBodyPos(TabDefault):
         """
 
         layout_position = QFormLayout()
-        for axis in self._get_axes():
+        for axis in self.AXES:
             if axis.startswith("r"):
                 layout_position.addRow(
-                    f"Offset {axis} (urad):", self._target_position_relative[axis]
+                    f"Offset {axis} (arcsec):", self._target_position_relative[axis]
                 )
             else:
                 layout_position.addRow(
-                    f"Offset {axis} (mm):", self._target_position_relative[axis]
+                    f"Offset {axis} (um):", self._target_position_relative[axis]
                 )
 
         layout = QVBoxLayout()
@@ -318,14 +312,14 @@ class TabRigidBodyPos(TabDefault):
         """
 
         layout_position = QFormLayout()
-        for axis in self._get_axes():
+        for axis in self.AXES:
             if axis.startswith("r"):
                 layout_position.addRow(
-                    f"Rotation {axis} (urad):", self._target_position_absolute[axis]
+                    f"Rotation {axis} (arcsec):", self._target_position_absolute[axis]
                 )
             else:
                 layout_position.addRow(
-                    f"Position {axis} (mm):", self._target_position_absolute[axis]
+                    f"Position {axis} (um):", self._target_position_absolute[axis]
                 )
 
         layout = QVBoxLayout()
@@ -355,8 +349,8 @@ class TabRigidBodyPos(TabDefault):
         ----------
         position : `list`
             Rigid body position as a list: [x, y, z, rx, ry, rz]. The unit of x
-            , y, and z is mm. The unit of rx, ry, and ry is urad.
+            , y, and z is um. The unit of rx, ry, and ry is arcsec.
         """
 
-        for idx, axis in enumerate(self._get_axes()):
+        for idx, axis in enumerate(self.AXES):
             self._position[axis].setText(str(position[idx]))

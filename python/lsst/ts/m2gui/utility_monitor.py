@@ -71,7 +71,7 @@ class UtilityMonitor(object):
         Detailed actuator forces.
     position : `list`
         Rigid body position: [x, y, z, rx, ry, rz]. The unit of x, y, and z is
-        mm. The unit of rx, ry, and ry is urad.
+        um. The unit of rx, ry, and ry is arcsec.
     """
 
     # Number of digits after the decimal
@@ -524,20 +524,20 @@ class UtilityMonitor(object):
         Parameters
         ----------
         x : `float`
-            Position x in mm.
+            Position x in um.
         y : `float`
-            Position y in mm.
+            Position y in um.
         z : `float`
-            Position z in mm.
+            Position z in um.
         rx : `float`
-            Rotation x in urad.
+            Rotation x in arcsec.
         ry : `float`
-            Rotation y in urad.
+            Rotation y in arcsec.
         rz : `float`
-            Rotation z in urad.
+            Rotation z in arcsec.
         """
 
-        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT)
+        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
 
         is_changed = False
         components = [x, y, z, rx, ry, rz]
@@ -548,8 +548,6 @@ class UtilityMonitor(object):
 
         if is_changed:
             for idx, component in enumerate(components):
-                self.position[idx] = round(
-                    component, self.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
-                )
+                self.position[idx] = round(component, self.NUM_DIGIT_AFTER_DECIMAL)
 
             self.signal_position.position.emit(self.position)
