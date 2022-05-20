@@ -307,7 +307,7 @@ class Model(object):
         if self.is_enabled_and_closed_loop_control():
             self.log.info(f"Move to the position: ({x}, {y}, {z}, {rx}, {ry}, {rz}).")
         else:
-            raise RuntimeError("This can only be done in the closed-loop control.")
+            raise RuntimeError("Mirror can be positioned only in closed-loop control.")
 
     def is_enabled_and_closed_loop_control(self):
         """The system is in the Enabled state and closed-loop control or not.

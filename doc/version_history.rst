@@ -12,7 +12,7 @@ Version History
 0.1.0
 -------------
 
-* Prompt the warning dialog if the command fails.
+* Show warning dialog on errors.
 
 .. _lsst.ts.m2gui-0.0.9:
 

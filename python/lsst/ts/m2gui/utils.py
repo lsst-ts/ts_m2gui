@@ -227,7 +227,7 @@ def get_num_actuator_ring(ring):
 
 
 def prompt_dialog_warning(description, is_prompted=True):
-    """Prompt the warning dialog.
+    """Shows a warning dialog.
 
     The user must react to this dialog. The rest of the GUI is blocked until
     the dialog is dismissed.
@@ -235,10 +235,10 @@ def prompt_dialog_warning(description, is_prompted=True):
     Parameters
     ----------
     description : `str`
-        Description that will be shown in the dialog.
+        Description message to be shown in the dialog.
     is_prompted : `bool`, optional
-        Dialog will be prompted or not. The value of False is used in the unit
-        test only. (the default is True)
+        When False, dialog will not be executed. That is used for tests, which
+        shall not be the case when used in real GUI. (the default is True)
     """
 
     dialog = QMessageBox()
@@ -262,8 +262,8 @@ def run_command(command, *args, is_prompted=True):
     *args : `args`
         Arguments of the command.
     is_prompted : `bool`, optional
-        Dialog will be prompted or not. The value of False is used in the
-        unit test only. (the default is True)
+        When False, dialog will not be executed. That is used for tests, which
+        shall not be the case when used in real GUI. (the default is True)
 
     Returns
     -------
