@@ -226,7 +226,7 @@ def get_num_actuator_ring(ring):
         raise ValueError(f"Not supported ring: {ring!r}")
 
 
-def prompt_dialog_warning(description, is_prompted=True):
+def prompt_dialog_warning(title, description, is_prompted=True):
     """Shows a warning dialog.
 
     The user must react to this dialog. The rest of the GUI is blocked until
@@ -234,15 +234,18 @@ def prompt_dialog_warning(description, is_prompted=True):
 
     Parameters
     ----------
+    title : `str`
+        Title of the dialog.
     description : `str`
         Description message to be shown in the dialog.
     is_prompted : `bool`, optional
         When False, dialog will not be executed. That is used for tests, which
-        shall not be the case when used in real GUI. (the default is True)
+        shall not be the case when used in the real GUI. (the default is True)
     """
 
     dialog = QMessageBox()
     dialog.setIcon(QMessageBox.Warning)
+    dialog.setWindowTitle(title)
     dialog.setText(description)
 
     if is_prompted:
@@ -263,7 +266,7 @@ def run_command(command, *args, is_prompted=True):
         Arguments of the command.
     is_prompted : `bool`, optional
         When False, dialog will not be executed. That is used for tests, which
-        shall not be the case when used in real GUI. (the default is True)
+        shall not be the case when used in the real GUI. (the default is True)
 
     Returns
     -------
@@ -274,7 +277,9 @@ def run_command(command, *args, is_prompted=True):
     try:
         command(*args)
     except Exception as error:
-        prompt_dialog_warning(str(error), is_prompted=is_prompted)
+        prompt_dialog_warning(
+            f"{command.__name__}()", str(error), is_prompted=is_prompted
+        )
 
         return False
 
