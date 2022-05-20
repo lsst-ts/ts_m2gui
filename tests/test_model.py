@@ -84,7 +84,8 @@ def test_reset_errors(qtbot, model):
 def test_enable_open_loop_max_limit(model):
 
     # Should fail for the wrong local state
-    model.enable_open_loop_max_limit()
+    with pytest.raises(RuntimeError):
+        model.enable_open_loop_max_limit()
 
     assert model.system_status["isOpenLoopMaxLimitsEnabled"] is False
 
@@ -147,3 +148,9 @@ def test_is_enabled_and_closed_loop_control(model):
 
     model.is_closed_loop = True
     assert model.is_enabled_and_closed_loop_control() is True
+
+
+def test_go_to_position_exception(model):
+
+    with pytest.raises(RuntimeError):
+        model.go_to_position(0, 0, 0, 0, 0, 0)

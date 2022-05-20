@@ -21,7 +21,13 @@
 
 import pytest
 
-from lsst.ts.m2gui import get_tol, get_num_actuator_ring, Ring
+from lsst.ts.m2gui import get_tol, get_num_actuator_ring, Ring, run_command
+
+
+def command(is_failed):
+
+    if is_failed:
+        raise RuntimeError("Command is failed.")
 
 
 def test_get_tol():
@@ -39,3 +45,9 @@ def test_get_num_actuator_ring():
 
     with pytest.raises(ValueError):
         get_num_actuator_ring("WrongRing")
+
+
+def test_run_command():
+
+    assert run_command(command, False) is True
+    assert run_command(command, True, is_prompted=False) is False

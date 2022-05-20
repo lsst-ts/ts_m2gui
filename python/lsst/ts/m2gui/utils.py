@@ -27,12 +27,14 @@ __all__ = [
     "create_table",
     "get_tol",
     "get_num_actuator_ring",
+    "prompt_dialog_warning",
+    "run_command",
 ]
 
 from functools import partial
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox, QTableWidget
+from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox, QTableWidget, QMessageBox
 from PySide2.QtGui import QPalette
 
 from . import Ring
@@ -222,3 +224,63 @@ def get_num_actuator_ring(ring):
         return 18
     else:
         raise ValueError(f"Not supported ring: {ring!r}")
+
+
+def prompt_dialog_warning(title, description, is_prompted=True):
+    """Shows a warning dialog.
+
+    The user must react to this dialog. The rest of the GUI is blocked until
+    the dialog is dismissed.
+
+    Parameters
+    ----------
+    title : `str`
+        Title of the dialog.
+    description : `str`
+        Description message to be shown in the dialog.
+    is_prompted : `bool`, optional
+        When False, dialog will not be executed. That is used for tests, which
+        shall not be the case when used in the real GUI. (the default is True)
+    """
+
+    dialog = QMessageBox()
+    dialog.setIcon(QMessageBox.Warning)
+    dialog.setWindowTitle(title)
+    dialog.setText(description)
+
+    if is_prompted:
+        dialog.exec()
+
+
+def run_command(command, *args, is_prompted=True):
+    """Run the command.
+
+    If the command fails, there will be a prompt dialog to warn the users
+    by default.
+
+    Parameters
+    ----------
+    command : `func`
+        Command to execute.
+    *args : `args`
+        Arguments of the command.
+    is_prompted : `bool`, optional
+        When False, dialog will not be executed. That is used for tests, which
+        shall not be the case when used in the real GUI. (the default is True)
+
+    Returns
+    -------
+    `bool`
+        True if the command succeeds. Otherwise, False.
+    """
+
+    try:
+        command(*args)
+    except Exception as error:
+        prompt_dialog_warning(
+            f"{command.__name__}()", str(error), is_prompted=is_prompted
+        )
+
+        return False
+
+    return True

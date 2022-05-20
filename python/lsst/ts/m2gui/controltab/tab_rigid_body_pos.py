@@ -24,7 +24,7 @@ __all__ = ["TabRigidBodyPos"]
 from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QVBoxLayout, QHBoxLayout, QFormLayout, QDoubleSpinBox
 
-from ..utils import set_button, create_label, create_group_box, get_tol
+from ..utils import set_button, create_label, create_group_box, get_tol, run_command
 from . import TabDefault
 
 
@@ -137,7 +137,7 @@ class TabRigidBodyPos(TabDefault):
     def _callback_go_to_home(self):
         """Callback of the go-to-home button. This will move the M2 to the
         home position."""
-        self.model.go_to_position(0, 0, 0, 0, 0, 0)
+        run_command(self.model.go_to_position, 0, 0, 0, 0, 0, 0)
 
     @Slot()
     def _callback_set_home(self):
@@ -151,7 +151,8 @@ class TabRigidBodyPos(TabDefault):
         position based on the relative offsets."""
 
         current_position = self.model.utility_monitor.position
-        self.model.go_to_position(
+        run_command(
+            self.model.go_to_position,
             self._target_position_relative["x"].value() + current_position[0],
             self._target_position_relative["y"].value() + current_position[1],
             self._target_position_relative["z"].value() + current_position[2],
@@ -179,7 +180,8 @@ class TabRigidBodyPos(TabDefault):
     def _callback_go_to_position(self):
         """Callback of the go-to-position button. This will move the M2 to the
         new absolute position."""
-        self.model.go_to_position(
+        run_command(
+            self.model.go_to_position,
             self._target_position_absolute["x"].value(),
             self._target_position_absolute["y"].value(),
             self._target_position_absolute["z"].value(),

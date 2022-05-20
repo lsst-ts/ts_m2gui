@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.0:
+
+-------------
+0.1.0
+-------------
+
+* Show warning dialog on errors.
+
 .. _lsst.ts.m2gui-0.0.9:
 
 -------------
