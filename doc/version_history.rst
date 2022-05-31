@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.1:
+
+-------------
+0.1.1
+-------------
+
+* Support the diagnostics.
+
 .. _lsst.ts.m2gui-0.1.0:
 
 -------------

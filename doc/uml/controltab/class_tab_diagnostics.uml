@@ -1,0 +1,13 @@
+@startuml
+package "m2gui" #DDDDDD {
+  Model *-- UtilityMonitor
+  UtilityMonitor *-- SignalUtility : emit()
+  UtilityMonitor *-- SignalDetailedForce : emit()
+}
+
+TabDefault *-- Model
+TabDefault <|-- TabDiagnostics
+
+TabDiagnostics --> SignalUtility : connect()
+TabDiagnostics --> SignalDetailedForce : connect()
+@enduml
