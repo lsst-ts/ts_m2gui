@@ -69,3 +69,13 @@ class TabDefault(QDockWidget):
         scroll_area.setWidgetResizable(is_resizable)
 
         return scroll_area
+
+    def add_empty_row_to_form_layout(self, layout):
+        """Add the empty row to the form layout.
+
+        Parameters
+        ----------
+        layout : `PySide2.QtWidgets.QFormLayout`
+            Layout.
+        """
+        layout.addRow(" ", None)
