@@ -24,6 +24,7 @@ import pytest
 from lsst.ts.m2gui import (
     UtilityMonitor,
     ActuatorForce,
+    ForceErrorTangent,
     PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
@@ -41,48 +42,76 @@ def utility_monitor():
 def test_report_utility_status(qtbot, utility_monitor):
 
     signals = [
-        utility_monitor.signal_utility.power_motor,
-        utility_monitor.signal_utility.power_communication,
+        utility_monitor.signal_utility.power_motor_calibrated,
+        utility_monitor.signal_utility.power_communication_calibrated,
+        utility_monitor.signal_utility.power_motor_raw,
+        utility_monitor.signal_utility.power_communication_raw,
         utility_monitor.signal_utility.inclinometer,
         utility_monitor.signal_utility.breaker_status,
         utility_monitor.signal_utility.temperatures,
         utility_monitor.signal_utility.displacements,
+        utility_monitor.signal_utility.digital_status_input,
+        utility_monitor.signal_utility.digital_status_output,
         utility_monitor.signal_detailed_force.hard_points,
         utility_monitor.signal_detailed_force.forces,
+        utility_monitor.signal_detailed_force.force_error_tangent,
         utility_monitor.signal_position.position,
     ]
     with qtbot.waitSignals(signals, timeout=TIMEOUT):
         utility_monitor.report_utility_status()
 
 
-def test_update_power(qtbot, utility_monitor):
+def test_update_power_calibrated(qtbot, utility_monitor):
 
     # Moter
 
     # There is the update
-    signal_motor = utility_monitor.signal_utility.power_motor
+    signal_motor = utility_monitor.signal_utility.power_motor_calibrated
     with qtbot.waitSignal(signal_motor, timeout=TIMEOUT):
-        utility_monitor.update_power(PowerType.Motor, 0.11, 0.27)
+        utility_monitor.update_power_calibrated(PowerType.Motor, 0.11, 0.27)
 
-    assert utility_monitor.power_motor["voltage"] == 0.1
-    assert utility_monitor.power_motor["current"] == 0.3
+    assert utility_monitor.power_motor_calibrated["voltage"] == 0.1
+    assert utility_monitor.power_motor_calibrated["current"] == 0.3
 
     # There should be no update
     with qtbot.assertNotEmitted(signal_motor, wait=TIMEOUT):
-        utility_monitor.update_power(PowerType.Motor, 0.12, 0.28)
+        utility_monitor.update_power_calibrated(PowerType.Motor, 0.12, 0.28)
 
-    assert utility_monitor.power_motor["voltage"] == 0.1
-    assert utility_monitor.power_motor["current"] == 0.3
+    assert utility_monitor.power_motor_calibrated["voltage"] == 0.1
+    assert utility_monitor.power_motor_calibrated["current"] == 0.3
 
     # Communication
 
     # There is the update
-    signal_communication = utility_monitor.signal_utility.power_communication
+    signal_communication = utility_monitor.signal_utility.power_communication_calibrated
     with qtbot.waitSignal(signal_communication, timeout=TIMEOUT):
-        utility_monitor.update_power(PowerType.Communication, 0.21, 0.37)
+        utility_monitor.update_power_calibrated(PowerType.Communication, 0.21, 0.37)
 
-    assert utility_monitor.power_communication["voltage"] == 0.2
-    assert utility_monitor.power_communication["current"] == 0.4
+    assert utility_monitor.power_communication_calibrated["voltage"] == 0.2
+    assert utility_monitor.power_communication_calibrated["current"] == 0.4
+
+
+def test_update_power_raw(qtbot, utility_monitor):
+
+    # Moter
+
+    # There is the update
+    signal_motor = utility_monitor.signal_utility.power_motor_raw
+    with qtbot.waitSignal(signal_motor, timeout=TIMEOUT):
+        utility_monitor.update_power_raw(PowerType.Motor, 0.11, 0.27)
+
+    assert utility_monitor.power_motor_raw["voltage"] == 0.1
+    assert utility_monitor.power_motor_raw["current"] == 0.3
+
+    # Communication
+
+    # There is the update
+    signal_communication = utility_monitor.signal_utility.power_communication_raw
+    with qtbot.waitSignal(signal_communication, timeout=TIMEOUT):
+        utility_monitor.update_power_raw(PowerType.Communication, 0.21, 0.37)
+
+    assert utility_monitor.power_communication_raw["voltage"] == 0.2
+    assert utility_monitor.power_communication_raw["current"] == 0.4
 
 
 def test_update_inclinometer_angle(qtbot, utility_monitor):
@@ -237,6 +266,36 @@ def test_update_displacements(qtbot, utility_monitor):
         assert utility_monitor.displacements[sensor] == displacement
 
 
+def test_update_digital_status_input(qtbot, utility_monitor):
+
+    # There is an update
+    signal = utility_monitor.signal_utility.digital_status_input
+    new_status = 1
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_digital_status_input(new_status)
+
+    assert utility_monitor.digital_status_input == new_status
+
+    # There should be no signal
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_digital_status_input(new_status)
+
+
+def test_update_digital_status_output(qtbot, utility_monitor):
+
+    # There is an update
+    signal = utility_monitor.signal_utility.digital_status_output
+    new_status = 1
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_digital_status_output(new_status)
+
+    assert utility_monitor.digital_status_output == new_status
+
+    # There should be no signal
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_digital_status_output(new_status)
+
+
 def test_update_hard_points(qtbot, utility_monitor):
 
     axial = [1, 2, 3]
@@ -282,6 +341,40 @@ def test_update_forces(qtbot, utility_monitor):
         utility_monitor.update_forces(actuator_force)
 
     assert utility_monitor.forces.position_in_mm == actuator_force.position_in_mm
+
+
+def test_update_force_error_tangent(qtbot, utility_monitor):
+
+    # Tangent force error is changed
+    force_error_tangent = ForceErrorTangent()
+    force_error_tangent.error_force[1] = 1.24
+    force_error_tangent.error_weight = 1
+
+    signal = utility_monitor.signal_detailed_force.force_error_tangent
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_force_error_tangent(force_error_tangent)
+
+    assert (
+        utility_monitor.force_error_tangent.error_weight
+        == force_error_tangent.error_weight
+    )
+    assert utility_monitor.force_error_tangent.error_force[1] == 1.2
+
+    # There should be no change
+    force_error_tangent.error_weight = 1.001
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_force_error_tangent(force_error_tangent)
+
+    # Tangent sum is changed
+    force_error_tangent.error_sum = 2
+    force_error_tangent.error_force[2] = 2.24
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_force_error_tangent(force_error_tangent)
+
+    assert (
+        utility_monitor.force_error_tangent.error_sum == force_error_tangent.error_sum
+    )
+    assert utility_monitor.force_error_tangent.error_force[2] == 2.2
 
 
 def test_update_position(qtbot, utility_monitor):

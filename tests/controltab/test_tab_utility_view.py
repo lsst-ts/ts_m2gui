@@ -57,14 +57,16 @@ def test_callback_reset_breakers(qtbot, widget):
 
 def test_callback_power_motor(qtbot, widget):
 
-    widget.model.utility_monitor.update_power(PowerType.Motor, 0.1, 0.2)
+    widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
     assert widget._power_inclinometer["power_voltage_motor"].text() == "0.1 V"
     assert widget._power_inclinometer["power_current_motor"].text() == "0.2 A"
 
 
 def test_callback_power_communication(qtbot, widget):
 
-    widget.model.utility_monitor.update_power(PowerType.Communication, 0.1, 0.2)
+    widget.model.utility_monitor.update_power_calibrated(
+        PowerType.Communication, 0.1, 0.2
+    )
     assert widget._power_inclinometer["power_voltage_communication"].text() == "0.1 V"
     assert widget._power_inclinometer["power_current_communication"].text() == "0.2 A"
 

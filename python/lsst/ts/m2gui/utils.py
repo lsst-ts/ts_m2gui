@@ -21,6 +21,7 @@
 
 __all__ = [
     "NUM_ACTUATOR",
+    "NUM_TANGENT_LINK",
     "set_button",
     "create_label",
     "create_group_box",
@@ -40,6 +41,7 @@ from PySide2.QtGui import QPalette
 from . import Ring
 
 NUM_ACTUATOR = 78
+NUM_TANGENT_LINK = 6
 
 
 def set_button(

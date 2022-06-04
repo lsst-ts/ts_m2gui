@@ -78,16 +78,24 @@ class SignalStatus(QtCore.QObject):
 class SignalConfig(QtCore.QObject):
     """Configuration signal to send the configuration."""
 
+    # Instance of `Config` class.
     config = QtCore.Signal(object)
 
 
 class SignalUtility(QtCore.QObject):
     """Utility signal to send the utility status."""
 
+    # Calibrated power data
     # The power should be a tuple: (voltage, current). The data type is float.
     # The units are volt and ampere respectively.
-    power_motor = QtCore.Signal(object)
-    power_communication = QtCore.Signal(object)
+    power_motor_calibrated = QtCore.Signal(object)
+    power_communication_calibrated = QtCore.Signal(object)
+
+    # Raw power data (debug only)
+    # The power should be a tuple: (voltage, current). The data type is float.
+    # The units are volt and ampere respectively.
+    power_motor_raw = QtCore.Signal(object)
+    power_communication_raw = QtCore.Signal(object)
 
     # Unit is degree
     inclinometer = QtCore.Signal(float)
@@ -112,6 +120,11 @@ class SignalUtility(QtCore.QObject):
     # direction.
     displacements = QtCore.Signal(object)
 
+    # Digital input/output status as 32/8 bits value. Each bit means different
+    # status. 1 means OK (or triggered). Otherwise 0.
+    digital_status_input = QtCore.Signal(int)
+    digital_status_output = QtCore.Signal(int)
+
 
 class SignalDetailedForce(QtCore.QObject):
     """Detailed force signal to send the calculated and measured force details
@@ -124,8 +137,13 @@ class SignalDetailedForce(QtCore.QObject):
     # Instance of the `ActuatorForce` class.
     forces = QtCore.Signal(object)
 
+    # Tangential force error to monitor the supporting force of tangential
+    # link. Instance of `ForceErrorTangent` class.
+    force_error_tangent = QtCore.Signal(object)
+
 
 class SignalPosition(QtCore.QObject):
+    """Position signal to send the rigid body position."""
 
     # Rigid body position as a list: [x, y, z, rx, ry, rz]. The unit of x, y,
     # and z is um. The unit of rx, ry, and ry is arcsec.

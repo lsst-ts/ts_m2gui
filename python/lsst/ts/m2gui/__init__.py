@@ -39,6 +39,7 @@ from .enums import (
 )
 from .utils import (
     NUM_ACTUATOR,
+    NUM_TANGENT_LINK,
     set_button,
     create_label,
     create_group_box,
@@ -62,6 +63,7 @@ from .signals import (
 from .log_window_handler import LogWindowHandler
 from .fault_manager import FaultManager
 from .actuator_force import ActuatorForce
+from .force_error_tangent import ForceErrorTangent
 from .utility_monitor import UtilityMonitor
 from .config import Config
 from .model import Model

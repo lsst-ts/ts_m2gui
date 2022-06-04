@@ -27,6 +27,7 @@ from copy import deepcopy
 
 from . import (
     ActuatorForce,
+    ForceErrorTangent,
     SignalUtility,
     SignalDetailedForce,
     SignalPosition,
@@ -48,11 +49,17 @@ class UtilityMonitor(object):
         Signal to report the detailed force.
     signal_position : `SignalPosition`
         Signal to report the rigid body position.
-    power_motor : `dict`
-        Motor power. The unit of voltage is volt and the unit of current is
+    power_motor_calibrated : `dict`
+        Calibrated motor power. The unit of voltage is volt and the unit of
+        current is ampere.
+    power_communication_calibrated : `dict`
+        Calibrated communication power. The unit of voltage is volt and the
+        unit of current is ampere.
+    power_motor_raw : `dict`
+        Raw motor power. The unit of voltage is volt and the unit of current is
         ampere.
-    power_communication : `dict`
-        Communication power. The unit of voltage is volt and the unit of
+    power_communication_raw : `dict`
+        Raw communication power. The unit of voltage is volt and the unit of
         current is ampere.
     inclinometer_angle : `float`
         Inclinometer angle in degree.
@@ -65,10 +72,18 @@ class UtilityMonitor(object):
     displacements : `dict`
         Displacement sensors. The key is the displacement sensor name. The
         value is the reading in the unit of mm.
+    digital_status_input : `int`
+        Digital input status as a 32 bits value. Each bit means different
+        status. 1 means OK (or triggered). Otherwise 0.
+    digital_status_output : `int`
+        Digital output status as a 8 bits value. Each bit means different
+        status. 1 means OK (or triggered). Otherwise 0.
     hard_points : `dict`
         Hard points of the axial and tangential actuators.
     forces : `ActuatorForce`
         Detailed actuator forces.
+    force_error_tangent : `ForceErrorTangent`
+        Tangential force error to monitor the supporting force of mirror.
     position : `list`
         Rigid body position: [x, y, z, rx, ry, rz]. The unit of x, y, and z is
         um. The unit of rx, ry, and ry is arcsec.
@@ -89,8 +104,11 @@ class UtilityMonitor(object):
         self.signal_detailed_force = SignalDetailedForce()
         self.signal_position = SignalPosition()
 
-        self.power_motor = {"voltage": 0, "current": 0}
-        self.power_communication = {"voltage": 0, "current": 0}
+        self.power_motor_calibrated = self._get_default_power()
+        self.power_communication_calibrated = self._get_default_power()
+
+        self.power_motor_raw = self._get_default_power()
+        self.power_communication_raw = self._get_default_power()
 
         self.inclinometer_angle = 0
 
@@ -146,18 +164,32 @@ class UtilityMonitor(object):
             "A6-Delta_z": 0,
         }
 
+        self.digital_status_input = 0
+        self.digital_status_output = 0
+
         self.hard_points = {"axial": [0, 0, 0], "tangent": [0, 0, 0]}
 
         self.forces = ActuatorForce()
+        self.force_error_tangent = ForceErrorTangent()
+
         self.position = [0, 0, 0, 0, 0, 0]
+
+    def _get_default_power(self):
+        """Get the default power data.
+
+        Returns
+        -------
+        `dict`
+            Default power data. The unit of voltage is volt and the unit of
+            current is ampere.
+        """
+
+        return {"voltage": 0, "current": 0}
 
     def report_utility_status(self):
         """Report the utility status."""
 
-        self.signal_utility.power_motor.emit(tuple(self.power_motor.values()))
-        self.signal_utility.power_communication.emit(
-            tuple(self.power_communication.values())
-        )
+        self._report_powers()
 
         self.signal_utility.inclinometer.emit(self.inclinometer_angle)
 
@@ -165,15 +197,27 @@ class UtilityMonitor(object):
             self.signal_utility.breaker_status.emit((name, status))
 
         self._report_temperatures()
-
         self._report_displacements()
+        self._report_digital_status()
 
-        self.signal_detailed_force.hard_points.emit(
-            self.hard_points["axial"] + self.hard_points["tangent"]
-        )
-        self.signal_detailed_force.forces.emit(self.forces)
+        self._report_forces()
 
         self.signal_position.position.emit(self.position)
+
+    def _report_powers(self):
+        """Report the powers."""
+
+        self.signal_utility.power_motor_calibrated.emit(
+            tuple(self.power_motor_calibrated.values())
+        )
+        self.signal_utility.power_communication_calibrated.emit(
+            tuple(self.power_communication_calibrated.values())
+        )
+
+        self.signal_utility.power_motor_raw.emit(tuple(self.power_motor_raw.values()))
+        self.signal_utility.power_communication_raw.emit(
+            tuple(self.power_communication_raw.values())
+        )
 
     def _report_temperatures(self):
         """Report the temperatures."""
@@ -186,6 +230,30 @@ class UtilityMonitor(object):
                 temperatures.append(self.temperatures[sensor])
 
             self.signal_utility.temperatures.emit((temperature_group, temperatures))
+
+    def _report_displacements(self):
+        """Report the displacements."""
+
+        for direction in DisplacementSensorDirection:
+            sensors = self.get_displacement_sensors(direction)
+            displacements = [self.displacements[sensor] for sensor in sensors]
+
+            self.signal_utility.displacements.emit((direction, displacements))
+
+    def _report_digital_status(self):
+        """Report the digital input/output status."""
+
+        self.signal_utility.digital_status_input.emit(self.digital_status_input)
+        self.signal_utility.digital_status_output.emit(self.digital_status_output)
+
+    def _report_forces(self):
+        """Report the forces."""
+
+        self.signal_detailed_force.hard_points.emit(
+            self.hard_points["axial"] + self.hard_points["tangent"]
+        )
+        self.signal_detailed_force.forces.emit(self.forces)
+        self.signal_detailed_force.force_error_tangent.emit(self.force_error_tangent)
 
     def get_temperature_sensors(self, temperature_group):
         """Get the temperature sensors in a specific group.
@@ -207,15 +275,6 @@ class UtilityMonitor(object):
                 sensors.append(sensor)
 
         return sensors
-
-    def _report_displacements(self):
-        """Report the displacements."""
-
-        for direction in DisplacementSensorDirection:
-            sensors = self.get_displacement_sensors(direction)
-            displacements = [self.displacements[sensor] for sensor in sensors]
-
-            self.signal_utility.displacements.emit((direction, displacements))
 
     def get_displacement_sensors(self, direction):
         """Get the displacement sensors in a specific direction.
@@ -239,8 +298,8 @@ class UtilityMonitor(object):
 
         return sensors
 
-    def update_power(self, power_type, new_voltage, new_current):
-        """Update the power data.
+    def update_power_calibrated(self, power_type, new_voltage, new_current):
+        """Update the calibrated power data.
 
         Parameters
         ----------
@@ -258,13 +317,30 @@ class UtilityMonitor(object):
         """
 
         if power_type == PowerType.Motor:
-            power = self.power_motor
-            signal_name = "power_motor"
+            power = self.power_motor_calibrated
+            signal_name = "power_motor_calibrated"
         elif power_type == PowerType.Communication:
-            power = self.power_communication
-            signal_name = "power_communication"
+            power = self.power_communication_calibrated
+            signal_name = "power_communication_calibrated"
         else:
             raise ValueError(f"Not supported power type: {power_type!r}.")
+
+        self._update_power(power, new_voltage, new_current, signal_name)
+
+    def _update_power(self, power, new_voltage, new_current, signal_name):
+        """Update the power data.
+
+        Parameters
+        ----------
+        power : `dict`
+            Power data.
+        new_voltage : `float`
+            New voltage value in volt.
+        new_current : `float`
+            New current value in ampere.
+        signal_name : `str`
+            Name of the signal.
+        """
 
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
         if self._has_changed(power["voltage"], new_voltage, tol) or self._has_changed(
@@ -300,6 +376,35 @@ class UtilityMonitor(object):
         """
 
         return np.max(np.abs(value_old - value_new)) >= tol
+
+    def update_power_raw(self, power_type, new_voltage, new_current):
+        """Update the raw power data.
+
+        Parameters
+        ----------
+        power_type : enum `PowerType`
+            Power type.
+        new_voltage : `float`
+            New voltage value in volt.
+        new_current : `float`
+            New current value in ampere.
+
+        Raises
+        ------
+        `ValueError`
+            Not supported power type.
+        """
+
+        if power_type == PowerType.Motor:
+            power = self.power_motor_raw
+            signal_name = "power_motor_raw"
+        elif power_type == PowerType.Communication:
+            power = self.power_communication_raw
+            signal_name = "power_communication_raw"
+        else:
+            raise ValueError(f"Not supported power type: {power_type!r}.")
+
+        self._update_power(power, new_voltage, new_current, signal_name)
 
     def update_inclinometer_angle(self, new_angle):
         """Update the angle of inclinometer.
@@ -466,6 +571,32 @@ class UtilityMonitor(object):
             direction,
         )
 
+    def update_digital_status_input(self, new_status):
+        """Update the digital input status (32 bits).
+
+        Parameters
+        ----------
+        new_status : `int`
+            New status.
+        """
+
+        if self.digital_status_input != new_status:
+            self.digital_status_input = int(new_status)
+            self.signal_utility.digital_status_input.emit(self.digital_status_input)
+
+    def update_digital_status_output(self, new_status):
+        """Update the digital output status (8 bits).
+
+        Parameters
+        ----------
+        new_status : `int`
+            New status.
+        """
+
+        if self.digital_status_output != new_status:
+            self.digital_status_output = int(new_status)
+            self.signal_utility.digital_status_output.emit(self.digital_status_output)
+
     def update_hard_points(self, axial, tangent):
         """Update the hard points.
 
@@ -517,6 +648,40 @@ class UtilityMonitor(object):
             # always work
             self.forces = deepcopy(actuator_force)
             self.signal_detailed_force.forces.emit(self.forces)
+
+    def update_force_error_tangent(self, force_error_tangent):
+        """Update the tangential force error that monitors the supporting
+        force of mirror.
+
+        Parameters
+        ----------
+        force_error_tangent : `ForceErrorTangent`
+            Tangential force error.
+        """
+
+        num_digit_after_decimal = self.NUM_DIGIT_AFTER_DECIMAL
+        tol = get_tol(num_digit_after_decimal)
+        if self._has_changed(
+            self.force_error_tangent.error_weight, force_error_tangent.error_weight, tol
+        ) or self._has_changed(
+            self.force_error_tangent.error_sum,
+            force_error_tangent.error_sum,
+            tol,
+        ):
+            self.force_error_tangent.error_force = [
+                round(force, num_digit_after_decimal)
+                for force in force_error_tangent.error_force
+            ]
+            self.force_error_tangent.error_weight = round(
+                force_error_tangent.error_weight, num_digit_after_decimal
+            )
+            self.force_error_tangent.error_sum = round(
+                force_error_tangent.error_sum, num_digit_after_decimal
+            )
+
+            self.signal_detailed_force.force_error_tangent.emit(
+                self.force_error_tangent
+            )
 
     def update_position(self, x, y, z, rx, ry, rz):
         """Update the position of rigid body.

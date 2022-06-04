@@ -323,3 +323,42 @@ class Model(object):
     def set_home(self):
         """Set the home position."""
         self.log.info("Set the home position.")
+
+    def reboot_controller(self):
+        """Reboot the cell controller.
+
+        Raises
+        ------
+        `RuntimeError`
+            Not in the standby state with local control.
+        """
+
+        if self.local_mode == LocalMode.Standby and not self.is_csc_commander:
+            self.log.info("Reboot the cell controller.")
+        else:
+            raise RuntimeError(
+                "Controller can only be rebooted at the standby state with local control."
+            )
+
+    def set_bit_digital_status(self, idx, value):
+        """Set the bit value of digital status.
+
+        Parameters
+        ----------
+        idx : `int`
+            Bit index that begins from 0, which should be >= 0.
+        value : `bool`
+            Bit value.
+
+        Raises
+        ------
+        `RuntimeError`
+            Not in the diagnostic state.
+        """
+
+        if self.local_mode == LocalMode.Diagnostic:
+            self.log.info(f"Set the {idx}th bit of digital status to be {int(value)}.")
+        else:
+            raise RuntimeError(
+                "Bit value of digital status can only be set in the diagnostic state."
+            )

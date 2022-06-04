@@ -303,19 +303,9 @@ class TabUtilityView(TabDefault):
             for sensor in sensors:
                 layout.addRow(sensor + ":", self._temperatures[sensor])
 
-            self._add_empty_row_to_layout(layout)
+            self.add_empty_row_to_form_layout(layout)
 
         return create_group_box(group_title, layout)
-
-    def _add_empty_row_to_layout(self, layout):
-        """Add the empty row to the layout.
-
-        Parameters
-        ----------
-        layout : `PySide2.QtWidgets.QFormLayout`
-            Layout.
-        """
-        layout.addRow(" ", None)
 
     def _create_group_displacements(self):
         """Create the group of displacement sensors.
@@ -338,7 +328,7 @@ class TabUtilityView(TabDefault):
         for sensor_theta, sensor_delta in zip(sensors_theta, sensors_delta):
             layout.addRow(sensor_theta + ":", self._displacements[sensor_theta])
             layout.addRow(sensor_delta + ":", self._displacements[sensor_delta])
-            self._add_empty_row_to_layout(layout)
+            self.add_empty_row_to_form_layout(layout)
 
         return create_group_box("Displacement Sensors", layout)
 
@@ -353,8 +343,10 @@ class TabUtilityView(TabDefault):
             Signal of the utility.
         """
 
-        signal_utility.power_motor.connect(self._callback_power_motor)
-        signal_utility.power_communication.connect(self._callback_power_communication)
+        signal_utility.power_motor_calibrated.connect(self._callback_power_motor)
+        signal_utility.power_communication_calibrated.connect(
+            self._callback_power_communication
+        )
 
         signal_utility.inclinometer.connect(self._callback_inclinometer)
 

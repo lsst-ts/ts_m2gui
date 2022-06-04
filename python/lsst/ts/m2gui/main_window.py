@@ -164,7 +164,13 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
         layout.addLayout(self._layout_control.layout)
+
+        space = 20
+        layout.addSpacing(space)
+
         layout.addLayout(self._layout_local_mode.layout)
+        layout.addSpacing(space)
+
         layout.addLayout(self._layout_control_mode.layout)
         layout.addLayout(self._control_tabs.layout)
 

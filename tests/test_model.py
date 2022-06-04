@@ -154,3 +154,20 @@ def test_go_to_position_exception(model):
 
     with pytest.raises(RuntimeError):
         model.go_to_position(0, 0, 0, 0, 0, 0)
+
+
+def test_reboot_controller_exception(model):
+
+    with pytest.raises(RuntimeError):
+        model.local_mode = LocalMode.Diagnostic
+        model.reboot_controller()
+
+    with pytest.raises(RuntimeError):
+        model.is_csc_commander = True
+        model.reboot_controller()
+
+
+def test_set_bit_digital_status(model):
+
+    with pytest.raises(RuntimeError):
+        model.set_bit_digital_status(0, 1)
