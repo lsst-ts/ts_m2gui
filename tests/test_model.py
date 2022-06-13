@@ -22,7 +22,14 @@
 import pytest
 import logging
 
-from lsst.ts.m2gui import Model, LocalMode, LimitSwitchType, Ring
+from lsst.ts.m2gui import (
+    Model,
+    LocalMode,
+    LimitSwitchType,
+    Ring,
+    CommandScript,
+    CommandActuator,
+)
 
 
 TIMEOUT = 1000
@@ -133,10 +140,27 @@ def test_report_config(qtbot, model):
     assert config.file_configuration == file_configuration
 
 
+def test_report_script_progress(qtbot, model):
+
+    with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
+        model.report_script_progress(30)
+
+
 def test_report_config_exception(model):
 
     with pytest.raises(KeyError):
         model.report_config(wrong_name=0)
+
+
+def test_is_enabled_and_open_loop_control(model):
+
+    assert model.is_enabled_and_open_loop_control() is False
+
+    model.local_mode = LocalMode.Enable
+    assert model.is_enabled_and_open_loop_control() is True
+
+    model.is_closed_loop = True
+    assert model.is_enabled_and_open_loop_control() is False
 
 
 def test_is_enabled_and_closed_loop_control(model):
@@ -167,7 +191,23 @@ def test_reboot_controller_exception(model):
         model.reboot_controller()
 
 
-def test_set_bit_digital_status(model):
+def test_set_bit_digital_status_exception(model):
 
     with pytest.raises(RuntimeError):
         model.set_bit_digital_status(0, 1)
+
+
+def test_command_script_exception(model):
+
+    with pytest.raises(RuntimeError):
+        model.command_script(CommandScript.LoadScript)
+
+
+def test_command_actuator_exception(model):
+
+    with pytest.raises(RuntimeError):
+        model.command_actuator(CommandActuator.Stop)
+
+    model.local_mode = LocalMode.Enable
+    with pytest.raises(RuntimeError):
+        model.command_actuator(CommandActuator.Start, actuators=[])
