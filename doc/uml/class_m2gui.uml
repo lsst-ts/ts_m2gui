@@ -18,6 +18,7 @@ Model *-- FaultManager
 Model *-- UtilityMonitor
 Model *-- SignalStatus : emit()
 Model *-- SignalConfig : emit()
+Model *-- SignalScript : emit()
 Model ..> Config
 
 FaultManager *-- SignalError : emit()

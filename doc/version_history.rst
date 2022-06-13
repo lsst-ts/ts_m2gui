@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.2:
+
+-------------
+0.1.2
+-------------
+
+* Support the actuator control.
+
 .. _lsst.ts.m2gui-0.1.1:
 
 -------------
