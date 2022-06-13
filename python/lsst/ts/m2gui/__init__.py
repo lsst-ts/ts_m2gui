@@ -36,6 +36,9 @@ from .enums import (
     PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
+    CommandScript,
+    CommandActuator,
+    ActuatorDisplacementUnit,
 )
 from .utils import (
     NUM_ACTUATOR,
@@ -59,6 +62,7 @@ from .signals import (
     SignalUtility,
     SignalDetailedForce,
     SignalPosition,
+    SignalScript,
 )
 from .log_window_handler import LogWindowHandler
 from .fault_manager import FaultManager

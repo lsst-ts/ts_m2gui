@@ -25,7 +25,6 @@ from PySide2.QtCore import Slot, Qt
 from PySide2.QtWidgets import (
     QVBoxLayout,
     QFormLayout,
-    QComboBox,
     QTableWidgetItem,
     QAbstractItemView,
 )
@@ -78,7 +77,9 @@ class TabDetailedForce(TabDefault):
         self._list_force_details = list(self._forces.keys())
 
         # Select the ring to show the detailed force
-        self._ring_selection = self._create_combo_box_ring_selection()
+        self._ring_selection = self.create_combo_box_ring_selection(
+            self._callback_selection_changed
+        )
 
         # Table of the detailed force
         self._table_forces = self._create_table_forces()
@@ -116,27 +117,6 @@ class TabDetailedForce(TabDefault):
                 items_force[name].append(QTableWidgetItem())
 
         return items_force
-
-    def _create_combo_box_ring_selection(self):
-        """Create the combo box of ring selection.
-
-        Returns
-        -------
-        ring_selection : `PySide2.QtWidgets.QComboBox`
-            Ring selection.
-        """
-
-        ring_selection = QComboBox()
-        for specific_ring in Ring:
-            ring_selection.addItem(specific_ring.name + " Ring")
-
-        # Index begins from 0 instead of 1 in QComboBox
-        index_B_ring = Ring.B.value - 1
-        ring_selection.setCurrentIndex(index_B_ring)
-
-        ring_selection.currentIndexChanged.connect(self._callback_selection_changed)
-
-        return ring_selection
 
     @Slot()
     def _callback_selection_changed(self):

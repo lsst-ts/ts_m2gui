@@ -25,8 +25,10 @@ from . import (
     LocalMode,
     LimitSwitchType,
     Ring,
+    ActuatorDisplacementUnit,
     SignalStatus,
     SignalConfig,
+    SignalScript,
     FaultManager,
     Config,
     UtilityMonitor,
@@ -56,6 +58,8 @@ class Model(object):
         Signal to report the updated status of system.
     signal_config : `SignalConfig`
         Signal to send the configuration.
+    signal_script : `SignalScript`
+        Signal to send the script progress.
     system_status : `dict`
         System status.
     fault_manager : `FaultManager`
@@ -74,6 +78,7 @@ class Model(object):
 
         self.signal_status = SignalStatus()
         self.signal_config = SignalConfig()
+        self.signal_script = SignalScript()
 
         self.system_status = self._set_system_status()
 
@@ -209,7 +214,7 @@ class Model(object):
             Not in the open-loop control.
         """
 
-        if (self.local_mode == LocalMode.Enable) and not self.is_closed_loop:
+        if self.is_enabled_and_open_loop_control():
             self.update_system_status("isOpenLoopMaxLimitsEnabled", True)
         else:
             raise RuntimeError(
@@ -276,6 +281,16 @@ class Model(object):
 
         return config
 
+    def report_script_progress(self, progress):
+        """Report the script progress.
+
+        Parameters
+        ----------
+        progress : `int`
+            Progress of the script execution (0-100%).
+        """
+        self.signal_script.progress.emit(int(progress))
+
     def save_position(self):
         """Save the rigid body position."""
         self.log.info("Save the rigid body position.")
@@ -308,6 +323,17 @@ class Model(object):
             self.log.info(f"Move to the position: ({x}, {y}, {z}, {rx}, {ry}, {rz}).")
         else:
             raise RuntimeError("Mirror can be positioned only in closed-loop control.")
+
+    def is_enabled_and_open_loop_control(self):
+        """The system is in the Enabled state and open-loop control or not.
+
+        Returns
+        -------
+        `bool`
+            True if the system is in the Enabled state and open-loop control.
+            Otherwise, False.
+        """
+        return self.local_mode == LocalMode.Enable and not self.is_closed_loop
 
     def is_enabled_and_closed_loop_control(self):
         """The system is in the Enabled state and closed-loop control or not.
@@ -361,4 +387,81 @@ class Model(object):
         else:
             raise RuntimeError(
                 "Bit value of digital status can only be set in the diagnostic state."
+            )
+
+    def command_script(self, command, script_name=None):
+        """Run the script command.
+
+        Parameters
+        ----------
+        command : enum `CommandScript`
+            Script command.
+        script_name : `str` or None, optional
+            Name of the script. (the default is None)
+
+        Raises
+        ------
+        `RuntimeError`
+            Not in the enabled state.
+        """
+
+        if self.local_mode == LocalMode.Enable:
+            self.log.info(f"Run the script command: {command!r}.")
+
+            if script_name is not None:
+                # Cell controller needs to check this file exists or not.
+                self.log.info(f"Load the script: {script_name}.")
+
+        else:
+            raise RuntimeError(
+                "Failed to run the script command. Only allowed in Enabled state."
+            )
+
+    def command_actuator(
+        self,
+        command,
+        actuators=None,
+        target_displacement=0,
+        displacement_unit=ActuatorDisplacementUnit.Millimeter,
+    ):
+        """Run the actuator command.
+
+        Parameters
+        ----------
+        command : enum `CommandActuator`
+            Actuator command.
+        actuators : `list [int]` or None, optional
+            Selected actuators to do the movement. If the empty list [] is
+            passed, the function will raise the RuntimeError. (the default is
+            None)
+        target_displacement : `float` or `int`, optional
+            Target displacement of the actuators. (the default is 0)
+        displacement_unit : enum `ActuatorDisplacementUnit`, optional
+            Displacement unit. (the default is
+            ActuatorDisplacementUnit.Millimeter)
+
+        Raises
+        ------
+        `RuntimeError`
+            No actuator is selected.
+        `RuntimeError`
+            Not in the enabled state with open-loop control.
+        """
+
+        if actuators == []:
+            raise RuntimeError("No actuator is selected.")
+
+        if self.is_enabled_and_open_loop_control():
+            self.log.info(f"Run the actuator command: {command!r}.")
+
+            if actuators is not None:
+                self.log.info(
+                    (
+                        f"Move {actuators} actuators with the"
+                        f" displacement={target_displacement} {displacement_unit.name}."
+                    )
+                )
+        else:
+            raise RuntimeError(
+                "Failed to command the actuator. Only allow in Enabled state and open-loop control."
             )

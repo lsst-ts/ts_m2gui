@@ -26,6 +26,9 @@ __all__ = [
     "PowerType",
     "TemperatureGroup",
     "DisplacementSensorDirection",
+    "CommandScript",
+    "CommandActuator",
+    "ActuatorDisplacementUnit",
 ]
 
 from enum import IntEnum, auto
@@ -65,3 +68,24 @@ class TemperatureGroup(IntEnum):
 class DisplacementSensorDirection(IntEnum):
     Theta = 1
     Delta = auto()
+
+
+class CommandScript(IntEnum):
+    LoadScript = 1
+    Run = auto()
+    Stop = auto()
+    Pause = auto()
+    Resume = auto()
+    Clear = auto()
+
+
+class CommandActuator(IntEnum):
+    Start = 1
+    Stop = auto()
+    Pause = auto()
+    Resume = auto()
+
+
+class ActuatorDisplacementUnit(IntEnum):
+    Millimeter = 1
+    Step = auto()
