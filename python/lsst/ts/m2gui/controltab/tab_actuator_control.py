@@ -42,7 +42,6 @@ from ..utils import (
     create_group_box,
     run_command,
     NUM_TANGENT_LINK,
-    NUM_ACTUATOR,
 )
 from ..enums import CommandScript, CommandActuator, ActuatorDisplacementUnit, Ring
 from . import TabDefault
@@ -64,14 +63,17 @@ class TabActuatorControl(TabDefault):
         Model class.
     """
 
-    MAX_DISPLACEMENT = 10**7
+    MAX_DISPLACEMENT_MM = 200
+    MAX_DISPLACEMENT_STEP = 10**7
 
     def __init__(self, title, model):
         super().__init__(title, model)
 
+        progress_bar = QProgressBar()
+        progress_bar.setValue(0)
         self._info_script = {
             "file": create_label(""),
-            "progress": self._create_progress_bar(0, 100, 0),
+            "progress": progress_bar,
         }
 
         self._labels_force = {
@@ -100,16 +102,24 @@ class TabActuatorControl(TabDefault):
             ),
         }
 
-        self._target_displacement = self._create_target_displacement()
-        self._displacement_unit_selection = self._create_displacement_unit_selection()
+        self._target_displacement = QDoubleSpinBox()
+
+        actuator_displacement_unit = ActuatorDisplacementUnit.Millimeter
+        self._set_target_displacement(actuator_displacement_unit)
+
+        self._displacement_unit_selection = self._create_displacement_unit_selection(
+            actuator_displacement_unit
+        )
 
         self._ring_selection = self.create_combo_box_ring_selection()
-        self._buttons_actuator_selection = self._create_buttons_actuator_selection()
+        self._buttons_actuator_selection = [
+            set_button(name, None, is_checkable=True, is_adjust_size=True)
+            for name in self.model.get_actuator_default_status(False)
+        ]
+
         self._buttons_actuator_selection_support = {
             "select_ring": set_button("Select Ring", self._callback_select_ring),
-            "clear_selection": set_button(
-                "Clear Selection", self._callback_clear_selection
-            ),
+            "clear_all": set_button("Clear All", self._callback_clear_all),
         }
 
         self._buttons_actuator = {
@@ -131,31 +141,6 @@ class TabActuatorControl(TabDefault):
         self._set_signal_detailed_force(
             self.model.utility_monitor.signal_detailed_force
         )
-
-    def _create_progress_bar(self, value_min, value_max, value_init):
-        """Create the progress bar. This will show the execution progress of
-        script in the cell controller.
-
-        Parameters
-        ----------
-        value_min : `float` or `int`
-            Minimum value.
-        value_max : `float` or `int`
-            Maximum value.
-        value_init : `float` or `int`
-            Initial value.
-
-        Returns
-        -------
-        progress_bar : `PySide2.QtWidgets.QProgressBar`
-            Progress bar.
-        """
-
-        progress_bar = QProgressBar()
-        progress_bar.setRange(value_min, value_max)
-        progress_bar.setValue(value_init)
-
-        return progress_bar
 
     @Slot()
     def _callback_script_load_script(self, file_name=""):
@@ -208,25 +193,50 @@ class TabActuatorControl(TabDefault):
             self._info_script["file"].setText("")
             self._info_script["progress"].setValue(0)
 
-    def _create_target_displacement(self):
-        """Create the target displacement of actuator.
+    def _set_target_displacement(self, actuator_displacement_unit):
+        """Set the target displacement.
 
-        Returns
-        -------
-        displacement : `QDoubleSpinBox`
-            Target displacement of the actuator.
+        The available decimal, range, suffix, and single step in box will be
+        updated.
+
+        Parameters
+        ----------
+        actuator_displacement_unit : enum `ActuatorDisplacementUnit`
+            Actuator displacement unit.
+
+        Raises
+        ------
+        `ValueError`
+            Not supported unit.
         """
 
-        displacement = QDoubleSpinBox()
-        displacement.setDecimals(
-            self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
-        )
-        displacement.setRange(-self.MAX_DISPLACEMENT, self.MAX_DISPLACEMENT)
+        if actuator_displacement_unit == ActuatorDisplacementUnit.Millimeter:
 
-        return displacement
+            decimal = self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
+            max_range = self.MAX_DISPLACEMENT_MM
+            suffix = " mm"
 
-    def _create_displacement_unit_selection(self):
+        elif actuator_displacement_unit == ActuatorDisplacementUnit.Step:
+
+            decimal = 0
+            max_range = self.MAX_DISPLACEMENT_STEP
+            suffix = " step"
+
+        else:
+            raise ValueError(f"Not supported unit: {actuator_displacement_unit!r}.")
+
+        self._target_displacement.setDecimals(decimal)
+        self._target_displacement.setRange(-max_range, max_range)
+        self._target_displacement.setSuffix(suffix)
+        self._target_displacement.setSingleStep(10**-decimal)
+
+    def _create_displacement_unit_selection(self, actuator_displacement_unit):
         """Create the combo box of displacement unit selection.
+
+        Parameters
+        ----------
+        actuator_displacement_unit : enum `ActuatorDisplacementUnit`
+            Default actuator displacement unit.
 
         Returns
         -------
@@ -240,8 +250,8 @@ class TabActuatorControl(TabDefault):
             unit_selection.addItem(displacement_unit.name)
 
         # Index begins from 0 instead of 1 in QComboBox
-        index_mm_unit = ActuatorDisplacementUnit.Millimeter.value - 1
-        unit_selection.setCurrentIndex(index_mm_unit)
+        index_unit = actuator_displacement_unit.value - 1
+        unit_selection.setCurrentIndex(index_unit)
 
         unit_selection.currentIndexChanged.connect(self._callback_selection_changed)
 
@@ -256,31 +266,7 @@ class TabActuatorControl(TabDefault):
         selected_unit = ActuatorDisplacementUnit(
             self._displacement_unit_selection.currentIndex() + 1
         )
-
-        if selected_unit == ActuatorDisplacementUnit.Millimeter:
-            self._target_displacement.setDecimals(
-                self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
-            )
-        else:
-            self._target_displacement.setDecimals(0)
-
-    def _create_buttons_actuator_selection(self):
-        """Create the buttons of actuator selection.
-
-        Returns
-        -------
-        buttons : `list [PySide2.QtWidgets.QPushButton]`
-            Buttons of actuators.
-        """
-
-        buttons = list()
-
-        actuators = self.model.get_actuator_default_status(False)
-        for name in actuators.keys():
-            button = set_button(name, None, is_checkable=True, is_adjust_size=True)
-            buttons.append(button)
-
-        return buttons
+        self._set_target_displacement(selected_unit)
 
     @Slot()
     def _callback_select_ring(self):
@@ -295,8 +281,8 @@ class TabActuatorControl(TabDefault):
                 actuator.setChecked(True)
 
     @Slot()
-    def _callback_clear_selection(self):
-        """Callback of the clear-selection button in actuator selector. The
+    def _callback_clear_all(self):
+        """Callback of the clear-all button in actuator selector. All of the
         selected actuators will be cleared/unchecked."""
 
         for button in self._buttons_actuator_selection:
@@ -411,18 +397,46 @@ class TabActuatorControl(TabDefault):
 
         layout.addLayout(layout_file)
 
-        layout_control = QGridLayout()
-        layout_control.addWidget(self._buttons_script["load_script"], 0, 0)
-        layout_control.addWidget(self._buttons_script["stop"], 0, 1)
-        layout_control.addWidget(self._buttons_script["resume"], 0, 2)
-
-        layout_control.addWidget(self._buttons_script["run"], 1, 0)
-        layout_control.addWidget(self._buttons_script["pause"], 1, 1)
-        layout_control.addWidget(self._buttons_script["clear"], 1, 2)
-
-        layout.addLayout(layout_control)
+        layout.addLayout(self._create_grid_layout_buttons(self._buttons_script, 3))
 
         return create_group_box("Script Control", layout)
+
+    def _create_grid_layout_buttons(self, buttons, num_column):
+        """Create the grid layout of buttons.
+
+        Parameters
+        ----------
+        buttons : `dict` or `list`
+            Buttons to put on the grid layout.
+        num_column : `int`
+            Number of column on the grid layput.
+
+        Returns
+        -------
+        layout : `PySide2.QtWidgets.QGridLayout`
+            Grid layout of buttons.
+        """
+
+        # Use the list in the following
+        if isinstance(buttons, dict):
+            items = list(buttons.values())
+        else:
+            items = buttons
+
+        # Add the item to the layout
+        layout = QGridLayout()
+
+        column = 0
+        row = 0
+        for item in items:
+            layout.addWidget(item, row, column)
+
+            column += 1
+            if column >= num_column:
+                column = 0
+                row += 1
+
+        return layout
 
     def _create_group_force_summary(self):
         """Create the group of force summary. This is just for the high-level
@@ -468,19 +482,10 @@ class TabActuatorControl(TabDefault):
 
         layout = QVBoxLayout()
 
-        # Grid layout of actuator selection
-        layout_actuator_selection = QGridLayout()
+        layout_actuator_selection = self._create_grid_layout_buttons(
+            self._buttons_actuator_selection, num_column
+        )
         layout_actuator_selection.setSpacing(spacing)
-
-        num_row = int(np.ceil(NUM_ACTUATOR / num_column))
-        idx = 0
-        for row in range(num_row):
-            for column in range(num_column):
-                if idx < NUM_ACTUATOR:
-                    layout_actuator_selection.addWidget(
-                        self._buttons_actuator_selection[idx], row, column
-                    )
-                idx += 1
 
         layout.addLayout(layout_actuator_selection)
 

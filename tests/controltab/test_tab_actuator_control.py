@@ -70,6 +70,37 @@ def test_callback_script_command(qtbot, widget):
     assert widget._info_script["progress"].value() == 0
 
 
+def test_set_target_displacement(widget):
+
+    widget._set_target_displacement(ActuatorDisplacementUnit.Millimeter)
+
+    assert (
+        widget._target_displacement.decimals()
+        == widget.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
+    )
+    assert widget._target_displacement.maximum() == widget.MAX_DISPLACEMENT_MM
+    assert widget._target_displacement.minimum() == -widget.MAX_DISPLACEMENT_MM
+    assert widget._target_displacement.suffix() == " mm"
+    assert (
+        widget._target_displacement.singleStep()
+        == 10**-widget.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
+    )
+
+    widget._set_target_displacement(ActuatorDisplacementUnit.Step)
+
+    assert widget._target_displacement.decimals() == 0
+    assert widget._target_displacement.maximum() == widget.MAX_DISPLACEMENT_STEP
+    assert widget._target_displacement.minimum() == -widget.MAX_DISPLACEMENT_STEP
+    assert widget._target_displacement.suffix() == " step"
+    assert widget._target_displacement.singleStep() == 1
+
+
+def test_set_target_displacement_exception(widget):
+
+    with pytest.raises(ValueError):
+        widget._set_target_displacement("Wrong Unit")
+
+
 def test_callback_selection_changed(widget):
 
     assert (
@@ -98,7 +129,7 @@ def test_callback_select_ring(qtbot, widget):
             assert button.isChecked() is False
 
 
-def test_callback_clear_selection(qtbot, widget):
+def test_callback_clear_all(qtbot, widget):
 
     # Select an actuator
     idx = 2
@@ -108,7 +139,7 @@ def test_callback_clear_selection(qtbot, widget):
 
     # Clear the selection
     qtbot.mouseClick(
-        widget._buttons_actuator_selection_support["clear_selection"], Qt.LeftButton
+        widget._buttons_actuator_selection_support["clear_all"], Qt.LeftButton
     )
 
     assert widget._buttons_actuator_selection[idx].isChecked() is False
