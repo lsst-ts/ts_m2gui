@@ -1,0 +1,15 @@
+@startuml
+package "m2gui" #DDDDDD {
+  Model *-- UtilityMonitor
+  Model *-- SignalScript : emit()
+  UtilityMonitor *-- SignalDetailedForce : emit()
+  UtilityMonitor ..> ActuatorForce
+}
+
+TabDefault *-- Model
+TabDefault <|-- TabActuatorControl
+
+TabActuatorControl --> SignalScript : connect()
+TabActuatorControl --> SignalDetailedForce : connect()
+TabActuatorControl ..> ActuatorForce
+@enduml

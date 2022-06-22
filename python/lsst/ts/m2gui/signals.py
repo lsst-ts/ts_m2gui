@@ -29,6 +29,7 @@ __all__ = [
     "SignalUtility",
     "SignalDetailedForce",
     "SignalPosition",
+    "SignalScript",
 ]
 
 from PySide2 import QtCore
@@ -148,3 +149,10 @@ class SignalPosition(QtCore.QObject):
     # Rigid body position as a list: [x, y, z, rx, ry, rz]. The unit of x, y,
     # and z is um. The unit of rx, ry, and ry is arcsec.
     position = QtCore.Signal(object)
+
+
+class SignalScript(QtCore.QObject):
+    """Script signal to send the status of script progress."""
+
+    # Progress of the script execution.
+    progress = QtCore.Signal(int)
