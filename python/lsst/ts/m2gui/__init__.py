@@ -39,6 +39,7 @@ from .enums import (
     CommandScript,
     CommandActuator,
     ActuatorDisplacementUnit,
+    FigureActuatorData,
 )
 from .utils import (
     NUM_ACTUATOR,
