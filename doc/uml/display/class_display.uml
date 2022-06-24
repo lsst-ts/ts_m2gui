@@ -1,0 +1,5 @@
+@startuml
+class Figure
+ViewMirror "1" *-- "n" ItemActuator
+ItemActuator ..> Gauge
+@enduml
