@@ -89,16 +89,15 @@ class ViewMirror(QGraphicsView):
         self.actuators.append(actuator)
 
         self._mirror.addItem(actuator)
-        self._mirror.addItem(actuator.label_id)
 
-    def _calculate_magnification(self, buffer_space=10):
+    def _calculate_magnification(self, margin=10):
         """Calculate the magnification. This is to re-dimensition the physical
         position of actuator to the graphical scene.
 
         Parameters
         ----------
-        buffer_space : `int`, optional
-            Space of the buffer. (the default is 10)
+        margin : `int`, optional
+            Margin. (the default is 10)
 
         Returns
         -------
@@ -106,7 +105,7 @@ class ViewMirror(QGraphicsView):
             Magnification.
         """
         return (
-            self.SIZE_SCENE // 2 - self.DIAMETER // 2 - buffer_space
+            self.SIZE_SCENE // 2 - self.DIAMETER // 2 - margin
         ) // self.mirror_radius
 
     def show_alias(self, is_alias):

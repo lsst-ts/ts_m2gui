@@ -68,7 +68,9 @@ class ItemActuator(QGraphicsEllipseItem):
         # Magnitude to to decide the color of actuator on the mirror's view
         self._magnitude = 0
 
-        self.label_id = QGraphicsTextItem(str(actuator_id))
+        # Note that the ItemActuator class will become the parent of
+        # self.label_id
+        self.label_id = QGraphicsTextItem(str(actuator_id), self)
 
         self._set_default(point_size)
 

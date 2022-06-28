@@ -41,12 +41,13 @@ def test_init(widget):
     assert widget.axis_y.min() == -widget.OFFSET_Y
     assert widget.axis_y.max() == widget.OFFSET_Y
 
-    assert widget._series.count() == 10
+    series = widget.chart().series()[0]
+    assert series.count() == 10
 
     assert widget.axis_x.titleText() == "title_x"
     assert widget.axis_y.titleText() == "title_y"
 
-    assert widget._chart.title() == "title_figure"
+    assert widget.chart().title() == "title_figure"
 
 
 def test_update_data_exception(widget):
@@ -63,7 +64,8 @@ def test_update_data(widget):
     data_y = range(3, 13)
     widget.update_data(data_x, data_y)
 
-    for point, x, y in zip(widget._series.points(), data_x, data_y):
+    series = widget.chart().series()[0]
+    for point, x, y in zip(series.points(), data_x, data_y):
         assert point.x() == x
         assert point.y() == y
 

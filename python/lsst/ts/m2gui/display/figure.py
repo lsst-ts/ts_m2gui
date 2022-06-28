@@ -68,18 +68,13 @@ class Figure(QtCharts.QChartView):
     def __init__(
         self, range_x_min, range_x_max, num_points, title_x, title_y, title_figure
     ):
-        self._chart = QtCharts.QChart()
-
-        super().__init__(self._chart)
+        super().__init__()
 
         self.axis_x = self._create_default_axis(range_x_min, range_x_max, title_x)
         self.axis_y = self._create_default_axis(-self.OFFSET_Y, self.OFFSET_Y, title_y)
 
-        self._chart.setTitle(title_figure)
-        self._chart.addAxis(self.axis_x, Qt.AlignBottom)
-        self._chart.addAxis(self.axis_y, Qt.AlignLeft)
+        self._set_chart(title_figure)
 
-        self._series = QtCharts.QLineSeries()
         self._set_default_series(range_x_min, range_x_max, num_points)
 
         self.setRenderHint(QPainter.Antialiasing)
@@ -104,6 +99,21 @@ class Figure(QtCharts.QChartView):
 
         return axis
 
+    def _set_chart(self, title):
+        """Set the chart.
+
+        Parameters
+        ----------
+        title : `str`
+            Title.
+        """
+
+        chart = QtCharts.QChart()
+        chart.setTitle(title)
+        chart.addAxis(self.axis_x, Qt.AlignBottom)
+        chart.addAxis(self.axis_y, Qt.AlignLeft)
+        self.setChart(chart)
+
     def _set_default_series(self, range_x_min, range_x_max, num_points):
         """Set the default series.
 
@@ -118,13 +128,15 @@ class Figure(QtCharts.QChartView):
         """
 
         # Default data to allocate the needed memory or space
+        series = QtCharts.QLineSeries()
         for x in np.linspace(range_x_min, range_x_max, num=num_points):
-            self._series.append(x, 0)
+            series.append(x, 0)
 
-        self._chart.addSeries(self._series)
+        chart = self.chart()
+        chart.addSeries(series)
 
-        self._series.attachAxis(self.axis_x)
-        self._series.attachAxis(self.axis_y)
+        series.attachAxis(self.axis_x)
+        series.attachAxis(self.axis_y)
 
     def update_data(self, list_x, list_y):
         """Update the data in figure.
@@ -143,11 +155,13 @@ class Figure(QtCharts.QChartView):
         """
 
         num_x = len(list_x)
-        count = self._series.count()
+
+        series = self.chart().series()[0]
+        count = series.count()
         if num_x > count:
             raise ValueError(f"Input x number(={num_x}) > available points (={count}).")
 
         points = [QPointF(x, y) for (x, y) in zip(list_x, list_y)]
-        self._series.replace(points)
+        series.replace(points)
 
         self.axis_y.setRange(min(list_y) - self.OFFSET_Y, max(list_y) + self.OFFSET_Y)

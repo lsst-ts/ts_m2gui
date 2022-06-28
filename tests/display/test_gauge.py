@@ -39,21 +39,13 @@ def test_init(widget):
     assert widget._max == 2
 
 
-def test_update_range(widget):
-
-    widget._update_range(-3, 4)
-
-    assert widget._min == -3
-    assert widget._max == 4
-
-
-def test_update_range_exception(widget):
+def test_set_magnitude_exception(widget):
 
     with pytest.raises(ValueError):
-        widget._update_range(2, 1)
+        widget.set_magnitude_range(2, 1)
 
     with pytest.raises(ValueError):
-        widget._update_range(1, 1)
+        widget.set_magnitude_range(1, 1)
 
 
 def test_set_magnitude_range(widget):

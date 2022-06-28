@@ -100,8 +100,11 @@ def test_callback_selection_changed(widget):
     assert widget._figures["axial"].axis_y.titleText() == "Position (mm)"
     assert widget._figures["tangent"].axis_y.titleText() == "Position (mm)"
 
-    assert widget._figures["axial"]._series.points()[0].y() == 3
-    assert widget._figures["tangent"]._series.points()[-1].y() == -3
+    series_axial = widget._figures["axial"].chart().series()[0]
+    series_tangent = widget._figures["tangent"].chart().series()[0]
+
+    assert series_axial.points()[0].y() == 3
+    assert series_tangent.points()[-1].y() == -3
 
     # Force
 
@@ -111,8 +114,8 @@ def test_callback_selection_changed(widget):
     assert widget._figures["axial"].axis_y.titleText() == "Force (N)"
     assert widget._figures["tangent"].axis_y.titleText() == "Force (N)"
 
-    assert widget._figures["axial"]._series.points()[0].y() == 2
-    assert widget._figures["tangent"]._series.points()[-1].y() == -2
+    assert series_axial.points()[0].y() == 2
+    assert series_tangent.points()[-1].y() == -2
 
 
 def test_callback_forces(qtbot, widget):
@@ -125,4 +128,5 @@ def test_callback_forces(qtbot, widget):
     assert widget._forces.f_cur[1] == 100
     assert widget._view_mirror.actuators[1]._magnitude == 100
 
-    assert widget._figures["axial"]._series.points()[1].y() == 100
+    series = widget._figures["axial"].chart().series()[0]
+    assert series.points()[1].y() == 100

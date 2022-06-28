@@ -66,7 +66,7 @@ class TabCellStatus(TabDefault):
         # Internal layout
         self.widget().setLayout(self._create_layout())
 
-        # Resize the dock to have a similar size of layout
+        # Resize the dock to match the layout size
         self.resize(self.widget().sizeHint())
 
         self._set_signal_detailed_force(
@@ -92,7 +92,7 @@ class TabCellStatus(TabDefault):
 
         num_axial_actuator = NUM_ACTUATOR - NUM_TANGENT_LINK
 
-        label_x = "Actator ID"
+        label_x = "Actuator ID"
         label_y = "Force (N)"
 
         figures = {

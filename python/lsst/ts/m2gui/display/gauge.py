@@ -43,15 +43,19 @@ class Gauge(QWidget):
     def __init__(self, magnitude_min, magnitude_max):
         super().__init__()
 
+        # These two new attributes decide the color range in this class. The
+        # following self.set_magnitude_range() will check the inputs are
+        # reasonable or not.
         self._min = 0
         self._max = 0
-        self._update_range(magnitude_min, magnitude_max)
+        self.set_magnitude_range(magnitude_min, magnitude_max)
 
         self.setMinimumSize(self.MIN_SIZE, self.MIN_SIZE)
         self.setMaximumWidth(2 * self.MIN_SIZE)
 
-    def _update_range(self, magnitude_min, magnitude_max):
-        """Update the range of gauge.
+    def set_magnitude_range(self, magnitude_min, magnitude_max):
+        """Set the magnitude range. Color is mapped between magnitude_min and
+        magnitude_max.
 
         Parameters
         ----------
@@ -72,19 +76,6 @@ class Gauge(QWidget):
         self._min = magnitude_min
         self._max = magnitude_max
 
-    def set_magnitude_range(self, magnitude_min, magnitude_max):
-        """Set the magnitude range. Color is mapped between magnitude_min and
-        magnitude_max.
-
-        Parameters
-        ----------
-        magnitude_min : `float` or `int`
-            Minimal magnitude in gauge.
-        magnitude_max : `float` or `int`
-            Maximal magnitude in gauge.
-        """
-
-        self._update_range(magnitude_min, magnitude_max)
         self.update()
 
     def sizeHint(self):
