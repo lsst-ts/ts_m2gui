@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.3:
+
+-------------
+0.1.3
+-------------
+
+* Add the **cell_geometry.yaml**.
+* Support the cell status in part 1.
+At this moment, the overview of mirror forces is supported.
+
 .. _lsst.ts.m2gui-0.1.2:
 
 -------------

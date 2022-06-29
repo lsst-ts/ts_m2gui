@@ -35,17 +35,25 @@ from enum import IntEnum, auto
 
 
 class LocalMode(IntEnum):
+    """Operation mode of the engineering user interface (EUI)."""
+
     Standby = 1
     Diagnostic = auto()
     Enable = auto()
 
 
 class LimitSwitchType(IntEnum):
+    """Type of the limit switches on actuators."""
+
     Retract = 1
     Extend = auto()
 
 
 class Ring(IntEnum):
+    """Ring of the actuators. Each ring contains the different actuators. From
+    the outer ring to the center, the order is A, B, C, and D ring. The A ring
+    has the tangent links and the others have the axial actuators."""
+
     A = 1
     B = auto()
     C = auto()
@@ -53,11 +61,15 @@ class Ring(IntEnum):
 
 
 class PowerType(IntEnum):
+    """Type of the power."""
+
     Motor = 1
     Communication = auto()
 
 
 class TemperatureGroup(IntEnum):
+    """Group of the temperature sensors."""
+
     Intake = 1
     Exhaust = auto()
     LG2 = auto()
@@ -66,11 +78,15 @@ class TemperatureGroup(IntEnum):
 
 
 class DisplacementSensorDirection(IntEnum):
+    """Direction of the displacement sensors."""
+
     Theta = 1
     Delta = auto()
 
 
 class CommandScript(IntEnum):
+    """Action to command the script execution."""
+
     LoadScript = 1
     Run = auto()
     Stop = auto()
@@ -80,6 +96,8 @@ class CommandScript(IntEnum):
 
 
 class CommandActuator(IntEnum):
+    """Action to command the actuators"""
+
     Start = 1
     Stop = auto()
     Pause = auto()
@@ -87,5 +105,15 @@ class CommandActuator(IntEnum):
 
 
 class ActuatorDisplacementUnit(IntEnum):
+    """Unit of the actuator displacement."""
+
     Millimeter = 1
     Step = auto()
+
+
+class FigureActuatorData(IntEnum):
+    """Select the actuator data to show on the figures."""
+
+    ForceMeasured = 1
+    ForceError = auto()
+    Displacement = auto()

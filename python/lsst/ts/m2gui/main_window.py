@@ -134,6 +134,7 @@ class MainWindow(QMainWindow):
 
         self._set_tab_overview()
         self._set_tab_alarm_warn()
+        self._set_tab_cell_status()
 
     def _set_tab_overview(self):
         """Set the table of overview."""
@@ -145,13 +146,29 @@ class MainWindow(QMainWindow):
     def _set_tab_alarm_warn(self):
         """Set the table of alarms and warnings."""
 
-        policy_dir = (
-            pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "policy"
-        )
-        filepath = policy_dir / "error_code_m2.tsv"
+        filepath = self._get_policy_dir() / "error_code_m2.tsv"
 
         tab_alarm_warn = self._control_tabs.get_tab("Alarms/Warnings")[1]
         tab_alarm_warn.read_error_list_file(filepath)
+
+    def _get_policy_dir(self):
+        """Get the policy directory.
+
+        Returns
+        -------
+        `pathlib.Path`
+            Policy directory.
+        """
+
+        return pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "policy"
+
+    def _set_tab_cell_status(self):
+        """Set the table of cell status."""
+
+        filepath = self._get_policy_dir() / "cell_geometry.yaml"
+
+        tab_cell_status = self._control_tabs.get_tab("Cell Status")[1]
+        tab_cell_status.read_cell_geometry_file(filepath)
 
     def _create_layout(self):
         """Create the layout.
