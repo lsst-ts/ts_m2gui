@@ -22,4 +22,4 @@
 from .gauge import Gauge
 from .item_actuator import ItemActuator
 from .view_mirror import ViewMirror
-from .figure import Figure
+from .figure_constant import FigureConstant

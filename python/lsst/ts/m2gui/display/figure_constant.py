@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["Figure"]
+__all__ = ["FigureConstant"]
 
 import numpy as np
 
@@ -28,8 +28,8 @@ from PySide2.QtCharts import QtCharts
 from PySide2.QtGui import QPainter
 
 
-class Figure(QtCharts.QChartView):
-    """Figure to show the line data.
+class FigureConstant(QtCharts.QChartView):
+    """Figure to show the constant line data.
 
     This figure will allocate the memory space of the data points. The new
     data will update the existed points on figure directly. This means if you

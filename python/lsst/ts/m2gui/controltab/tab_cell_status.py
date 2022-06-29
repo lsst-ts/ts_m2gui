@@ -27,7 +27,7 @@ from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QComboBox
 import yaml
 import numpy as np
 
-from ..display import ViewMirror, ItemActuator, Gauge, Figure
+from ..display import ViewMirror, ItemActuator, Gauge, FigureConstant
 from ..utils import NUM_ACTUATOR, NUM_TANGENT_LINK, set_button
 from ..enums import FigureActuatorData
 from .. import ActuatorForce
@@ -96,7 +96,7 @@ class TabCellStatus(TabDefault):
         label_y = "Force (N)"
 
         figures = {
-            "axial": Figure(
+            "axial": FigureConstant(
                 1,
                 num_axial_actuator,
                 num_axial_actuator,
@@ -104,7 +104,7 @@ class TabCellStatus(TabDefault):
                 label_y,
                 "Axial Actuator",
             ),
-            "tangent": Figure(
+            "tangent": FigureConstant(
                 num_axial_actuator + 1,
                 num_axial_actuator + NUM_TANGENT_LINK,
                 NUM_TANGENT_LINK,

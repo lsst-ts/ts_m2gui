@@ -21,13 +21,13 @@
 
 import pytest
 
-from lsst.ts.m2gui.display import Figure
+from lsst.ts.m2gui.display import FigureConstant
 
 
 @pytest.fixture
 def widget(qtbot):
 
-    widget = Figure(2, 5, 10, "title_x", "title_y", "title_figure")
+    widget = FigureConstant(2, 5, 10, "title_x", "title_y", "title_figure")
     qtbot.addWidget(widget)
 
     return widget

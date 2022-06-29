@@ -6,7 +6,7 @@ package "m2gui" #DDDDDD {
 }
 
 package "display" #DDDDDD {
-  class Figure
+  class FigureConstant
   ViewMirror "1" *-- "n" ItemActuator
   ItemActuator ..> Gauge
 }
@@ -15,7 +15,7 @@ TabDefault *-- Model
 TabDefault <|-- TabCellStatus
 
 TabCellStatus *-- ViewMirror
-TabCellStatus "1" *-- "2" Figure
+TabCellStatus "1" *-- "2" FigureConstant
 TabCellStatus ..> Gauge
 TabCellStatus ..> ItemActuator
 
