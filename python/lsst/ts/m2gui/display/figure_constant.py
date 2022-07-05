@@ -50,6 +50,13 @@ class FigureConstant(QtCharts.QChartView):
         Title of the y axis.
     title_figure : `str`
         Title of the figure.
+    legends : `list [str]`
+        Legends. The number of elements should be the same as num_lines. Put []
+        if you do not want to show the legends.
+    num_lines : `int`, optional
+        Number of the lines. (the default is 1)
+    is_realtime : `bool`, optional
+        Is the realtime figure or not. (the default is False)
 
     Attributes
     ----------
@@ -66,16 +73,33 @@ class FigureConstant(QtCharts.QChartView):
     OFFSET_Y = 1
 
     def __init__(
-        self, range_x_min, range_x_max, num_points, title_x, title_y, title_figure
+        self,
+        range_x_min,
+        range_x_max,
+        num_points,
+        title_x,
+        title_y,
+        title_figure,
+        legends,
+        num_lines=1,
+        is_realtime=False,
     ):
         super().__init__()
 
         self.axis_x = self._create_default_axis(range_x_min, range_x_max, title_x)
         self.axis_y = self._create_default_axis(-self.OFFSET_Y, self.OFFSET_Y, title_y)
 
+        # Track the maximum and minimum y values in points. These are used to
+        # decide the range of y-axis.
+        self._value_y_min = 0
+        self._value_y_max = 0
+
+        self._num_points = num_points
+        self._is_realtime = is_realtime
+
         self._set_chart(title_figure)
 
-        self._set_default_series(range_x_min, range_x_max, num_points)
+        self._set_default_series(range_x_min, range_x_max, num_lines, legends)
 
         self.setRenderHint(QPainter.Antialiasing)
         self.setMinimumWidth(self.MINIMUM_WIDTH)
@@ -114,7 +138,7 @@ class FigureConstant(QtCharts.QChartView):
         chart.addAxis(self.axis_y, Qt.AlignLeft)
         self.setChart(chart)
 
-    def _set_default_series(self, range_x_min, range_x_max, num_points):
+    def _set_default_series(self, range_x_min, range_x_max, num_lines, text_legends):
         """Set the default series.
 
         Parameters
@@ -123,23 +147,72 @@ class FigureConstant(QtCharts.QChartView):
             Minimum of the range of x-axis.
         range_x_max : `float` or `int`
             Maximum of the range of x-axis.
-        num_points : `int`
-            Number of the points.
+        num_lines : `int`
+            Number of the lines.
+        text_legends : `list [str]`
+            Text of the legends. The number of elements should be the same as
+            num_lines. Put [] if you do not want to show the legend.
         """
 
-        # Default data to allocate the needed memory or space
-        series = QtCharts.QLineSeries()
-        for x in np.linspace(range_x_min, range_x_max, num=num_points):
-            series.append(x, 0)
-
         chart = self.chart()
-        chart.addSeries(series)
+        for idx in range(num_lines):
 
-        series.attachAxis(self.axis_x)
-        series.attachAxis(self.axis_y)
+            series = QtCharts.QLineSeries()
 
-    def update_data(self, list_x, list_y):
+            if not self._is_realtime:
+                # Default data to allocate the needed memory or space
+                for x in np.linspace(range_x_min, range_x_max, num=self._num_points):
+                    series.append(x, 0)
+
+            chart.addSeries(series)
+
+            series.attachAxis(self.axis_x)
+            series.attachAxis(self.axis_y)
+
+        # Update the legend
+        legend = chart.legend()
+        for marker, text_legend in zip(legend.markers(), text_legends):
+            marker.setLabel(text_legend)
+
+        if len(text_legends) == 0:
+            legend.hide()
+
+    def get_points(self, idx):
+        """Get the points.
+
+        Parameters
+        ----------
+        idx : `int`
+            Index of the series.
+
+        Returns
+        -------
+        `list [PySide2.QtCore.QPointF]`
+            Points.
+        """
+
+        series = self.get_series(idx)
+        return series.points()
+
+    def get_series(self, idx):
+        """Get the series.
+
+        Parameters
+        ----------
+        idx : `int`
+            Index of the series.
+
+        Returns
+        -------
+        `PySide2.QtCharts.QtCharts.QLineSeries`
+            Series.
+        """
+        return self.chart().series()[idx]
+
+    def update_data(self, list_x, list_y, idx=0):
         """Update the data in figure.
+
+        This can not be used for the realtime data.
 
         Parameters
         ----------
@@ -147,21 +220,177 @@ class FigureConstant(QtCharts.QChartView):
             List of the x values.
         list_y : `list`
             List of the y values.
+        idx : `int`, optional
+            Index of the series. (the default is 0)
 
         Raises
         ------
+        `RuntimeError`
+            If the realtime data is applied.
         `ValueError`
             Input x number is more than the available points.
         """
 
+        if self._is_realtime:
+            raise RuntimeError("Cannot be called for the realtime data.")
+
+        # Check the number of input data
         num_x = len(list_x)
+        if num_x > self._num_points:
+            raise ValueError(
+                f"Input x number(={num_x}) > available points (={self._num_points})."
+            )
 
-        series = self.chart().series()[0]
-        count = series.count()
-        if num_x > count:
-            raise ValueError(f"Input x number(={num_x}) > available points (={count}).")
+        # Replace the points in series
+        points = self.get_points(idx)
+        for (
+            point,
+            x,
+            y,
+        ) in zip(points, list_x, list_y):
+            point.setX(x)
+            point.setY(y)
 
-        points = [QPointF(x, y) for (x, y) in zip(list_x, list_y)]
+        series = self.get_series(idx)
         series.replace(points)
 
-        self.axis_y.setRange(min(list_y) - self.OFFSET_Y, max(list_y) + self.OFFSET_Y)
+        # Check the range of y-axis needs to be updated or not
+        self._value_y_min = min(self._value_y_min, *list_y)
+        self._value_y_max = max(self._value_y_max, *list_y)
+        self._update_range_axis_y()
+
+    def _update_range_axis_y(self, threshold=50):
+        """Update the range of y-axis.
+
+        This is used internally to track the incoming data and update the range
+        only when required.
+
+        Parameters
+        ----------
+        threshold : `float` or `int`, optional
+            Threshold to decide the update of range. (the default is 50)
+        """
+
+        axis_max = self.axis_y.max()
+        axis_min = self.axis_y.min()
+
+        if (
+            (self._value_y_min < axis_min)
+            or (self._value_y_max > axis_max)
+            or (abs(self._value_y_min - axis_min) > threshold)
+            or (abs(self._value_y_max - axis_max) > threshold)
+        ):
+            self.axis_y.setRange(
+                self._value_y_min - self.OFFSET_Y, self._value_y_max + self.OFFSET_Y
+            )
+
+    def adjust_range_axis_y(self):
+        """Adjust the range of y-axis.
+
+        This is different from the self._update_range_axis_y(). Sometimes, it
+        may be required to go through all the points to adjust the range of
+        y-axis.
+        """
+
+        num_series = len(self.chart().series())
+
+        values = list()
+        for idx in range(num_series):
+            value_min, value_max = self._get_range_points(idx)
+            values.append(value_min)
+            values.append(value_max)
+
+        self._value_y_min = min(values)
+        self._value_y_max = max(values)
+        self._update_range_axis_y(threshold=1)
+
+    def _get_range_points(self, idx):
+        """Get the range of points in a specific series.
+
+        Parameters
+        ----------
+        idx : `int`
+            Index of the series.
+
+        Returns
+        -------
+        `float`
+            Minimum value.
+        `float`
+            Maximum value.
+        """
+
+        points = self.get_points(idx)
+
+        values = list()
+        for point in points:
+            values.append(point.y())
+
+        return min(values), max(values)
+
+    def append_data(self, value, idx=0):
+        """Append the data. This is only useful if the realtime data is
+        applied.
+
+        Parameters
+        ----------
+        value : `float`
+            New coming data.
+        idx : `int`, optional
+            Index of the series. (the default is 0)
+
+        Raises
+        ------
+        `RuntimeError`
+            If not for the realtime data.
+        """
+
+        if not self._is_realtime:
+            raise RuntimeError("Can only be called for the realtime data.")
+
+        points = self.get_points(idx)
+        self._append_point(points, value)
+
+        # Replace the points in series
+        series = self.get_series(idx)
+        series.replace(points)
+
+        # Update the range of axes to show the new data
+        if self.axis_x.max() < points[-1].x():
+            self.axis_x.setRange(points[0].x(), points[-1].x())
+
+        # Check the range of y-axis needs to be updated or not
+        self._value_y_max = max(self._value_y_max, value)
+        self._value_y_min = min(self._value_y_min, value)
+        self._update_range_axis_y()
+
+    def _append_point(self, points, value):
+        """Append the point.
+
+        Parameters
+        ----------
+        points : `list [PySide2.QtCore.QPointF]`
+            Points.
+        value : `float`
+            New coming data.
+        """
+
+        length_points = len(points)
+
+        # No data yet, begin from 0
+        if length_points == 0:
+            points.append(QPointF(0, value))
+
+        # The holded amount of data is less than the allowed maximum. Add the
+        # new point.
+        elif length_points < self._num_points:
+            points.append(QPointF(points[-1].x() + 1, value))
+
+        # Instead of instantiating new point, pop the oldest point, update the
+        # data, and put back as the latest one.
+        else:
+            point = points.pop(0)
+            point.setX(points[-1].x() + 1)
+            point.setY(value)
+
+            points.append(point)
