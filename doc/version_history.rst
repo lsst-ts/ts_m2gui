@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.4:
+
+-------------
+0.1.4
+-------------
+
+* Support the cell status in part 2.
+This is to support the realtime figure.
+
 .. _lsst.ts.m2gui-0.1.3:
 
 -------------
