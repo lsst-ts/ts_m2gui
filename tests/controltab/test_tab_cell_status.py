@@ -85,8 +85,8 @@ def test_get_data_selected(widget):
 def test_callback_selection_changed(widget):
 
     # Update the internal holded actuator data
-    widget._forces.position_in_mm[0] = 3
-    widget._forces.position_in_mm[-1] = -3
+    widget._forces.position_in_mm[0] = 3000
+    widget._forces.position_in_mm[-1] = -3000
 
     widget._forces.f_error[0] = 2
     widget._forces.f_error[-1] = -2
@@ -100,11 +100,14 @@ def test_callback_selection_changed(widget):
     assert widget._figures["axial"].axis_y.titleText() == "Position (mm)"
     assert widget._figures["tangent"].axis_y.titleText() == "Position (mm)"
 
-    series_axial = widget._figures["axial"].chart().series()[0]
-    series_tangent = widget._figures["tangent"].chart().series()[0]
+    assert widget._figures["axial"].get_points(0)[0].y() == 3000
+    assert widget._figures["tangent"].get_points(0)[-1].y() == -3000
 
-    assert series_axial.points()[0].y() == 3
-    assert series_tangent.points()[-1].y() == -3
+    assert widget._figures["axial"].axis_y.min() == -1
+    assert widget._figures["axial"].axis_y.max() == 3001
+
+    assert widget._figures["tangent"].axis_y.min() == -3001
+    assert widget._figures["tangent"].axis_y.max() == 1
 
     # Force
 
@@ -114,19 +117,32 @@ def test_callback_selection_changed(widget):
     assert widget._figures["axial"].axis_y.titleText() == "Force (N)"
     assert widget._figures["tangent"].axis_y.titleText() == "Force (N)"
 
-    assert series_axial.points()[0].y() == 2
-    assert series_tangent.points()[-1].y() == -2
+    assert widget._figures["axial"].get_points(0)[0].y() == 2
+    assert widget._figures["tangent"].get_points(0)[-1].y() == -2
+
+    assert widget._figures["axial"].axis_y.min() == -1
+    assert widget._figures["axial"].axis_y.max() == 3
+
+    assert widget._figures["tangent"].axis_y.min() == -3
+    assert widget._figures["tangent"].axis_y.max() == 1
 
 
 def test_callback_forces(qtbot, widget):
 
     actuator_force = ActuatorForce()
     actuator_force.f_cur[1] = 100
+    actuator_force.f_error[1] = 72
+    actuator_force.f_error[77] = -12
 
     widget.model.utility_monitor.update_forces(actuator_force)
 
     assert widget._forces.f_cur[1] == 100
     assert widget._view_mirror.actuators[1]._magnitude == 100
 
-    series = widget._figures["axial"].chart().series()[0]
-    assert series.points()[1].y() == 100
+    figure_realtime = widget._figures["realtime"]
+
+    assert figure_realtime.get_series(0).count() == 1
+    assert figure_realtime.get_series(1).count() == 1
+
+    assert figure_realtime.get_points(0)[0].y() == 1
+    assert figure_realtime.get_points(1)[0].y() == 2
