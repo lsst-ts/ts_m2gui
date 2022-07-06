@@ -51,8 +51,9 @@ class FigureConstant(QtCharts.QChartView):
     title_figure : `str`
         Title of the figure.
     legends : `list [str]`
-        Legends. The number of elements should be the same as num_lines. Put []
-        if you do not want to show the legends.
+        Legends. The number of elements should be the same as num_lines,
+        otherwise, there will be the IndexError. Put [] if you do not want to
+        show the legends.
     num_lines : `int`, optional
         Number of the lines. (the default is 1)
     is_realtime : `bool`, optional
@@ -151,7 +152,8 @@ class FigureConstant(QtCharts.QChartView):
             Number of the lines.
         text_legends : `list [str]`
             Text of the legends. The number of elements should be the same as
-            num_lines. Put [] if you do not want to show the legend.
+            num_lines, otherwise, there will be the IndexError. Put [] if you
+            do not want to show the legend.
         """
 
         chart = self.chart()
