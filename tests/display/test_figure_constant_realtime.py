@@ -85,11 +85,9 @@ def test_append_point(widget):
         assert points[-1].y() == (idx + 1)
 
     # Points are full
-    point_oldest = points[0]
     widget._append_point(points, 999)
 
     assert len(points) == widget._num_points
-    assert id(points[-1]) == id(point_oldest)
 
     assert points[-1].x() == widget._num_points
     assert points[-1].y() == 999

@@ -155,9 +155,13 @@ class FigureConstant(QtCharts.QChartView):
         """
 
         chart = self.chart()
-        for idx in range(num_lines):
 
+        is_set_legend = len(text_legends) != 0
+        for idx in range(num_lines):
             series = QtCharts.QLineSeries()
+
+            if is_set_legend:
+                series.setName(text_legends[idx])
 
             if not self._is_realtime:
                 # Default data to allocate the needed memory or space
@@ -169,13 +173,8 @@ class FigureConstant(QtCharts.QChartView):
             series.attachAxis(self.axis_x)
             series.attachAxis(self.axis_y)
 
-        # Update the legend
-        legend = chart.legend()
-        for marker, text_legend in zip(legend.markers(), text_legends):
-            marker.setLabel(text_legend)
-
-        if len(text_legends) == 0:
-            legend.hide()
+        if not is_set_legend:
+            chart.legend().hide()
 
     def get_points(self, idx):
         """Get the points.
@@ -190,9 +189,7 @@ class FigureConstant(QtCharts.QChartView):
         `list [PySide2.QtCore.QPointF]`
             Points.
         """
-
-        series = self.get_series(idx)
-        return series.points()
+        return self.get_series(idx).points()
 
     def get_series(self, idx):
         """Get the series.
@@ -386,11 +383,7 @@ class FigureConstant(QtCharts.QChartView):
         elif length_points < self._num_points:
             points.append(QPointF(points[-1].x() + 1, value))
 
-        # Instead of instantiating new point, pop the oldest point, update the
-        # data, and put back as the latest one.
+        # Pop the oldest point and append a new one.
         else:
-            point = points.pop(0)
-            point.setX(points[-1].x() + 1)
-            point.setY(value)
-
-            points.append(point)
+            points.pop(0)
+            points.append(QPointF(points[-1].x() + 1, value))
