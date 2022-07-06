@@ -15,7 +15,7 @@ TabDefault *-- Model
 TabDefault <|-- TabCellStatus
 
 TabCellStatus *-- ViewMirror
-TabCellStatus "1" *-- "2" FigureConstant
+TabCellStatus "1" *-- "3" FigureConstant
 TabCellStatus ..> Gauge
 TabCellStatus ..> ItemActuator
 

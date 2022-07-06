@@ -81,8 +81,13 @@ class TabCellStatus(TabDefault):
         is_alias = self._button_show_alias.isChecked()
         self._view_mirror.show_alias(is_alias)
 
-    def _create_figures(self):
+    def _create_figures(self, num_realtime=200):
         """Create the figures to show the actuator forces.
+
+        Parameters
+        ----------
+        num_realtime : `int`, optional
+            Number of the realtime data (>=0). (the default is 200)
 
         Returns
         -------
@@ -96,6 +101,17 @@ class TabCellStatus(TabDefault):
         label_y = "Force (N)"
 
         figures = {
+            "realtime": FigureConstant(
+                1,
+                num_realtime,
+                num_realtime,
+                "Data Point",
+                label_y,
+                "Absolute Average Force Error",
+                legends=["Axial", "Tangent"],
+                num_lines=2,
+                is_realtime=True,
+            ),
             "axial": FigureConstant(
                 1,
                 num_axial_actuator,
@@ -103,6 +119,7 @@ class TabCellStatus(TabDefault):
                 label_x,
                 label_y,
                 "Axial Actuator",
+                legends=[],
             ),
             "tangent": FigureConstant(
                 num_axial_actuator + 1,
@@ -111,6 +128,7 @@ class TabCellStatus(TabDefault):
                 label_x,
                 label_y,
                 "Tangent Link",
+                legends=[],
             ),
         }
 
@@ -155,6 +173,9 @@ class TabCellStatus(TabDefault):
 
         data_selected, is_displacement = self._get_data_selected()
         self._update_figures(data_selected, is_displacement)
+
+        for specific_type in ("axial", "tangent"):
+            self._figures[specific_type].adjust_range_axis_y()
 
     def _get_data_selected(self):
         """Get the selected actuator data.
@@ -203,12 +224,11 @@ class TabCellStatus(TabDefault):
         list_x_tangent = range(num_axial_actuator + 1, NUM_ACTUATOR + 1)
         self._figures["tangent"].update_data(list_x_tangent, values[-NUM_TANGENT_LINK:])
 
-        for figure in self._figures.values():
-
+        for figure_type in ("axial", "tangent"):
             if is_displacement:
-                figure.axis_y.setTitleText("Position (mm)")
+                self._figures[figure_type].axis_y.setTitleText("Position (mm)")
             else:
-                figure.axis_y.setTitleText("Force (N)")
+                self._figures[figure_type].axis_y.setTitleText("Force (N)")
 
     def _create_layout(self):
         """Create the layout.
@@ -224,6 +244,7 @@ class TabCellStatus(TabDefault):
         # First column
         layout_mirror = QVBoxLayout()
         layout_mirror.addWidget(self._view_mirror)
+        layout_mirror.addWidget(self._figures["realtime"])
         layout_mirror.addWidget(self._button_show_alias)
 
         layout.addLayout(layout_mirror)
@@ -319,6 +340,14 @@ class TabCellStatus(TabDefault):
 
         for actuator, force_current in zip(self._view_mirror.actuators, forces.f_cur):
             actuator.update_magnitude(force_current)
+
+        num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
+        self._figures["realtime"].append_data(
+            np.mean(np.abs(forces.f_error[0:num_axial])), idx=0
+        )
+        self._figures["realtime"].append_data(
+            np.mean(np.abs(forces.f_error[-NUM_TANGENT_LINK:])), idx=1
+        )
 
         data_selected, is_displacement = self._get_data_selected()
         self._update_figures(data_selected, is_displacement)
