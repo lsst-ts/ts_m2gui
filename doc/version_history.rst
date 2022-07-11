@@ -6,6 +6,19 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.5:
+
+-------------
+0.1.5
+-------------
+
+* Support the tool bar.
+* Support the table of settings.
+* Add the tips.
+* Turn off the docker widget features.
+* Add the run_application().
+* Rename **bin/run_m2gui.py** to **bin/run_m2gui**.
+
 .. _lsst.ts.m2gui-0.1.4:
 
 -------------

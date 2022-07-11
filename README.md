@@ -56,7 +56,7 @@ You may need to setup the **PYTHONPATH** to point to `python/` directory as well
 
 ## Executable
 
-The executable (`run_m2gui.py`) is under the `bin/` directory.
+The executable (`run_m2gui`) is under the `bin/` directory.
 Use the argument of `-h` to know the available options.
 
 ## Unit Tests
