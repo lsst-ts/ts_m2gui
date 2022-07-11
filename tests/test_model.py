@@ -211,3 +211,33 @@ def test_command_actuator_exception(model):
     model.local_mode = LocalMode.Enable
     with pytest.raises(RuntimeError):
         model.command_actuator(CommandActuator.Start, actuators=[])
+
+
+def test_update_connection_information(model):
+
+    model.update_connection_information("test", 1, 2, 3)
+
+    assert model.host == "test"
+    assert model.port_command == 1
+    assert model.port_telemetry == 2
+    assert model.timeout_connection == 3
+
+
+def test_update_connection_information_exception(model):
+
+    model.system_status["isCrioConnected"] = True
+    with pytest.raises(RuntimeError):
+        model.update_connection_information("test", 1, 2, 3)
+
+
+def test_connect_exception(model):
+
+    model.system_status["isCrioConnected"] = True
+    with pytest.raises(RuntimeError):
+        model.connect()
+
+
+def test_disconnect_exception(model):
+
+    with pytest.raises(RuntimeError):
+        model.disconnect()
