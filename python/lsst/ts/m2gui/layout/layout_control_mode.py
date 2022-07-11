@@ -76,10 +76,14 @@ class LayoutControlMode(LayoutDefault):
 
     def _set_layout(self):
         self._button_open_loop = set_button(
-            "Enter open-loop control", self._callback_open_loop
+            "Enter open-loop control",
+            self._callback_open_loop,
+            tool_tip="No look-up table correction applied",
         )
         self._button_closed_loop = set_button(
-            "Enter closed-loop control", self._callback_closed_loop
+            "Enter closed-loop control",
+            self._callback_closed_loop,
+            tool_tip="Look-up table correction is applied",
         )
 
         layout = QVBoxLayout()

@@ -75,8 +75,14 @@ class LayoutControl(LayoutDefault):
         self._button_local.setEnabled(False)
 
     def _set_layout(self):
-        self._button_remote = set_button("Remote", self._callback_remote)
-        self._button_local = set_button("Local", self._callback_local)
+        self._button_remote = set_button(
+            "Remote",
+            self._callback_remote,
+            tool_tip="Remote control mode by commandable SAL component",
+        )
+        self._button_local = set_button(
+            "Local", self._callback_local, tool_tip="Local control mode by engineer"
+        )
 
         layout = QVBoxLayout()
         layout.addWidget(self._button_remote)

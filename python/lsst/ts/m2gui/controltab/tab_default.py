@@ -50,6 +50,12 @@ class TabDefault(QDockWidget):
 
         self.model = model
 
+        # Turn off the docker widget specific features
+        # Because the code reuse in this project is mainly based on the
+        # composition instead of inheritance in QT logic, these dock widget
+        # features bring more troubles than the benifits.
+        self.setFeatures(QDockWidget.NoDockWidgetFeatures)
+
     def set_widget_scrollable(self, widget, is_resizable=False):
         """Set the widget to be scrollable.
 

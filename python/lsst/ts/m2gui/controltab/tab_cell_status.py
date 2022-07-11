@@ -24,11 +24,10 @@ __all__ = ["TabCellStatus"]
 from PySide2.QtCore import Slot
 from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QComboBox
 
-import yaml
 import numpy as np
 
 from ..display import ViewMirror, ItemActuator, Gauge, FigureConstant
-from ..utils import NUM_ACTUATOR, NUM_TANGENT_LINK, set_button
+from ..utils import NUM_ACTUATOR, NUM_TANGENT_LINK, set_button, read_yaml_file
 from ..enums import FigureActuatorData
 from .. import ActuatorForce
 from . import TabDefault
@@ -278,12 +277,7 @@ class TabCellStatus(TabDefault):
         """
 
         # Read the yaml file
-        cell_geometry = dict()
-        try:
-            with open(filepath, "r") as yaml_file:
-                cell_geometry = yaml.safe_load(yaml_file)
-        except IOError:
-            raise IOError(f"Cannot open the cell geometry file: {filepath}.")
+        cell_geometry = read_yaml_file(filepath)
 
         # Set the mirror radius to calculate the magnification of actuator
         # on the mirror's view

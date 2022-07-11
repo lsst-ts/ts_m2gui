@@ -43,6 +43,14 @@ class Model(object):
     ----------
     log : `logging.Logger`
         A logger.
+    host : `str`, optional
+        Host address. (the default is "localhost")
+    port_command : `int`, optional
+        Command port to connect. (the default is 50000)
+    port_telemetry : `int`, optional
+        Telemetry port to connect. (the default is 50001)
+    timeout_connection : `int` or `float`, optional
+        Connection timeout in second. (the default is 10)
 
     Attributes
     ----------
@@ -66,9 +74,24 @@ class Model(object):
         Fault manager to record the system error.
     utility_monitor : `UtilityMonitor`
         Utility monitor to monitor the utility status.
+    host : `str`
+        Host address.
+    port_command : `int`
+        Command port to connect.
+    port_telemetry : `int`
+        Telemetry port to connect.
+    timeout_connection : `int` or `float`
+        Connection timeout in second.
     """
 
-    def __init__(self, log):
+    def __init__(
+        self,
+        log,
+        host="localhost",
+        port_command=50000,
+        port_telemetry=50001,
+        timeout_connection=10,
+    ):
 
         self.log = log
 
@@ -84,6 +107,13 @@ class Model(object):
 
         self.fault_manager = FaultManager(self.get_actuator_default_status(False))
         self.utility_monitor = UtilityMonitor()
+
+        # TCP/IP connection information. They will be move to other places in a
+        # latter time
+        self.host = host
+        self.port_command = port_command
+        self.port_telemetry = port_telemetry
+        self.timeout_connection = timeout_connection
 
     def _set_system_status(self):
         """Set the default system status.
@@ -465,3 +495,61 @@ class Model(object):
             raise RuntimeError(
                 "Failed to command the actuator. Only allow in Enabled state and open-loop control."
             )
+
+    def update_connection_information(
+        self, host, port_command, port_telemetry, timeout_connection
+    ):
+        """Update the connection information.
+
+        Parameters
+        ----------
+        host : `str`
+            Host address.
+        port_command : `int`
+            Command port to connect.
+        port_telemetry : `int`
+            Telemetry port to connect.
+        timeout_connection : `int` or `float`
+            Connection timeout in second.
+
+        Raises
+        ------
+        `RuntimeError`
+            There is the connection with the M2 controller already.
+        """
+
+        if self.system_status["isCrioConnected"]:
+            raise RuntimeError("Please disconnect from the M2 controller first.")
+
+        self.host = host
+        self.port_command = port_command
+        self.port_telemetry = port_telemetry
+        self.timeout_connection = timeout_connection
+
+    def connect(self):
+        """Connect to the M2 controller.
+
+        Raises
+        ------
+        `RuntimeError`
+            There is the connection with the M2 controller already.
+        """
+
+        if self.system_status["isCrioConnected"]:
+            raise RuntimeError("Please disconnect from the M2 controller first.")
+
+        self.log.info("Connect to the M2 controller.")
+
+    def disconnect(self):
+        """Disconnect from the M2 controller.
+
+        Raises
+        ------
+        `RuntimeError`
+            There is no connection with the M2 controller yet.
+        """
+
+        if not self.system_status["isCrioConnected"]:
+            raise RuntimeError("There is no connection with the M2 controller.")
+
+        self.log.info("Disconnect from the M2 controller.")

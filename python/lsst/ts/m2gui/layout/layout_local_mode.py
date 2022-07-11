@@ -102,9 +102,17 @@ class LayoutLocalMode(LayoutDefault):
         self._button_enable.setEnabled(False)
 
     def _set_layout(self):
-        self._button_standby = set_button("Standby", self._callback_standby)
-        self._button_diagnostic = set_button("Diagnostic", self._callback_diagnostic)
-        self._button_enable = set_button("Enable", self._callback_enable)
+        self._button_standby = set_button(
+            "Standby", self._callback_standby, tool_tip="Transition to standby state"
+        )
+        self._button_diagnostic = set_button(
+            "Diagnostic",
+            self._callback_diagnostic,
+            tool_tip="Transition to diagnostic state",
+        )
+        self._button_enable = set_button(
+            "Enable", self._callback_enable, tool_tip="Transition to enable state"
+        )
 
         layout = QVBoxLayout()
         layout.addWidget(self._button_standby)
