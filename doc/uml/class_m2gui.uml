@@ -4,11 +4,12 @@ package "layout" #DDDDDD {
 }
 
 package "controltab" #DDDDDD {
-  class TabDefault
+  TabDefault <|-- TabSettings
 }
 
 MainWindow *-- Model
 MainWindow *-- ControlTabs
+MainWindow *-- TabSettings
 MainWindow "1" *-- "3" LayoutDefault
 MainWindow *-- SignalControl
 MainWindow *-- SignalMessage

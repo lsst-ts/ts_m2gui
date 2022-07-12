@@ -1,0 +1,8 @@
+@startuml
+package "m2gui" #DDDDDD {
+  class Model
+}
+
+TabDefault *-- Model
+TabDefault <|-- TabSettings
+@enduml

@@ -30,7 +30,10 @@ __all__ = [
     "get_num_actuator_ring",
     "prompt_dialog_warning",
     "run_command",
+    "read_yaml_file",
 ]
+
+import yaml
 
 from functools import partial
 
@@ -45,7 +48,13 @@ NUM_TANGENT_LINK = 6
 
 
 def set_button(
-    name, callback, *args, is_checkable=False, is_indicator=False, is_adjust_size=False
+    name,
+    callback,
+    *args,
+    is_checkable=False,
+    is_indicator=False,
+    is_adjust_size=False,
+    tool_tip=None,
 ):
     """Set the button.
 
@@ -66,6 +75,8 @@ def set_button(
         value is True. (the default is False)
     is_adjust_size : `bool`, optional
         Adjust the size of button or not. (the default is False)
+    tool_tip : `str` or None, optional
+        Tool tip. If None, there will be no tip. (the default is None)
 
     Returns
     -------
@@ -91,6 +102,9 @@ def set_button(
 
     if is_adjust_size:
         button.adjustSize()
+
+    if tool_tip is not None:
+        button.setToolTip(tool_tip)
 
     return button
 
@@ -286,3 +300,32 @@ def run_command(command, *args, is_prompted=True):
         return False
 
     return True
+
+
+def read_yaml_file(filepath):
+    """Read the yaml file.
+
+    Parameters
+    ----------
+    filepath : `str` or `pathlib.PosixPath`
+        Yaml file path.
+
+    Returns
+    -------
+    content : `dict`
+        File content.
+
+    Raises
+    ------
+    `IOError`
+        Cannot open the file.
+    """
+
+    content = dict()
+    try:
+        with open(filepath, "r") as yaml_file:
+            content = yaml.safe_load(yaml_file)
+    except IOError:
+        raise IOError(f"Cannot open the yaml file: {filepath}.")
+
+    return content

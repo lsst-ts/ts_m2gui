@@ -35,7 +35,6 @@ from .controltab import (
     TabRigidBodyPos,
     TabUtilityView,
 )
-from . import set_button
 
 
 class ControlTabs(object):
@@ -54,9 +53,6 @@ class ControlTabs(object):
 
     def __init__(self, model):
 
-        # Show the selected table or not
-        self._button_show = None
-
         # List of the control tables
         self._tabs = list()
 
@@ -66,9 +62,6 @@ class ControlTabs(object):
         self._setup_tabs_and_list_widget(model)
 
         self.layout = self._set_layout()
-
-        # Set the default selection
-        self._list_widget.setCurrentItem(self.get_tab("Overview")[0])
 
     def _setup_tabs_and_list_widget(self, model):
         """Setup the tables and list widget.
@@ -94,6 +87,13 @@ class ControlTabs(object):
         for tab in self._tabs:
             self._list_widget.addItem(tab.windowTitle())
 
+        # Set the default selection
+        self._list_widget.setCurrentItem(self.get_tab("Overview")[0])
+
+        self._list_widget.setToolTip("Double click to open the table")
+
+        self._list_widget.itemDoubleClicked.connect(self._callback_show)
+
     def _set_layout(self):
         """Set the layout.
 
@@ -102,17 +102,15 @@ class ControlTabs(object):
         layout : `PySide2.QtWidgets.QVBoxLayout`
             Layout.
         """
-        self._button_show = set_button("Show Selected Table", self._callback_show)
 
         layout = QVBoxLayout()
         layout.addWidget(self._list_widget)
-        layout.addWidget(self._button_show)
 
         return layout
 
     @Slot()
     def _callback_show(self):
-        """Callback of the show button."""
+        """Callback function to show the selected table."""
         item = self._list_widget.currentItem()
         control_tab = self._get_control_tab(item.text())
         control_tab.show()

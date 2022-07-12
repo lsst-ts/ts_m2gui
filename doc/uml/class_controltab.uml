@@ -8,4 +8,5 @@ TabDefault <|-- TabDiagnostics
 TabDefault <|-- TabOverview
 TabDefault <|-- TabRigidBodyPos
 TabDefault <|-- TabUtilityView
+TabDefault <|-- TabSettings
 @enduml

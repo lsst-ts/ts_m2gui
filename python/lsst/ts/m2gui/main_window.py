@@ -30,11 +30,20 @@ from PySide2.QtWidgets import (
     QMainWindow,
     QWidget,
     QVBoxLayout,
+    QMessageBox,
 )
 
-from .utils import set_button
+from .controltab import TabSettings
 from .layout import LayoutControl, LayoutLocalMode, LayoutControlMode
-from . import Model, ControlTabs, LogWindowHandler, SignalMessage, SignalControl
+from . import (
+    read_yaml_file,
+    Model,
+    ControlTabs,
+    LogWindowHandler,
+    SignalMessage,
+    SignalControl,
+    run_command,
+)
 
 
 class MainWindow(QMainWindow):
@@ -66,7 +75,7 @@ class MainWindow(QMainWindow):
         message_format = "%(asctime)s, %(levelname)s, %(message)s"
         self.log = self._set_log(message_format, is_output_log_on_screen, log=log)
 
-        self.model = Model(self.log)
+        self.model = self._set_model()
 
         # Singal of control
         self._signal_control = SignalControl()
@@ -84,6 +93,9 @@ class MainWindow(QMainWindow):
         self._control_tabs = ControlTabs(self.model)
         self._set_control_tabs()
 
+        # Table to have the settings
+        self._tab_settings = TabSettings("Settings", self.model)
+
         # Set the main window of application
         self.setWindowTitle("M2 Control")
 
@@ -91,6 +103,15 @@ class MainWindow(QMainWindow):
         container = QWidget()
         container.setLayout(self._create_layout())
         self.setCentralWidget(container)
+
+        # Disable the Qt close button
+        self.setWindowFlags(
+            QtCore.Qt.Window
+            | QtCore.Qt.WindowMinimizeButtonHint
+            | QtCore.Qt.WindowMaximizeButtonHint
+        )
+
+        self._add_tool_bar()
 
         self._set_default()
 
@@ -128,6 +149,29 @@ class MainWindow(QMainWindow):
             )
 
         return log
+
+    def _set_model(self):
+        """Set the model.
+
+        Returns
+        -------
+        model : `Model`
+            Model object.
+        """
+
+        # Read the yaml file
+        filepath = self._get_policy_dir() / "default.yaml"
+        default_settings = read_yaml_file(filepath)
+
+        model = Model(
+            self.log,
+            host=default_settings["host"],
+            port_command=default_settings["port_command"],
+            port_telemetry=default_settings["port_telemetry"],
+            timeout_connection=default_settings["timeout_connection"],
+        )
+
+        return model
 
     def _set_control_tabs(self):
         """Set the control tables"""
@@ -191,17 +235,75 @@ class MainWindow(QMainWindow):
         layout.addLayout(self._layout_control_mode.layout)
         layout.addLayout(self._control_tabs.layout)
 
-        button_exit = set_button("Exit", self._callback_exit)
-        layout.addWidget(button_exit)
-
         return layout
+
+    def _add_tool_bar(self):
+        """Add the tool bar."""
+
+        tool_bar = self.addToolBar("ToolBar")
+
+        action_exit = tool_bar.addAction("Exit", self._callback_exit)
+        action_exit.setToolTip("Exit the application")
+
+        action_connect = tool_bar.addAction("Connect", self._callback_connect)
+        action_connect.setToolTip("Connect to the M2 controller")
+
+        action_disconnect = tool_bar.addAction("Disconnect", self._callback_disconnect)
+        action_disconnect.setToolTip("Disconnect from the M2 controller")
+
+        action_settings = tool_bar.addAction("Settings", self._callback_settings)
+        action_settings.setToolTip("Show the application settings")
 
     @QtCore.Slot()
     def _callback_exit(self):
         """Exit the application."""
 
-        app = QtCore.QCoreApplication.instance()
-        app.quit()
+        dialog = self._create_dialog_exit()
+        result = dialog.exec()
+
+        if result == QMessageBox.Ok:
+            app = QtCore.QCoreApplication.instance()
+            app.quit()
+
+    def _create_dialog_exit(self):
+        """Create the exit dialog.
+
+        Returns
+        -------
+        `PySide2.QtWidgets.QMessageBox`
+            Exit dialog.
+        """
+
+        dialog = QMessageBox()
+        dialog.setIcon(QMessageBox.Warning)
+        dialog.setWindowTitle("exit")
+
+        if self.model.system_status["isCrioConnected"]:
+            dialog.setText(
+                "There is still the connection with M2 controller. Exit the application?"
+            )
+        else:
+            dialog.setText("Exit the application?")
+
+        dialog.addButton(QMessageBox.Cancel)
+        dialog.addButton(QMessageBox.Ok)
+
+        return dialog
+
+    @QtCore.Slot()
+    def _callback_connect(self):
+        """Callback function to connect to the M2 controller."""
+        run_command(self.model.connect)
+
+    @QtCore.Slot()
+    def _callback_disconnect(self):
+        """Callback function to disconnect from the M2 controller."""
+        run_command(self.model.disconnect)
+
+    @QtCore.Slot()
+    def _callback_settings(self):
+        """Callback function to show the settings."""
+        self._tab_settings.show()
 
     def _set_default(self):
         """Set the default condition."""

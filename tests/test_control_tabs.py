@@ -108,15 +108,17 @@ def test_show(qtbot, widget):
 
         rect = widget.layout_control_tabs._list_widget.visualItemRect(tab_item)
         center = rect.center()
-        qtbot.mouseClick(
+
+        qtbot.mousePress(
             widget.layout_control_tabs._list_widget.viewport(),
             QtCore.Qt.LeftButton,
             pos=center,
         )
 
-        qtbot.mouseClick(
-            widget.layout_control_tabs._button_show,
+        qtbot.mouseDClick(
+            widget.layout_control_tabs._list_widget.viewport(),
             QtCore.Qt.LeftButton,
+            pos=center,
         )
 
         assert tab_item.isSelected() is True
