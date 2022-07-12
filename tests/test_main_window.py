@@ -54,8 +54,8 @@ def test_init(widget):
     assert len(actions) == 4
 
     assert widget.model.host == "m2-crio-controller01.cp.lsst.org"
-    assert widget.model.port_command == 50000
-    assert widget.model.port_telemetry == 50001
+    assert widget.model.port_command == 50010
+    assert widget.model.port_telemetry == 50011
     assert widget.model.timeout_connection == 10
 
 

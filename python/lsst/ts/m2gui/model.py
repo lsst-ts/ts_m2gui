@@ -46,9 +46,9 @@ class Model(object):
     host : `str`, optional
         Host address. (the default is "localhost")
     port_command : `int`, optional
-        Command port to connect. (the default is 50000)
+        Command port to connect. (the default is 50010)
     port_telemetry : `int`, optional
-        Telemetry port to connect. (the default is 50001)
+        Telemetry port to connect. (the default is 50011)
     timeout_connection : `int` or `float`, optional
         Connection timeout in second. (the default is 10)
 
@@ -88,8 +88,8 @@ class Model(object):
         self,
         log,
         host="localhost",
-        port_command=50000,
-        port_telemetry=50001,
+        port_command=50010,
+        port_telemetry=50011,
         timeout_connection=10,
     ):
 

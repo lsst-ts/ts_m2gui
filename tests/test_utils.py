@@ -69,8 +69,8 @@ def test_read_yaml_file():
     content = read_yaml_file(yaml_file)
 
     assert content["host"] == "m2-crio-controller01.cp.lsst.org"
-    assert content["port_command"] == 50000
-    assert content["port_telemetry"] == 50001
+    assert content["port_command"] == 50010
+    assert content["port_telemetry"] == 50011
     assert content["timeout_connection"] == 10
 
 

@@ -4,10 +4,10 @@
 host: "m2-crio-controller01.cp.lsst.org"
 
 # Command port number of the M2 controller.
-port_command: 50000
+port_command: 50010
 
 # Telemetry port number of the M2 controller.
-port_telemetry: 50001
+port_telemetry: 50011
 
 # Connection timeout in second.
 timeout_connection: 10
