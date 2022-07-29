@@ -11,6 +11,7 @@
 - pyyaml (install by `conda`)
 - pyside2 (install by `conda`)
 - qt5-qtbase-devel (install by `yum`)
+- qasync (install by `conda -c conda-forge`)
 - [black](https://github.com/psf/black) (22.3.0, optional)
 - [documenteer](https://github.com/lsst-sqre/documenteer) (optional)
 - pytest (optional, install by `conda`)
