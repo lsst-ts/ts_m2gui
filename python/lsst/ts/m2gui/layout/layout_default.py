@@ -31,8 +31,6 @@ class LayoutDefault(object):
     ----------
     model : `Model`
         Model class.
-    signal_control : `SignalControl`
-        Signal to know the control is updated or not.
 
     Attributes
     ----------
@@ -42,12 +40,12 @@ class LayoutDefault(object):
         Layout.
     """
 
-    def __init__(self, model, signal_control):
+    def __init__(self, model):
 
         self.model = model
-
-        self._signal_control = signal_control
-        self._signal_control.is_control_updated.connect(self._callback_signal_control)
+        self.model.signal_control.is_control_updated.connect(
+            self._callback_signal_control
+        )
 
         self.layout = self._set_layout()
 

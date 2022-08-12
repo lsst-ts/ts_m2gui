@@ -41,7 +41,6 @@ from . import (
     ControlTabs,
     LogWindowHandler,
     SignalMessage,
-    SignalControl,
     run_command,
 )
 
@@ -77,17 +76,14 @@ class MainWindow(QMainWindow):
 
         self.model = self._set_model()
 
-        # Singal of control
-        self._signal_control = SignalControl()
-
         # Layout of the control panel
-        self._layout_control = LayoutControl(self.model, self._signal_control)
+        self._layout_control = LayoutControl(self.model)
 
         # Layout of the local mode
-        self._layout_local_mode = LayoutLocalMode(self.model, self._signal_control)
+        self._layout_local_mode = LayoutLocalMode(self.model)
 
         # Layout of the control mode
-        self._layout_control_mode = LayoutControlMode(self.model, self._signal_control)
+        self._layout_control_mode = LayoutControlMode(self.model)
 
         # Control tables
         self._control_tabs = ControlTabs(self.model)
@@ -184,7 +180,7 @@ class MainWindow(QMainWindow):
         """Set the table of overview."""
 
         tab_overview = self._control_tabs.get_tab("Overview")[1]
-        tab_overview.set_signal_control(self._signal_control)
+        tab_overview.set_signal_control(self.model.signal_control)
         tab_overview.set_signal_message(self._signal_message)
 
     def _set_tab_alarm_warn(self):

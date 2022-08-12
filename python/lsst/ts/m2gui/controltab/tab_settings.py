@@ -29,7 +29,7 @@ from . import TabDefault
 
 
 class TabSettings(TabDefault):
-    """Table of the configuration view.
+    """Table of the settings.
 
     Parameters
     ----------

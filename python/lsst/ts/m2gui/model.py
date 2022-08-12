@@ -26,6 +26,7 @@ from . import (
     LimitSwitchType,
     Ring,
     ActuatorDisplacementUnit,
+    SignalControl,
     SignalStatus,
     SignalConfig,
     SignalScript,
@@ -62,6 +63,8 @@ class Model(object):
         Local model.
     is_closed_loop : `bool`
         Closed-loop control is on or not.
+    signal_control : `SignalControl`
+        Signal to report the control status.
     signal_status : `SignalStatus`
         Signal to report the updated status of system.
     signal_config : `SignalConfig`
@@ -99,6 +102,7 @@ class Model(object):
         self.local_mode = LocalMode.Standby
         self.is_closed_loop = False
 
+        self.signal_control = SignalControl()
         self.signal_status = SignalStatus()
         self.signal_config = SignalConfig()
         self.signal_script = SignalScript()
@@ -192,6 +196,10 @@ class Model(object):
             collection[name] = status
 
         return collection
+
+    def report_control_status(self):
+        """Report the control status."""
+        self.signal_control.is_control_updated.emit(True)
 
     def add_error(self, error):
         """Add the error.

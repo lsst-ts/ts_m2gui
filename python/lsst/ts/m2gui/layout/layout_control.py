@@ -36,8 +36,6 @@ class LayoutControl(LayoutDefault):
     ----------
     model : `Model`
         Model class.
-    signal_control : `SignalControl`
-        Signal to know the control is updated or not.
 
     Attributes
     ----------
@@ -47,7 +45,7 @@ class LayoutControl(LayoutDefault):
         Layout.
     """
 
-    def __init__(self, model, signal_control):
+    def __init__(self, model):
 
         # Remote button
         self._button_remote = None
@@ -55,7 +53,7 @@ class LayoutControl(LayoutDefault):
         # Local button
         self._button_local = None
 
-        super().__init__(model, signal_control)
+        super().__init__(model)
 
     @Slot()
     def _callback_signal_control(self, is_control_updated):
@@ -115,4 +113,4 @@ class LayoutControl(LayoutDefault):
         """
 
         self.model.is_csc_commander = is_commander
-        self._signal_control.is_control_updated.emit(True)
+        self.model.report_control_status()

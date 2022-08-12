@@ -36,8 +36,6 @@ class LayoutLocalMode(LayoutDefault):
     ----------
     model : `Model`
         Model class.
-    signal_control : `SignalControl`
-        Signal to know the control is updated or not.
 
     Attributes
     ----------
@@ -47,7 +45,7 @@ class LayoutLocalMode(LayoutDefault):
         Layout.
     """
 
-    def __init__(self, model, signal_control):
+    def __init__(self, model):
 
         # Standby button
         self._button_standby = None
@@ -58,7 +56,7 @@ class LayoutLocalMode(LayoutDefault):
         # Enable button
         self._button_enable = None
 
-        super().__init__(model, signal_control)
+        super().__init__(model)
 
     @Slot()
     def _callback_signal_control(self, is_control_updated):
@@ -156,4 +154,4 @@ class LayoutLocalMode(LayoutDefault):
         """
 
         self.model.local_mode = local_mode
-        self._signal_control.is_control_updated.emit(True)
+        self.model.report_control_status()

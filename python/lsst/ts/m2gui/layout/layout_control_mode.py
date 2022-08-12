@@ -36,8 +36,6 @@ class LayoutControlMode(LayoutDefault):
     ----------
     model : `Model`
         Model class.
-    signal_control : `SignalControl`
-        Signal to know the control is updated or not.
 
     Attributes
     ----------
@@ -47,7 +45,7 @@ class LayoutControlMode(LayoutDefault):
         Layout.
     """
 
-    def __init__(self, model, signal_control):
+    def __init__(self, model):
 
         # Open-loop button
         self._button_open_loop = None
@@ -55,7 +53,7 @@ class LayoutControlMode(LayoutDefault):
         # Closed-loop button
         self._button_closed_loop = None
 
-        super().__init__(model, signal_control)
+        super().__init__(model)
 
     @Slot()
     def _callback_signal_control(self, is_control_updated):
@@ -116,4 +114,4 @@ class LayoutControlMode(LayoutDefault):
         """
 
         self.model.is_closed_loop = status
-        self._signal_control.is_control_updated.emit(True)
+        self.model.report_control_status()
