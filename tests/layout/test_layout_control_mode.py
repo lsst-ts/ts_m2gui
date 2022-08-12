@@ -26,7 +26,7 @@ import logging
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
 
-from lsst.ts.m2gui import Model, LocalMode, SignalControl
+from lsst.ts.m2gui import Model, LocalMode
 from lsst.ts.m2gui.layout import LayoutControlMode
 
 
@@ -35,8 +35,7 @@ class MockWidget(QWidget):
         super().__init__()
 
         model = Model(logging.getLogger())
-        signal_control = SignalControl()
-        self.layout_control_mode = LayoutControlMode(model, signal_control)
+        self.layout_control_mode = LayoutControlMode(model)
 
         self.setLayout(self.layout_control_mode.layout)
 
@@ -51,7 +50,7 @@ def widget(qtbot):
 
 
 def test_callback_signal_control_normal(qtbot, widget):
-    widget.layout_control_mode._signal_control.is_control_updated.emit(True)
+    widget.layout_control_mode.model.report_control_status()
 
     assert widget.layout_control_mode._button_open_loop.isEnabled() is False
     assert widget.layout_control_mode._button_closed_loop.isEnabled() is False
@@ -60,7 +59,7 @@ def test_callback_signal_control_normal(qtbot, widget):
 def test_callback_signal_control_prohibit_control(qtbot, widget):
     widget.layout_control_mode.model.local_mode = LocalMode.Enable
 
-    widget.layout_control_mode._signal_control.is_control_updated.emit(True)
+    widget.layout_control_mode.model.report_control_status()
 
     assert widget.layout_control_mode._button_open_loop.isEnabled() is False
     assert widget.layout_control_mode._button_closed_loop.isEnabled() is True

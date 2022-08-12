@@ -26,7 +26,7 @@ import logging
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
 
-from lsst.ts.m2gui import Model, LocalMode, SignalControl
+from lsst.ts.m2gui import Model, LocalMode
 from lsst.ts.m2gui.layout import LayoutLocalMode
 
 
@@ -35,8 +35,7 @@ class MockWidget(QWidget):
         super().__init__()
 
         model = Model(logging.getLogger())
-        signal_control = SignalControl()
-        self.layout_local_mode = LayoutLocalMode(model, signal_control)
+        self.layout_local_mode = LayoutLocalMode(model)
 
         self.setLayout(self.layout_local_mode.layout)
 
@@ -51,7 +50,7 @@ def widget(qtbot):
 
 
 def test_callback_signal_control_normal(qtbot, widget):
-    widget.layout_local_mode._signal_control.is_control_updated.emit(True)
+    widget.layout_local_mode.model.report_control_status()
 
     assert widget.layout_local_mode._button_standby.isEnabled() is False
     assert widget.layout_local_mode._button_diagnostic.isEnabled() is True
@@ -62,7 +61,7 @@ def test_callback_signal_control_prohibit_control(qtbot, widget):
     # CSC has the control
     widget.layout_local_mode.model.is_csc_commander = True
 
-    widget.layout_local_mode._signal_control.is_control_updated.emit(True)
+    widget.layout_local_mode.model.report_control_status()
 
     _assert_prohibit_transition(widget)
 
@@ -70,7 +69,7 @@ def test_callback_signal_control_prohibit_control(qtbot, widget):
     widget.layout_local_mode.model.is_csc_commander = False
     widget.layout_local_mode.model.is_closed_loop = True
 
-    widget.layout_local_mode._signal_control.is_control_updated.emit(True)
+    widget.layout_local_mode.model.report_control_status()
 
     _assert_prohibit_transition(widget)
 
