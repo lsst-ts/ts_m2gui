@@ -11,12 +11,12 @@ MainWindow *-- Model
 MainWindow *-- ControlTabs
 MainWindow *-- TabSettings
 MainWindow "1" *-- "3" LayoutDefault
-MainWindow *-- SignalControl
 MainWindow *-- SignalMessage
 MainWindow ..> LogWindowHandler
 
 Model *-- FaultManager
 Model *-- UtilityMonitor
+Model *-- SignalControl : emit()
 Model *-- SignalStatus : emit()
 Model *-- SignalConfig : emit()
 Model *-- SignalScript : emit()
@@ -33,7 +33,7 @@ UtilityMonitor *-- ActuatorForce
 UtilityMonitor *-- ForceErrorTangent
 
 LayoutDefault *-- Model
-LayoutDefault *-- SignalControl : emit()/connect()
+LayoutDefault --> SignalControl : connect()
 
 LogWindowHandler *-- SignalMessage : emit()
 

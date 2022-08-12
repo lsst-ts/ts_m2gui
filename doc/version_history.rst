@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.6:
+
+-------------
+0.1.6
+-------------
+
+* Add the **Jenkinsfile** and publish the built document to `ts_m2gui <https://ts-m2gui.lsst.io>`_.
+* Add the documentation.
+* Let the **Model** to hold the **SignalControl** instead of the **MainWindow**.
+
 .. _lsst.ts.m2gui-0.1.5:
 
 -------------
@@ -25,8 +35,7 @@ Version History
 0.1.4
 -------------
 
-* Support the cell status in part 2.
-This is to support the realtime figure.
+* Support the cell status in part 2. This is to support the realtime figure.
 
 .. _lsst.ts.m2gui-0.1.3:
 
@@ -35,8 +44,7 @@ This is to support the realtime figure.
 -------------
 
 * Add the **cell_geometry.yaml**.
-* Support the cell status in part 1.
-At this moment, the overview of mirror forces is supported.
+* Support the cell status in part 1. At this moment, the overview of mirror forces is supported.
 
 .. _lsst.ts.m2gui-0.1.2:
 
