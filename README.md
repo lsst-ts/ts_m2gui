@@ -80,6 +80,7 @@ Use the argument of `-h` to know the available options.
 You can run the unit tests by:
 
 ```bash
+export PYTEST_QT_API="PySide2"
 pytest tests/
 ```
 

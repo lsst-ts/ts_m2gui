@@ -54,6 +54,11 @@ Most of signals are holded and emitted from the **Model** or its components to s
 Only the **SignalMessage** is holded by the **MainView**.
 The **SignalMessage** is unrelated to the **Model**, which is only used to show the logged message on the overview table.
 
+Qt provides its own event loop that is different from the event loop in Python `asyncio <https://docs.python.org/3/library/asyncio.html>`_ library.
+Because of this, the `qasync <https://github.com/CabbageDevelopment/qasync>`_ libary is applied to let this GUI use the `async/await` syntax in Python.
+It adds some logic on the top of original Qt signal processing, and has some impact to the system performance.
+Therefore, when using the `pytest_qt <https://github.com/pytest-dev/pytest-qt>`_ library in the unit testing, the `asyncio.sleep()` will be required to let the system have time to process the Qt signal.
+
 .. _lsst.ts.m2gui-modules_m2gui_signals:
 
 m2gui.signals
