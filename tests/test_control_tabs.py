@@ -21,6 +21,7 @@
 
 import pytest
 import logging
+import asyncio
 
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
@@ -87,7 +88,7 @@ def test_flag(qtbot, widget):
     assert control_tab.isVisible() is False
 
 
-def test_show(qtbot, widget):
+async def test_show(qtbot, widget):
 
     names = [
         "Overview",
@@ -120,6 +121,10 @@ def test_show(qtbot, widget):
             QtCore.Qt.LeftButton,
             pos=center,
         )
+
+        # Sleep one second to let the event loop to have the time to run the
+        # signal
+        await asyncio.sleep(1)
 
         assert tab_item.isSelected() is True
         assert control_tab.isVisible() is True

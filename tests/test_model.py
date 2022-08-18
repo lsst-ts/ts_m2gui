@@ -22,13 +22,13 @@
 import pytest
 import logging
 
+from lsst.ts.m2com import CommandScript, CommandActuator
+
 from lsst.ts.m2gui import (
     Model,
     LocalMode,
     LimitSwitchType,
     Ring,
-    CommandScript,
-    CommandActuator,
 )
 
 

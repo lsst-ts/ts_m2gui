@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 import pathlib
 
@@ -69,7 +70,7 @@ def test_init(qtbot, widget):
             assert color == Qt.green
 
 
-def test_callback_selection_changed(qtbot, widget):
+async def test_callback_selection_changed(qtbot, widget):
 
     assert widget._text_error_cause.toPlainText() == ""
 
@@ -80,6 +81,9 @@ def test_callback_selection_changed(qtbot, widget):
         Qt.LeftButton,
         pos=center,
     )
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     assert (
         widget._text_error_cause.toPlainText()
@@ -94,6 +98,9 @@ def test_callback_selection_changed(qtbot, widget):
         pos=center,
     )
 
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert (
         widget._text_error_cause.toPlainText()
         == "ILC responded with an exception code or did not respond at all (timeout)"
@@ -106,6 +113,9 @@ def test_callback_selection_changed(qtbot, widget):
         Qt.LeftButton,
         pos=center,
     )
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     assert (
         widget._text_error_cause.toPlainText()
@@ -120,14 +130,20 @@ def _get_widget_item_center(widget, item_text):
     return rect.center()
 
 
-def test_callback_signal_error_new(qtbot, widget):
+async def test_callback_signal_error_new(qtbot, widget):
 
     widget.model.add_error(6051)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     color_6051 = _get_widget_item_color(widget, "6051")
     assert color_6051 == Qt.red
 
     widget.model.add_error(6052)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     color_6052 = _get_widget_item_color(widget, "6052")
     assert color_6052 == Qt.yellow
@@ -139,18 +155,21 @@ def _get_widget_item_color(widget, item_text):
     return items[0].background().color()
 
 
-def test_callback_signal_error_cleared(qtbot, widget):
+async def test_callback_signal_error_cleared(qtbot, widget):
 
     widget.model.add_error(6051)
 
     widget.model.clear_error(6051)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     # Color should be white
     color_6051 = _get_widget_item_color(widget, "6051")
     assert color_6051 == Qt.white
 
 
-def test_callback_reset(qtbot, widget):
+async def test_callback_reset(qtbot, widget):
 
     # Update the text of error cause
     center = _get_widget_item_center(widget, "6054")
@@ -170,6 +189,9 @@ def test_callback_reset(qtbot, widget):
 
     # Click the reset button
     qtbot.mouseClick(widget._button_reset, Qt.LeftButton)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     # Check the text of error cause should be cleared
     assert widget._text_error_cause.toPlainText() == ""
@@ -194,11 +216,14 @@ def test_set_error_item_color_error(qtbot, widget):
         widget._set_error_item_color(None, "wrong_status")
 
 
-def test_callback_signal_limit_switch(qtbot, widget):
+async def test_callback_signal_limit_switch(qtbot, widget):
 
     widget.model.fault_manager.update_limit_switch_status(
         LimitSwitchType.Extend, Ring.C, 3, True
     )
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     indicator = widget._indicators_limit_switch_extend["C3"]
     palette = indicator.palette()

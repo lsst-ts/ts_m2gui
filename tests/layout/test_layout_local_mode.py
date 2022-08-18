@@ -20,7 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-
+import asyncio
 import logging
 
 from PySide2 import QtCore
@@ -49,19 +49,25 @@ def widget(qtbot):
     return widget
 
 
-def test_callback_signal_control_normal(qtbot, widget):
+async def test_callback_signal_control_normal(qtbot, widget):
     widget.layout_local_mode.model.report_control_status()
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     assert widget.layout_local_mode._button_standby.isEnabled() is False
     assert widget.layout_local_mode._button_diagnostic.isEnabled() is True
     assert widget.layout_local_mode._button_enable.isEnabled() is True
 
 
-def test_callback_signal_control_prohibit_control(qtbot, widget):
+async def test_callback_signal_control_prohibit_control(qtbot, widget):
     # CSC has the control
     widget.layout_local_mode.model.is_csc_commander = True
 
     widget.layout_local_mode.model.report_control_status()
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     _assert_prohibit_transition(widget)
 
@@ -80,8 +86,12 @@ def _assert_prohibit_transition(widget):
     assert widget.layout_local_mode._button_enable.isEnabled() is False
 
 
-def test_set_local_mode(qtbot, widget):
+async def test_set_local_mode(qtbot, widget):
     qtbot.mouseClick(widget.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget.layout_local_mode.model.local_mode == LocalMode.Diagnostic
 
     assert widget.layout_local_mode._button_standby.isEnabled() is True
@@ -89,6 +99,10 @@ def test_set_local_mode(qtbot, widget):
     assert widget.layout_local_mode._button_enable.isEnabled() is True
 
     qtbot.mouseClick(widget.layout_local_mode._button_enable, QtCore.Qt.LeftButton)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget.layout_local_mode.model.local_mode == LocalMode.Enable
 
     assert widget.layout_local_mode._button_standby.isEnabled() is True
@@ -103,6 +117,10 @@ def test_set_local_mode(qtbot, widget):
 
     qtbot.mouseClick(widget.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton)
     qtbot.mouseClick(widget.layout_local_mode._button_standby, QtCore.Qt.LeftButton)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget.layout_local_mode.model.local_mode == LocalMode.Standby
 
     assert widget.layout_local_mode._button_standby.isEnabled() is False

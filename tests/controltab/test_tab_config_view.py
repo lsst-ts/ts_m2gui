@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from lsst.ts.m2gui import Model
@@ -35,7 +36,7 @@ def widget(qtbot):
     return widget
 
 
-def test_callback_signal_config(qtbot, widget):
+async def test_callback_signal_config(qtbot, widget):
 
     widget.model.report_config(
         file_configuration="a",
@@ -58,6 +59,9 @@ def test_callback_signal_config(qtbot, widget):
         misc_diff_enabled=True,
         misc_range_temperature=3.2,
     )
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     assert widget._config_parameters["file_configuration"].text() == "a"
     assert widget._config_parameters["file_version"].text() == "b"

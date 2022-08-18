@@ -20,12 +20,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 
-from lsst.ts.m2gui import Model, ForceErrorTangent, LocalMode, PowerType
+from lsst.ts.m2com import PowerType
+
+from lsst.ts.m2gui import Model, ForceErrorTangent, LocalMode
 from lsst.ts.m2gui.controltab import TabDiagnostics
 
 
@@ -38,7 +41,7 @@ def widget(qtbot):
     return widget
 
 
-def test_callback_control_digital_status(qtbot, widget):
+async def test_callback_control_digital_status(qtbot, widget):
 
     widget.model.local_mode = LocalMode.Diagnostic
 
@@ -48,43 +51,65 @@ def test_callback_control_digital_status(qtbot, widget):
 
     qtbot.mouseClick(control, Qt.LeftButton)
 
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert control.isChecked() is True
     assert control.text() == "ON"
 
 
-def test_callback_power_motor_calibrated(widget):
+async def test_callback_power_motor_calibrated(widget):
 
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget._power_calibrated["power_voltage_motor"].text() == "0.1 V"
     assert widget._power_calibrated["power_current_motor"].text() == "0.2 A"
 
 
-def test_callback_power_communication_calibrated(widget):
+async def test_callback_power_communication_calibrated(widget):
 
     widget.model.utility_monitor.update_power_calibrated(
         PowerType.Communication, 0.3, 0.4
     )
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget._power_calibrated["power_voltage_communication"].text() == "0.3 V"
     assert widget._power_calibrated["power_current_communication"].text() == "0.4 A"
 
 
-def test_callback_power_motor_raw(widget):
+async def test_callback_power_motor_raw(widget):
 
     widget.model.utility_monitor.update_power_raw(PowerType.Motor, 0.5, 0.6)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget._power_raw["power_voltage_motor"].text() == "0.5 V"
     assert widget._power_raw["power_current_motor"].text() == "0.6 A"
 
 
-def test_callback_power_communication_raw(widget):
+async def test_callback_power_communication_raw(widget):
 
     widget.model.utility_monitor.update_power_raw(PowerType.Communication, 0.7, 0.8)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget._power_raw["power_voltage_communication"].text() == "0.7 V"
     assert widget._power_raw["power_current_communication"].text() == "0.8 A"
 
 
-def test_callback_digital_status_input(widget):
+async def test_callback_digital_status_input(widget):
 
     widget.model.utility_monitor.update_digital_status_input(3)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     _assert_indicator_color(widget._digital_status_input[0], Qt.green)
     _assert_indicator_color(widget._digital_status_input[1], Qt.green)
@@ -97,9 +122,12 @@ def _assert_indicator_color(indicator, target_color):
     assert palette.color(QPalette.Button) == target_color
 
 
-def test_callback_digital_status_output(widget):
+async def test_callback_digital_status_output(widget):
 
     widget.model.utility_monitor.update_digital_status_output(6)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     _assert_indicator_color(widget._digital_status_output[0], Qt.gray)
     _assert_indicator_color(widget._digital_status_output[1], Qt.green)
@@ -117,13 +145,16 @@ def test_callback_digital_status_output(widget):
     assert widget._digital_status_control[3].text() == "OFF"
 
 
-def test_callback_force_error_tangent(widget):
+async def test_callback_force_error_tangent(widget):
 
     force_error_tangent = ForceErrorTangent()
     force_error_tangent.error_force = [1.2, 0.233, -1.334, 0, 31.34, -2.29]
     force_error_tangent.error_weight = 13.331
     force_error_tangent.error_sum = 12.452
     widget.model.utility_monitor.update_force_error_tangent(force_error_tangent)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     assert widget._force_error_tangent["a1"].text() == "1.2 N"
     assert widget._force_error_tangent["a2"].text() == "0.2 N"

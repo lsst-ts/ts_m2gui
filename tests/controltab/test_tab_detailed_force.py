@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from lsst.ts.m2gui import Model, ActuatorForce
@@ -35,17 +36,20 @@ def widget(qtbot):
     return widget
 
 
-def test_callback_callback_hard_points(widget):
+async def test_callback_callback_hard_points(widget):
 
     axial = [1, 2, 3]
     tangent = [72, 73, 74]
     widget.model.utility_monitor.update_hard_points(axial, tangent)
 
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
+
     assert widget._hard_points["axial"].text() == str(axial)
     assert widget._hard_points["tangent"].text() == str(tangent)
 
 
-def test_callback_callback_forces(widget):
+async def test_callback_callback_forces(widget):
 
     forces = ActuatorForce()
     forces.f_hc[3] = 1.234
@@ -55,6 +59,9 @@ def test_callback_callback_forces(widget):
     forces.step[13] = 34
 
     widget.model.utility_monitor.update_forces(forces)
+
+    # Sleep one second to let the event loop to have the time to run the signal
+    await asyncio.sleep(1)
 
     assert widget._forces["f_hc"][3].text() == "1.23"
     assert widget._forces["f_cur"][5].text() == "0.20"
