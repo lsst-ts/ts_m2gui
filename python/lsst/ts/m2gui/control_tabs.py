@@ -21,8 +21,10 @@
 
 __all__ = ["ControlTabs"]
 
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import QListWidget, QVBoxLayout
-from PySide2.QtCore import Slot, Qt
+from PySide2.QtCore import Qt
 
 from .controltab import (
     TabActuatorControl,
@@ -108,10 +110,16 @@ class ControlTabs(object):
 
         return layout
 
-    @Slot()
-    def _callback_show(self):
-        """Callback function to show the selected table."""
-        item = self._list_widget.currentItem()
+    @asyncSlot()
+    async def _callback_show(self, item):
+        """Callback function to show the selected table.
+
+        Parameters
+        ----------
+        item : `PySide2.QtWidgets.QListWidgetItem`
+            Current item.
+        """
+
         control_tab = self._get_control_tab(item.text())
         control_tab.show()
 

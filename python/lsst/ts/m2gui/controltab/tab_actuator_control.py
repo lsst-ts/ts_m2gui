@@ -21,7 +21,8 @@
 
 __all__ = ["TabActuatorControl"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
@@ -36,14 +37,20 @@ from PySide2.QtWidgets import (
 import numpy as np
 from pathlib import Path
 
+from lsst.ts.m2com import (
+    NUM_TANGENT_LINK,
+    CommandScript,
+    CommandActuator,
+    ActuatorDisplacementUnit,
+)
+
 from ..utils import (
     set_button,
     create_label,
     create_group_box,
     run_command,
-    NUM_TANGENT_LINK,
 )
-from ..enums import CommandScript, CommandActuator, ActuatorDisplacementUnit, Ring
+from ..enums import Ring
 from . import TabDefault
 
 
@@ -142,8 +149,8 @@ class TabActuatorControl(TabDefault):
             self.model.utility_monitor.signal_detailed_force
         )
 
-    @Slot()
-    def _callback_script_load_script(self, file_name=""):
+    @asyncSlot()
+    async def _callback_script_load_script(self, file_name=""):
         """Callback of the load-script button in script control. The cell
         controller will load the script.
 
@@ -176,14 +183,14 @@ class TabActuatorControl(TabDefault):
 
         return name
 
-    @Slot()
-    def _callback_script_command(self, command):
+    @asyncSlot()
+    async def _callback_script_command(self, command):
         """Callback of the command buttons in script control. The cell
         controller will run the related command.
 
         Parameters
         ----------
-        command : enum `CommandScript`
+        command : enum `lsst.ts.m2com.CommandScript`
             Script command.
         """
 
@@ -193,7 +200,7 @@ class TabActuatorControl(TabDefault):
             self._info_script["file"].setText("")
             self._info_script["progress"].setValue(0)
 
-    def _set_target_displacement(self, actuator_displacement_unit):
+    def _set_target_displacement(self, displacement_unit):
         """Set the target displacement.
 
         The available decimal, range, suffix, and single step in box will be
@@ -201,7 +208,7 @@ class TabActuatorControl(TabDefault):
 
         Parameters
         ----------
-        actuator_displacement_unit : enum `ActuatorDisplacementUnit`
+        displacement_unit : enum `lsst.ts.m2com.ActuatorDisplacementUnit`
             Actuator displacement unit.
 
         Raises
@@ -210,32 +217,32 @@ class TabActuatorControl(TabDefault):
             Not supported unit.
         """
 
-        if actuator_displacement_unit == ActuatorDisplacementUnit.Millimeter:
+        if displacement_unit == ActuatorDisplacementUnit.Millimeter:
 
             decimal = self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
             max_range = self.MAX_DISPLACEMENT_MM
             suffix = " mm"
 
-        elif actuator_displacement_unit == ActuatorDisplacementUnit.Step:
+        elif displacement_unit == ActuatorDisplacementUnit.Step:
 
             decimal = 0
             max_range = self.MAX_DISPLACEMENT_STEP
             suffix = " step"
 
         else:
-            raise ValueError(f"Not supported unit: {actuator_displacement_unit!r}.")
+            raise ValueError(f"Not supported unit: {displacement_unit!r}.")
 
         self._target_displacement.setDecimals(decimal)
         self._target_displacement.setRange(-max_range, max_range)
         self._target_displacement.setSuffix(suffix)
         self._target_displacement.setSingleStep(10**-decimal)
 
-    def _create_displacement_unit_selection(self, actuator_displacement_unit):
+    def _create_displacement_unit_selection(self, displacement_unit):
         """Create the combo box of displacement unit selection.
 
         Parameters
         ----------
-        actuator_displacement_unit : enum `ActuatorDisplacementUnit`
+        displacement_unit : enum `lsst.ts.m2com.ActuatorDisplacementUnit`
             Default actuator displacement unit.
 
         Returns
@@ -246,30 +253,34 @@ class TabActuatorControl(TabDefault):
 
         unit_selection = QComboBox()
 
-        for displacement_unit in ActuatorDisplacementUnit:
-            unit_selection.addItem(displacement_unit.name)
+        for unit in ActuatorDisplacementUnit:
+            unit_selection.addItem(unit.name)
 
         # Index begins from 0 instead of 1 in QComboBox
-        index_unit = actuator_displacement_unit.value - 1
+        index_unit = displacement_unit.value - 1
         unit_selection.setCurrentIndex(index_unit)
 
         unit_selection.currentIndexChanged.connect(self._callback_selection_changed)
 
         return unit_selection
 
-    @Slot()
-    def _callback_selection_changed(self):
+    @asyncSlot()
+    async def _callback_selection_changed(self, index):
         """Callback of the changed selection. This will update the decimals in
-        the target displacement."""
+        the target displacement.
+
+        Parameters
+        ----------
+        index : `int`
+            Current index.
+        """
 
         # Index begins from 0 instead of 1 in QComboBox
-        selected_unit = ActuatorDisplacementUnit(
-            self._displacement_unit_selection.currentIndex() + 1
-        )
+        selected_unit = ActuatorDisplacementUnit(index + 1)
         self._set_target_displacement(selected_unit)
 
-    @Slot()
-    def _callback_select_ring(self):
+    @asyncSlot()
+    async def _callback_select_ring(self):
         """Callback of the select-ring button in actuator selector. All
         actuators in the specific ring will be selected."""
 
@@ -280,16 +291,16 @@ class TabActuatorControl(TabDefault):
             if actuator.text().startswith(ring.name):
                 actuator.setChecked(True)
 
-    @Slot()
-    def _callback_clear_all(self):
+    @asyncSlot()
+    async def _callback_clear_all(self):
         """Callback of the clear-all button in actuator selector. All of the
         selected actuators will be cleared/unchecked."""
 
         for button in self._buttons_actuator_selection:
             button.setChecked(False)
 
-    @Slot()
-    def _callback_actuator_start(self):
+    @asyncSlot()
+    async def _callback_actuator_start(self):
         """Callback of the start button in actuator control. The cell
         controller will start to move the actuators.
 
@@ -299,7 +310,7 @@ class TabActuatorControl(TabDefault):
             Selected actuators to do the movement.
         target_displacement : `float` or `int`
             Target displacement of the actuators.
-        displacement_unit : enum `ActuatorDisplacementUnit`
+        displacement_unit : enum `lsst.ts.m2com.ActuatorDisplacementUnit`
             Displacement unit.
         """
 
@@ -325,14 +336,14 @@ class TabActuatorControl(TabDefault):
 
         return actuators, target_displacement, displacement_unit
 
-    @Slot()
-    def _callback_actuator_command(self, command):
+    @asyncSlot()
+    async def _callback_actuator_command(self, command):
         """Callback of the actuator buttons in actuator control. The cell
         controller will run the related command.
 
         Parameters
         ----------
-        command : enum `CommandActuator`
+        command : enum `lsst.ts.m2com.CommandActuator`
             Actuator command.
         """
         run_command(self.model.command_actuator, command)
@@ -530,8 +541,8 @@ class TabActuatorControl(TabDefault):
         """
         signal_script.progress.connect(self._callback_progress)
 
-    @Slot()
-    def _callback_progress(self, progress):
+    @asyncSlot()
+    async def _callback_progress(self, progress):
         """Callback of the script signal for the progress of script execution.
 
         Parameters
@@ -553,8 +564,8 @@ class TabActuatorControl(TabDefault):
         """
         signal_detailed_force.forces.connect(self._callback_forces)
 
-    @Slot()
-    def _callback_forces(self, forces):
+    @asyncSlot()
+    async def _callback_forces(self, forces):
         """Callback of the forces, which contain the look-up table (LUT)
         details.
 

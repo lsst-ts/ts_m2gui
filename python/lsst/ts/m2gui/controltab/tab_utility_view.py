@@ -21,12 +21,16 @@
 
 __all__ = ["TabUtilityView"]
 
-from PySide2.QtCore import Slot, Qt
+from qasync import asyncSlot
+
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QVBoxLayout, QFormLayout, QHBoxLayout
 from PySide2.QtGui import QPalette
 
+from lsst.ts.m2com import PowerType
+
 from ..utils import set_button, create_label, create_group_box
-from ..enums import TemperatureGroup, DisplacementSensorDirection, PowerType
+from ..enums import TemperatureGroup, DisplacementSensorDirection
 from . import TabDefault
 
 
@@ -113,8 +117,8 @@ class TabUtilityView(TabDefault):
 
         indicator.setPalette(palette)
 
-    @Slot()
-    def _callback_reset_breakers(self):
+    @asyncSlot()
+    async def _callback_reset_breakers(self):
         """Callback of the reset-breakers button. This will reset all triggered
         breakers."""
         self.model.utility_monitor.reset_breakers()
@@ -261,7 +265,7 @@ class TabUtilityView(TabDefault):
 
         Parameters
         ----------
-        power_type : enum `PowerType`
+        power_type : enum `lsst.ts.m2com.PowerType`
             Power type.
 
         Returns
@@ -356,8 +360,8 @@ class TabUtilityView(TabDefault):
 
         signal_utility.displacements.connect(self._callback_displacements)
 
-    @Slot()
-    def _callback_power_motor(self, power_motor):
+    @asyncSlot()
+    async def _callback_power_motor(self, power_motor):
         """Callback of the utility signal for the motor power.
 
         Parameters
@@ -370,8 +374,8 @@ class TabUtilityView(TabDefault):
         self._power_inclinometer["power_voltage_motor"].setText(f"{power_motor[0]} V")
         self._power_inclinometer["power_current_motor"].setText(f"{power_motor[1]} A")
 
-    @Slot()
-    def _callback_power_communication(self, power_communication):
+    @asyncSlot()
+    async def _callback_power_communication(self, power_communication):
         """Callback of the utility signal for the communication power.
 
         Parameters
@@ -388,8 +392,8 @@ class TabUtilityView(TabDefault):
             f"{power_communication[1]} A"
         )
 
-    @Slot()
-    def _callback_inclinometer(self, inclinometer):
+    @asyncSlot()
+    async def _callback_inclinometer(self, inclinometer):
         """Callback of the utility signal for the inclinometer angle.
 
         Parameters
@@ -399,8 +403,8 @@ class TabUtilityView(TabDefault):
         """
         self._power_inclinometer["inclinometer"].setText(f"{inclinometer} degree")
 
-    @Slot()
-    def _callback_breakers(self, breaker_status):
+    @asyncSlot()
+    async def _callback_breakers(self, breaker_status):
         """Callback of the utility signal for the breakers.
 
         Parameters
@@ -415,8 +419,8 @@ class TabUtilityView(TabDefault):
         is_triggered = breaker_status[1]
         self._update_indicator_color(self._breakers[name], is_triggered)
 
-    @Slot()
-    def _callback_temperatures(self, temperatures):
+    @asyncSlot()
+    async def _callback_temperatures(self, temperatures):
         """Callback of the utility signal for the temperatures.
 
         Parameters
@@ -436,8 +440,8 @@ class TabUtilityView(TabDefault):
         for sensor, value in zip(sensors, values):
             self._temperatures[sensor].setText(f"{value} degree C")
 
-    @Slot()
-    def _callback_displacements(self, displacements):
+    @asyncSlot()
+    async def _callback_displacements(self, displacements):
         """Callback of the utility signal for the displacements.
 
         Parameters

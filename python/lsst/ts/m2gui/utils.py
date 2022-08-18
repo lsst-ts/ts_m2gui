@@ -20,8 +20,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 __all__ = [
-    "NUM_ACTUATOR",
-    "NUM_TANGENT_LINK",
     "set_button",
     "create_label",
     "create_group_box",
@@ -30,10 +28,7 @@ __all__ = [
     "get_num_actuator_ring",
     "prompt_dialog_warning",
     "run_command",
-    "read_yaml_file",
 ]
-
-import yaml
 
 from functools import partial
 
@@ -42,9 +37,6 @@ from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox, QTableWidget, QMes
 from PySide2.QtGui import QPalette
 
 from . import Ring
-
-NUM_ACTUATOR = 78
-NUM_TANGENT_LINK = 6
 
 
 def set_button(
@@ -300,32 +292,3 @@ def run_command(command, *args, is_prompted=True):
         return False
 
     return True
-
-
-def read_yaml_file(filepath):
-    """Read the yaml file.
-
-    Parameters
-    ----------
-    filepath : `str` or `pathlib.PosixPath`
-        Yaml file path.
-
-    Returns
-    -------
-    content : `dict`
-        File content.
-
-    Raises
-    ------
-    `IOError`
-        Cannot open the file.
-    """
-
-    content = dict()
-    try:
-        with open(filepath, "r") as yaml_file:
-            content = yaml.safe_load(yaml_file)
-    except IOError:
-        raise IOError(f"Cannot open the yaml file: {filepath}.")
-
-    return content

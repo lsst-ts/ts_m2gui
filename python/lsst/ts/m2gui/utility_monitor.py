@@ -25,13 +25,14 @@ import re
 import numpy as np
 from copy import deepcopy
 
+from lsst.ts.m2com import PowerType
+
 from . import (
     ActuatorForce,
     ForceErrorTangent,
     SignalUtility,
     SignalDetailedForce,
     SignalPosition,
-    PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
     get_tol,
@@ -303,7 +304,7 @@ class UtilityMonitor(object):
 
         Parameters
         ----------
-        power_type : enum `PowerType`
+        power_type : enum `lsst.ts.m2com.PowerType`
             Power type.
         new_voltage : `float`
             New voltage value in volt.
@@ -382,7 +383,7 @@ class UtilityMonitor(object):
 
         Parameters
         ----------
-        power_type : enum `PowerType`
+        power_type : enum `lsst.ts.m2com.PowerType`
             Power type.
         new_voltage : `float`
             New voltage value in volt.
@@ -447,7 +448,7 @@ class UtilityMonitor(object):
 
         Parameters
         ----------
-        power_type : enum `PowerType`
+        power_type : enum `lsst.ts.m2com.PowerType`
             Power type.
 
         Returns

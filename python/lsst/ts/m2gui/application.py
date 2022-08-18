@@ -21,8 +21,13 @@
 
 __all__ = ["run_application"]
 
+import asyncio
+import functools
+import os
+import sys
+import qasync
+
 from PySide2.QtCore import QCommandLineParser, QCommandLineOption
-from PySide2.QtWidgets import QApplication
 
 from . import MainWindow
 
@@ -36,8 +41,37 @@ def run_application(argv):
         Arguements from the command line.
     """
 
+    if "QT_API" not in os.environ:
+        os.environ.setdefault("QT_API", "PySide2")
+        print("qasync: QT_API not set, defaulting to PySide2.")
+
+    try:
+        qasync.run(main(argv))
+    except asyncio.exceptions.CancelledError:
+        sys.exit(0)
+
+
+async def main(argv):
+    """Main application.
+
+    Parameters
+    ----------
+    argv : `list`
+        Arguements from the command line.
+    """
+
+    # The set of "aboutToQuit" comes from "qasync/examples/aiohttp_fetch.py"
+    loop = asyncio.get_event_loop()
+    future = asyncio.Future()
+
     # You need one (and only one) QApplication instance per application.
-    app = QApplication(argv)
+    # There is one QApplication instance in "qasync" already.
+    app = qasync.QApplication.instance()
+    if hasattr(app, "aboutToQuit"):
+        getattr(app, "aboutToQuit").connect(
+            functools.partial(close_future, future, loop)
+        )
+
     app.setApplicationName("M2 EUI")
 
     # Set the parser
@@ -48,17 +82,38 @@ def run_application(argv):
     option_verbose = QCommandLineOption(["v", "verbose"], "Output the log on screen.")
     parser.addOption(option_verbose)
 
+    option_simulation = QCommandLineOption(
+        ["s", "simulation"], "Run the simulation mode or not."
+    )
+    parser.addOption(option_simulation)
+
     parser.process(app)
 
     # Get the argument
     is_verbose = parser.isSet(option_verbose)
+    is_simulation_mode = parser.isSet(option_simulation)
 
     # Create a Qt main window, which will be our window.
-    window_main = MainWindow(is_verbose)
+    window_main = MainWindow(is_verbose, is_simulation_mode)
     window_main.show()
 
-    # Start the event loop.
-    app.exec_()
+    await future
 
     # Your application won't reach here until you exit and the event
     # loop has stopped.
+    return True
+
+
+def close_future(future, loop):
+    """Close the future.
+
+    Parameters
+    ----------
+    future : `asyncio.Future`
+        Future.
+    loop : `asyncio.unix_events._UnixSelectorEventLoop`
+        Loop.
+    """
+
+    loop.call_later(10, future.cancel)
+    future.cancel()

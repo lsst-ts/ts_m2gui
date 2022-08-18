@@ -21,7 +21,8 @@
 
 __all__ = ["TabSettings"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import QVBoxLayout, QFormLayout, QLineEdit, QSpinBox
 
 from ..utils import set_button, create_group_box, run_command
@@ -108,8 +109,8 @@ class TabSettings(TabDefault):
         width = font_metrics.boundingRect(text).width()
         line_edit.setMinimumWidth(width + offset)
 
-    @Slot()
-    def _callback_apply(self):
+    @asyncSlot()
+    async def _callback_apply(self):
         """Callback of the apply button. This will apply the settings."""
 
         host = self._settings["host"].text()

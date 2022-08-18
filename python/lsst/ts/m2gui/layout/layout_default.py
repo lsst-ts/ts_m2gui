@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutDefault"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
 
 
 class LayoutDefault(object):
@@ -49,8 +49,8 @@ class LayoutDefault(object):
 
         self.layout = self._set_layout()
 
-    @Slot()
-    def _callback_signal_control(self, is_control_updated):
+    @asyncSlot()
+    async def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
         Parameters

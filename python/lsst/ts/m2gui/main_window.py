@@ -25,7 +25,9 @@ import logging
 import sys
 import pathlib
 
-from PySide2 import QtCore
+from qasync import asyncSlot, QApplication
+
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QMainWindow,
     QWidget,
@@ -33,10 +35,11 @@ from PySide2.QtWidgets import (
     QMessageBox,
 )
 
+from lsst.ts.m2com import read_yaml_file
+
 from .controltab import TabSettings
 from .layout import LayoutControl, LayoutLocalMode, LayoutControlMode
 from . import (
-    read_yaml_file,
     Model,
     ControlTabs,
     LogWindowHandler,
@@ -52,6 +55,8 @@ class MainWindow(QMainWindow):
     ----------
     is_output_log_on_screen : `bool`
         Is outputting the log messages on screen or not.
+    is_simulation_mode: `bool`
+        Is the simulation mode or not.
     log : `logging.Logger` or None, optional
         A logger. If None, a logger will be instantiated. (the default is
         None)
@@ -64,7 +69,7 @@ class MainWindow(QMainWindow):
         Model class.
     """
 
-    def __init__(self, is_output_log_on_screen, log=None):
+    def __init__(self, is_output_log_on_screen, is_simulation_mode, log=None):
         super().__init__()
 
         # Signal of message
@@ -74,7 +79,7 @@ class MainWindow(QMainWindow):
         message_format = "%(asctime)s, %(levelname)s, %(message)s"
         self.log = self._set_log(message_format, is_output_log_on_screen, log=log)
 
-        self.model = self._set_model()
+        self.model = self._set_model(is_simulation_mode)
 
         # Layout of the control panel
         self._layout_control = LayoutControl(self.model)
@@ -102,14 +107,15 @@ class MainWindow(QMainWindow):
 
         # Disable the Qt close button
         self.setWindowFlags(
-            QtCore.Qt.Window
-            | QtCore.Qt.WindowMinimizeButtonHint
-            | QtCore.Qt.WindowMaximizeButtonHint
+            Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
         )
 
         self._add_tool_bar()
 
         self._set_default()
+
+        if is_simulation_mode:
+            self.log.info("Running the simulation mode.")
 
     def _set_log(self, message_format, is_output_log_on_screen, log=None):
         """Set the logger.
@@ -146,8 +152,13 @@ class MainWindow(QMainWindow):
 
         return log
 
-    def _set_model(self):
+    def _set_model(self, is_simulation_mode):
         """Set the model.
+
+        Parameters
+        ----------
+        is_simulation_mode: `bool`
+            Is the simulation mode or not.
 
         Returns
         -------
@@ -165,6 +176,7 @@ class MainWindow(QMainWindow):
             port_command=default_settings["port_command"],
             port_telemetry=default_settings["port_telemetry"],
             timeout_connection=default_settings["timeout_connection"],
+            is_simulation_mode=is_simulation_mode,
         )
 
         return model
@@ -250,15 +262,15 @@ class MainWindow(QMainWindow):
         action_settings = tool_bar.addAction("Settings", self._callback_settings)
         action_settings.setToolTip("Show the application settings")
 
-    @QtCore.Slot()
-    def _callback_exit(self):
+    @asyncSlot()
+    async def _callback_exit(self):
         """Exit the application."""
 
         dialog = self._create_dialog_exit()
         result = dialog.exec()
 
         if result == QMessageBox.Ok:
-            app = QtCore.QCoreApplication.instance()
+            app = QApplication.instance()
             app.quit()
 
     def _create_dialog_exit(self):
@@ -286,18 +298,18 @@ class MainWindow(QMainWindow):
 
         return dialog
 
-    @QtCore.Slot()
-    def _callback_connect(self):
+    @asyncSlot()
+    async def _callback_connect(self):
         """Callback function to connect to the M2 controller."""
         run_command(self.model.connect)
 
-    @QtCore.Slot()
-    def _callback_disconnect(self):
+    @asyncSlot()
+    async def _callback_disconnect(self):
         """Callback function to disconnect from the M2 controller."""
         run_command(self.model.disconnect)
 
-    @QtCore.Slot()
-    def _callback_settings(self):
+    @asyncSlot()
+    async def _callback_settings(self):
         """Callback function to show the settings."""
         self._tab_settings.show()
 

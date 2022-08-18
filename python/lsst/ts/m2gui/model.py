@@ -21,11 +21,12 @@
 
 __all__ = ["Model"]
 
+from lsst.ts.m2com import ActuatorDisplacementUnit
+
 from . import (
     LocalMode,
     LimitSwitchType,
     Ring,
-    ActuatorDisplacementUnit,
     SignalControl,
     SignalStatus,
     SignalConfig,
@@ -52,6 +53,8 @@ class Model(object):
         Telemetry port to connect. (the default is 50011)
     timeout_connection : `int` or `float`, optional
         Connection timeout in second. (the default is 10)
+    is_simulation_mode: `bool`, optional
+        Is the simulation mode or not. (the default is False)
 
     Attributes
     ----------
@@ -94,6 +97,7 @@ class Model(object):
         port_command=50010,
         port_telemetry=50011,
         timeout_connection=10,
+        is_simulation_mode=False,
     ):
 
         self.log = log
@@ -118,6 +122,8 @@ class Model(object):
         self.port_command = port_command
         self.port_telemetry = port_telemetry
         self.timeout_connection = timeout_connection
+
+        self._is_simulation_mode = is_simulation_mode
 
     def _set_system_status(self):
         """Set the default system status.
@@ -432,7 +438,7 @@ class Model(object):
 
         Parameters
         ----------
-        command : enum `CommandScript`
+        command : enum `lsst.ts.m2com.CommandScript`
             Script command.
         script_name : `str` or None, optional
             Name of the script. (the default is None)
@@ -460,13 +466,13 @@ class Model(object):
         command,
         actuators=None,
         target_displacement=0,
-        displacement_unit=ActuatorDisplacementUnit.Millimeter,
+        unit=ActuatorDisplacementUnit.Millimeter,
     ):
         """Run the actuator command.
 
         Parameters
         ----------
-        command : enum `CommandActuator`
+        command : enum `lsst.ts.m2com.CommandActuator`
             Actuator command.
         actuators : `list [int]` or None, optional
             Selected actuators to do the movement. If the empty list [] is
@@ -474,7 +480,7 @@ class Model(object):
             None)
         target_displacement : `float` or `int`, optional
             Target displacement of the actuators. (the default is 0)
-        displacement_unit : enum `ActuatorDisplacementUnit`, optional
+        unit : enum `lsst.ts.m2com.ActuatorDisplacementUnit`, optional
             Displacement unit. (the default is
             ActuatorDisplacementUnit.Millimeter)
 
@@ -496,7 +502,7 @@ class Model(object):
                 self.log.info(
                     (
                         f"Move {actuators} actuators with the"
-                        f" displacement={target_displacement} {displacement_unit.name}."
+                        f" displacement={target_displacement} {unit.name}."
                     )
                 )
         else:

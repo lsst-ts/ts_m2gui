@@ -33,17 +33,11 @@ from .enums import (
     LocalMode,
     LimitSwitchType,
     Ring,
-    PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
-    CommandScript,
-    CommandActuator,
-    ActuatorDisplacementUnit,
     FigureActuatorData,
 )
 from .utils import (
-    NUM_ACTUATOR,
-    NUM_TANGENT_LINK,
     set_button,
     create_label,
     create_group_box,
@@ -52,7 +46,6 @@ from .utils import (
     get_num_actuator_ring,
     prompt_dialog_warning,
     run_command,
-    read_yaml_file,
 )
 from .signals import (
     SignalControl,

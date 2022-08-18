@@ -21,16 +21,19 @@
 
 __all__ = ["TabDiagnostics"]
 
-from PySide2.QtCore import Slot, Qt
+from qasync import asyncSlot
+
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QVBoxLayout, QFormLayout, QHBoxLayout, QMessageBox
 from PySide2.QtGui import QPalette
+
+from lsst.ts.m2com import NUM_TANGENT_LINK
 
 from ..utils import (
     set_button,
     create_label,
     create_group_box,
     run_command,
-    NUM_TANGENT_LINK,
 )
 from . import TabDefault
 
@@ -107,8 +110,8 @@ class TabDiagnostics(TabDefault):
             "power_current_communication": create_label(),
         }
 
-    @Slot()
-    def _callback_reboot_controller(self):
+    @asyncSlot()
+    async def _callback_reboot_controller(self):
         """Callback of the reboot-cell-controller button. This will ask the
         user to confirm this command again."""
 
@@ -255,8 +258,8 @@ class TabDiagnostics(TabDefault):
 
         return controls
 
-    @Slot()
-    def _callback_control_digital_status(self, idx):
+    @asyncSlot()
+    async def _callback_control_digital_status(self, idx):
         """Callback of the digital-status-control button.
 
         This allows the user to command individual binary signals to the cell
@@ -554,8 +557,8 @@ class TabDiagnostics(TabDefault):
             self._callback_digital_status_output
         )
 
-    @Slot()
-    def _callback_power_motor_calibrated(self, power_motor):
+    @asyncSlot()
+    async def _callback_power_motor_calibrated(self, power_motor):
         """Callback of the utility signal for the calibrated motor power.
 
         Parameters
@@ -583,8 +586,8 @@ class TabDiagnostics(TabDefault):
         power["power_voltage_motor"].setText(f"{voltage} V")
         power["power_current_motor"].setText(f"{current} A")
 
-    @Slot()
-    def _callback_power_communication_calibrated(self, power_communication):
+    @asyncSlot()
+    async def _callback_power_communication_calibrated(self, power_communication):
         """Callback of the utility signal for the communication power.
 
         Parameters
@@ -614,8 +617,8 @@ class TabDiagnostics(TabDefault):
         power["power_voltage_communication"].setText(f"{voltage} V")
         power["power_current_communication"].setText(f"{current} A")
 
-    @Slot()
-    def _callback_power_motor_raw(self, power_motor):
+    @asyncSlot()
+    async def _callback_power_motor_raw(self, power_motor):
         """Callback of the utility signal for the raw motor power.
 
         Parameters
@@ -627,8 +630,8 @@ class TabDiagnostics(TabDefault):
 
         self._update_power_motor(self._power_raw, power_motor[0], power_motor[1])
 
-    @Slot()
-    def _callback_power_communication_raw(self, power_communication):
+    @asyncSlot()
+    async def _callback_power_communication_raw(self, power_communication):
         """Callback of the utility signal for the raw communication power.
 
         Parameters
@@ -642,8 +645,8 @@ class TabDiagnostics(TabDefault):
             self._power_raw, power_communication[0], power_communication[1]
         )
 
-    @Slot()
-    def _callback_digital_status_input(self, digital_status_input):
+    @asyncSlot()
+    async def _callback_digital_status_input(self, digital_status_input):
         """Callback of the utility signal for the digital input status.
 
         Parameters
@@ -679,8 +682,8 @@ class TabDiagnostics(TabDefault):
                 control.setChecked(is_bit_on)
                 self._update_control_text(control, is_bit_on)
 
-    @Slot()
-    def _callback_digital_status_output(self, digital_status_output):
+    @asyncSlot()
+    async def _callback_digital_status_output(self, digital_status_output):
         """Callback of the utility signal for the digital output status.
 
         Parameters
@@ -707,8 +710,8 @@ class TabDiagnostics(TabDefault):
             self._callback_force_error_tangent
         )
 
-    @Slot()
-    def _callback_force_error_tangent(self, force_error_tangent):
+    @asyncSlot()
+    async def _callback_force_error_tangent(self, force_error_tangent):
         """Callback of the detailed force signal for tangential force error
         that monitors the supporting force of mirror.
 

@@ -21,7 +21,8 @@
 
 __all__ = ["TabRigidBodyPos"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import QVBoxLayout, QHBoxLayout, QFormLayout, QDoubleSpinBox
 
 from ..utils import set_button, create_label, create_group_box, get_tol, run_command
@@ -127,26 +128,26 @@ class TabRigidBodyPos(TabDefault):
 
         return position
 
-    @Slot()
-    def _callback_save_position(self):
+    @asyncSlot()
+    async def _callback_save_position(self):
         """Callback of the save-position button. This will save the current
         position to a file."""
         self.model.save_position()
 
-    @Slot()
-    def _callback_go_to_home(self):
+    @asyncSlot()
+    async def _callback_go_to_home(self):
         """Callback of the go-to-home button. This will move the M2 to the
         home position."""
         run_command(self.model.go_to_position, 0, 0, 0, 0, 0, 0)
 
-    @Slot()
-    def _callback_set_home(self):
+    @asyncSlot()
+    async def _callback_set_home(self):
         """Callback of the set-home button. This will set the new home position
         of M2."""
         self.model.set_home()
 
-    @Slot()
-    def _callback_jog(self):
+    @asyncSlot()
+    async def _callback_jog(self):
         """Callback of the jog button. This will move the M2 to the new
         position based on the relative offsets."""
 
@@ -161,8 +162,8 @@ class TabRigidBodyPos(TabDefault):
             self._target_position_relative["rz"].value() + current_position[5],
         )
 
-    @Slot()
-    def _callback_clear_values(self, target_positions):
+    @asyncSlot()
+    async def _callback_clear_values(self, target_positions):
         """Callback of the clear-values button. This will clear the values of
         new target positions.
 
@@ -176,8 +177,8 @@ class TabRigidBodyPos(TabDefault):
         for target_position in target_positions.values():
             target_position.setValue(0)
 
-    @Slot()
-    def _callback_go_to_position(self):
+    @asyncSlot()
+    async def _callback_go_to_position(self):
         """Callback of the go-to-position button. This will move the M2 to the
         new absolute position."""
         run_command(
@@ -343,8 +344,8 @@ class TabRigidBodyPos(TabDefault):
 
         signal_position.position.connect(self._callback_position)
 
-    @Slot()
-    def _callback_position(self, position):
+    @asyncSlot()
+    async def _callback_position(self, position):
         """Callback of the position signal for the rigid body position.
 
         Parameters
