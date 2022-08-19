@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.8:
+
+-------------
+0.1.8
+-------------
+
+* Add the **.pre-commit-config.yaml**, **pyproject.toml**, and **meta.yaml**.
+* Support the **isort**.
+
 .. _lsst.ts.m2gui-0.1.7:
 
 -------------
