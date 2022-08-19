@@ -19,11 +19,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 
-from lsst.ts.m2gui import Model, ActuatorForce
+import pytest
+from lsst.ts.m2gui import ActuatorForce, Model
 from lsst.ts.m2gui.controltab import TabDetailedForce
 
 

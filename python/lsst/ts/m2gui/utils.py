@@ -33,8 +33,8 @@ __all__ = [
 from functools import partial
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QPushButton, QLabel, QGroupBox, QTableWidget, QMessageBox
 from PySide2.QtGui import QPalette
+from PySide2.QtWidgets import QGroupBox, QLabel, QMessageBox, QPushButton, QTableWidget
 
 from . import Ring
 

@@ -19,16 +19,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 import pathlib
 
+import pytest
+from lsst.ts.m2gui import LimitSwitchType, Model, Ring
+from lsst.ts.m2gui.controltab import TabAlarmWarn
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-
-from lsst.ts.m2gui import Model, LimitSwitchType, Ring
-from lsst.ts.m2gui.controltab import TabAlarmWarn
 
 
 def get_error_list_file():

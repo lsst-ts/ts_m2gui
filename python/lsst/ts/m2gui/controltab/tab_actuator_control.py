@@ -21,36 +21,29 @@
 
 __all__ = ["TabActuatorControl"]
 
-from qasync import asyncSlot
-
-from PySide2.QtWidgets import (
-    QVBoxLayout,
-    QHBoxLayout,
-    QGridLayout,
-    QFormLayout,
-    QFileDialog,
-    QDoubleSpinBox,
-    QComboBox,
-    QProgressBar,
-)
-
-import numpy as np
 from pathlib import Path
 
+import numpy as np
 from lsst.ts.m2com import (
     NUM_TANGENT_LINK,
-    CommandScript,
-    CommandActuator,
     ActuatorDisplacementUnit,
+    CommandActuator,
+    CommandScript,
 )
+from PySide2.QtWidgets import (
+    QComboBox,
+    QDoubleSpinBox,
+    QFileDialog,
+    QFormLayout,
+    QGridLayout,
+    QHBoxLayout,
+    QProgressBar,
+    QVBoxLayout,
+)
+from qasync import asyncSlot
 
-from ..utils import (
-    set_button,
-    create_label,
-    create_group_box,
-    run_command,
-)
 from ..enums import Ring
+from ..utils import create_group_box, create_label, run_command, set_button
 from . import TabDefault
 
 

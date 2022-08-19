@@ -21,18 +21,15 @@
 
 __all__ = ["TabCellStatus"]
 
+import numpy as np
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
+from PySide2.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QComboBox
-
-import numpy as np
-
-from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
-
-from ..display import ViewMirror, ItemActuator, Gauge, FigureConstant
-from ..utils import set_button
-from ..enums import FigureActuatorData
 from .. import ActuatorForce
+from ..display import FigureConstant, Gauge, ItemActuator, ViewMirror
+from ..enums import FigureActuatorData
+from ..utils import set_button
 from . import TabDefault
 
 

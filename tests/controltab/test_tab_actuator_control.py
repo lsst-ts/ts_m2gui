@@ -19,16 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 
-from PySide2.QtCore import Qt
-
+import pytest
 from lsst.ts.m2com import ActuatorDisplacementUnit
-
-from lsst.ts.m2gui import Model, LocalMode, ActuatorForce
+from lsst.ts.m2gui import ActuatorForce, LocalMode, Model
 from lsst.ts.m2gui.controltab import TabActuatorControl
+from PySide2.QtCore import Qt
 
 
 @pytest.fixture

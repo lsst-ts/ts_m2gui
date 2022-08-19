@@ -21,11 +21,10 @@
 
 __all__ = ["TabSettings"]
 
+from PySide2.QtWidgets import QFormLayout, QLineEdit, QSpinBox, QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtWidgets import QVBoxLayout, QFormLayout, QLineEdit, QSpinBox
-
-from ..utils import set_button, create_group_box, run_command
+from ..utils import create_group_box, run_command, set_button
 from . import TabDefault
 
 

@@ -21,13 +21,12 @@
 
 __all__ = ["LayoutLocalMode"]
 
+from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtWidgets import QVBoxLayout
-
-from . import LayoutDefault
-from ..utils import set_button
 from ..enums import LocalMode
+from ..utils import set_button
+from . import LayoutDefault
 
 
 class LayoutLocalMode(LayoutDefault):

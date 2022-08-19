@@ -22,19 +22,19 @@
 __all__ = ["UtilityMonitor"]
 
 import re
-import numpy as np
 from copy import deepcopy
 
+import numpy as np
 from lsst.ts.m2com import PowerType
 
 from . import (
     ActuatorForce,
+    DisplacementSensorDirection,
     ForceErrorTangent,
-    SignalUtility,
     SignalDetailedForce,
     SignalPosition,
+    SignalUtility,
     TemperatureGroup,
-    DisplacementSensorDirection,
     get_tol,
 )
 

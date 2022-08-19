@@ -21,13 +21,12 @@
 
 __all__ = ["TabOverview"]
 
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette
+from PySide2.QtWidgets import QPlainTextEdit, QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QVBoxLayout, QPlainTextEdit
-from PySide2.QtGui import QPalette
-
-from ..utils import set_button, create_label
+from ..utils import create_label, set_button
 from . import TabDefault
 
 

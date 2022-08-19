@@ -19,15 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 import pathlib
 
-from PySide2.QtCore import Qt
-
-from lsst.ts.m2gui import Model, FigureActuatorData, ActuatorForce
+import pytest
+from lsst.ts.m2gui import ActuatorForce, FigureActuatorData, Model
 from lsst.ts.m2gui.controltab import TabCellStatus
+from PySide2.QtCore import Qt
 
 TIMEOUT = 1000
 

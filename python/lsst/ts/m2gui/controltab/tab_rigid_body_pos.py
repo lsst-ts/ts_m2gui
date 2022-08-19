@@ -21,11 +21,10 @@
 
 __all__ = ["TabRigidBodyPos"]
 
+from PySide2.QtWidgets import QDoubleSpinBox, QFormLayout, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtWidgets import QVBoxLayout, QHBoxLayout, QFormLayout, QDoubleSpinBox
-
-from ..utils import set_button, create_label, create_group_box, get_tol, run_command
+from ..utils import create_group_box, create_label, get_tol, run_command, set_button
 from . import TabDefault
 
 

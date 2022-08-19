@@ -21,7 +21,7 @@
 
 __all__ = ["ViewMirror"]
 
-from PySide2.QtWidgets import QGraphicsView, QGraphicsScene
+from PySide2.QtWidgets import QGraphicsScene, QGraphicsView
 
 from . import ItemActuator
 

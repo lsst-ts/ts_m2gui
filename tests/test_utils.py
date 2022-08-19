@@ -20,13 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-
-from lsst.ts.m2gui import (
-    get_tol,
-    get_num_actuator_ring,
-    Ring,
-    run_command,
-)
+from lsst.ts.m2gui import Ring, get_num_actuator_ring, get_tol, run_command
 
 
 def command(is_failed):

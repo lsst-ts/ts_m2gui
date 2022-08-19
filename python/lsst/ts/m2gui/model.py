@@ -24,15 +24,15 @@ __all__ = ["Model"]
 from lsst.ts.m2com import ActuatorDisplacementUnit
 
 from . import (
-    LocalMode,
-    LimitSwitchType,
-    Ring,
-    SignalControl,
-    SignalStatus,
-    SignalConfig,
-    SignalScript,
-    FaultManager,
     Config,
+    FaultManager,
+    LimitSwitchType,
+    LocalMode,
+    Ring,
+    SignalConfig,
+    SignalControl,
+    SignalScript,
+    SignalStatus,
     UtilityMonitor,
     get_num_actuator_ring,
 )

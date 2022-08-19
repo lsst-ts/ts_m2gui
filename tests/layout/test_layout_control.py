@@ -19,15 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 
+import pytest
+from lsst.ts.m2gui import LocalMode, Model
+from lsst.ts.m2gui.layout import LayoutControl
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
-
-from lsst.ts.m2gui import Model, LocalMode
-from lsst.ts.m2gui.layout import LayoutControl
 
 
 class MockWidget(QWidget):

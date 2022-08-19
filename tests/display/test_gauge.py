@@ -20,7 +20,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-
 from lsst.ts.m2gui.display import Gauge
 
 

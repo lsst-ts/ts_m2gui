@@ -23,21 +23,20 @@ __all__ = ["TabAlarmWarn"]
 
 import csv
 
-from qasync import asyncSlot
-
 from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
-    QVBoxLayout,
-    QTableWidgetItem,
-    QPlainTextEdit,
-    QWidget,
     QHBoxLayout,
     QHeaderView,
+    QPlainTextEdit,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide2.QtGui import QPalette
+from qasync import asyncSlot
 
-from ..utils import set_button, create_label, create_table, run_command
 from ..enums import LimitSwitchType, Ring
+from ..utils import create_label, create_table, run_command, set_button
 from . import TabDefault
 
 

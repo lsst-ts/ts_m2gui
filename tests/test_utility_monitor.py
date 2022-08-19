@@ -20,17 +20,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-
 from lsst.ts.m2com import PowerType
-
 from lsst.ts.m2gui import (
-    UtilityMonitor,
     ActuatorForce,
+    DisplacementSensorDirection,
     ForceErrorTangent,
     TemperatureGroup,
-    DisplacementSensorDirection,
+    UtilityMonitor,
 )
-
 
 TIMEOUT = 1000
 

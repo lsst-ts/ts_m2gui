@@ -21,8 +21,8 @@
 
 __all__ = ["Gauge"]
 
-from PySide2.QtCore import Qt, QSize
-from PySide2.QtGui import QPainter, QColor
+from PySide2.QtCore import QSize, Qt
+from PySide2.QtGui import QColor, QPainter
 from PySide2.QtWidgets import QWidget
 
 

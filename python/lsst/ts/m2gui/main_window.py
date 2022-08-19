@@ -22,30 +22,17 @@
 __all__ = ["MainWindow"]
 
 import logging
-import sys
 import pathlib
-
-from qasync import asyncSlot, QApplication
-
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
-    QMainWindow,
-    QWidget,
-    QVBoxLayout,
-    QMessageBox,
-)
+import sys
 
 from lsst.ts.m2com import read_yaml_file
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QMainWindow, QMessageBox, QVBoxLayout, QWidget
+from qasync import QApplication, asyncSlot
 
+from . import ControlTabs, LogWindowHandler, Model, SignalMessage, run_command
 from .controltab import TabSettings
-from .layout import LayoutControl, LayoutLocalMode, LayoutControlMode
-from . import (
-    Model,
-    ControlTabs,
-    LogWindowHandler,
-    SignalMessage,
-    run_command,
-)
+from .layout import LayoutControl, LayoutControlMode, LayoutLocalMode
 
 
 class MainWindow(QMainWindow):
