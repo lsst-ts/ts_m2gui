@@ -23,7 +23,9 @@ __all__ = ["TabAlarmWarn"]
 
 import csv
 
-from PySide2.QtCore import Slot, Qt
+from qasync import asyncSlot
+
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QVBoxLayout,
     QTableWidgetItem,
@@ -110,8 +112,8 @@ class TabAlarmWarn(TabDefault):
 
         return table
 
-    @Slot()
-    def _callback_selection_changed(self):
+    @asyncSlot()
+    async def _callback_selection_changed(self):
         """Callback of the selection changed on table."""
 
         items = self._table_error.selectedItems()
@@ -284,16 +286,16 @@ class TabAlarmWarn(TabDefault):
 
         return layout
 
-    @Slot()
-    def _callback_reset(self):
+    @asyncSlot()
+    async def _callback_reset(self):
         """Callback of the reset button to reset all alarms and warnings."""
 
         self._text_error_cause.clear()
 
         self.model.reset_errors()
 
-    @Slot()
-    def _callback_enable_open_loop_max_limit(self):
+    @asyncSlot()
+    async def _callback_enable_open_loop_max_limit(self):
         """Callback of the enable button to enable the maximum limit of
         open-loop control."""
         run_command(self.model.enable_open_loop_max_limit)
@@ -310,8 +312,8 @@ class TabAlarmWarn(TabDefault):
         signal_error.error_new.connect(self._callback_signal_error_new)
         signal_error.error_cleared.connect(self._callback_signal_error_cleared)
 
-    @Slot()
-    def _callback_signal_error_new(self, error_code):
+    @asyncSlot()
+    async def _callback_signal_error_new(self, error_code):
         """Callback of the error signal for the new error. This function will
         highlight the error.
 
@@ -350,8 +352,8 @@ class TabAlarmWarn(TabDefault):
         else:
             raise ValueError(f"Unsupported status: {status} to highlight the error.")
 
-    @Slot()
-    def _callback_signal_error_cleared(self, error_code):
+    @asyncSlot()
+    async def _callback_signal_error_cleared(self, error_code):
         """Callback of the error signal for the cleared error. This function
         will deemphasize the error.
 
@@ -377,8 +379,8 @@ class TabAlarmWarn(TabDefault):
 
         signal_limit_switch.type_name_status.connect(self._callback_signal_limit_switch)
 
-    @Slot()
-    def _callback_signal_limit_switch(self, type_name_status):
+    @asyncSlot()
+    async def _callback_signal_limit_switch(self, type_name_status):
         """Callback of the limit switch signal.
 
         Parameters

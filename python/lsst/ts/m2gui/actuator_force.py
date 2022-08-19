@@ -24,7 +24,7 @@ __all__ = ["ActuatorForce"]
 from typing import List
 from dataclasses import dataclass, field
 
-from . import NUM_ACTUATOR
+from lsst.ts.m2com import NUM_ACTUATOR
 
 
 @dataclass

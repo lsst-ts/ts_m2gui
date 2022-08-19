@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from PySide2.QtCore import Qt
@@ -61,7 +62,7 @@ def test_init(widget):
     )
 
 
-def test_callback_apply(qtbot, widget):
+async def test_callback_apply(qtbot, widget):
 
     widget._settings["host"].setText("newHost")
     widget._settings["port_command"].setValue(1)
@@ -69,6 +70,9 @@ def test_callback_apply(qtbot, widget):
     widget._settings["timeout_connection"].setValue(3)
 
     qtbot.mouseClick(widget._button_apply, Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget.model.host == "newHost"
     assert widget.model.port_command == 1

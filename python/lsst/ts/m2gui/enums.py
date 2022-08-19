@@ -23,12 +23,8 @@ __all__ = [
     "LocalMode",
     "LimitSwitchType",
     "Ring",
-    "PowerType",
     "TemperatureGroup",
     "DisplacementSensorDirection",
-    "CommandScript",
-    "CommandActuator",
-    "ActuatorDisplacementUnit",
 ]
 
 from enum import IntEnum, auto
@@ -60,13 +56,6 @@ class Ring(IntEnum):
     D = auto()
 
 
-class PowerType(IntEnum):
-    """Type of the power."""
-
-    Motor = 1
-    Communication = auto()
-
-
 class TemperatureGroup(IntEnum):
     """Group of the temperature sensors."""
 
@@ -82,33 +71,6 @@ class DisplacementSensorDirection(IntEnum):
 
     Theta = 1
     Delta = auto()
-
-
-class CommandScript(IntEnum):
-    """Action to command the script execution."""
-
-    LoadScript = 1
-    Run = auto()
-    Stop = auto()
-    Pause = auto()
-    Resume = auto()
-    Clear = auto()
-
-
-class CommandActuator(IntEnum):
-    """Action to command the actuators"""
-
-    Start = 1
-    Stop = auto()
-    Pause = auto()
-    Resume = auto()
-
-
-class ActuatorDisplacementUnit(IntEnum):
-    """Unit of the actuator displacement."""
-
-    Millimeter = 1
-    Step = auto()
 
 
 class FigureActuatorData(IntEnum):

@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QToolBar
@@ -40,7 +41,7 @@ def get_button_action(tool_bar, name):
 @pytest.fixture
 def widget(qtbot):
 
-    widget = MainWindow(False)
+    widget = MainWindow(False, False)
     qtbot.addWidget(widget)
 
     return widget
@@ -59,7 +60,7 @@ def test_init(widget):
     assert widget.model.timeout_connection == 10
 
 
-def test_callback_settings(qtbot, widget):
+async def test_callback_settings(qtbot, widget):
 
     assert widget._tab_settings.isVisible() is False
 
@@ -67,5 +68,8 @@ def test_callback_settings(qtbot, widget):
     button_settings = get_button_action(tool_bar, "Settings")
 
     qtbot.mouseClick(button_settings, Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget._tab_settings.isVisible() is True

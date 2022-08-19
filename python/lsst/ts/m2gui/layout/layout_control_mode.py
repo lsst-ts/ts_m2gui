@@ -21,7 +21,8 @@
 
 __all__ = ["LayoutControlMode"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import QVBoxLayout
 
 from . import LayoutDefault
@@ -55,8 +56,8 @@ class LayoutControlMode(LayoutDefault):
 
         super().__init__(model)
 
-    @Slot()
-    def _callback_signal_control(self, is_control_updated):
+    @asyncSlot()
+    async def _callback_signal_control(self, is_control_updated):
         if self.model.local_mode == LocalMode.Enable:
             self._update_buttons()
         else:
@@ -90,14 +91,14 @@ class LayoutControlMode(LayoutDefault):
 
         return layout
 
-    @Slot()
-    def _callback_open_loop(self):
+    @asyncSlot()
+    async def _callback_open_loop(self):
         """Callback of the open-loop button. The system will turn off the force
         balance system."""
         self.switch_force_balance_system(False)
 
-    @Slot()
-    def _callback_closed_loop(self):
+    @asyncSlot()
+    async def _callback_closed_loop(self):
         """Callback of the closed-loop button. The system will turn off the
         force balance system."""
         self.model.disable_open_loop_max_limit()

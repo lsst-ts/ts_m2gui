@@ -21,7 +21,8 @@
 
 __all__ = ["LayoutControl"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import QVBoxLayout
 
 from . import LayoutDefault
@@ -55,8 +56,8 @@ class LayoutControl(LayoutDefault):
 
         super().__init__(model)
 
-    @Slot()
-    def _callback_signal_control(self, is_control_updated):
+    @asyncSlot()
+    async def _callback_signal_control(self, is_control_updated):
         if self.model.local_mode == LocalMode.Standby:
             self._update_buttons()
         else:
@@ -88,14 +89,14 @@ class LayoutControl(LayoutDefault):
 
         return layout
 
-    @Slot()
-    def _callback_remote(self):
+    @asyncSlot()
+    async def _callback_remote(self):
         """Callback of the remote button. The commander will be the commandable
         SAL component (CSC)"""
         self.set_csc_commander(True)
 
-    @Slot()
-    def _callback_local(self):
+    @asyncSlot()
+    async def _callback_local(self):
         """Callback of the local button. The commander will be the graphical
         use interface (GUI)."""
         self.set_csc_commander(False)

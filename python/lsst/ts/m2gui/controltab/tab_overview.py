@@ -21,7 +21,9 @@
 
 __all__ = ["TabOverview"]
 
-from PySide2.QtCore import Slot, Qt
+from qasync import asyncSlot
+
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QVBoxLayout, QPlainTextEdit
 from PySide2.QtGui import QPalette
 
@@ -181,8 +183,8 @@ class TabOverview(TabDefault):
 
         return layout
 
-    @Slot()
-    def _callback_clear(self):
+    @asyncSlot()
+    async def _callback_clear(self):
         """Callback of the clear button - removes all log messages from the
         widget."""
         self._window_log.clear()
@@ -198,8 +200,8 @@ class TabOverview(TabDefault):
 
         signal_message.message.connect(self._callback_signal_message)
 
-    @Slot()
-    def _callback_signal_message(self, message):
+    @asyncSlot()
+    async def _callback_signal_message(self, message):
         """Callback of the message signal.
 
         Parameters
@@ -237,8 +239,8 @@ class TabOverview(TabDefault):
 
         signal_status.name_status.connect(self._callback_signal_status)
 
-    @Slot()
-    def _callback_signal_status(self, name_status):
+    @asyncSlot()
+    async def _callback_signal_status(self, name_status):
         """Callback of the status signal.
 
         Parameters
@@ -263,8 +265,8 @@ class TabOverview(TabDefault):
 
         signal_control.is_control_updated.connect(self._callback_signal_control)
 
-    @Slot()
-    def _callback_signal_control(self, is_control_updated):
+    @asyncSlot()
+    async def _callback_signal_control(self, is_control_updated):
         """Callback of the control signal.
 
         Parameters

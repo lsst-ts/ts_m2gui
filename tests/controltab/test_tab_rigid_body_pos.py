@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from PySide2.QtCore import Qt
@@ -59,31 +60,40 @@ def test_init(widget):
     )
 
 
-def test_callback_clear_values_relative(qtbot, widget):
+async def test_callback_clear_values_relative(qtbot, widget):
 
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_relative[axis].setValue(idx)
 
     qtbot.mouseClick(widget._buttons["clear_values_relative"], Qt.LeftButton)
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     for position in widget._target_position_relative.values():
         assert position.value() == 0
 
 
-def test_callback_clear_values_absolute(qtbot, widget):
+async def test_callback_clear_values_absolute(qtbot, widget):
 
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_absolute[axis].setValue(idx)
 
     qtbot.mouseClick(widget._buttons["clear_values_absolute"], Qt.LeftButton)
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     for position in widget._target_position_absolute.values():
         assert position.value() == 0
 
 
-def test_callback_position(widget):
+async def test_callback_position(widget):
 
     widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     for idx, axis in enumerate(widget.AXES):
         assert widget._position[axis].text() == str(idx + 1)

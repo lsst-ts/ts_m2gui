@@ -21,11 +21,12 @@
 
 import pytest
 
+from lsst.ts.m2com import PowerType
+
 from lsst.ts.m2gui import (
     UtilityMonitor,
     ActuatorForce,
     ForceErrorTangent,
-    PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
 )

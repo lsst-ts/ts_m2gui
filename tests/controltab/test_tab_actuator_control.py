@@ -20,11 +20,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from PySide2.QtCore import Qt
 
-from lsst.ts.m2gui import Model, LocalMode, ActuatorForce, ActuatorDisplacementUnit
+from lsst.ts.m2com import ActuatorDisplacementUnit
+
+from lsst.ts.m2gui import Model, LocalMode, ActuatorForce
 from lsst.ts.m2gui.controltab import TabActuatorControl
 
 
@@ -46,12 +49,12 @@ def test_init(widget):
     assert progress.isTextVisible() is True
 
 
-def test_callback_script_load_script(widget):
+async def test_callback_script_load_script(widget):
 
     widget.model.local_mode = LocalMode.Enable
 
     file_name = "/a/b/c"
-    name = widget._callback_script_load_script(file_name=file_name)
+    name = await widget._callback_script_load_script(file_name=file_name)
 
     assert name == "c"
     assert widget._info_script["file"].text() == file_name
@@ -101,7 +104,7 @@ def test_set_target_displacement_exception(widget):
         widget._set_target_displacement("Wrong Unit")
 
 
-def test_callback_selection_changed(widget):
+async def test_callback_selection_changed(widget):
 
     assert (
         widget._target_displacement.decimals()
@@ -112,14 +115,20 @@ def test_callback_selection_changed(widget):
     index_step_unit = ActuatorDisplacementUnit.Step.value - 1
     widget._displacement_unit_selection.setCurrentIndex(index_step_unit)
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget._target_displacement.decimals() == 0
 
 
-def test_callback_select_ring(qtbot, widget):
+async def test_callback_select_ring(qtbot, widget):
 
     qtbot.mouseClick(
         widget._buttons_actuator_selection_support["select_ring"], Qt.LeftButton
     )
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     for button in widget._buttons_actuator_selection:
         # The default selected ring is the ring B
@@ -129,11 +138,14 @@ def test_callback_select_ring(qtbot, widget):
             assert button.isChecked() is False
 
 
-def test_callback_clear_all(qtbot, widget):
+async def test_callback_clear_all(qtbot, widget):
 
     # Select an actuator
     idx = 2
     qtbot.mouseClick(widget._buttons_actuator_selection[idx], Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget._buttons_actuator_selection[idx].isChecked() is True
 
@@ -142,10 +154,13 @@ def test_callback_clear_all(qtbot, widget):
         widget._buttons_actuator_selection_support["clear_all"], Qt.LeftButton
     )
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget._buttons_actuator_selection[idx].isChecked() is False
 
 
-def test_callback_actuator_start(qtbot, widget):
+async def test_callback_actuator_start(qtbot, widget):
 
     # Select the actuators
     selected_actuators = [0, 1, 3, 7, 76, 77]
@@ -153,6 +168,9 @@ def test_callback_actuator_start(qtbot, widget):
         qtbot.mouseClick(
             widget._buttons_actuator_selection[selected_actuator], Qt.LeftButton
         )
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     # Change the unit
     # Index begins from 0 instead of 1 in QComboBox
@@ -168,22 +186,25 @@ def test_callback_actuator_start(qtbot, widget):
         actuators,
         target_displacement,
         displacement_unit,
-    ) = widget._callback_actuator_start()
+    ) = await widget._callback_actuator_start()
 
     assert actuators == selected_actuators
     assert target_displacement == widget._target_displacement.value()
     assert displacement_unit == ActuatorDisplacementUnit.Step
 
 
-def test_callback_progress(widget):
+async def test_callback_progress(widget):
 
     progress = 20
     widget.model.report_script_progress(progress)
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget._info_script["progress"].value() == progress
 
 
-def test_callback_forces(widget):
+async def test_callback_forces(widget):
 
     actuator_force = ActuatorForce()
     actuator_force.f_cur[0] = -1
@@ -192,6 +213,9 @@ def test_callback_forces(widget):
     actuator_force.f_cur[77] = -5
 
     widget.model.utility_monitor.update_forces(actuator_force)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget._labels_force["axial_min"].text() == "-1"
     assert widget._labels_force["axial_max"].text() == "2"

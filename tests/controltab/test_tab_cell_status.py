@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 import pathlib
 
@@ -82,7 +83,7 @@ def test_get_data_selected(widget):
     assert is_displacement is False
 
 
-def test_callback_selection_changed(widget):
+async def test_callback_selection_changed(widget):
 
     # Update the internal holded actuator data
     widget._forces.position_in_mm[0] = 3000
@@ -96,6 +97,9 @@ def test_callback_selection_changed(widget):
     # Index begins from 0 instead of 1 in QComboBox
     index_actuator_data = FigureActuatorData.Displacement.value - 1
     widget._actuator_data_selection.setCurrentIndex(index_actuator_data)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget._figures["axial"].axis_y.titleText() == "Position (mm)"
     assert widget._figures["tangent"].axis_y.titleText() == "Position (mm)"
@@ -114,6 +118,9 @@ def test_callback_selection_changed(widget):
     index_actuator_data = FigureActuatorData.ForceError.value - 1
     widget._actuator_data_selection.setCurrentIndex(index_actuator_data)
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget._figures["axial"].axis_y.titleText() == "Force (N)"
     assert widget._figures["tangent"].axis_y.titleText() == "Force (N)"
 
@@ -127,7 +134,7 @@ def test_callback_selection_changed(widget):
     assert widget._figures["tangent"].axis_y.max() == 1
 
 
-def test_callback_forces(qtbot, widget):
+async def test_callback_forces(qtbot, widget):
 
     actuator_force = ActuatorForce()
     actuator_force.f_cur[1] = 100
@@ -135,6 +142,9 @@ def test_callback_forces(qtbot, widget):
     actuator_force.f_error[77] = -12
 
     widget.model.utility_monitor.update_forces(actuator_force)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget._forces.f_cur[1] == 100
     assert widget._view_mirror.actuators[1]._magnitude == 100

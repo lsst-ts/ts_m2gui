@@ -20,6 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from PySide2.QtCore import Qt
@@ -69,7 +70,7 @@ def test_update_control_status(qtbot, widget):
     assert widget._label_local_mode.text() == "Control Loop: Closed-Loop Control"
 
 
-def test_callback_signal_message(qtbot, widget):
+async def test_callback_signal_message(qtbot, widget):
 
     assert widget._window_log.toPlainText() == ""
 
@@ -78,6 +79,9 @@ def test_callback_signal_message(qtbot, widget):
 
     message = "This is a test"
     signal_message.message.emit(message)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget._window_log.toPlainText() == message
 
@@ -95,10 +99,13 @@ def test_callback_clear(qtbot, widget):
     assert widget._window_log.toPlainText() == ""
 
 
-def test_callback_signal_status(qtbot, widget):
+async def test_callback_signal_status(qtbot, widget):
 
     name = "isTelemetryActive"
     widget.model.update_system_status(name, True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     palette = widget._indicators_status[name].palette()
     color = palette.color(QPalette.Button)
@@ -106,7 +113,7 @@ def test_callback_signal_status(qtbot, widget):
     assert color == Qt.green
 
 
-def test_callback_signal_status_is_alarm_warning_on(qtbot, widget):
+async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget):
 
     # Default color
     assert _get_color_is_alarm_warning_on(widget) == Qt.gray
@@ -114,10 +121,16 @@ def test_callback_signal_status_is_alarm_warning_on(qtbot, widget):
     # There is the error
     widget.model.add_error(3)
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert _get_color_is_alarm_warning_on(widget) == Qt.red
 
     # The error is cleared
     widget.model.reset_errors()
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert _get_color_is_alarm_warning_on(widget) == Qt.gray
 

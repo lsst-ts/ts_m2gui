@@ -21,7 +21,8 @@
 
 __all__ = ["TabConfigView"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import QVBoxLayout, QFormLayout
 
 from ..utils import create_label, create_group_box
@@ -261,8 +262,8 @@ class TabConfigView(TabDefault):
 
         signal_config.config.connect(self._callback_signal_config)
 
-    @Slot()
-    def _callback_signal_config(self, config):
+    @asyncSlot()
+    async def _callback_signal_config(self, config):
         """Callback of the config signal for the new configuration.
 
         Parameters

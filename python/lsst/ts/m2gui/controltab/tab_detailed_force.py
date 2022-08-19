@@ -21,7 +21,9 @@
 
 __all__ = ["TabDetailedForce"]
 
-from PySide2.QtCore import Slot, Qt
+from qasync import asyncSlot
+
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QVBoxLayout,
     QFormLayout,
@@ -29,8 +31,9 @@ from PySide2.QtWidgets import (
     QAbstractItemView,
 )
 
+from lsst.ts.m2com import NUM_ACTUATOR
+
 from ..utils import (
-    NUM_ACTUATOR,
     create_label,
     create_group_box,
     create_table,
@@ -118,13 +121,19 @@ class TabDetailedForce(TabDefault):
 
         return items_force
 
-    @Slot()
-    def _callback_selection_changed(self):
+    @asyncSlot()
+    async def _callback_selection_changed(self, index):
         """Callback of the changed selection. This will scroll the table to
-        make sure the user can see the actuators of selected ring."""
+        make sure the user can see the actuators of selected ring.
+
+        Parameters
+        ----------
+        index : `int`
+            Current index.
+        """
 
         # Index begins from 0 instead of 1 in QComboBox
-        ring = Ring(self._ring_selection.currentIndex() + 1)
+        ring = Ring(index + 1)
         name_first_actuator = ring.name + "1"
 
         items = self._table_forces.findItems(name_first_actuator, Qt.MatchExactly)
@@ -249,8 +258,8 @@ class TabDetailedForce(TabDefault):
         signal_detailed_force.hard_points.connect(self._callback_hard_points)
         signal_detailed_force.forces.connect(self._callback_forces)
 
-    @Slot()
-    def _callback_hard_points(self, hard_points):
+    @asyncSlot()
+    async def _callback_hard_points(self, hard_points):
         """Callback of the hard points (axial and tangential directions).
 
         Parameters
@@ -264,8 +273,8 @@ class TabDetailedForce(TabDefault):
         self._hard_points["axial"].setText(f"{hard_points[:3]}")
         self._hard_points["tangent"].setText(f"{hard_points[3:]}")
 
-    @Slot()
-    def _callback_forces(self, forces):
+    @asyncSlot()
+    async def _callback_forces(self, forces):
         """Callback of the forces, which contain the look-up table (LUT)
         details.
 

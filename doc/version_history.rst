@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.7:
+
+-------------
+0.1.7
+-------------
+
+* Adapt the **ts_m2com** and **qasync**.
+* Begin to support the simulation mode.
+
 .. _lsst.ts.m2gui-0.1.6:
 
 -------------

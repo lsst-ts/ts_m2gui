@@ -20,14 +20,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import asyncio
 import logging
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 
+from lsst.ts.m2com import PowerType
+
 from lsst.ts.m2gui import (
     Model,
-    PowerType,
     TemperatureGroup,
     DisplacementSensorDirection,
 )
@@ -55,39 +57,54 @@ def test_callback_reset_breakers(qtbot, widget):
     assert color == Qt.green
 
 
-def test_callback_power_motor(qtbot, widget):
+async def test_callback_power_motor(qtbot, widget):
 
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget._power_inclinometer["power_voltage_motor"].text() == "0.1 V"
     assert widget._power_inclinometer["power_current_motor"].text() == "0.2 A"
 
 
-def test_callback_power_communication(qtbot, widget):
+async def test_callback_power_communication(qtbot, widget):
 
     widget.model.utility_monitor.update_power_calibrated(
         PowerType.Communication, 0.1, 0.2
     )
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget._power_inclinometer["power_voltage_communication"].text() == "0.1 V"
     assert widget._power_inclinometer["power_current_communication"].text() == "0.2 A"
 
 
-def test_callback_inclinometer(qtbot, widget):
+async def test_callback_inclinometer(qtbot, widget):
 
     widget.model.utility_monitor.update_inclinometer_angle(0.1)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget._power_inclinometer["inclinometer"].text() == "0.1 degree"
 
 
-def test_callback_breakers(qtbot, widget):
+async def test_callback_breakers(qtbot, widget):
 
     name = "J1-W9-3"
     widget.model.utility_monitor.update_breaker(name, True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     palette = widget._breakers[name].palette()
     color = palette.color(QPalette.Button)
     assert color == Qt.red
 
 
-def test_callback_temperatures(qtbot, widget):
+async def test_callback_temperatures(qtbot, widget):
 
     temperature_group = TemperatureGroup.LG3
     temperatures = list(range(1, 5))
@@ -95,18 +112,24 @@ def test_callback_temperatures(qtbot, widget):
     utility_monitor = widget.model.utility_monitor
     utility_monitor.update_temperature(temperature_group, temperatures)
 
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     sensors = utility_monitor.get_temperature_sensors(temperature_group)
     for sensor, temperature in zip(sensors, temperatures):
         assert widget._temperatures[sensor].text() == f"{temperature} degree C"
 
 
-def test_callback_displacements(qtbot, widget):
+async def test_callback_displacements(qtbot, widget):
 
     direction = DisplacementSensorDirection.Delta
     displacements = list(range(1, 7))
 
     utility_monitor = widget.model.utility_monitor
     utility_monitor.update_displacements(direction, displacements)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     sensors = utility_monitor.get_displacement_sensors(direction)
     for sensor, displacement in zip(sensors, displacements):

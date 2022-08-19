@@ -24,7 +24,7 @@ __all__ = ["ForceErrorTangent"]
 from typing import List
 from dataclasses import dataclass, field
 
-from . import NUM_TANGENT_LINK
+from lsst.ts.m2com import NUM_TANGENT_LINK
 
 
 @dataclass

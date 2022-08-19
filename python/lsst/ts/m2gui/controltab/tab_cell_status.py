@@ -21,13 +21,16 @@
 
 __all__ = ["TabCellStatus"]
 
-from PySide2.QtCore import Slot
+from qasync import asyncSlot
+
 from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout, QComboBox
 
 import numpy as np
 
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
+
 from ..display import ViewMirror, ItemActuator, Gauge, FigureConstant
-from ..utils import NUM_ACTUATOR, NUM_TANGENT_LINK, set_button, read_yaml_file
+from ..utils import set_button
 from ..enums import FigureActuatorData
 from .. import ActuatorForce
 from . import TabDefault
@@ -72,8 +75,8 @@ class TabCellStatus(TabDefault):
             self.model.utility_monitor.signal_detailed_force
         )
 
-    @Slot()
-    def _callback_show_alias(self):
+    @asyncSlot()
+    async def _callback_show_alias(self):
         """Callback of the show-alias button. The actuator will show the alias
         or the actuator ID based on this."""
 
@@ -165,19 +168,30 @@ class TabCellStatus(TabDefault):
 
         return actuator_data_selection
 
-    @Slot()
-    def _callback_selection_changed(self):
+    @asyncSlot()
+    async def _callback_selection_changed(self, index):
         """Callback of the changed selection. This will update the actuator
-        data on figures."""
+        data on figures.
 
-        data_selected, is_displacement = self._get_data_selected()
+        Parameters
+        ----------
+        index : `int`
+            Current index.
+        """
+
+        data_selected, is_displacement = self._get_data_selected(index=index)
         self._update_figures(data_selected, is_displacement)
 
         for specific_type in ("axial", "tangent"):
             self._figures[specific_type].adjust_range_axis_y()
 
-    def _get_data_selected(self):
+    def _get_data_selected(self, index=None):
         """Get the selected actuator data.
+
+        Parameters
+        ----------
+        index : `int` or None, optional
+            Current index. (the default is None)
 
         Returns
         -------
@@ -189,9 +203,10 @@ class TabCellStatus(TabDefault):
         """
 
         # Index begins from 0 instead of 1 in QComboBox
-        actuator_data = FigureActuatorData(
-            self._actuator_data_selection.currentIndex() + 1
+        selected_index = (
+            self._actuator_data_selection.currentIndex() if index is None else index
         )
+        actuator_data = FigureActuatorData(selected_index + 1)
 
         if actuator_data == FigureActuatorData.ForceMeasured:
             return self._forces.f_cur, False
@@ -319,8 +334,8 @@ class TabCellStatus(TabDefault):
         """
         signal_detailed_force.forces.connect(self._callback_forces)
 
-    @Slot()
-    def _callback_forces(self, forces):
+    @asyncSlot()
+    async def _callback_forces(self, forces):
         """Callback of the forces, which contain the look-up table (LUT)
         details.
 

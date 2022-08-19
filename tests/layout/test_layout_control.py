@@ -20,7 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-
+import asyncio
 import logging
 
 from PySide2 import QtCore
@@ -49,34 +49,52 @@ def widget(qtbot):
     return widget
 
 
-def test_callback_signal_control_normal(qtbot, widget):
+async def test_callback_signal_control_normal(qtbot, widget):
     widget.layout_control.model.report_control_status()
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget.layout_control._button_remote.isEnabled() is True
     assert widget.layout_control._button_local.isEnabled() is False
 
 
-def test_callback_signal_control_prohibit_control(qtbot, widget):
+async def test_callback_signal_control_prohibit_control(qtbot, widget):
     widget.layout_control.model.local_mode = LocalMode.Diagnostic
 
     widget.layout_control.model.report_control_status()
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget.layout_control._button_remote.isEnabled() is False
     assert widget.layout_control._button_local.isEnabled() is False
 
 
-def test_set_csc_commander(qtbot, widget):
+async def test_set_csc_commander(qtbot, widget):
     widget.layout_control.set_csc_commander(True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget.layout_control.model.is_csc_commander is True
     assert widget.layout_control._button_remote.isEnabled() is False
     assert widget.layout_control._button_local.isEnabled() is True
 
     qtbot.mouseClick(widget.layout_control._button_local, QtCore.Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget.layout_control.model.is_csc_commander is False
     assert widget.layout_control._button_remote.isEnabled() is True
     assert widget.layout_control._button_local.isEnabled() is False
 
     qtbot.mouseClick(widget.layout_control._button_remote, QtCore.Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget.layout_control.model.is_csc_commander is True
     assert widget.layout_control._button_remote.isEnabled() is False
     assert widget.layout_control._button_local.isEnabled() is True
