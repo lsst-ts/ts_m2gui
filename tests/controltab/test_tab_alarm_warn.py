@@ -82,7 +82,7 @@ async def test_callback_selection_changed(qtbot, widget):
         pos=center,
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert (
@@ -98,7 +98,7 @@ async def test_callback_selection_changed(qtbot, widget):
         pos=center,
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert (
@@ -114,7 +114,7 @@ async def test_callback_selection_changed(qtbot, widget):
         pos=center,
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert (
@@ -134,7 +134,7 @@ async def test_callback_signal_error_new(qtbot, widget):
 
     widget.model.add_error(6051)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     color_6051 = _get_widget_item_color(widget, "6051")
@@ -142,7 +142,7 @@ async def test_callback_signal_error_new(qtbot, widget):
 
     widget.model.add_error(6052)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     color_6052 = _get_widget_item_color(widget, "6052")
@@ -161,7 +161,7 @@ async def test_callback_signal_error_cleared(qtbot, widget):
 
     widget.model.clear_error(6051)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     # Color should be white
@@ -190,7 +190,7 @@ async def test_callback_reset(qtbot, widget):
     # Click the reset button
     qtbot.mouseClick(widget._button_reset, Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     # Check the text of error cause should be cleared
@@ -222,7 +222,7 @@ async def test_callback_signal_limit_switch(qtbot, widget):
         LimitSwitchType.Extend, Ring.C, 3, True
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     indicator = widget._indicators_limit_switch_extend["C3"]

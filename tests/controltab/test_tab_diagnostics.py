@@ -51,7 +51,7 @@ async def test_callback_control_digital_status(qtbot, widget):
 
     qtbot.mouseClick(control, Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert control.isChecked() is True
@@ -62,7 +62,7 @@ async def test_callback_power_motor_calibrated(widget):
 
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._power_calibrated["power_voltage_motor"].text() == "0.1 V"
@@ -75,7 +75,7 @@ async def test_callback_power_communication_calibrated(widget):
         PowerType.Communication, 0.3, 0.4
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._power_calibrated["power_voltage_communication"].text() == "0.3 V"
@@ -86,7 +86,7 @@ async def test_callback_power_motor_raw(widget):
 
     widget.model.utility_monitor.update_power_raw(PowerType.Motor, 0.5, 0.6)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._power_raw["power_voltage_motor"].text() == "0.5 V"
@@ -97,7 +97,7 @@ async def test_callback_power_communication_raw(widget):
 
     widget.model.utility_monitor.update_power_raw(PowerType.Communication, 0.7, 0.8)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._power_raw["power_voltage_communication"].text() == "0.7 V"
@@ -108,7 +108,7 @@ async def test_callback_digital_status_input(widget):
 
     widget.model.utility_monitor.update_digital_status_input(3)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     _assert_indicator_color(widget._digital_status_input[0], Qt.green)
@@ -126,7 +126,7 @@ async def test_callback_digital_status_output(widget):
 
     widget.model.utility_monitor.update_digital_status_output(6)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     _assert_indicator_color(widget._digital_status_output[0], Qt.gray)
@@ -153,7 +153,7 @@ async def test_callback_force_error_tangent(widget):
     force_error_tangent.error_sum = 12.452
     widget.model.utility_monitor.update_force_error_tangent(force_error_tangent)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._force_error_tangent["a1"].text() == "1.2 N"

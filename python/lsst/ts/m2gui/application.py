@@ -38,7 +38,7 @@ def run_application(argv):
     Parameters
     ----------
     argv : `list`
-        Arguements from the command line.
+        Arguments from the command line.
     """
 
     if "QT_API" not in os.environ:
@@ -57,7 +57,7 @@ async def main(argv):
     Parameters
     ----------
     argv : `list`
-        Arguements from the command line.
+        Arguments from the command line.
     """
 
     # The set of "aboutToQuit" comes from "qasync/examples/aiohttp_fetch.py"
@@ -79,11 +79,13 @@ async def main(argv):
     parser.setApplicationDescription("Run the M2 graphical user interface (GUI).")
     parser.addHelpOption()
 
-    option_verbose = QCommandLineOption(["v", "verbose"], "Output the log on screen.")
+    option_verbose = QCommandLineOption(
+        ["v", "verbose"], "Print log messages to terminal."
+    )
     parser.addOption(option_verbose)
 
     option_simulation = QCommandLineOption(
-        ["s", "simulation"], "Run the simulation mode or not."
+        ["s", "simulation"], "Run the simulation mode."
     )
     parser.addOption(option_simulation)
 
@@ -107,12 +109,15 @@ async def main(argv):
 def close_future(future, loop):
     """Close the future.
 
+    This is needed to ensure that all pre- and post-processing for the event
+    loop is done. See the source code in qasync library for the details.
+
     Parameters
     ----------
     future : `asyncio.Future`
         Future.
     loop : `asyncio.unix_events._UnixSelectorEventLoop`
-        Loop.
+        Event loop.
     """
 
     loop.call_later(10, future.cancel)

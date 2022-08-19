@@ -122,8 +122,7 @@ async def test_show(qtbot, widget):
             pos=center,
         )
 
-        # Sleep one second to let the event loop to have the time to run the
-        # signal
+        # Sleep so the event loop can access CPU to handle the signal
         await asyncio.sleep(1)
 
         assert tab_item.isSelected() is True

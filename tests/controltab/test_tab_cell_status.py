@@ -98,7 +98,7 @@ async def test_callback_selection_changed(widget):
     index_actuator_data = FigureActuatorData.Displacement.value - 1
     widget._actuator_data_selection.setCurrentIndex(index_actuator_data)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._figures["axial"].axis_y.titleText() == "Position (mm)"
@@ -118,7 +118,7 @@ async def test_callback_selection_changed(widget):
     index_actuator_data = FigureActuatorData.ForceError.value - 1
     widget._actuator_data_selection.setCurrentIndex(index_actuator_data)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._figures["axial"].axis_y.titleText() == "Force (N)"
@@ -143,7 +143,7 @@ async def test_callback_forces(qtbot, widget):
 
     widget.model.utility_monitor.update_forces(actuator_force)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._forces.f_cur[1] == 100

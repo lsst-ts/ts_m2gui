@@ -54,7 +54,7 @@ class Model(object):
     timeout_connection : `int` or `float`, optional
         Connection timeout in second. (the default is 10)
     is_simulation_mode: `bool`, optional
-        Is the simulation mode or not. (the default is False)
+        True if running in simulation mode. (the default is False)
 
     Attributes
     ----------

@@ -80,7 +80,7 @@ async def test_callback_signal_message(qtbot, widget):
     message = "This is a test"
     signal_message.message.emit(message)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._window_log.toPlainText() == message
@@ -104,7 +104,7 @@ async def test_callback_signal_status(qtbot, widget):
     name = "isTelemetryActive"
     widget.model.update_system_status(name, True)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     palette = widget._indicators_status[name].palette()
@@ -121,7 +121,7 @@ async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget):
     # There is the error
     widget.model.add_error(3)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert _get_color_is_alarm_warning_on(widget) == Qt.red
@@ -129,7 +129,7 @@ async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget):
     # The error is cleared
     widget.model.reset_errors()
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert _get_color_is_alarm_warning_on(widget) == Qt.gray

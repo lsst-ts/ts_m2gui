@@ -42,7 +42,7 @@ async def test_callback_callback_hard_points(widget):
     tangent = [72, 73, 74]
     widget.model.utility_monitor.update_hard_points(axial, tangent)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._hard_points["axial"].text() == str(axial)
@@ -60,7 +60,7 @@ async def test_callback_callback_forces(widget):
 
     widget.model.utility_monitor.update_forces(forces)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._forces["f_hc"][3].text() == "1.23"

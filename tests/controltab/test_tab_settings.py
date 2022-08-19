@@ -71,7 +71,7 @@ async def test_callback_apply(qtbot, widget):
 
     qtbot.mouseClick(widget._button_apply, Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.model.host == "newHost"

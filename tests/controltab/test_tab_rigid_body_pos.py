@@ -67,7 +67,7 @@ async def test_callback_clear_values_relative(qtbot, widget):
 
     qtbot.mouseClick(widget._buttons["clear_values_relative"], Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     for position in widget._target_position_relative.values():
@@ -81,7 +81,7 @@ async def test_callback_clear_values_absolute(qtbot, widget):
 
     qtbot.mouseClick(widget._buttons["clear_values_absolute"], Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     for position in widget._target_position_absolute.values():
@@ -92,7 +92,7 @@ async def test_callback_position(widget):
 
     widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     for idx, axis in enumerate(widget.AXES):

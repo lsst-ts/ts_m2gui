@@ -52,7 +52,7 @@ def widget(qtbot):
 async def test_callback_signal_control_normal(qtbot, widget):
     widget.layout_control_mode.model.report_control_status()
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_control_mode._button_open_loop.isEnabled() is False
@@ -64,7 +64,7 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
 
     widget.layout_control_mode.model.report_control_status()
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_control_mode._button_open_loop.isEnabled() is False
@@ -76,7 +76,7 @@ async def test_switch_force_balance_system(qtbot, widget):
 
     widget.layout_control_mode.switch_force_balance_system(True)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_control_mode.model.is_closed_loop is True
@@ -85,7 +85,7 @@ async def test_switch_force_balance_system(qtbot, widget):
 
     qtbot.mouseClick(widget.layout_control_mode._button_open_loop, QtCore.Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_control_mode.model.is_closed_loop is False
@@ -102,7 +102,7 @@ async def test_switch_force_balance_system(qtbot, widget):
         widget.layout_control_mode._button_closed_loop, QtCore.Qt.LeftButton
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_control_mode.model.is_closed_loop is True

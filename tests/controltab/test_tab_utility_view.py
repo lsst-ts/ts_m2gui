@@ -61,7 +61,7 @@ async def test_callback_power_motor(qtbot, widget):
 
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._power_inclinometer["power_voltage_motor"].text() == "0.1 V"
@@ -74,7 +74,7 @@ async def test_callback_power_communication(qtbot, widget):
         PowerType.Communication, 0.1, 0.2
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._power_inclinometer["power_voltage_communication"].text() == "0.1 V"
@@ -85,7 +85,7 @@ async def test_callback_inclinometer(qtbot, widget):
 
     widget.model.utility_monitor.update_inclinometer_angle(0.1)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._power_inclinometer["inclinometer"].text() == "0.1 degree"
@@ -96,7 +96,7 @@ async def test_callback_breakers(qtbot, widget):
     name = "J1-W9-3"
     widget.model.utility_monitor.update_breaker(name, True)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     palette = widget._breakers[name].palette()
@@ -112,7 +112,7 @@ async def test_callback_temperatures(qtbot, widget):
     utility_monitor = widget.model.utility_monitor
     utility_monitor.update_temperature(temperature_group, temperatures)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     sensors = utility_monitor.get_temperature_sensors(temperature_group)
@@ -128,7 +128,7 @@ async def test_callback_displacements(qtbot, widget):
     utility_monitor = widget.model.utility_monitor
     utility_monitor.update_displacements(direction, displacements)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     sensors = utility_monitor.get_displacement_sensors(direction)

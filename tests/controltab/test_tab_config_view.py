@@ -60,7 +60,7 @@ async def test_callback_signal_config(qtbot, widget):
         misc_range_temperature=3.2,
     )
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget._config_parameters["file_configuration"].text() == "a"

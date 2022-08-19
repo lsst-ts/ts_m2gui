@@ -52,7 +52,7 @@ def widget(qtbot):
 async def test_callback_signal_control_normal(qtbot, widget):
     widget.layout_local_mode.model.report_control_status()
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_local_mode._button_standby.isEnabled() is False
@@ -66,7 +66,7 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
 
     widget.layout_local_mode.model.report_control_status()
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     _assert_prohibit_transition(widget)
@@ -89,7 +89,7 @@ def _assert_prohibit_transition(widget):
 async def test_set_local_mode(qtbot, widget):
     qtbot.mouseClick(widget.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_local_mode.model.local_mode == LocalMode.Diagnostic
@@ -100,7 +100,7 @@ async def test_set_local_mode(qtbot, widget):
 
     qtbot.mouseClick(widget.layout_local_mode._button_enable, QtCore.Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_local_mode.model.local_mode == LocalMode.Enable
@@ -118,7 +118,7 @@ async def test_set_local_mode(qtbot, widget):
     qtbot.mouseClick(widget.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton)
     qtbot.mouseClick(widget.layout_local_mode._button_standby, QtCore.Qt.LeftButton)
 
-    # Sleep one second to let the event loop to have the time to run the signal
+    # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     assert widget.layout_local_mode.model.local_mode == LocalMode.Standby
