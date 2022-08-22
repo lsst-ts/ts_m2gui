@@ -22,9 +22,8 @@
 __all__ = ["FigureConstant"]
 
 import numpy as np
-
-from PySide2.QtCore import Qt, QPointF
 from PySide2.QtCharts import QtCharts
+from PySide2.QtCore import QPointF, Qt
 from PySide2.QtGui import QPainter
 
 

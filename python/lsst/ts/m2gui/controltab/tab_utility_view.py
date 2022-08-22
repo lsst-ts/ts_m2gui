@@ -21,16 +21,14 @@
 
 __all__ = ["TabUtilityView"]
 
+from lsst.ts.m2com import PowerType
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette
+from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QVBoxLayout, QFormLayout, QHBoxLayout
-from PySide2.QtGui import QPalette
-
-from lsst.ts.m2com import PowerType
-
-from ..utils import set_button, create_label, create_group_box
-from ..enums import TemperatureGroup, DisplacementSensorDirection
+from ..enums import DisplacementSensorDirection, TemperatureGroup
+from ..utils import create_group_box, create_label, set_button
 from . import TabDefault
 
 

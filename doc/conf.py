@@ -5,9 +5,10 @@ For more information, see:
 https://developer.lsst.io/stack/building-single-package-docs.html
 """
 
-from documenteer.conf.pipelinespkg import *
 from os import getenv
+
 import lsst.ts.m2gui
+from documenteer.conf.pipelinespkg import *
 
 project = "ts_m2gui"
 html_theme_options["logotext"] = project

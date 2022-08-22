@@ -21,20 +21,13 @@
 
 __all__ = ["TabDiagnostics"]
 
+from lsst.ts.m2com import NUM_TANGENT_LINK
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette
+from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QMessageBox, QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QVBoxLayout, QFormLayout, QHBoxLayout, QMessageBox
-from PySide2.QtGui import QPalette
-
-from lsst.ts.m2com import NUM_TANGENT_LINK
-
-from ..utils import (
-    set_button,
-    create_label,
-    create_group_box,
-    run_command,
-)
+from ..utils import create_group_box, create_label, run_command, set_button
 from . import TabDefault
 
 

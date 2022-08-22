@@ -19,21 +19,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 
+import pytest
+from lsst.ts.m2com import PowerType
+from lsst.ts.m2gui import DisplacementSensorDirection, Model, TemperatureGroup
+from lsst.ts.m2gui.controltab import TabUtilityView
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-
-from lsst.ts.m2com import PowerType
-
-from lsst.ts.m2gui import (
-    Model,
-    TemperatureGroup,
-    DisplacementSensorDirection,
-)
-from lsst.ts.m2gui.controltab import TabUtilityView
 
 
 @pytest.fixture

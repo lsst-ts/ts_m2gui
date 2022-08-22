@@ -19,17 +19,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 
+import pytest
+from lsst.ts.m2com import PowerType
+from lsst.ts.m2gui import ForceErrorTangent, LocalMode, Model
+from lsst.ts.m2gui.controltab import TabDiagnostics
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-
-from lsst.ts.m2com import PowerType
-
-from lsst.ts.m2gui import Model, ForceErrorTangent, LocalMode
-from lsst.ts.m2gui.controltab import TabDiagnostics
 
 
 @pytest.fixture

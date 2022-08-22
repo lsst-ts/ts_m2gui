@@ -21,7 +21,7 @@
 
 __all__ = ["TabDefault"]
 
-from PySide2.QtWidgets import QDockWidget, QWidget, QScrollArea, QComboBox
+from PySide2.QtWidgets import QComboBox, QDockWidget, QScrollArea, QWidget
 
 from ..enums import Ring
 

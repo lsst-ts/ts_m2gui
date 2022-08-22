@@ -19,18 +19,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import logging
 
-from lsst.ts.m2com import CommandScript, CommandActuator
-
-from lsst.ts.m2gui import (
-    Model,
-    LocalMode,
-    LimitSwitchType,
-    Ring,
-)
-
+import pytest
+from lsst.ts.m2com import CommandActuator, CommandScript
+from lsst.ts.m2gui import LimitSwitchType, LocalMode, Model, Ring
 
 TIMEOUT = 1000
 

@@ -19,15 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import asyncio
 import logging
 
+import pytest
+from lsst.ts.m2gui import LocalMode, Model, SignalMessage
+from lsst.ts.m2gui.controltab import TabOverview
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-
-from lsst.ts.m2gui import Model, LocalMode, SignalMessage
-from lsst.ts.m2gui.controltab import TabOverview
 
 
 @pytest.fixture

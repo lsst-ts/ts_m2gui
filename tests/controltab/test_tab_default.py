@@ -19,13 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pytest
 import logging
 
-from PySide2.QtWidgets import QWidget, QScrollArea
-
+import pytest
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabDefault
+from PySide2.QtWidgets import QScrollArea, QWidget
 
 
 @pytest.fixture

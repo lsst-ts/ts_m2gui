@@ -21,10 +21,9 @@
 
 __all__ = ["ControlTabs"]
 
-from qasync import asyncSlot
-
-from PySide2.QtWidgets import QListWidget, QVBoxLayout
 from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QListWidget, QVBoxLayout
+from qasync import asyncSlot
 
 from .controltab import (
     TabActuatorControl,

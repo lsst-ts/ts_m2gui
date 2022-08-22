@@ -25,9 +25,9 @@ import asyncio
 import functools
 import os
 import sys
-import qasync
 
-from PySide2.QtCore import QCommandLineParser, QCommandLineOption
+import qasync
+from PySide2.QtCore import QCommandLineOption, QCommandLineParser
 
 from . import MainWindow
 

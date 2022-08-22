@@ -21,11 +21,10 @@
 
 __all__ = ["TabConfigView"]
 
+from PySide2.QtWidgets import QFormLayout, QVBoxLayout
 from qasync import asyncSlot
 
-from PySide2.QtWidgets import QVBoxLayout, QFormLayout
-
-from ..utils import create_label, create_group_box
+from ..utils import create_group_box, create_label
 from . import TabDefault
 
 

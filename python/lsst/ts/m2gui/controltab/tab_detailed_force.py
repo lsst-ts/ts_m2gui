@@ -21,25 +21,18 @@
 
 __all__ = ["TabDetailedForce"]
 
-from qasync import asyncSlot
-
+from lsst.ts.m2com import NUM_ACTUATOR
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
-    QVBoxLayout,
+    QAbstractItemView,
     QFormLayout,
     QTableWidgetItem,
-    QAbstractItemView,
+    QVBoxLayout,
 )
+from qasync import asyncSlot
 
-from lsst.ts.m2com import NUM_ACTUATOR
-
-from ..utils import (
-    create_label,
-    create_group_box,
-    create_table,
-    get_num_actuator_ring,
-)
 from ..enums import Ring
+from ..utils import create_group_box, create_label, create_table, get_num_actuator_ring
 from . import TabDefault
 
 
