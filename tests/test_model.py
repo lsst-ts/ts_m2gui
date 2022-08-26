@@ -218,19 +218,16 @@ def test_update_connection_information(model):
 
 def test_update_connection_information_exception(model):
 
+    with pytest.raises(ValueError):
+        model.update_connection_information("test", 1, 1, 3)
+
     model.system_status["isCrioConnected"] = True
     with pytest.raises(RuntimeError):
         model.update_connection_information("test", 1, 2, 3)
 
 
-def test_connect_exception(model):
+async def test_connect_exception(model):
 
     model.system_status["isCrioConnected"] = True
     with pytest.raises(RuntimeError):
-        model.connect()
-
-
-def test_disconnect_exception(model):
-
-    with pytest.raises(RuntimeError):
-        model.disconnect()
+        await model.connect()

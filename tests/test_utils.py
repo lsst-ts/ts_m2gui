@@ -19,11 +19,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import asyncio
+
 import pytest
 from lsst.ts.m2gui import Ring, get_num_actuator_ring, get_tol, run_command
 
 
-def command(is_failed):
+def command_normal(is_failed):
+
+    if is_failed:
+        raise RuntimeError("Command is failed.")
+
+
+async def command_coroutine(is_failed):
+
+    await asyncio.sleep(0.5)
 
     if is_failed:
         raise RuntimeError("Command is failed.")
@@ -46,9 +56,12 @@ def test_get_num_actuator_ring():
         get_num_actuator_ring("WrongRing")
 
 
-def test_run_command(qtbot):
+async def test_run_command(qtbot):
     # Note that we need to add the "qtbot" here as the argument for the event
     # loop or GUI to run
 
-    assert run_command(command, False) is True
-    assert run_command(command, True, is_prompted=False) is False
+    assert await run_command(command_normal, False) is True
+    assert await run_command(command_normal, True, is_prompted=False) is False
+
+    assert await run_command(command_coroutine, False) is True
+    assert await run_command(command_coroutine, True, is_prompted=False) is False
