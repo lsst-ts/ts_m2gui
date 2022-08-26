@@ -47,6 +47,9 @@ class TabSettings(TabDefault):
     PORT_MINIMUM = 1
     PORT_MAXIMUM = 65535
 
+    LOG_LEVEL_MINIMUM = 10
+    LOG_LEVEL_MAXIMUM = 50
+
     TIMEOUT_MINIMUM = 1
 
     def __init__(self, title, model):
@@ -73,6 +76,7 @@ class TabSettings(TabDefault):
             "port_command": QSpinBox(),
             "port_telemetry": QSpinBox(),
             "timeout_connection": QSpinBox(),
+            "log_level": QSpinBox(),
         }
 
         for port in ("port_command", "port_telemetry"):
@@ -81,11 +85,17 @@ class TabSettings(TabDefault):
         settings["timeout_connection"].setMinimum(self.TIMEOUT_MINIMUM)
         settings["timeout_connection"].setSuffix(" sec")
 
+        settings["log_level"].setRange(self.LOG_LEVEL_MINIMUM, self.LOG_LEVEL_MAXIMUM)
+        settings["log_level"].setToolTip(
+            "CRITICAL (50), ERROR (40), WARNING (30), INFO (20), DEBUG (10)"
+        )
+
         # Set the default values
         settings["host"].setText(self.model.host)
         settings["port_command"].setValue(self.model.port_command)
         settings["port_telemetry"].setValue(self.model.port_telemetry)
         settings["timeout_connection"].setValue(self.model.timeout_connection)
+        settings["log_level"].setValue(self.model.log.level)
 
         self._set_minimum_width_line_edit(settings["host"])
 
@@ -117,13 +127,16 @@ class TabSettings(TabDefault):
         port_telemetry = self._settings["port_telemetry"].value()
         timeout_connection = self._settings["timeout_connection"].value()
 
-        run_command(
+        is_successful = await run_command(
             self.model.update_connection_information,
             host,
             port_command,
             port_telemetry,
             timeout_connection,
         )
+
+        if is_successful:
+            self.model.log.setLevel(self._settings["log_level"].value())
 
     def _create_layout(self):
         """Create the layout.
@@ -137,6 +150,7 @@ class TabSettings(TabDefault):
         layout = QVBoxLayout()
 
         layout.addWidget(self._create_group_tcpip())
+        layout.addWidget(self._create_group_application())
         layout.addWidget(self._button_apply)
 
         return layout
@@ -157,3 +171,17 @@ class TabSettings(TabDefault):
         layout.addRow("Connection timeout:", self._settings["timeout_connection"])
 
         return create_group_box("Tcp/Ip Connection", layout)
+
+    def _create_group_application(self):
+        """Create the group of application.
+
+        Returns
+        -------
+        `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QFormLayout()
+        layout.addRow("Logging level:", self._settings["log_level"])
+
+        return create_group_box("Application", layout)

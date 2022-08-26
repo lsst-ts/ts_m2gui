@@ -89,14 +89,26 @@ async def main(argv):
     )
     parser.addOption(option_simulation)
 
+    option_log_level = QCommandLineOption(
+        ["l", "level"],
+        (
+            "Logging level: CRITICAL (50), ERROR (40), WARNING (30), "
+            "INFO (20), DEBUG (10), NOTSET (0). The default is 30."
+        ),
+        "level",
+        "30",
+    )
+    parser.addOption(option_log_level)
+
     parser.process(app)
 
     # Get the argument
     is_verbose = parser.isSet(option_verbose)
     is_simulation_mode = parser.isSet(option_simulation)
+    log_level = int(parser.value(option_log_level))
 
     # Create a Qt main window, which will be our window.
-    window_main = MainWindow(is_verbose, is_simulation_mode)
+    window_main = MainWindow(is_verbose, is_simulation_mode, log_level=log_level)
     window_main.show()
 
     await future

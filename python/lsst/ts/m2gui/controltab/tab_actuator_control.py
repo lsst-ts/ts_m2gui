@@ -33,7 +33,6 @@ from lsst.ts.m2com import (
 from PySide2.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
-    QFileDialog,
     QFormLayout,
     QGridLayout,
     QHBoxLayout,
@@ -44,6 +43,7 @@ from qasync import asyncSlot
 
 from ..enums import Ring
 from ..utils import create_group_box, create_label, run_command, set_button
+from ..widget import QFileDialogAsync
 from . import TabDefault
 
 
@@ -159,7 +159,8 @@ class TabActuatorControl(TabDefault):
         """
 
         if file_name == "":
-            file_name = QFileDialog.getOpenFileName(caption="Select script file")[0]
+            dialog = QFileDialogAsync(caption="Select script file")
+            file_name = await dialog.get_open_filename_async()
 
         name = ""
         if file_name != "":
@@ -167,7 +168,7 @@ class TabActuatorControl(TabDefault):
             file_path = Path(file_name)
             name = file_path.name
 
-            is_successful = run_command(
+            is_successful = await run_command(
                 self.model.command_script, CommandScript.LoadScript, name
             )
 
@@ -187,7 +188,7 @@ class TabActuatorControl(TabDefault):
             Script command.
         """
 
-        run_command(self.model.command_script, command)
+        await run_command(self.model.command_script, command)
 
         if command == CommandScript.Clear:
             self._info_script["file"].setText("")
@@ -319,7 +320,7 @@ class TabActuatorControl(TabDefault):
             self._displacement_unit_selection.currentIndex() + 1
         )
 
-        run_command(
+        await run_command(
             self.model.command_actuator,
             CommandActuator.Start,
             actuators,
@@ -339,7 +340,7 @@ class TabActuatorControl(TabDefault):
         command : enum `lsst.ts.m2com.CommandActuator`
             Actuator command.
         """
-        run_command(self.model.command_actuator, command)
+        await run_command(self.model.command_actuator, command)
 
     def _set_widget_and_layout(self):
         """Set the widget and layout."""
