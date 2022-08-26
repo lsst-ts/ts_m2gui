@@ -74,6 +74,8 @@ You may need to setup the **PYTHONPATH** to point to `python/` directory as well
 The executable (`run_m2gui`) is under the `bin/` directory.
 Use the argument of `-h` to know the available options.
 
+When running the GUI with simulation mode, the environment variable of **TS_CONFIG_MTTCS_DIR** is used to get the disk position of [ts_config_mttcs](https://github.com/lsst-ts/ts_config_mttcs).
+
 ## Unit Tests
 
 You can run the unit tests by:

@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.9:
+
+-------------
+0.1.9
+-------------
+
+* Begin to implement the simulation mode.
+* Support the assignment of debug level.
+
 .. _lsst.ts.m2gui-0.1.8:
 
 -------------

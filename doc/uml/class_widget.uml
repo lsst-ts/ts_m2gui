@@ -1,0 +1,4 @@
+@startuml
+class QMessageBoxAsync
+class QFileDialogAsync
+@enduml

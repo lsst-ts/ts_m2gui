@@ -6,10 +6,15 @@ package "m2gui" #DDDDDD {
   UtilityMonitor ..> ActuatorForce
 }
 
+package "widget" #DDDDDD {
+  class QFileDialogAsync
+}
+
 TabDefault *-- Model
 TabDefault <|-- TabActuatorControl
 
 TabActuatorControl --> SignalScript : connect()
 TabActuatorControl --> SignalDetailedForce : connect()
 TabActuatorControl ..> ActuatorForce
+TabActuatorControl ..> QFileDialogAsync
 @enduml

@@ -46,6 +46,7 @@ The model–view–controller (MVC) architecture is used in this module.
 In this design, the view always shows the data sent from the model.
 This helps to minimize the business logic in view and makes the tests easier.
 If you want to cache the data for a smooth showing in view, you need to do this in the **Model**.
+The controller in MVC reuses the existed module in `ts_m2com <https://github.com/lsst-ts/ts_m2com>`_, which provides the mock server for the simulation purpose as well.
 
 The `Qt signal <https://doc.qt.io/qt-6/signalsandslots.html>`_ is used to do the data exchange.
 The `emit()` and `connect()` in the class diagrams mean the class **emits** a specific signal and **connects** it to a specific callback function.
@@ -103,6 +104,22 @@ m2gui.display
 * **ItemActuator** is the actuator item used in the **ViewMirror** class to show the actuator information.
 * **Gauge** provides the color scale.
 * **FigureConstant** is the figure to show the constant line data in real-time.
+
+.. _lsst.ts.m2gui-modules_m2gui_widget:
+
+m2gui.widget
+-------------
+
+.. uml:: ../uml/class_widget.uml
+    :caption: Class diagram of widget module
+
+* **QMessageBoxAsync** is the QT message box in the asynchronous version.
+* **QFileDialogAsync** is the QT file dialog in the asynchronous version.
+
+Some of the functions in QT widgets (such as `QDialog exec <https://doc.qt.io/qt-6/qdialog.html#exec>`_) are not asynchronous and may spin an additional event loop when running the application.
+Therefore, it is needed to have an asynchronous version of these widgets to avoid breaking the
+trick of switching the event loop used in `qasync <https://github.com/CabbageDevelopment/qasync>`_ library.
+Otherwise, the system would not have the permission to wake up the running `asynchronous tasks <https://docs.python.org/3/library/asyncio-task.html#task-object>`_.
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab:
 
