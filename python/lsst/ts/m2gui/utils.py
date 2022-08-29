@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -28,15 +28,18 @@ __all__ = [
     "get_num_actuator_ring",
     "prompt_dialog_warning",
     "run_command",
+    "get_button_action",
 ]
 
+import asyncio
 from functools import partial
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QGroupBox, QLabel, QMessageBox, QPushButton, QTableWidget
+from PySide2.QtWidgets import QGroupBox, QLabel, QPushButton, QTableWidget
 
 from . import Ring
+from .widget import QMessageBoxAsync
 
 
 def set_button(
@@ -234,7 +237,7 @@ def get_num_actuator_ring(ring):
         raise ValueError(f"Not supported ring: {ring!r}")
 
 
-def prompt_dialog_warning(title, description, is_prompted=True):
+async def prompt_dialog_warning(title, description, is_prompted=True):
     """Shows a warning dialog.
 
     The user must react to this dialog. The rest of the GUI is blocked until
@@ -251,24 +254,27 @@ def prompt_dialog_warning(title, description, is_prompted=True):
         shall not be the case when used in the real GUI. (the default is True)
     """
 
-    dialog = QMessageBox()
-    dialog.setIcon(QMessageBox.Warning)
+    dialog = QMessageBoxAsync()
+    dialog.setIcon(QMessageBoxAsync.Warning)
     dialog.setWindowTitle(title)
     dialog.setText(description)
 
+    # Block the user to interact with other running widgets
+    dialog.setModal(True)
+
     if is_prompted:
-        dialog.exec()
+        await dialog.show()
 
 
-def run_command(command, *args, is_prompted=True):
-    """Run the command.
+async def run_command(command, *args, is_prompted=True):
+    """Run the command, which can be a normal function or a coroutine.
 
-    If the command fails, there will be a prompt dialog to warn the users
-    by default.
+    If the command fails and is_prompted is True, a dialog to warn the users
+    will appear/pop up.
 
     Parameters
     ----------
-    command : `func`
+    command : `func` or `coroutine`
         Command to execute.
     *args : `args`
         Arguments of the command.
@@ -282,13 +288,41 @@ def run_command(command, *args, is_prompted=True):
         True if the command succeeds. Otherwise, False.
     """
 
+    is_coroutine = asyncio.iscoroutine(command) or asyncio.iscoroutinefunction(command)
     try:
-        command(*args)
+        if is_coroutine:
+            await command(*args)
+        else:
+            command(*args)
     except Exception as error:
-        prompt_dialog_warning(
+        await prompt_dialog_warning(
             f"{command.__name__}()", str(error), is_prompted=is_prompted
         )
 
         return False
 
     return True
+
+
+def get_button_action(tool_bar, name):
+    """Get the button widget of action in tool bar.
+
+    Parameters
+    ----------
+    tool_bar : `PySide2.QtWidgets.QToolBar`
+        Tool bar.
+    name : `str`
+        Action name.
+
+    Returns
+    -------
+    `PySide2.QtWidgets.QAction` or None
+        Button widget of the action. None if does not exist.
+    """
+
+    actions = tool_bar.actions()
+    for action in actions:
+        if action.text() == name:
+            return tool_bar.widgetForAction(action)
+
+    return None

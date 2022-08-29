@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -297,7 +297,7 @@ class TabAlarmWarn(TabDefault):
     async def _callback_enable_open_loop_max_limit(self):
         """Callback of the enable button to enable the maximum limit of
         open-loop control."""
-        run_command(self.model.enable_open_loop_max_limit)
+        await run_command(self.model.enable_open_loop_max_limit)
 
     def _set_signal_error(self, signal_error):
         """Set the error signal with callback functions.

@@ -5,9 +5,14 @@ package "m2gui" #DDDDDD {
   UtilityMonitor *-- SignalDetailedForce : emit()
 }
 
+package "widget" #DDDDDD {
+  class QMessageBoxAsync
+}
+
 TabDefault *-- Model
 TabDefault <|-- TabDiagnostics
 
 TabDiagnostics --> SignalUtility : connect()
 TabDiagnostics --> SignalDetailedForce : connect()
+TabDiagnostics ..> QMessageBoxAsync
 @enduml

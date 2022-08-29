@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -46,12 +46,16 @@ def test_init(widget):
         widget._settings["timeout_connection"].value()
         == widget.model.timeout_connection
     )
+    assert widget._settings["log_level"].value() == widget.model.log.level
 
     for port in ("port_command", "port_telemetry"):
         assert widget._settings[port].minimum() == widget.PORT_MINIMUM
         assert widget._settings[port].maximum() == widget.PORT_MAXIMUM
 
     assert widget._settings["timeout_connection"].minimum() == widget.TIMEOUT_MINIMUM
+
+    assert widget._settings["log_level"].minimum() == widget.LOG_LEVEL_MINIMUM
+    assert widget._settings["log_level"].maximum() == widget.LOG_LEVEL_MAXIMUM
 
     line_edit = widget._settings["host"]
     font_metrics = line_edit.fontMetrics()
@@ -67,6 +71,7 @@ async def test_callback_apply(qtbot, widget):
     widget._settings["port_command"].setValue(1)
     widget._settings["port_telemetry"].setValue(2)
     widget._settings["timeout_connection"].setValue(3)
+    widget._settings["log_level"].setValue(11)
 
     qtbot.mouseClick(widget._button_apply, Qt.LeftButton)
 
@@ -77,3 +82,4 @@ async def test_callback_apply(qtbot, widget):
     assert widget.model.port_command == 1
     assert widget.model.port_telemetry == 2
     assert widget.model.timeout_connection == 3
+    assert widget.model.log.level == 11

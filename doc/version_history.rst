@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.1.9:
+
+-------------
+0.1.9
+-------------
+
+* Early simulation mode support.
+* Debug level command line argument and settings.
+
 .. _lsst.ts.m2gui-0.1.8:
 
 -------------

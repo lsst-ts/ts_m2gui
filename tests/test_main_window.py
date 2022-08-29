@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -27,26 +27,27 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QToolBar
 
 
-def get_button_action(tool_bar, name):
-
-    actions = tool_bar.actions()
-    for action in actions:
-        if action.text() == name:
-            return tool_bar.widgetForAction(action)
-
-    return None
-
-
 @pytest.fixture
 def widget(qtbot):
 
-    widget = MainWindow(False, False)
+    widget = MainWindow(False, False, log_level=13)
     qtbot.addWidget(widget)
 
     return widget
 
 
+@pytest.fixture
+def widget_sim(qtbot):
+
+    widget_sim = MainWindow(False, True)
+    qtbot.addWidget(widget_sim)
+
+    return widget_sim
+
+
 def test_init(widget):
+
+    assert widget.log.level == 13
 
     tool_bar = widget.findChildren(QToolBar)[0]
     actions = tool_bar.actions()
@@ -59,13 +60,25 @@ def test_init(widget):
     assert widget.model.timeout_connection == 10
 
 
+def test_init_sim(widget_sim):
+
+    assert widget_sim.model.host == "127.0.0.1"
+
+
+def test_get_action(widget):
+
+    button_exit = widget._get_action("Exit")
+    assert button_exit.text() == "Exit"
+
+    button_wrong_action = widget._get_action("WrongAction")
+    assert button_wrong_action is None
+
+
 async def test_callback_settings(qtbot, widget):
 
     assert widget._tab_settings.isVisible() is False
 
-    tool_bar = widget.findChildren(QToolBar)[0]
-    button_settings = get_button_action(tool_bar, "Settings")
-
+    button_settings = widget._get_action("Settings")
     qtbot.mouseClick(button_settings, Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal

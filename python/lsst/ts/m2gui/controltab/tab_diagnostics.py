@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -24,10 +24,11 @@ __all__ = ["TabDiagnostics"]
 from lsst.ts.m2com import NUM_TANGENT_LINK
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QMessageBox, QVBoxLayout
+from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from ..utils import create_group_box, create_label, run_command, set_button
+from ..widget import QMessageBoxAsync
 from . import TabDefault
 
 
@@ -108,17 +109,20 @@ class TabDiagnostics(TabDefault):
         """Callback of the reboot-cell-controller button. This will ask the
         user to confirm this command again."""
 
-        dialog = QMessageBox()
+        dialog = QMessageBoxAsync()
 
         dialog.setText("This will reboot the cell controller.")
         dialog.setInformativeText("Are you sure to reboot the controller?")
 
-        dialog.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        dialog.setDefaultButton(QMessageBox.Cancel)
+        dialog.setStandardButtons(QMessageBoxAsync.Ok | QMessageBoxAsync.Cancel)
+        dialog.setDefaultButton(QMessageBoxAsync.Cancel)
 
-        decision = dialog.exec()
-        if decision == QMessageBox.Ok:
-            run_command(self.model.reboot_controller)
+        # Make dialog modal, disallow interaction with other running widgets
+        dialog.setModal(True)
+
+        decision = await dialog.show()
+        if decision == QMessageBoxAsync.Ok:
+            await run_command(self.model.reboot_controller)
 
     def _create_indicators_digital_status(self, list_digital_status):
         """Create the indicators of digital status.
@@ -268,7 +272,9 @@ class TabDiagnostics(TabDefault):
         control = self._digital_status_control[idx]
         is_checked = control.isChecked()
 
-        is_successful = run_command(self.model.set_bit_digital_status, idx, is_checked)
+        is_successful = await run_command(
+            self.model.set_bit_digital_status, idx, is_checked
+        )
 
         if is_successful:
             self._update_control_text(control, is_checked)

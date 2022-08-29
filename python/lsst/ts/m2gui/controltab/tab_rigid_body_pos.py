@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -137,7 +137,7 @@ class TabRigidBodyPos(TabDefault):
     async def _callback_go_to_home(self):
         """Callback of the go-to-home button. This will move the M2 to the
         home position."""
-        run_command(self.model.go_to_position, 0, 0, 0, 0, 0, 0)
+        await run_command(self.model.go_to_position, 0, 0, 0, 0, 0, 0)
 
     @asyncSlot()
     async def _callback_set_home(self):
@@ -151,7 +151,7 @@ class TabRigidBodyPos(TabDefault):
         position based on the relative offsets."""
 
         current_position = self.model.utility_monitor.position
-        run_command(
+        await run_command(
             self.model.go_to_position,
             self._target_position_relative["x"].value() + current_position[0],
             self._target_position_relative["y"].value() + current_position[1],
@@ -180,7 +180,7 @@ class TabRigidBodyPos(TabDefault):
     async def _callback_go_to_position(self):
         """Callback of the go-to-position button. This will move the M2 to the
         new absolute position."""
-        run_command(
+        await run_command(
             self.model.go_to_position,
             self._target_position_absolute["x"].value(),
             self._target_position_absolute["y"].value(),

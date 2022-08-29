@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -26,11 +26,21 @@ import pathlib
 import sys
 
 from lsst.ts.m2com import read_yaml_file
+from lsst.ts.tcpip import LOCAL_HOST
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QMainWindow, QMessageBox, QVBoxLayout, QWidget
+from PySide2.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
 from qasync import QApplication, asyncSlot
 
-from . import ControlTabs, LogWindowHandler, Model, SignalMessage, run_command
+from . import (
+    ControlTabs,
+    LogWindowHandler,
+    Model,
+    QMessageBoxAsync,
+    SignalMessage,
+    get_button_action,
+    prompt_dialog_warning,
+    run_command,
+)
 from .controltab import TabSettings
 from .layout import LayoutControl, LayoutControlMode, LayoutLocalMode
 
@@ -47,6 +57,8 @@ class MainWindow(QMainWindow):
     log : `logging.Logger` or None, optional
         A logger. If None, a logger will be instantiated. (the default is
         None)
+    log_level : `int`, optional
+        Logging level. (the default is `logging.WARN`)
 
     Attributes
     ----------
@@ -56,7 +68,13 @@ class MainWindow(QMainWindow):
         Model class.
     """
 
-    def __init__(self, is_output_log_on_screen, is_simulation_mode, log=None):
+    def __init__(
+        self,
+        is_output_log_on_screen,
+        is_simulation_mode,
+        log=None,
+        log_level=logging.WARN,
+    ):
         super().__init__()
 
         # Signal of message
@@ -64,7 +82,9 @@ class MainWindow(QMainWindow):
 
         # Set the logger
         message_format = "%(asctime)s, %(levelname)s, %(message)s"
-        self.log = self._set_log(message_format, is_output_log_on_screen, log=log)
+        self.log = self._set_log(
+            message_format, is_output_log_on_screen, log_level, log=log
+        )
 
         self.model = self._set_model(is_simulation_mode)
 
@@ -104,7 +124,7 @@ class MainWindow(QMainWindow):
         if is_simulation_mode:
             self.log.info("Running the simulation mode.")
 
-    def _set_log(self, message_format, is_output_log_on_screen, log=None):
+    def _set_log(self, message_format, is_output_log_on_screen, level, log=None):
         """Set the logger.
 
         Parameters
@@ -113,6 +133,8 @@ class MainWindow(QMainWindow):
             Format of the message.
         is_output_log_on_screen : `bool`
             Is outputting the log messages on screen or not.
+        level : `int`
+            Logging level.
         log : `logging.Logger` or None, optional
             A logger. If None, a logger will be instantiated. (the default is
             None)
@@ -137,6 +159,8 @@ class MainWindow(QMainWindow):
                 format=message_format,
             )
 
+        log.setLevel(level)
+
         return log
 
     def _set_model(self, is_simulation_mode):
@@ -156,6 +180,9 @@ class MainWindow(QMainWindow):
         # Read the yaml file
         filepath = self._get_policy_dir() / "default.yaml"
         default_settings = read_yaml_file(filepath)
+
+        if is_simulation_mode:
+            default_settings["host"] = LOCAL_HOST
 
         model = Model(
             self.log,
@@ -238,62 +265,142 @@ class MainWindow(QMainWindow):
         tool_bar = self.addToolBar("ToolBar")
 
         action_exit = tool_bar.addAction("Exit", self._callback_exit)
-        action_exit.setToolTip("Exit the application")
+        action_exit.setToolTip("Exit the application (this might take some time)")
 
         action_connect = tool_bar.addAction("Connect", self._callback_connect)
         action_connect.setToolTip("Connect to the M2 controller")
 
         action_disconnect = tool_bar.addAction("Disconnect", self._callback_disconnect)
-        action_disconnect.setToolTip("Disconnect from the M2 controller")
+        action_disconnect.setToolTip(
+            "Disconnect and close all tasks (this might take some time)"
+        )
 
         action_settings = tool_bar.addAction("Settings", self._callback_settings)
         action_settings.setToolTip("Show the application settings")
 
     @asyncSlot()
     async def _callback_exit(self):
-        """Exit the application."""
+        """Exit the application.
 
-        dialog = self._create_dialog_exit()
-        result = dialog.exec()
+        The 'exit' action will be disabled during the call. If the user cancels
+        the exit (in the displayed message box), it will be reenabled.
+        """
 
-        if result == QMessageBox.Ok:
-            app = QApplication.instance()
-            app.quit()
+        action_exit = self._get_action("Exit")
+        action_exit.setEnabled(False)
+
+        if self.model.system_status["isCrioConnected"]:
+            await prompt_dialog_warning(
+                "_callback_exit()",
+                (
+                    "M2 cRIO controller is still connected. Please disconnect "
+                    "it before exiting the user interface."
+                ),
+            )
+
+        else:
+            dialog = self._create_dialog_exit()
+            result = await dialog.show()
+
+            if result == QMessageBoxAsync.Ok:
+                # Closes the running asynchronous tasks before quitting the
+                # application. This makes sure the asynchronous tasks aren't
+                # running without a connection.
+                if self.model.run_loops:
+                    await self.model.close_tasks()
+
+                QApplication.instance().quit()
+
+        action_exit.setEnabled(True)
+
+    def _get_action(self, name):
+        """Get the action.
+
+        Parameters
+        ----------
+        name : `str`
+            Action name.
+
+        Returns
+        -------
+        `PySide2.QtWidgets.QAction`
+            Action.
+        """
+
+        tool_bar = self.findChildren(QToolBar)[0]
+        return get_button_action(tool_bar, name)
 
     def _create_dialog_exit(self):
         """Create the exit dialog.
 
         Returns
         -------
-        `PySide2.QtWidgets.QMessageBox`
+        `QMessageBoxAsync`
             Exit dialog.
         """
 
-        dialog = QMessageBox()
-        dialog.setIcon(QMessageBox.Warning)
+        dialog = QMessageBoxAsync()
+        dialog.setIcon(QMessageBoxAsync.Warning)
         dialog.setWindowTitle("exit")
 
         if self.model.system_status["isCrioConnected"]:
-            dialog.setText(
-                "There is still the connection with M2 controller. Exit the application?"
-            )
+            dialog.setText("There is still the connection with M2 controller.")
         else:
             dialog.setText("Exit the application?")
+            dialog.addButton(QMessageBoxAsync.Ok)
 
-        dialog.addButton(QMessageBox.Cancel)
-        dialog.addButton(QMessageBox.Ok)
+        dialog.addButton(QMessageBoxAsync.Cancel)
+
+        # Block the user to interact with other running widgets
+        dialog.setModal(True)
 
         return dialog
 
     @asyncSlot()
     async def _callback_connect(self):
-        """Callback function to connect to the M2 controller."""
-        run_command(self.model.connect)
+        """Callback function to connect to the M2 controller.
+
+        Disable the 'connect' action, open the connection and re-enable the
+        'connect' action.
+        """
+
+        action_connect = self._get_action("Connect")
+        action_connect.setEnabled(False)
+
+        if self.model.system_status["isCrioConnected"]:
+            await prompt_dialog_warning(
+                "_callback_connect()", "The M2 cRIO controller is already connected."
+            )
+        else:
+            await run_command(self.model.connect)
+
+        action_connect.setEnabled(True)
 
     @asyncSlot()
     async def _callback_disconnect(self):
-        """Callback function to disconnect from the M2 controller."""
-        run_command(self.model.disconnect)
+        """Callback function to disconnect from the M2 controller.
+
+        The 'connect', 'disconnect' and 'exit' actions wiil be disabled before
+        disconnecting and re-enabled after the controller is disconnected. That
+        prevents the operator from trying to connect as asynchronous tasks are
+        being closed during the disconnection command, thus preventing
+        unpredictable application behavior.
+        """
+
+        action_connect = self._get_action("Connect")
+        action_connect.setEnabled(False)
+
+        action_disconnect = self._get_action("Disconnect")
+        action_disconnect.setEnabled(False)
+
+        action_exit = self._get_action("Exit")
+        action_exit.setEnabled(False)
+
+        await run_command(self.model.disconnect)
+
+        action_connect.setEnabled(True)
+        action_disconnect.setEnabled(True)
+        action_exit.setEnabled(True)
 
     @asyncSlot()
     async def _callback_settings(self):

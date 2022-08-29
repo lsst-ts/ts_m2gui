@@ -19,14 +19,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .tab_default import TabDefault
-from .tab_actuator_control import TabActuatorControl
-from .tab_alarm_warn import TabAlarmWarn
-from .tab_cell_status import TabCellStatus
-from .tab_config_view import TabConfigView
-from .tab_detailed_force import TabDetailedForce
-from .tab_diagnostics import TabDiagnostics
-from .tab_overview import TabOverview
-from .tab_rigid_body_pos import TabRigidBodyPos
-from .tab_utility_view import TabUtilityView
-from .tab_settings import TabSettings
+__all__ = ["QMessageBoxAsync"]
+
+from PySide2.QtWidgets import QMessageBox
+
+from . import connect_signal_to_future
+
+
+class QMessageBoxAsync(QMessageBox):
+    """QT message box in the asynchronous version."""
+
+    def show(self):
+        """This is an overridden function.
+
+        Based on the QT documents, we should avoid the use of exec().
+
+        See:
+        1. https://github.com/CabbageDevelopment/qasync/issues/59
+        2. https://doc.qt.io/qt-6/qwidget.html#show
+        3. https://doc.qt.io/qt-6/qmessagebox.html#open
+        4. https://doc.qt.io/qt-6/qdialog.html#exec
+
+        Returns
+        -------
+        future : `asyncio.Future`
+            Future instance that represents an eventual result of an
+            asynchronous operation.
+        """
+        return connect_signal_to_future(self.finished, super().show)

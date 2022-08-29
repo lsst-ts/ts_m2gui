@@ -19,14 +19,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .tab_default import TabDefault
-from .tab_actuator_control import TabActuatorControl
-from .tab_alarm_warn import TabAlarmWarn
-from .tab_cell_status import TabCellStatus
-from .tab_config_view import TabConfigView
-from .tab_detailed_force import TabDetailedForce
-from .tab_diagnostics import TabDiagnostics
-from .tab_overview import TabOverview
-from .tab_rigid_body_pos import TabRigidBodyPos
-from .tab_utility_view import TabUtilityView
-from .tab_settings import TabSettings
+__all__ = ["connect_signal_to_future"]
+
+import asyncio
+
+
+def connect_signal_to_future(signal, func):
+    """Connect the siganl to asyncio.Future() and execute the function.
+
+    Parameters
+    ----------
+    signal : `PySide2.QtCore.Signal`
+        Signal.
+    func : `func`
+        Function to execute.
+
+    Returns
+    -------
+    future : `asyncio.Future`
+        Future instance that represents an eventual result of an asynchronous
+        operation.
+    """
+
+    future = asyncio.Future()
+    signal.connect(lambda result: future.set_result(result))
+
+    func()
+
+    return future
