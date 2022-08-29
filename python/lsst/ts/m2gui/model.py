@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -686,7 +686,7 @@ class Model(object):
             else:
                 await asyncio.sleep(self.timeout_in_second)
 
-        self.log.debug("Stop the running of event loop from component.")
+        self.log.debug("Component's event loop exited.")
 
     def _process_events(self, message):
         """Process the events from the M2 controller.
@@ -715,11 +715,14 @@ class Model(object):
                     time_wait_telemetry >= self.TELEMETRY_WAIT_TIMEOUT
                     and not is_telemetry_timed_out
                 ):
+
                     self.log.warning(
                         (
-                            "No telemetry for more than "
-                            f"{self.TELEMETRY_WAIT_TIMEOUT } seconds "
-                            "already. Is the internet OK?"
+                            "No telemetry update for more than "
+                            f"{self.TELEMETRY_WAIT_TIMEOUT} seconds. Can you "
+                            f"ping the controller at {self.host} and initiate "
+                            "connection to one of it's ports (at "
+                            f"{self.port_command} and {self.port_telemetry})?"
                         )
                     )
                     time_wait_telemetry = 0.0
@@ -734,7 +737,7 @@ class Model(object):
                 # There is the telemetry to publish
                 time_wait_telemetry = 0.0
                 if is_telemetry_timed_out:
-                    self.log.info("Receive the new telemetry again.")
+                    self.log.info("Telemetry is up and running after failure.")
 
                 is_telemetry_timed_out = False
 
@@ -749,7 +752,7 @@ class Model(object):
                 )
                 await asyncio.sleep(self.timeout_in_second)
 
-        self.log.debug("Telemetry loop from component closed.")
+        self.log.debug("The component's telemetry loop exited/ended.")
 
     def _process_telemetry(self, message):
         """Process the telemetry from the M2 controller.
@@ -834,7 +837,9 @@ class Model(object):
 
         if not self.controller.are_clients_connected():
             raise RuntimeError(
-                f"Timeount in connection. Host: {self.host}, ports: {port_command} and {port_telemetry}"
+                "Timeout in connection - Conection timeouted, connection "
+                f"failed or cannot connect. Host: {self.host}, ports: "
+                f"{port_command} and {port_telemetry}."
             )
 
     async def disconnect(self):

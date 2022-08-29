@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -90,9 +90,9 @@ async def main(argv):
     parser.addOption(option_simulation)
 
     option_log_level = QCommandLineOption(
-        ["l", "level"],
+        ["d", "debuglevel"],
         (
-            "Logging level: CRITICAL (50), ERROR (40), WARNING (30), "
+            "Debug logging level: CRITICAL (50), ERROR (40), WARNING (30), "
             "INFO (20), DEBUG (10), NOTSET (0). The default is 30."
         ),
         "level",

@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -282,8 +282,8 @@ class MainWindow(QMainWindow):
     async def _callback_exit(self):
         """Exit the application.
 
-        The 'exit' action will be disabled first. If cancels, it will be
-        enabled again.
+        The 'exit' action will be disabled during the call. If the user cancels
+        the exit (in the displayed message box), it will be reenabled.
         """
 
         action_exit = self._get_action("Exit")
@@ -291,7 +291,11 @@ class MainWindow(QMainWindow):
 
         if self.model.system_status["isCrioConnected"]:
             await prompt_dialog_warning(
-                "_callback_exit()", "There is still the connection with M2 controller."
+                "_callback_exit()",
+                (
+                    "M2 cRIO controller is still connected. Please disconnect "
+                    "it before exiting the user interface."
+                ),
             )
 
         else:
@@ -299,14 +303,13 @@ class MainWindow(QMainWindow):
             result = await dialog.show()
 
             if result == QMessageBoxAsync.Ok:
-                # Close the running asynchronous tasks first. This is to deal
-                # with the condition that the asynchronous tasks are running
-                # but there is no connection actually.
+                # Closes the running asynchronous tasks before quitting the
+                # application. This makes sure the asynchronous tasks aren't
+                # running without a connection.
                 if self.model.run_loops:
                     await self.model.close_tasks()
 
-                app = QApplication.instance()
-                app.quit()
+                QApplication.instance().quit()
 
         action_exit.setEnabled(True)
 
@@ -357,8 +360,8 @@ class MainWindow(QMainWindow):
     async def _callback_connect(self):
         """Callback function to connect to the M2 controller.
 
-        The 'connect' action will be disabled first. After the connection, it
-        will be enabled again.
+        Disable the 'connect' action, open the connection and re-enable the
+        'connect' action.
         """
 
         action_connect = self._get_action("Connect")
@@ -366,7 +369,7 @@ class MainWindow(QMainWindow):
 
         if self.model.system_status["isCrioConnected"]:
             await prompt_dialog_warning(
-                "_callback_connect()", "There is the connection with M2 controller."
+                "_callback_connect()", "The M2 cRIO controller is already connected."
             )
         else:
             await run_command(self.model.connect)
@@ -377,11 +380,11 @@ class MainWindow(QMainWindow):
     async def _callback_disconnect(self):
         """Callback function to disconnect from the M2 controller.
 
-        The 'connect', 'disconnect' and 'exit' actions will be disabled first.
-        After the disconnection, they will be enabled again. This is because
-        the disconnection will close all the running asynchronous tasks and it
-        will take some time. If the user tries to do the connect/diconnect/exit
-        at the same time, the result will be unpredictable.
+        The 'connect', 'disconnect' and 'exit' actions wiil be disabled before
+        disconnecting and re-enabled after the controller is disconnected. That
+        prevents the operator from trying to connect as asynchronous tasks are
+        being closed during the disconnection command, thus preventing
+        unpredictable application behavior.
         """
 
         action_connect = self._get_action("Connect")

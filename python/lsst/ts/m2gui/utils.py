@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -267,10 +267,10 @@ async def prompt_dialog_warning(title, description, is_prompted=True):
 
 
 async def run_command(command, *args, is_prompted=True):
-    """Run the command. This command can be a normal function or coroutine.
+    """Run the command, which can be a normal function or a coroutine.
 
-    If the command fails, there will be a prompt dialog to warn the users
-    by default.
+    If the command fails and is_prompted is True, a dialog to warn the users
+    will appear/pop up.
 
     Parameters
     ----------

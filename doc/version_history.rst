@@ -12,8 +12,8 @@ Version History
 0.1.9
 -------------
 
-* Begin to implement the simulation mode.
-* Support the assignment of debug level.
+* Early simulation mode support.
+* Debug level command line argument and settings.
 
 .. _lsst.ts.m2gui-0.1.8:
 

@@ -1,6 +1,6 @@
 # This file is part of ts_m2gui.
 #
-# Developed for the LSST Data Management System.
+# Developed for the LSST Telescope and Site Systems.
 # This product includes software developed by the LSST Project
 # (https://www.lsst.org).
 # See the COPYRIGHT file at the top-level directory of this distribution
@@ -117,7 +117,7 @@ class TabDiagnostics(TabDefault):
         dialog.setStandardButtons(QMessageBoxAsync.Ok | QMessageBoxAsync.Cancel)
         dialog.setDefaultButton(QMessageBoxAsync.Cancel)
 
-        # Block the user to interact with other running widgets
+        # Make dialog modal, disallow interaction with other running widgets
         dialog.setModal(True)
 
         decision = await dialog.show()
