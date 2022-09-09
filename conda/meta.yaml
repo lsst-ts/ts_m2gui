@@ -12,6 +12,24 @@ build:
   entry_points:
     - run_m2gui = lsst.ts.m2gui.application:run_application
 
+test:
+  requires:
+    - ts-conda-build =0.3
+    - ts-simactuators
+    - ts-idl {{ idl_version }}
+    - ts-salobj {{ salobj_version }}
+    - ts-tcpip
+    - ts-utils
+    - ts-m2com
+  source_files:
+    - python
+    - bin
+    - tests
+    - setup.cfg
+    - pyproject.toml
+  commands:
+    - py.test
+
 requirements:
   host:
     - python {{ python }}

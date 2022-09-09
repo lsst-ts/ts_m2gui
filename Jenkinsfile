@@ -24,6 +24,10 @@ pipeline {
     environment {
         // SAL setup file
         SAL_SETUP_FILE = "/home/saluser/.setup.sh"
+        // XML report path
+        XML_REPORT = "jenkinsReport/report.xml"
+        // Module name used in the pytest coverage analysis
+        MODULE_NAME = "lsst.ts.m2gui"
         // PlantUML url
         PLANTUML_URL = "https://github.com/plantuml/plantuml/releases/download/v1.2021.13/plantuml-1.2021.13.jar"
         // Branch name. This is to deal with the condition that the env.BRANCH_NAME
@@ -47,6 +51,24 @@ pipeline {
 
                         cd ${WORK_HOME}/ts_m2com
                         git checkout -t origin/${env.BRANCH} | true
+                    """
+                }
+            }
+        }
+
+        stage('Unit Tests and Coverage Analysis') {
+            steps {
+                // Pytest needs to export the junit report.
+                withEnv(["WORK_HOME=${env.WORKSPACE}"]) {
+                    sh """
+                        source ${env.SAL_SETUP_FILE}
+
+                        cd ${WORK_HOME}/ts_m2com
+                        setup -k -r .
+
+                        cd ${WORK_HOME}
+                        setup -k -r .
+                        pytest tests/ --cov-report html --cov=${env.MODULE_NAME} --junitxml=${env.XML_REPORT}
                     """
                 }
             }
@@ -80,6 +102,22 @@ pipeline {
     }
 
     post {
+        always {
+            // The path of xml needed by JUnit is relative to
+            // the workspace.
+            junit "${env.XML_REPORT}"
+
+            // Publish the HTML report
+            publishHTML (target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'htmlcov',
+                reportFiles: 'index.html',
+                reportName: "Coverage Report"
+            ])
+        }
+
         cleanup {
             // Change the ownership of workspace to Jenkins for the clean up
             // This is to work around the condition that the user ID of jenkins
