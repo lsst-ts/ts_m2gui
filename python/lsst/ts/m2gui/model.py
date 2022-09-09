@@ -26,9 +26,12 @@ import time
 
 from lsst.ts import salobj
 from lsst.ts.m2com import (
+    NUM_ACTUATOR,
+    NUM_TANGENT_LINK,
     ActuatorDisplacementUnit,
     Controller,
     MockServer,
+    PowerType,
     get_config_dir,
 )
 from lsst.ts.tcpip import LOCAL_HOST
@@ -36,6 +39,7 @@ from lsst.ts.utils import index_generator, make_done_future
 
 from . import (
     Config,
+    DisplacementSensorDirection,
     FaultManager,
     LimitSwitchType,
     LocalMode,
@@ -44,6 +48,7 @@ from . import (
     SignalControl,
     SignalScript,
     SignalStatus,
+    TemperatureGroup,
     UtilityMonitor,
     get_num_actuator_ring,
 )
@@ -151,7 +156,7 @@ class Model(object):
 
         self.timeout_in_second = timeout_in_second
         self.controller = Controller(
-            log=self.log, timeout_in_second=self.timeout_in_second
+            log=self.log, timeout_in_second=self.timeout_in_second, is_csc=False
         )
 
         self._is_simulation_mode = is_simulation_mode
@@ -288,10 +293,10 @@ class Model(object):
         self.fault_manager.clear_error(error)
         self._check_error_and_update_status()
 
-    def reset_errors(self):
+    async def reset_errors(self):
         """Reset errors."""
 
-        self.log.info("Reset all errors.")
+        await self.controller.clear_errors()
 
         self.fault_manager.reset_errors()
         self.fault_manager.reset_limit_switch_status(LimitSwitchType.Retract)
@@ -299,7 +304,7 @@ class Model(object):
 
         self._check_error_and_update_status()
 
-    def enable_open_loop_max_limit(self):
+    async def enable_open_loop_max_limit(self):
         """Enable the maximum limit in open-loop control.
 
         Raises
@@ -308,11 +313,12 @@ class Model(object):
             Not in the open-loop control.
         """
 
-        if self.is_enabled_and_open_loop_control():
+        if not self.is_closed_loop:
+            await self.controller.write_command_to_server("enableOpenLoopMaxLimit")
             self.update_system_status("isOpenLoopMaxLimitsEnabled", True)
         else:
             raise RuntimeError(
-                "Failed to enable the maximum limit. Only allow in Enabled state and open-loop control."
+                "Failed to enable the maximum limit. Only allow in open-loop control."
             )
 
     def disable_open_loop_max_limit(self):
@@ -385,11 +391,11 @@ class Model(object):
         """
         self.signal_script.progress.emit(int(progress))
 
-    def save_position(self):
+    async def save_position(self):
         """Save the rigid body position."""
-        self.log.info("Save the rigid body position.")
+        await self.controller.write_command_to_server("saveMirrorPosition")
 
-    def go_to_position(self, x, y, z, rx, ry, rz):
+    async def go_to_position(self, x, y, z, rx, ry, rz):
         """Go to the position.
 
         Parameters
@@ -414,7 +420,17 @@ class Model(object):
         """
 
         if self.is_enabled_and_closed_loop_control():
-            self.log.info(f"Move to the position: ({x}, {y}, {z}, {rx}, {ry}, {rz}).")
+            await self.controller.write_command_to_server(
+                "positionMirror",
+                message_details={
+                    "x": x,
+                    "y": y,
+                    "z": z,
+                    "xRot": rx,
+                    "yRot": ry,
+                    "zRot": rz,
+                },
+            )
         else:
             raise RuntimeError("Mirror can be positioned only in closed-loop control.")
 
@@ -440,11 +456,11 @@ class Model(object):
         """
         return self.local_mode == LocalMode.Enable and self.is_closed_loop
 
-    def set_home(self):
+    async def set_home(self):
         """Set the home position."""
-        self.log.info("Set the home position.")
+        await self.controller.write_command_to_server("setMirrorHome")
 
-    def reboot_controller(self):
+    async def reboot_controller(self):
         """Reboot the cell controller.
 
         Raises
@@ -454,7 +470,7 @@ class Model(object):
         """
 
         if self.local_mode == LocalMode.Standby and not self.is_csc_commander:
-            self.log.info("Reboot the cell controller.")
+            await self.controller.write_command_to_server("rebootController")
         else:
             raise RuntimeError(
                 "Controller can only be rebooted at the standby state with local control."
@@ -477,13 +493,14 @@ class Model(object):
         """
 
         if self.local_mode == LocalMode.Diagnostic:
+            # TODO: Fix this in DM-36020.
             self.log.info(f"Set the {idx}th bit of digital status to be {int(value)}.")
         else:
             raise RuntimeError(
                 "Bit value of digital status can only be set in the diagnostic state."
             )
 
-    def command_script(self, command, script_name=None):
+    async def command_script(self, command, script_name=None):
         """Run the script command.
 
         Parameters
@@ -500,18 +517,22 @@ class Model(object):
         """
 
         if self.local_mode == LocalMode.Enable:
-            self.log.info(f"Run the script command: {command!r}.")
 
+            message_details = {"scriptCommand": command}
             if script_name is not None:
-                # Cell controller needs to check this file exists or not.
-                self.log.info(f"Load the script: {script_name}.")
+                message_details["scriptName"] = script_name
+
+            await self.controller.write_command_to_server(
+                "runScript",
+                message_details=message_details,
+            )
 
         else:
             raise RuntimeError(
                 "Failed to run the script command. Only allowed in Enabled state."
             )
 
-    def command_actuator(
+    async def command_actuator(
         self,
         command,
         actuators=None,
@@ -545,20 +566,43 @@ class Model(object):
         if actuators == []:
             raise RuntimeError("No actuator is selected.")
 
-        if self.is_enabled_and_open_loop_control():
-            self.log.info(f"Run the actuator command: {command!r}.")
+        if unit == ActuatorDisplacementUnit.Step:
+            target_displacement = int(target_displacement)
 
+        if self.is_enabled_and_open_loop_control():
+
+            message_details = {"actuatorCommand": command}
             if actuators is not None:
-                self.log.info(
-                    (
-                        f"Move {actuators} actuators with the"
-                        f" displacement={target_displacement} {unit.name}."
-                    )
+                message_details.update(
+                    {
+                        "actuators": actuators,
+                        "displacement": target_displacement,
+                        "unit": unit,
+                    }
                 )
+
+            await self.controller.write_command_to_server(
+                "moveActuators",
+                message_details=message_details,
+            )
+
         else:
             raise RuntimeError(
                 "Failed to command the actuator. Only allow in Enabled state and open-loop control."
             )
+
+    async def reset_breakers(self):
+        """Reset the breakers."""
+
+        await self.controller.write_command_to_server(
+            "resetBreakers", message_details={"powerType": PowerType.Motor}
+        )
+
+        await self.controller.write_command_to_server(
+            "resetBreakers", message_details={"powerType": PowerType.Communication}
+        )
+
+        self.utility_monitor.reset_breakers()
 
     def update_connection_information(
         self, host, port_command, port_telemetry, timeout_connection
@@ -676,15 +720,7 @@ class Model(object):
 
             self._process_events(message)
 
-            # Transition to the Diagnostic state if the controller is in Fault
-            if (self.local_mode == LocalMode.Enable) and (
-                self.controller.controller_state == salobj.State.FAULT
-            ):
-                # TODO: Implement this in DM-36015
-                pass
-
-            else:
-                await asyncio.sleep(self.timeout_in_second)
+            await asyncio.sleep(self.timeout_in_second)
 
         self.log.debug("Component's event loop exited.")
 
@@ -696,8 +732,134 @@ class Model(object):
         message : `str`
             Message from the M2 controller.
         """
-        # TODO: Implement this in DM-36015
-        pass
+
+        name = self._get_message_name(message)
+
+        if name != "":
+
+            if name == "m2AssemblyInPosition":
+                self.update_system_status("isInPosition", message["inPosition"])
+
+            elif name == "summaryState":
+                summary_state = salobj.State(message["summaryState"])
+                self.local_mode = self._summary_state_to_local_mode(summary_state)
+                self.report_control_status()
+
+                self.log.info(f"M2 controller has the state: {summary_state!r}.")
+                self.log.info(f"Local mode is: {self.local_mode!r}.")
+
+            elif name == "errorCode":
+                error_code = message["errorCode"]
+                self.add_error(error_code)
+
+                self.log.warning(f"Receive the error code: {error_code}.")
+
+            elif name == "commandableByDDS":
+                self.is_csc_commander = message["state"]
+                self.report_control_status()
+
+                self.log.info(
+                    f"M2 controller is commandable by CSC: {self.is_csc_commander}."
+                )
+
+            elif name == "hardpointList":
+                hardpoints = message["actuators"]
+                # The first 3 actuators are the axial actuators. The latters
+                # are the tangent links.
+                self.utility_monitor.update_hard_points(hardpoints[:3], hardpoints[3:])
+
+            elif name == "forceBalanceSystemStatus":
+                self.is_closed_loop = message["status"]
+                self.report_control_status()
+
+                self.log.info(
+                    f"Status of the force balance system: {self.is_closed_loop}."
+                )
+
+            elif name == "scriptExecutionStatus":
+                self.report_script_progress(int(message["percentage"]))
+
+            elif name == "digitalOutput":
+                self.utility_monitor.update_digital_status_output(message["value"])
+
+            elif name == "digitalInput":
+                self.utility_monitor.update_digital_status_input(message["value"])
+
+            # Ignore these messages because they are specific to CSC
+            elif name in (
+                "cellTemperatureHiWarning",
+                "detailedState",
+                "inclinationTelemetrySource",
+                "interlock",
+                "tcpIpConnected",
+                "temperatureOffset",
+            ):
+                pass
+
+            else:
+                self.log.warning(f"Unspecified event message: {name}, ignoring...")
+
+    def _get_message_name(self, message):
+        """Get the name of message.
+
+        Parameters
+        ----------
+        message : `dict`
+            Message.
+
+        Returns
+        -------
+        `str`
+            Name of the message. If there is no 'id' field, return the empty
+            string.
+        """
+
+        try:
+            return message["id"]
+        except (TypeError, KeyError):
+            return ""
+
+    def _summary_state_to_local_mode(self, summary_state):
+        """Transform the summary state to local mode.
+
+        Parameters
+        ----------
+        summary_state : enum `lsst.ts.salobj.State`
+            Summary state.
+
+        Returns
+        -------
+        local_mode : enum `LocalMode`
+            Local mode.
+        """
+
+        local_mode = LocalMode.Standby
+
+        if summary_state == salobj.State.STANDBY:
+            local_mode = LocalMode.Standby
+
+        elif summary_state == salobj.State.DISABLED:
+            local_mode = LocalMode.Diagnostic
+
+        elif summary_state == salobj.State.ENABLED:
+            local_mode = LocalMode.Enable
+
+        # Transition to the Diagnostic state if the local mode was the Enable
+        # mode originally.
+        elif summary_state == salobj.State.FAULT:
+            local_mode = (
+                LocalMode.Diagnostic
+                if self.local_mode == LocalMode.Enable
+                else self.local_mode
+            )
+
+        else:
+            self.log.warning(
+                f"Unsupported summary state: {summary_state!r}."
+                f"Use the {local_mode!r} instead."
+            )
+
+        return local_mode
 
     async def _telemetry_loop(self):
         """Update and output telemetry information from component."""
@@ -762,8 +924,163 @@ class Model(object):
         message : `str`
             Message from the M2 controller.
         """
-        # TODO: Implement this in DM-36015
-        pass
+
+        name = self._get_message_name(message)
+
+        if name != "":
+
+            num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
+
+            if name == "position":
+                self.utility_monitor.update_position(
+                    message["x"],
+                    message["y"],
+                    message["z"],
+                    message["xRot"],
+                    message["yRot"],
+                    message["zRot"],
+                )
+
+            elif name == "axialForce":
+                forces = self.utility_monitor.get_forces()
+
+                forces.f_gravity[:num_axial] = message["lutGravity"]
+                forces.f_temperature[:num_axial] = message["lutTemperature"]
+                forces.f_delta[:num_axial] = message["applied"]
+                forces.f_cur[:num_axial] = message["measured"]
+                forces.f_hc[:num_axial] = message["hardpointCorrection"]
+
+                forces.f_error[:num_axial] = [
+                    (
+                        message["lutGravity"][idx]
+                        + message["lutTemperature"][idx]
+                        + message["applied"][idx]
+                        - message["hardpointCorrection"][idx]
+                        - message["measured"][idx]
+                    )
+                    for idx in range(num_axial)
+                ]
+
+                # Do not consider the force error in hardpoints.
+                # This is the logic in M2 cell LabVIEW code by vendor. Need to
+                # figure out why it was designed in this way in a latter time.
+                for idx in self.utility_monitor.hard_points["axial"]:
+                    # Index begins from 0 in list
+                    forces.f_error[idx - 1] = 0
+
+                self.utility_monitor.update_forces(forces)
+
+            elif name == "tangentForce":
+                forces = self.utility_monitor.get_forces()
+
+                # There is no temperature LUT correction
+                forces.f_gravity[-NUM_TANGENT_LINK:] = message["lutGravity"]
+                forces.f_delta[-NUM_TANGENT_LINK:] = message["applied"]
+                forces.f_cur[-NUM_TANGENT_LINK:] = message["measured"]
+                forces.f_hc[-NUM_TANGENT_LINK:] = message["hardpointCorrection"]
+
+                forces.f_error[-NUM_TANGENT_LINK:] = [
+                    (
+                        message["lutGravity"][idx]
+                        + message["applied"][idx]
+                        - message["hardpointCorrection"][idx]
+                        - message["measured"][idx]
+                    )
+                    for idx in range(NUM_TANGENT_LINK)
+                ]
+
+                # Do not consider the force error in hardpoints.
+                # This is the logic in M2 cell LabVIEW code by vendor. Need to
+                # figure out why it was designed in this way in a latter time.
+                for idx in self.utility_monitor.hard_points["tangent"]:
+                    # Index begins from 0 in list
+                    forces.f_error[idx - 1] = 0
+
+                self.utility_monitor.update_forces(forces)
+
+            elif name == "temperature":
+                self.utility_monitor.update_temperature(
+                    TemperatureGroup.Intake, message["intake"]
+                )
+                self.utility_monitor.update_temperature(
+                    TemperatureGroup.Exhaust, message["exhaust"]
+                )
+
+                ring_temperature = message["ring"]
+                self.utility_monitor.update_temperature(
+                    TemperatureGroup.LG2, ring_temperature[:4]
+                )
+                self.utility_monitor.update_temperature(
+                    TemperatureGroup.LG3, ring_temperature[4:8]
+                )
+                self.utility_monitor.update_temperature(
+                    TemperatureGroup.LG4, ring_temperature[8:]
+                )
+
+            elif name == "zenithAngle":
+                self.utility_monitor.update_inclinometer_angle(
+                    message["inclinometerProcessed"]
+                )
+
+            # If the step changes, the position will be changed as well.
+            # We base on the change of position to send the "signal" to
+            # update the GUI.
+            elif name == "axialActuatorSteps":
+                self.utility_monitor.forces.step[:num_axial] = message["steps"]
+
+            elif name == "tangentActuatorSteps":
+                self.utility_monitor.forces.step[-NUM_TANGENT_LINK:] = message["steps"]
+
+            elif name == "axialEncoderPositions":
+                forces = self.utility_monitor.get_forces()
+
+                # The received unit is um instead of mm.
+                position = message["position"]
+                forces.position_in_mm[:num_axial] = [value * 1e-3 for value in position]
+
+                self.utility_monitor.update_forces(forces)
+
+            elif name == "tangentEncoderPositions":
+                forces = self.utility_monitor.get_forces()
+
+                # The received unit is um instead of mm.
+                position = message["position"]
+                forces.position_in_mm[-NUM_TANGENT_LINK:] = [
+                    value * 1e-3 for value in position
+                ]
+
+                self.utility_monitor.update_forces(forces)
+
+            elif name == "displacementSensors":
+                self.utility_monitor.update_displacements(
+                    DisplacementSensorDirection.Theta, message["thetaZ"]
+                )
+                self.utility_monitor.update_displacements(
+                    DisplacementSensorDirection.Delta, message["deltaZ"]
+                )
+
+            elif name == "powerStatus":
+                self.utility_monitor.update_power_calibrated(
+                    PowerType.Motor, message["motorVoltage"], message["motorCurrent"]
+                )
+                self.utility_monitor.update_power_calibrated(
+                    PowerType.Communication,
+                    message["commVoltage"],
+                    message["commCurrent"],
+                )
+
+            # Ignore these messages because they are specific to CSC
+            elif name in (
+                "forceBalance",
+                "ilcData",
+                "netForcesTotal",
+                "netMomentsTotal",
+                "positionIMS",
+            ):
+                pass
+
+            else:
+                self.log.warning(f"Unspecified telemetry message: {name}, ignoring...")
 
     async def _connection_monitor_loop(self, period=1):
         """Actively monitor the connection status from component. Disconnect
@@ -889,3 +1206,13 @@ class Model(object):
                 self.log.debug("Timed out waiting for the loop to finish. Canceling.")
 
                 task.cancel()
+
+    async def __aenter__(self):
+        """This is an overridden function to support the asynchronous context
+        manager."""
+        return self
+
+    async def __aexit__(self, type, value, traceback):
+        """This is an overridden function to support the asynchronous context
+        manager."""
+        await self.close_tasks()

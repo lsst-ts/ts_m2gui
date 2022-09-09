@@ -291,7 +291,7 @@ class TabAlarmWarn(TabDefault):
 
         self._text_error_cause.clear()
 
-        self.model.reset_errors()
+        await run_command(self.model.reset_errors)
 
     @asyncSlot()
     async def _callback_enable_open_loop_max_limit(self):

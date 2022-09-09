@@ -48,6 +48,7 @@ from .utils import (
     prompt_dialog_warning,
     run_command,
     get_button_action,
+    is_jenkins,
 )
 from .signals import (
     SignalControl,

@@ -131,7 +131,7 @@ class TabRigidBodyPos(TabDefault):
     async def _callback_save_position(self):
         """Callback of the save-position button. This will save the current
         position to a file."""
-        self.model.save_position()
+        await run_command(self.model.save_position)
 
     @asyncSlot()
     async def _callback_go_to_home(self):
@@ -143,7 +143,7 @@ class TabRigidBodyPos(TabDefault):
     async def _callback_set_home(self):
         """Callback of the set-home button. This will set the new home position
         of M2."""
-        self.model.set_home()
+        await run_command(self.model.set_home)
 
     @asyncSlot()
     async def _callback_jog(self):

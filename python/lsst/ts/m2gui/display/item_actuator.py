@@ -21,7 +21,6 @@
 
 __all__ = ["ItemActuator"]
 
-import numpy as np
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPen
 from PySide2.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem
@@ -53,10 +52,6 @@ class ItemActuator(QGraphicsEllipseItem):
     label_id : `PySide2.QtWidgets.QGraphicsTextItem`
         Label of the actuator ID.
     """
-
-    # Maximum of the magnitude to decide the color of actuator on the mirror's
-    # view
-    MAX_MAGNITUDE = 700
 
     def __init__(self, x, y, diameter, actuator_id, alias, point_size):
         super().__init__(x, y, diameter, diameter)
@@ -120,7 +115,7 @@ class ItemActuator(QGraphicsEllipseItem):
         else:
             self.label_id.setPlainText(str(self._acutator_id))
 
-    def update_magnitude(self, magnitude):
+    def update_magnitude(self, magnitude, magnitude_min, magnitude_max):
         """Update the magnitude. This will update the color of actuator on the
         mirror's view. If the magnitude is out of range, the limit of range
         will be used to show the color of magnitude on the view of mirror.
@@ -129,20 +124,33 @@ class ItemActuator(QGraphicsEllipseItem):
         ----------
         magnitude : `float`
             Magnitude.
+        magnitude_min : `float`
+            Minimal magnitude in gauge.
+        magnitude_max : `float`
+            Maximal magnitude in gauge.
+
+        Raises
+        ------
+        `ValueError`
+            If minimum magnitude >= maximum magnitude.
         """
+
+        if magnitude_min >= magnitude_max:
+            raise ValueError("Minimum magnitude should be less than maximum magnitude.")
 
         self._magnitude = magnitude
 
         # If the magnitude is out of range, use the limit of range instead
         # to decide the color to show
-        magnitude_color = (
-            magnitude
-            if abs(magnitude) <= self.MAX_MAGNITUDE
-            else np.sign(magnitude) * self.MAX_MAGNITUDE
-        )
+        if magnitude > magnitude_max:
+            magnitude_color = magnitude_max
+        elif magnitude < magnitude_min:
+            magnitude_color = magnitude_min
+        else:
+            magnitude_color = magnitude
 
-        magnitude_ratio = (
-            (magnitude_color + self.MAX_MAGNITUDE) / self.MAX_MAGNITUDE / 2
+        magnitude_ratio = (magnitude_color - magnitude_min) / (
+            magnitude_max - magnitude_min
         )
 
         self.setBrush(Gauge.get_color(magnitude_ratio))

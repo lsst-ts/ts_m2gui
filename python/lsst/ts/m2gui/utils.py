@@ -29,10 +29,12 @@ __all__ = [
     "prompt_dialog_warning",
     "run_command",
     "get_button_action",
+    "is_jenkins",
 ]
 
 import asyncio
 from functools import partial
+from os import getenv
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
@@ -266,7 +268,7 @@ async def prompt_dialog_warning(title, description, is_prompted=True):
         await dialog.show()
 
 
-async def run_command(command, *args, is_prompted=True):
+async def run_command(command, *args, is_prompted=True, **kwargs):
     """Run the command, which can be a normal function or a coroutine.
 
     If the command fails and is_prompted is True, a dialog to warn the users
@@ -281,6 +283,8 @@ async def run_command(command, *args, is_prompted=True):
     is_prompted : `bool`, optional
         When False, dialog will not be executed. That is used for tests, which
         shall not be the case when used in the real GUI. (the default is True)
+    **kwargs : `dict`, optional
+        Additional keyword arguments to run the command.
 
     Returns
     -------
@@ -291,9 +295,9 @@ async def run_command(command, *args, is_prompted=True):
     is_coroutine = asyncio.iscoroutine(command) or asyncio.iscoroutinefunction(command)
     try:
         if is_coroutine:
-            await command(*args)
+            await command(*args, **kwargs)
         else:
-            command(*args)
+            command(*args, **kwargs)
     except Exception as error:
         await prompt_dialog_warning(
             f"{command.__name__}()", str(error), is_prompted=is_prompted
@@ -326,3 +330,14 @@ def get_button_action(tool_bar, name):
             return tool_bar.widgetForAction(action)
 
     return None
+
+
+def is_jenkins():
+    """The running environment is Jenkins or not.
+
+    Returns
+    -------
+    `bool`
+        True if running on Jenkins. Otherwise, False.
+    """
+    return getenv("JOB_NAME") is not None

@@ -21,11 +21,12 @@
 
 __all__ = ["LayoutLocalMode"]
 
+from lsst.ts import salobj
 from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
-from ..utils import set_button
+from ..utils import run_command, set_button
 from . import LayoutDefault
 
 
@@ -78,7 +79,7 @@ class LayoutLocalMode(LayoutDefault):
         if local_mode == LocalMode.Standby:
             self._button_standby.setEnabled(False)
             self._button_diagnostic.setEnabled(True)
-            self._button_enable.setEnabled(True)
+            self._button_enable.setEnabled(False)
 
         elif local_mode == LocalMode.Diagnostic:
             self._button_standby.setEnabled(True)
@@ -86,7 +87,7 @@ class LayoutLocalMode(LayoutDefault):
             self._button_enable.setEnabled(True)
 
         elif local_mode == LocalMode.Enable:
-            self._button_standby.setEnabled(True)
+            self._button_standby.setEnabled(False)
             self._button_diagnostic.setEnabled(True)
             self._button_enable.setEnabled(False)
 
@@ -123,29 +124,38 @@ class LayoutLocalMode(LayoutDefault):
     async def _callback_standby(self):
         """Callback of the standby button. The system will transition to the
         standby state."""
-        self.model.disable_open_loop_max_limit()
-        self.set_local_mode(LocalMode.Standby)
+
+        is_successful = await self.set_local_mode(LocalMode.Standby)
+        if is_successful:
+            self.model.disable_open_loop_max_limit()
 
     @asyncSlot()
     async def _callback_diagnostic(self):
         """Callback of the diagnostic button. The system will transition to the
         diagnostic state."""
-        self.model.disable_open_loop_max_limit()
-        self.set_local_mode(LocalMode.Diagnostic)
+
+        is_successful = await self.set_local_mode(LocalMode.Diagnostic)
+        if is_successful:
+            self.model.disable_open_loop_max_limit()
 
     @asyncSlot()
     async def _callback_enable(self):
         """Callback of the enable button. The system will transition to the
         enable state."""
-        self.set_local_mode(LocalMode.Enable)
+        await self.set_local_mode(LocalMode.Enable)
 
-    def set_local_mode(self, local_mode):
+    async def set_local_mode(self, local_mode):
         """Set the local mode.
 
         Parameters
         ----------
-        local_mode : `LocalMode`
+        local_mode : enum `LocalMode`
             Local mode.
+
+        Returns
+        -------
+        `bool`
+            True if the command succeeds. Otherwise, False.
 
         Raises
         ------
@@ -153,5 +163,22 @@ class LayoutLocalMode(LayoutDefault):
             If the input local mode is not supported.
         """
 
-        self.model.local_mode = local_mode
-        self.model.report_control_status()
+        if local_mode == LocalMode.Standby:
+            command = "standby"
+            controller_state_expected = salobj.State.STANDBY
+
+        elif local_mode == LocalMode.Diagnostic:
+            command = (
+                "start" if self.model.local_mode == LocalMode.Standby else "disable"
+            )
+            controller_state_expected = salobj.State.DISABLED
+
+        elif local_mode == LocalMode.Enable:
+            command = "enable"
+            controller_state_expected = salobj.State.ENABLED
+
+        return await run_command(
+            self.model.controller.write_command_to_server,
+            command,
+            controller_state_expected=controller_state_expected,
+        )

@@ -25,7 +25,7 @@ from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
-from ..utils import set_button
+from ..utils import run_command, set_button
 from . import LayoutDefault
 
 
@@ -94,16 +94,16 @@ class LayoutControlMode(LayoutDefault):
     async def _callback_open_loop(self):
         """Callback of the open-loop button. The system will turn off the force
         balance system."""
-        self.switch_force_balance_system(False)
+        await self.switch_force_balance_system(False)
 
     @asyncSlot()
     async def _callback_closed_loop(self):
         """Callback of the closed-loop button. The system will turn off the
         force balance system."""
         self.model.disable_open_loop_max_limit()
-        self.switch_force_balance_system(True)
+        await self.switch_force_balance_system(True)
 
-    def switch_force_balance_system(self, status):
+    async def switch_force_balance_system(self, status):
         """Switch the force balance system.
 
         Parameters
@@ -112,6 +112,8 @@ class LayoutControlMode(LayoutDefault):
             True if turn on the force balance system, which means the system is
             going to do the closed-loop control. Otherwise, False.
         """
-
-        self.model.is_closed_loop = status
-        self.model.report_control_status()
+        await run_command(
+            self.model.controller.write_command_to_server,
+            "switchForceBalanceSystem",
+            message_details={"status": status},
+        )

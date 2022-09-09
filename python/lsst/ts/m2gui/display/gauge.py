@@ -35,6 +35,13 @@ class Gauge(QWidget):
         Minimal magnitude in gauge.
     magnitude_max : `float` or `int`
         Maximal magnitude in gauge.
+
+    Attributes
+    ----------
+    min : `float` or `int`
+        Minimum of the gauge.
+    max : `float` or `int`
+        Maximum of the gauge.
     """
 
     # Minimum size of widget
@@ -46,8 +53,8 @@ class Gauge(QWidget):
         # These two new attributes decide the color range in this class. The
         # following self.set_magnitude_range() will check the inputs are
         # reasonable or not.
-        self._min = 0
-        self._max = 0
+        self.min = 0
+        self.max = 0
         self.set_magnitude_range(magnitude_min, magnitude_max)
 
         self.setMinimumSize(self.MIN_SIZE, self.MIN_SIZE)
@@ -73,8 +80,8 @@ class Gauge(QWidget):
         if magnitude_min >= magnitude_max:
             raise ValueError("Minimum magnitude should be less than maximum magnitude.")
 
-        self._min = magnitude_min
-        self._max = magnitude_max
+        self.min = magnitude_min
+        self.max = magnitude_max
 
         self.update()
 
@@ -116,7 +123,7 @@ class Gauge(QWidget):
             self.width() - width,
             offset,
             Qt.AlignCenter,
-            format_text.format(self._max),
+            format_text.format(self.max),
         )
 
         painter.drawText(
@@ -125,7 +132,7 @@ class Gauge(QWidget):
             self.width() - width,
             offset,
             Qt.AlignCenter,
-            format_text.format(self._min),
+            format_text.format(self.min),
         )
 
     @staticmethod

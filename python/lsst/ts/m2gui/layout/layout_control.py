@@ -25,7 +25,7 @@ from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
-from ..utils import set_button
+from ..utils import run_command, set_button
 from . import LayoutDefault
 
 
@@ -92,15 +92,15 @@ class LayoutControl(LayoutDefault):
     async def _callback_remote(self):
         """Callback of the remote button. The commander will be the commandable
         SAL component (CSC)"""
-        self.set_csc_commander(True)
+        await self.set_csc_commander(True)
 
     @asyncSlot()
     async def _callback_local(self):
         """Callback of the local button. The commander will be the graphical
         use interface (GUI)."""
-        self.set_csc_commander(False)
+        await self.set_csc_commander(False)
 
-    def set_csc_commander(self, is_commander):
+    async def set_csc_commander(self, is_commander):
         """Set the commandable SAL component (CSC) as the commander.
 
         If CSC is the commander, graphical user interface (GUI) can not
@@ -111,6 +111,8 @@ class LayoutControl(LayoutDefault):
         is_commander : `bool`
             CSC is the commander or not.
         """
-
-        self.model.is_csc_commander = is_commander
-        self.model.report_control_status()
+        await run_command(
+            self.model.controller.write_command_to_server,
+            "switchCommandSource",
+            message_details={"isRemote": is_commander},
+        )

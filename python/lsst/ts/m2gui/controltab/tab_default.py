@@ -115,3 +115,13 @@ class TabDefault(QDockWidget):
             ring_selection.currentIndexChanged.connect(callback_current_index_changed)
 
         return ring_selection
+
+    async def __aenter__(self):
+        """This is an overridden function to support the asynchronous context
+        manager."""
+        return self
+
+    async def __aexit__(self, type, value, traceback):
+        """This is an overridden function to support the asynchronous context
+        manager."""
+        await self.model.close_tasks()

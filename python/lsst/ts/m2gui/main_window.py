@@ -24,6 +24,7 @@ __all__ = ["MainWindow"]
 import logging
 import pathlib
 import sys
+from datetime import datetime
 
 from lsst.ts.m2com import read_yaml_file
 from lsst.ts.tcpip import LOCAL_HOST
@@ -150,18 +151,33 @@ class MainWindow(QMainWindow):
         else:
             log = log.getChild(type(self).__name__)
 
+        logging.basicConfig(
+            filename=self._get_log_file_name(),
+            format=message_format,
+        )
+
         log.addHandler(LogWindowHandler(self._signal_message, message_format))
 
         if is_output_log_on_screen:
-            logging.basicConfig(
-                level=logging.INFO,
-                handlers=[logging.StreamHandler(sys.stdout)],
-                format=message_format,
-            )
+            log.addHandler(logging.StreamHandler(sys.stdout))
 
         log.setLevel(level)
 
         return log
+
+    def _get_log_file_name(self):
+        """Get the log file name.
+
+        Returns
+        -------
+        `pathlib.Path`
+            Log file name.
+        """
+
+        name = "log_%s.txt" % datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+        return (
+            pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "log" / name
+        )
 
     def _set_model(self, is_simulation_mode):
         """Set the model.
@@ -410,6 +426,5 @@ class MainWindow(QMainWindow):
     def _set_default(self):
         """Set the default condition."""
 
-        self._layout_control.set_csc_commander(True)
         self.model.report_config()
         self.model.utility_monitor.report_utility_status()

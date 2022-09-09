@@ -28,7 +28,7 @@ from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import DisplacementSensorDirection, TemperatureGroup
-from ..utils import create_group_box, create_label, set_button
+from ..utils import create_group_box, create_label, run_command, set_button
 from . import TabDefault
 
 
@@ -118,8 +118,17 @@ class TabUtilityView(TabDefault):
     @asyncSlot()
     async def _callback_reset_breakers(self):
         """Callback of the reset-breakers button. This will reset all triggered
-        breakers."""
-        self.model.utility_monitor.reset_breakers()
+        breakers.
+
+        Disable the reset-breakers button, reset the breakers and re-enable the
+        reset-breakers button.
+        """
+
+        self._button_reset_breakers.setEnabled(False)
+
+        await run_command(self.model.reset_breakers)
+
+        self._button_reset_breakers.setEnabled(True)
 
     def _create_labels_sensor_data(self, sensor_data):
         """Create the labels of sensor data.

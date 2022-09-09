@@ -123,7 +123,9 @@ class SignalUtility(QtCore.QObject):
 
     # Digital input/output status as 32/8 bits value. Each bit means different
     # status. 1 means OK (or triggered). Otherwise 0.
-    digital_status_input = QtCore.Signal(int)
+    # Note the input data type needs to be object instead of int, which is 4
+    # bytes by default in QT. Otherwise, it will result in the overflow error.
+    digital_status_input = QtCore.Signal(object)
     digital_status_output = QtCore.Signal(int)
 
 
