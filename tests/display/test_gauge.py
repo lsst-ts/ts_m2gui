@@ -34,8 +34,8 @@ def widget(qtbot):
 
 def test_init(widget):
 
-    assert widget._min == 1
-    assert widget._max == 2
+    assert widget.min == 1
+    assert widget.max == 2
 
 
 def test_set_magnitude_exception(widget):
@@ -51,8 +51,8 @@ def test_set_magnitude_range(widget):
 
     widget.set_magnitude_range(-3, 4)
 
-    assert widget._min == -3
-    assert widget._max == 4
+    assert widget.min == -3
+    assert widget.max == 4
 
 
 def test_get_color():

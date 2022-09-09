@@ -23,6 +23,7 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
 from lsst.ts.m2gui import LocalMode, Model, SignalMessage
 from lsst.ts.m2gui.controltab import TabOverview
 from PySide2.QtCore import Qt
@@ -36,6 +37,17 @@ def widget(qtbot):
     qtbot.addWidget(widget)
 
     return widget
+
+
+@pytest_asyncio.fixture
+async def widget_async(qtbot):
+    async with TabOverview(
+        "Overview", Model(logging.getLogger(), is_simulation_mode=True)
+    ) as widget_sim:
+        qtbot.addWidget(widget_sim)
+
+        await widget_sim.model.connect()
+        yield widget_sim
 
 
 def test_init(qtbot, widget):
@@ -69,6 +81,7 @@ def test_update_control_status(qtbot, widget):
     assert widget._label_local_mode.text() == "Control Loop: Closed-Loop Control"
 
 
+@pytest.mark.asyncio
 async def test_callback_signal_message(qtbot, widget):
 
     assert widget._window_log.toPlainText() == ""
@@ -98,6 +111,7 @@ def test_callback_clear(qtbot, widget):
     assert widget._window_log.toPlainText() == ""
 
 
+@pytest.mark.asyncio
 async def test_callback_signal_status(qtbot, widget):
 
     name = "isTelemetryActive"
@@ -112,26 +126,27 @@ async def test_callback_signal_status(qtbot, widget):
     assert color == Qt.green
 
 
-async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget):
+@pytest.mark.asyncio
+async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget_async):
 
     # Default color
-    assert _get_color_is_alarm_warning_on(widget) == Qt.gray
+    assert _get_color_is_alarm_warning_on(widget_async) == Qt.gray
 
     # There is the error
-    widget.model.add_error(3)
+    widget_async.model.add_error(3)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_alarm_warning_on(widget) == Qt.red
+    assert _get_color_is_alarm_warning_on(widget_async) == Qt.red
 
     # The error is cleared
-    widget.model.reset_errors()
+    await widget_async.model.reset_errors()
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_alarm_warning_on(widget) == Qt.gray
+    assert _get_color_is_alarm_warning_on(widget_async) == Qt.gray
 
 
 def _get_color_is_alarm_warning_on(widget):

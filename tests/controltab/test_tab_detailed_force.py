@@ -36,6 +36,7 @@ def widget(qtbot):
     return widget
 
 
+@pytest.mark.asyncio
 async def test_callback_callback_hard_points(widget):
 
     axial = [1, 2, 3]
@@ -49,13 +50,14 @@ async def test_callback_callback_hard_points(widget):
     assert widget._hard_points["tangent"].text() == str(tangent)
 
 
+@pytest.mark.asyncio
 async def test_callback_callback_forces(widget):
 
     forces = ActuatorForce()
     forces.f_hc[3] = 1.234
     forces.f_cur[5] = 0.2
     forces.f_error[7] = 0.249
-    forces.encoder_count[10] = 123
+    forces.position_in_mm[10] = 123
     forces.step[13] = 34
 
     widget.model.utility_monitor.update_forces(forces)
@@ -66,5 +68,5 @@ async def test_callback_callback_forces(widget):
     assert widget._forces["f_hc"][3].text() == "1.23"
     assert widget._forces["f_cur"][5].text() == "0.20"
     assert widget._forces["f_error"][7].text() == "0.25"
-    assert widget._forces["encoder_count"][10].text() == "123"
+    assert widget._forces["position_in_mm"][10].text() == "123.00"
     assert widget._forces["step"][13].text() == "34"

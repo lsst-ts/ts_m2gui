@@ -20,9 +20,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-from lsst.ts.m2com import PowerType
+from lsst.ts.m2com import DigitalInput, PowerType
 from lsst.ts.m2gui import (
-    ActuatorForce,
     DisplacementSensorDirection,
     ForceErrorTangent,
     TemperatureGroup,
@@ -35,6 +34,12 @@ TIMEOUT = 1000
 @pytest.fixture
 def utility_monitor():
     return UtilityMonitor()
+
+
+def test_get_forces(utility_monitor):
+
+    forces = utility_monitor.get_forces()
+    assert id(forces) != id(utility_monitor.forces)
 
 
 def test_report_utility_status(qtbot, utility_monitor):
@@ -279,6 +284,24 @@ def test_update_digital_status_input(qtbot, utility_monitor):
         utility_monitor.update_digital_status_input(new_status)
 
 
+def test_process_digital_status_input(utility_monitor):
+
+    value = (
+        DigitalInput.J1_W9_1_MotorPowerBreaker.value
+        + DigitalInput.InterlockPowerReplay.value
+    )
+
+    value_update = utility_monitor._process_digital_status_input(value)
+
+    assert value_update & DigitalInput.J1_W9_1_MotorPowerBreaker.value == 0
+    assert value_update & DigitalInput.InterlockPowerReplay.value == 0
+
+    assert (
+        value_update & DigitalInput.J2_W10_3_MotorPowerBreaker.value
+        == DigitalInput.J2_W10_3_MotorPowerBreaker.value
+    )
+
+
 def test_update_digital_status_output(qtbot, utility_monitor):
 
     # There is an update
@@ -313,25 +336,33 @@ def test_update_hard_points_exception(utility_monitor):
         utility_monitor.update_hard_points([1], [2])
 
 
+def test_update_forces_exception(utility_monitor):
+
+    with pytest.raises(ValueError):
+        utility_monitor.update_forces(utility_monitor.forces)
+
+
 def test_update_forces(qtbot, utility_monitor):
 
     # Current force is changed
-    actuator_force = ActuatorForce()
+    actuator_force = utility_monitor.get_forces()
     actuator_force.f_cur[1] = 100
 
     signal = utility_monitor.signal_detailed_force.forces
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
         utility_monitor.update_forces(actuator_force)
 
-    assert id(utility_monitor.forces) != id(actuator_force)
+    assert id(utility_monitor.forces) == id(actuator_force)
     assert utility_monitor.forces.f_cur == actuator_force.f_cur
 
     # There should be no change
+    actuator_force = utility_monitor.get_forces()
     actuator_force.f_cur[1] = 100.001
     with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
         utility_monitor.update_forces(actuator_force)
 
     # Current position is changed
+    actuator_force = utility_monitor.get_forces()
     actuator_force.position_in_mm[1] = 100
 
     signal = utility_monitor.signal_detailed_force.forces

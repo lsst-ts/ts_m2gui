@@ -36,6 +36,7 @@ def widget(qtbot):
     return widget
 
 
+@pytest.mark.asyncio
 async def test_callback_signal_config(qtbot, widget):
 
     widget.model.report_config(

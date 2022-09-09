@@ -23,31 +23,43 @@ import asyncio
 import logging
 
 import pytest
-from lsst.ts.m2gui import LocalMode, Model
+import pytest_asyncio
+from lsst.ts.m2gui import LocalMode, Model, is_jenkins
+from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutControl
 from PySide2 import QtCore
-from PySide2.QtWidgets import QWidget
 
 
-class MockWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+class MockWidget(TabDefault):
+    def __init__(self, title, model):
+        super().__init__(title, model)
 
-        model = Model(logging.getLogger())
-        self.layout_control = LayoutControl(model)
+        self.layout_control = LayoutControl(self.model)
 
-        self.setLayout(self.layout_control.layout)
+        self.widget().setLayout(self.layout_control.layout)
 
 
 @pytest.fixture
 def widget(qtbot):
 
-    widget = MockWidget()
+    widget = MockWidget("Mock", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
     return widget
 
 
+@pytest_asyncio.fixture
+async def widget_async(qtbot):
+    async with MockWidget(
+        "Mock", Model(logging.getLogger(), is_simulation_mode=True)
+    ) as widget_sim:
+        qtbot.addWidget(widget_sim)
+
+        await widget_sim.model.connect()
+        yield widget_sim
+
+
+@pytest.mark.asyncio
 async def test_callback_signal_control_normal(qtbot, widget):
     widget.layout_control.model.report_control_status()
 
@@ -58,6 +70,7 @@ async def test_callback_signal_control_normal(qtbot, widget):
     assert widget.layout_control._button_local.isEnabled() is False
 
 
+@pytest.mark.asyncio
 async def test_callback_signal_control_prohibit_control(qtbot, widget):
     widget.layout_control.model.local_mode = LocalMode.Diagnostic
 
@@ -70,30 +83,33 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
     assert widget.layout_control._button_local.isEnabled() is False
 
 
-async def test_set_csc_commander(qtbot, widget):
-    widget.layout_control.set_csc_commander(True)
+@pytest.mark.skipif(
+    is_jenkins(), reason="Jenkins failed to initiate the context manager."
+)
+@pytest.mark.asyncio
+async def test_set_csc_commander(qtbot, widget_async):
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget.layout_control.model.is_csc_commander is True
-    assert widget.layout_control._button_remote.isEnabled() is False
-    assert widget.layout_control._button_local.isEnabled() is True
+    assert widget_async.model.is_csc_commander is True
+    assert widget_async.layout_control._button_remote.isEnabled() is False
+    assert widget_async.layout_control._button_local.isEnabled() is True
 
-    qtbot.mouseClick(widget.layout_control._button_local, QtCore.Qt.LeftButton)
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
-
-    assert widget.layout_control.model.is_csc_commander is False
-    assert widget.layout_control._button_remote.isEnabled() is True
-    assert widget.layout_control._button_local.isEnabled() is False
-
-    qtbot.mouseClick(widget.layout_control._button_remote, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(widget_async.layout_control._button_local, QtCore.Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget.layout_control.model.is_csc_commander is True
-    assert widget.layout_control._button_remote.isEnabled() is False
-    assert widget.layout_control._button_local.isEnabled() is True
+    assert widget_async.model.is_csc_commander is False
+    assert widget_async.layout_control._button_remote.isEnabled() is True
+    assert widget_async.layout_control._button_local.isEnabled() is False
+
+    qtbot.mouseClick(widget_async.layout_control._button_remote, QtCore.Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget_async.model.is_csc_commander is True
+    assert widget_async.layout_control._button_remote.isEnabled() is False
+    assert widget_async.layout_control._button_local.isEnabled() is True

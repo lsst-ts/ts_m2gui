@@ -87,6 +87,7 @@ def test_flag(qtbot, widget):
     assert control_tab.isVisible() is False
 
 
+@pytest.mark.asyncio
 async def test_show(qtbot, widget):
 
     names = [

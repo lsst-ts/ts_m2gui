@@ -74,6 +74,7 @@ def test_get_action(widget):
     assert button_wrong_action is None
 
 
+@pytest.mark.asyncio
 async def test_callback_settings(qtbot, widget):
 
     assert widget._tab_settings.isVisible() is False

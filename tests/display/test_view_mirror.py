@@ -67,16 +67,26 @@ def test_item_actuator(widget):
     assert actuator.label_id.y() == actuator.rect().y()
 
 
+def test_item_actuator_update_magnitude_exception(widget):
+
+    actuator = widget.actuators[0]
+    with pytest.raises(ValueError):
+        actuator.update_magnitude(0, 1, 1)
+
+    with pytest.raises(ValueError):
+        actuator.update_magnitude(0, 1, -1)
+
+
 def test_item_actuator_update_magnitude(widget):
 
     actuator = widget.actuators[0]
 
-    actuator.update_magnitude(0)
+    actuator.update_magnitude(0, -700, 700)
     assert actuator.brush().color().hue() == 150
 
     # Test the magnitude is out of range
-    actuator.update_magnitude(actuator.MAX_MAGNITUDE + 1)
+    actuator.update_magnitude(750, -700, 700)
     assert actuator.brush().color().hue() == 60
 
-    actuator.update_magnitude(-actuator.MAX_MAGNITUDE - 1)
+    actuator.update_magnitude(-750, -700, 700)
     assert actuator.brush().color().hue() == 240

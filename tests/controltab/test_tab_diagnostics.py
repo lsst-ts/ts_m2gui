@@ -39,6 +39,7 @@ def widget(qtbot):
     return widget
 
 
+@pytest.mark.asyncio
 async def test_callback_control_digital_status(qtbot, widget):
 
     widget.model.local_mode = LocalMode.Diagnostic
@@ -56,6 +57,7 @@ async def test_callback_control_digital_status(qtbot, widget):
     assert control.text() == "ON"
 
 
+@pytest.mark.asyncio
 async def test_callback_power_motor_calibrated(widget):
 
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
@@ -67,6 +69,7 @@ async def test_callback_power_motor_calibrated(widget):
     assert widget._power_calibrated["power_current_motor"].text() == "0.2 A"
 
 
+@pytest.mark.asyncio
 async def test_callback_power_communication_calibrated(widget):
 
     widget.model.utility_monitor.update_power_calibrated(
@@ -80,6 +83,7 @@ async def test_callback_power_communication_calibrated(widget):
     assert widget._power_calibrated["power_current_communication"].text() == "0.4 A"
 
 
+@pytest.mark.asyncio
 async def test_callback_power_motor_raw(widget):
 
     widget.model.utility_monitor.update_power_raw(PowerType.Motor, 0.5, 0.6)
@@ -91,6 +95,7 @@ async def test_callback_power_motor_raw(widget):
     assert widget._power_raw["power_current_motor"].text() == "0.6 A"
 
 
+@pytest.mark.asyncio
 async def test_callback_power_communication_raw(widget):
 
     widget.model.utility_monitor.update_power_raw(PowerType.Communication, 0.7, 0.8)
@@ -102,6 +107,7 @@ async def test_callback_power_communication_raw(widget):
     assert widget._power_raw["power_current_communication"].text() == "0.8 A"
 
 
+@pytest.mark.asyncio
 async def test_callback_digital_status_input(widget):
 
     widget.model.utility_monitor.update_digital_status_input(3)
@@ -120,6 +126,7 @@ def _assert_indicator_color(indicator, target_color):
     assert palette.color(QPalette.Button) == target_color
 
 
+@pytest.mark.asyncio
 async def test_callback_digital_status_output(widget):
 
     widget.model.utility_monitor.update_digital_status_output(6)
@@ -143,6 +150,7 @@ async def test_callback_digital_status_output(widget):
     assert widget._digital_status_control[3].text() == "OFF"
 
 
+@pytest.mark.asyncio
 async def test_callback_force_error_tangent(widget):
 
     force_error_tangent = ForceErrorTangent()
