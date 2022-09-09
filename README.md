@@ -73,6 +73,7 @@ You may need to setup the **PYTHONPATH** to point to `python/` directory as well
 
 The executable (`run_m2gui`) is under the `bin/` directory.
 Use the argument of `-h` to know the available options.
+The logged message will be under the `log/` directory.
 
 The environment variable **TS_CONFIG_MTTCS_DIR** specifies [ts_config_mttcs](https://github.com/lsst-ts/ts_config_mttcs) directory for GUI started in the simulation mode.
 
