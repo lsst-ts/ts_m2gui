@@ -133,3 +133,6 @@ dmypy.json
 
 # Mac metadata
 .DS_Store
+
+# Directory
+log/
