@@ -25,7 +25,7 @@ import re
 from copy import deepcopy
 
 import numpy as np
-from lsst.ts.m2com import PowerType
+from lsst.ts.m2com import DigitalInput, PowerType
 
 from . import (
     ActuatorForce,
@@ -186,6 +186,16 @@ class UtilityMonitor(object):
         """
 
         return {"voltage": 0, "current": 0}
+
+    def get_forces(self):
+        """Get the forces.
+
+        Parameters
+        ----------
+        `ActuatorForce`
+            Detailed actuator forces as a new copy of internal data.
+        """
+        return deepcopy(self.forces)
 
     def report_utility_status(self):
         """Report the utility status."""
@@ -583,7 +593,32 @@ class UtilityMonitor(object):
 
         if self.digital_status_input != new_status:
             self.digital_status_input = int(new_status)
-            self.signal_utility.digital_status_input.emit(self.digital_status_input)
+
+            value_update = self._process_digital_status_input(new_status)
+            self.signal_utility.digital_status_input.emit(value_update)
+
+    def _process_digital_status_input(self, value):
+        """Process the digital input status.
+
+        This is based on the Model.processPowerStatusTelemetry.vi in ts_mtm2.
+
+        Parameters
+        ----------
+        value : `int`
+            Value.
+
+        Returns
+        -------
+        value_update : `int`
+            Updated value.
+        """
+
+        value_update = value
+        for item in DigitalInput:
+            if ("PowerBreaker" in item.name) or ("PowerReplay" in item.name):
+                value_update = value_update ^ item.value
+
+        return value_update
 
     def update_digital_status_output(self, new_status):
         """Update the digital output status (8 bits).
@@ -635,7 +670,15 @@ class UtilityMonitor(object):
         ----------
         actuator_force : `ActuatorForce`
             Actuator force.
+
+        Raises
+        ------
+        `ValueError`
+            When the input is the same object of self.forces.
         """
+
+        if id(actuator_force) == id(self.forces):
+            raise ValueError("Input cannot be the same object of self.forces.")
 
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
         if self._has_changed(
@@ -645,9 +688,7 @@ class UtilityMonitor(object):
             np.array(actuator_force.position_in_mm),
             tol,
         ):
-            # Use the deepcopy() here to make sure the above comparison can
-            # always work
-            self.forces = deepcopy(actuator_force)
+            self.forces = actuator_force
             self.signal_detailed_force.forces.emit(self.forces)
 
     def update_force_error_tangent(self, force_error_tangent):

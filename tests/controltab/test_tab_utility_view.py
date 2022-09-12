@@ -51,6 +51,7 @@ def test_callback_reset_breakers(qtbot, widget):
     assert color == Qt.green
 
 
+@pytest.mark.asyncio
 async def test_callback_power_motor(qtbot, widget):
 
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
@@ -62,6 +63,7 @@ async def test_callback_power_motor(qtbot, widget):
     assert widget._power_inclinometer["power_current_motor"].text() == "0.2 A"
 
 
+@pytest.mark.asyncio
 async def test_callback_power_communication(qtbot, widget):
 
     widget.model.utility_monitor.update_power_calibrated(
@@ -75,6 +77,7 @@ async def test_callback_power_communication(qtbot, widget):
     assert widget._power_inclinometer["power_current_communication"].text() == "0.2 A"
 
 
+@pytest.mark.asyncio
 async def test_callback_inclinometer(qtbot, widget):
 
     widget.model.utility_monitor.update_inclinometer_angle(0.1)
@@ -85,6 +88,7 @@ async def test_callback_inclinometer(qtbot, widget):
     assert widget._power_inclinometer["inclinometer"].text() == "0.1 degree"
 
 
+@pytest.mark.asyncio
 async def test_callback_breakers(qtbot, widget):
 
     name = "J1-W9-3"
@@ -98,6 +102,7 @@ async def test_callback_breakers(qtbot, widget):
     assert color == Qt.red
 
 
+@pytest.mark.asyncio
 async def test_callback_temperatures(qtbot, widget):
 
     temperature_group = TemperatureGroup.LG3
@@ -114,6 +119,7 @@ async def test_callback_temperatures(qtbot, widget):
         assert widget._temperatures[sensor].text() == f"{temperature} degree C"
 
 
+@pytest.mark.asyncio
 async def test_callback_displacements(qtbot, widget):
 
     direction = DisplacementSensorDirection.Delta

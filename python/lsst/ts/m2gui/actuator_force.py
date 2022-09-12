@@ -35,20 +35,11 @@ class ActuatorForce:
     # The unit of force is Newton.
 
     # Force component in the calculation of gravity LUT.
-    f_e: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_0: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_a: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_f: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_gravity: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
     f_delta: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Force component in the calculation of temperature LUT.
-    t_u: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    t_x: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    t_y: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    t_r: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-
-    # Commanded force
-    f_cmd: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_temperature: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Current force
     f_cur: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
@@ -58,9 +49,6 @@ class ActuatorForce:
 
     # Force error
     f_error: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-
-    # Count of the encoder. The data type should be integer.
-    encoder_count: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Step of motor. The data type should be integer.
     step: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)

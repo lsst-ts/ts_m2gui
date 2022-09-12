@@ -23,6 +23,8 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
+from lsst.ts import salobj
 from lsst.ts.m2com import ActuatorDisplacementUnit
 from lsst.ts.m2gui import ActuatorForce, LocalMode, Model
 from lsst.ts.m2gui.controltab import TabActuatorControl
@@ -38,6 +40,17 @@ def widget(qtbot):
     return widget
 
 
+@pytest_asyncio.fixture
+async def widget_async(qtbot):
+    async with TabActuatorControl(
+        "Actuator Control", Model(logging.getLogger(), is_simulation_mode=True)
+    ) as widget_sim:
+        qtbot.addWidget(widget_sim)
+
+        await widget_sim.model.connect()
+        yield widget_sim
+
+
 def test_init(widget):
 
     progress = widget._info_script["progress"]
@@ -47,28 +60,41 @@ def test_init(widget):
     assert progress.isTextVisible() is True
 
 
-async def test_callback_script_load_script(widget):
+@pytest.mark.asyncio
+async def test_callback_script_load_script(widget_async):
 
-    widget.model.local_mode = LocalMode.Enable
+    await _transition_to_enable_state(widget_async)
 
     file_name = "/a/b/c"
-    name = await widget._callback_script_load_script(file_name=file_name)
+    name = await widget_async._callback_script_load_script(file_name=file_name)
 
     assert name == "c"
-    assert widget._info_script["file"].text() == file_name
+    assert widget_async._info_script["file"].text() == file_name
 
 
-def test_callback_script_command(qtbot, widget):
+async def _transition_to_enable_state(widget_async):
 
-    widget.model.local_mode = LocalMode.Enable
+    controller = widget_async.model.controller
+    await controller.write_command_to_server(
+        "start", controller_state_expected=salobj.State.DISABLED
+    )
+    await controller.write_command_to_server(
+        "enable", controller_state_expected=salobj.State.ENABLED
+    )
 
-    widget._callback_script_load_script(file_name="/a/b/c")
-    widget.model.report_script_progress(30)
 
-    qtbot.mouseClick(widget._buttons_script["clear"], Qt.LeftButton)
+@pytest.mark.asyncio
+async def test_callback_script_command(qtbot, widget_async):
 
-    assert widget._info_script["file"].text() == ""
-    assert widget._info_script["progress"].value() == 0
+    await _transition_to_enable_state(widget_async)
+
+    widget_async._callback_script_load_script(file_name="/a/b/c")
+    widget_async.model.report_script_progress(30)
+
+    qtbot.mouseClick(widget_async._buttons_script["clear"], Qt.LeftButton)
+
+    assert widget_async._info_script["file"].text() == ""
+    assert widget_async._info_script["progress"].value() == 0
 
 
 def test_set_target_displacement(widget):
@@ -102,6 +128,7 @@ def test_set_target_displacement_exception(widget):
         widget._set_target_displacement("Wrong Unit")
 
 
+@pytest.mark.asyncio
 async def test_callback_selection_changed(widget):
 
     assert (
@@ -119,6 +146,7 @@ async def test_callback_selection_changed(widget):
     assert widget._target_displacement.decimals() == 0
 
 
+@pytest.mark.asyncio
 async def test_callback_select_ring(qtbot, widget):
 
     qtbot.mouseClick(
@@ -136,6 +164,7 @@ async def test_callback_select_ring(qtbot, widget):
             assert button.isChecked() is False
 
 
+@pytest.mark.asyncio
 async def test_callback_clear_all(qtbot, widget):
 
     # Select an actuator
@@ -158,13 +187,22 @@ async def test_callback_clear_all(qtbot, widget):
     assert widget._buttons_actuator_selection[idx].isChecked() is False
 
 
-async def test_callback_actuator_start(qtbot, widget):
+@pytest.mark.asyncio
+async def test_callback_actuator_start(qtbot, widget_async):
+
+    # Transition to the enabled state with the open-loop control
+    await _transition_to_enable_state(widget_async)
+
+    controller = widget_async.model.controller
+    await controller.write_command_to_server(
+        "switchForceBalanceSystem", message_details={"status": False}
+    )
 
     # Select the actuators
     selected_actuators = [0, 1, 3, 7, 76, 77]
     for selected_actuator in selected_actuators:
         qtbot.mouseClick(
-            widget._buttons_actuator_selection[selected_actuator], Qt.LeftButton
+            widget_async._buttons_actuator_selection[selected_actuator], Qt.LeftButton
         )
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -173,24 +211,28 @@ async def test_callback_actuator_start(qtbot, widget):
     # Change the unit
     # Index begins from 0 instead of 1 in QComboBox
     index_step_unit = ActuatorDisplacementUnit.Step.value - 1
-    widget._displacement_unit_selection.setCurrentIndex(index_step_unit)
+    widget_async._displacement_unit_selection.setCurrentIndex(index_step_unit)
 
     # Change the displacement
-    widget._target_displacement.setValue(10)
+    widget_async._target_displacement.setValue(10)
 
     # Start the movement
-    widget.model.local_mode = LocalMode.Enable
+    widget_async.model.local_mode = LocalMode.Enable
     (
         actuators,
         target_displacement,
         displacement_unit,
-    ) = await widget._callback_actuator_start()
+    ) = await widget_async._callback_actuator_start()
 
     assert actuators == selected_actuators
-    assert target_displacement == widget._target_displacement.value()
+    assert target_displacement == widget_async._target_displacement.value()
     assert displacement_unit == ActuatorDisplacementUnit.Step
 
+    # Sleep sometime to let the movement to be done
+    await asyncio.sleep(10)
 
+
+@pytest.mark.asyncio
 async def test_callback_progress(widget):
 
     progress = 20
@@ -202,6 +244,7 @@ async def test_callback_progress(widget):
     assert widget._info_script["progress"].value() == progress
 
 
+@pytest.mark.asyncio
 async def test_callback_forces(widget):
 
     actuator_force = ActuatorForce()
@@ -215,10 +258,10 @@ async def test_callback_forces(widget):
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget._labels_force["axial_min"].text() == "-1"
-    assert widget._labels_force["axial_max"].text() == "2"
-    assert widget._labels_force["axial_total"].text() == "1"
+    assert widget._labels_force["axial_min"].text() == "-1.00"
+    assert widget._labels_force["axial_max"].text() == "2.00"
+    assert widget._labels_force["axial_total"].text() == "1.00"
 
-    assert widget._labels_force["tangent_min"].text() == "-5"
-    assert widget._labels_force["tangent_max"].text() == "3"
-    assert widget._labels_force["tangent_total"].text() == "-2"
+    assert widget._labels_force["tangent_min"].text() == "-5.00"
+    assert widget._labels_force["tangent_max"].text() == "3.00"
+    assert widget._labels_force["tangent_total"].text() == "-2.00"

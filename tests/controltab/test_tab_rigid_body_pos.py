@@ -59,6 +59,7 @@ def test_init(widget):
     )
 
 
+@pytest.mark.asyncio
 async def test_callback_clear_values_relative(qtbot, widget):
 
     for idx, axis in enumerate(widget.AXES):
@@ -73,6 +74,7 @@ async def test_callback_clear_values_relative(qtbot, widget):
         assert position.value() == 0
 
 
+@pytest.mark.asyncio
 async def test_callback_clear_values_absolute(qtbot, widget):
 
     for idx, axis in enumerate(widget.AXES):
@@ -87,6 +89,7 @@ async def test_callback_clear_values_absolute(qtbot, widget):
         assert position.value() == 0
 
 
+@pytest.mark.asyncio
 async def test_callback_position(widget):
 
     widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6)

@@ -20,9 +20,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
+from os import getenv
 
 import pytest
-from lsst.ts.m2gui import Ring, get_num_actuator_ring, get_tol, run_command
+from lsst.ts.m2gui import Ring, get_num_actuator_ring, get_tol, is_jenkins, run_command
 
 
 def command_normal(is_failed):
@@ -56,6 +57,7 @@ def test_get_num_actuator_ring():
         get_num_actuator_ring("WrongRing")
 
 
+@pytest.mark.asyncio
 async def test_run_command(qtbot):
     # Note that we need to add the "qtbot" here as the argument for the event
     # loop or GUI to run
@@ -65,3 +67,11 @@ async def test_run_command(qtbot):
 
     assert await run_command(command_coroutine, False) is True
     assert await run_command(command_coroutine, True, is_prompted=False) is False
+
+
+def test_is_jenkins():
+
+    if getenv("JOB_NAME") is None:
+        assert is_jenkins() is False
+    else:
+        assert is_jenkins() is True

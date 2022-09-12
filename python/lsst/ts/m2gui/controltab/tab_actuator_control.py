@@ -169,7 +169,7 @@ class TabActuatorControl(TabDefault):
             name = file_path.name
 
             is_successful = await run_command(
-                self.model.command_script, CommandScript.LoadScript, name
+                self.model.command_script, CommandScript.LoadScript, script_name=name
             )
 
             if is_successful:
@@ -188,9 +188,9 @@ class TabActuatorControl(TabDefault):
             Script command.
         """
 
-        await run_command(self.model.command_script, command)
+        is_successful = await run_command(self.model.command_script, command)
 
-        if command == CommandScript.Clear:
+        if (command == CommandScript.Clear) and is_successful:
             self._info_script["file"].setText("")
             self._info_script["progress"].setValue(0)
 
@@ -323,9 +323,9 @@ class TabActuatorControl(TabDefault):
         await run_command(
             self.model.command_actuator,
             CommandActuator.Start,
-            actuators,
-            target_displacement,
-            displacement_unit,
+            actuators=actuators,
+            target_displacement=target_displacement,
+            unit=displacement_unit,
         )
 
         return actuators, target_displacement, displacement_unit
@@ -573,10 +573,11 @@ class TabActuatorControl(TabDefault):
         force_axial = force_measured[:-NUM_TANGENT_LINK]
         force_tangent = force_measured[-NUM_TANGENT_LINK:]
 
-        self._labels_force["axial_min"].setText(str(force_axial.min()))
-        self._labels_force["axial_max"].setText(str(force_axial.max()))
-        self._labels_force["axial_total"].setText(str(force_axial.sum()))
+        value_format = "%.2f"
+        self._labels_force["axial_min"].setText(value_format % force_axial.min())
+        self._labels_force["axial_max"].setText(value_format % force_axial.max())
+        self._labels_force["axial_total"].setText(value_format % force_axial.sum())
 
-        self._labels_force["tangent_min"].setText(str(force_tangent.min()))
-        self._labels_force["tangent_max"].setText(str(force_tangent.max()))
-        self._labels_force["tangent_total"].setText(str(force_tangent.sum()))
+        self._labels_force["tangent_min"].setText(value_format % force_tangent.min())
+        self._labels_force["tangent_max"].setText(value_format % force_tangent.max())
+        self._labels_force["tangent_total"].setText(value_format % force_tangent.sum())

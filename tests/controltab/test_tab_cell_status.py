@@ -82,6 +82,7 @@ def test_get_data_selected(widget):
     assert is_displacement is False
 
 
+@pytest.mark.asyncio
 async def test_callback_selection_changed(widget):
 
     # Update the internal holded actuator data
@@ -133,6 +134,7 @@ async def test_callback_selection_changed(widget):
     assert widget._figures["tangent"].axis_y.max() == 1
 
 
+@pytest.mark.asyncio
 async def test_callback_forces(qtbot, widget):
 
     actuator_force = ActuatorForce()

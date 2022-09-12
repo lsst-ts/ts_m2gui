@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.2.0:
+
+-------------
+0.2.0
+-------------
+
+* Support the parts of command, event and telemetry.
+* Support the unit test on TSSW Jenkins instance.
+* Output the logging message to file.
+
 .. _lsst.ts.m2gui-0.1.9:
 
 -------------

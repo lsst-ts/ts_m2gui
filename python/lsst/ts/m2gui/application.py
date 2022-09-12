@@ -93,10 +93,10 @@ async def main(argv):
         ["d", "debuglevel"],
         (
             "Debug logging level: CRITICAL (50), ERROR (40), WARNING (30), "
-            "INFO (20), DEBUG (10), NOTSET (0). The default is 30."
+            "INFO (20), DEBUG (10), NOTSET (0). The default is 20."
         ),
         "level",
-        "30",
+        "20",
     )
     parser.addOption(option_log_level)
 

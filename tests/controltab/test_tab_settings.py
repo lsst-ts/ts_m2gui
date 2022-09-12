@@ -65,6 +65,7 @@ def test_init(widget):
     )
 
 
+@pytest.mark.asyncio
 async def test_callback_apply(qtbot, widget):
 
     widget._settings["host"].setText("newHost")

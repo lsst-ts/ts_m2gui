@@ -22,15 +22,25 @@
 import logging
 
 import pytest
-from lsst.ts.m2com import CommandActuator, CommandScript
+import pytest_asyncio
+from lsst.ts import salobj
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, CommandActuator, CommandScript
 from lsst.ts.m2gui import LimitSwitchType, LocalMode, Model, Ring
 
 TIMEOUT = 1000
+TIMEOUT_LONG = 2000
 
 
 @pytest.fixture
 def model():
     return Model(logging.getLogger())
+
+
+@pytest_asyncio.fixture
+async def model_async():
+    async with Model(logging.getLogger(), is_simulation_mode=True) as model_sim:
+        await model_sim.connect()
+        yield model_sim
 
 
 def test_init(model):
@@ -58,49 +68,53 @@ def test_clear_error(qtbot, model):
     assert model.fault_manager.errors == set()
 
 
-def test_reset_errors(qtbot, model):
+@pytest.mark.asyncio
+async def test_reset_errors(qtbot, model_async):
 
-    model.add_error(3)
-    model.fault_manager.update_limit_switch_status(
+    assert model_async.controller.are_clients_connected() is True
+
+    model_async.add_error(3)
+    model_async.fault_manager.update_limit_switch_status(
         LimitSwitchType.Retract, Ring.B, 2, True
     )
-    model.fault_manager.update_limit_switch_status(
+    model_async.fault_manager.update_limit_switch_status(
         LimitSwitchType.Extend, Ring.C, 3, True
     )
 
     signals = [
-        model.fault_manager.signal_error.error_cleared,
-        model.fault_manager.signal_limit_switch.type_name_status,
-        model.signal_status.name_status,
+        model_async.fault_manager.signal_error.error_cleared,
+        model_async.fault_manager.signal_limit_switch.type_name_status,
+        model_async.signal_status.name_status,
     ]
     with qtbot.waitSignals(signals, timeout=TIMEOUT):
-        model.reset_errors()
+        await model_async.reset_errors()
 
-    assert model.fault_manager.errors == set()
-    assert model.fault_manager.limit_switch_status_retract["B2"] is False
-    assert model.fault_manager.limit_switch_status_extend["C3"] is False
+    assert model_async.fault_manager.errors == set()
+    assert model_async.fault_manager.limit_switch_status_retract["B2"] is False
+    assert model_async.fault_manager.limit_switch_status_extend["C3"] is False
 
 
-def test_enable_open_loop_max_limit(model):
+@pytest.mark.asyncio
+async def test_enable_open_loop_max_limit(model_async):
 
-    # Should fail for the wrong local state
+    # Should fail for the closed-loop control
+    model_async.is_closed_loop = True
     with pytest.raises(RuntimeError):
-        model.enable_open_loop_max_limit()
+        await model_async.enable_open_loop_max_limit()
 
-    assert model.system_status["isOpenLoopMaxLimitsEnabled"] is False
+    assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is False
 
-    # Should succeed for the correct state
-    model.local_mode = LocalMode.Enable
+    # Should succeed for the open-loop control
+    model_async.is_closed_loop = False
 
-    model.enable_open_loop_max_limit()
+    await model_async.enable_open_loop_max_limit()
 
-    assert model.system_status["isOpenLoopMaxLimitsEnabled"] is True
+    assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
 
 def test_disable_open_loop_max_limit(model):
 
-    model.local_mode = LocalMode.Enable
-    model.enable_open_loop_max_limit()
+    model.system_status["isOpenLoopMaxLimitsEnabled"] = True
 
     model.disable_open_loop_max_limit()
 
@@ -167,21 +181,23 @@ def test_is_enabled_and_closed_loop_control(model):
     assert model.is_enabled_and_closed_loop_control() is True
 
 
-def test_go_to_position_exception(model):
+@pytest.mark.asyncio
+async def test_go_to_position_exception(model):
 
     with pytest.raises(RuntimeError):
-        model.go_to_position(0, 0, 0, 0, 0, 0)
+        await model.go_to_position(0, 0, 0, 0, 0, 0)
 
 
-def test_reboot_controller_exception(model):
+@pytest.mark.asyncio
+async def test_reboot_controller_exception(model):
 
     with pytest.raises(RuntimeError):
         model.local_mode = LocalMode.Diagnostic
-        model.reboot_controller()
+        await model.reboot_controller()
 
     with pytest.raises(RuntimeError):
         model.is_csc_commander = True
-        model.reboot_controller()
+        await model.reboot_controller()
 
 
 def test_set_bit_digital_status_exception(model):
@@ -190,20 +206,42 @@ def test_set_bit_digital_status_exception(model):
         model.set_bit_digital_status(0, 1)
 
 
-def test_command_script_exception(model):
+@pytest.mark.asyncio
+async def test_command_script_exception(model):
 
     with pytest.raises(RuntimeError):
-        model.command_script(CommandScript.LoadScript)
+        await model.command_script(CommandScript.LoadScript)
 
 
-def test_command_actuator_exception(model):
+@pytest.mark.asyncio
+async def test_command_actuator_exception(model):
 
     with pytest.raises(RuntimeError):
-        model.command_actuator(CommandActuator.Stop)
+        await model.command_actuator(CommandActuator.Stop)
 
     model.local_mode = LocalMode.Enable
     with pytest.raises(RuntimeError):
-        model.command_actuator(CommandActuator.Start, actuators=[])
+        await model.command_actuator(CommandActuator.Start, actuators=[])
+
+
+@pytest.mark.asyncio
+async def test_reset_breakers(qtbot, model_async):
+
+    # Transition to the Enabled state to power on the motor and communication
+    controller = model_async.controller
+    await controller.write_command_to_server(
+        "start", controller_state_expected=salobj.State.DISABLED
+    )
+    await controller.write_command_to_server(
+        "enable", controller_state_expected=salobj.State.ENABLED
+    )
+
+    model_async.utility_monitor.update_breaker("J1-W9-1", True)
+
+    with qtbot.waitSignal(
+        model_async.utility_monitor.signal_utility.breaker_status, timeout=TIMEOUT_LONG
+    ):
+        await model_async.reset_breakers()
 
 
 def test_update_connection_information(model):
@@ -226,8 +264,186 @@ def test_update_connection_information_exception(model):
         model.update_connection_information("test", 1, 2, 3)
 
 
+@pytest.mark.asyncio
 async def test_connect_exception(model):
 
     model.system_status["isCrioConnected"] = True
     with pytest.raises(RuntimeError):
         await model.connect()
+
+
+def test_process_events(qtbot, model):
+
+    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+        model._process_events({"id": "m2AssemblyInPosition", "inPosition": True})
+
+    with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
+        model._process_events(
+            {"id": "summaryState", "summaryState": salobj.State.DISABLED}
+        )
+    assert model.local_mode == LocalMode.Diagnostic
+
+    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+        model._process_events({"id": "errorCode", "errorCode": 1})
+
+    with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
+        model._process_events({"id": "commandableByDDS", "state": True})
+    assert model.is_csc_commander is True
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_detailed_force.hard_points, timeout=TIMEOUT
+    ):
+        model._process_events({"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]})
+
+    with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
+        model._process_events({"id": "forceBalanceSystemStatus", "status": True})
+    assert model.is_closed_loop is True
+
+    with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
+        model._process_events({"id": "scriptExecutionStatus", "percentage": 1})
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_utility.digital_status_output, timeout=TIMEOUT
+    ):
+        model._process_events({"id": "digitalOutput", "value": 1})
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_utility.digital_status_input, timeout=TIMEOUT
+    ):
+        model._process_events({"id": "digitalInput", "value": 1})
+
+
+def test_get_message_name(model):
+
+    assert model._get_message_name("") == ""
+    assert model._get_message_name(dict()) == ""
+
+    assert model._get_message_name({"id": "test"}) == "test"
+
+
+def test_summary_state_to_local_mode(model):
+
+    assert model._summary_state_to_local_mode(salobj.State.STANDBY) == LocalMode.Standby
+    assert (
+        model._summary_state_to_local_mode(salobj.State.DISABLED)
+        == LocalMode.Diagnostic
+    )
+    assert model._summary_state_to_local_mode(salobj.State.ENABLED) == LocalMode.Enable
+
+    # Check the Fault state
+    assert model._summary_state_to_local_mode(salobj.State.FAULT) == LocalMode.Standby
+
+    model.local_mode = LocalMode.Enable
+    assert (
+        model._summary_state_to_local_mode(salobj.State.FAULT) == LocalMode.Diagnostic
+    )
+
+
+def test_process_telemetry(qtbot, model):
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_position.position, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            {"id": "position", "x": 1, "y": 1, "z": 1, "xRot": 1, "yRot": 1, "zRot": 1}
+        )
+
+    num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            {
+                "id": "axialForce",
+                "lutGravity": [1] * num_axial,
+                "lutTemperature": [1] * num_axial,
+                "applied": [1] * num_axial,
+                "measured": [1] * num_axial,
+                "hardpointCorrection": [1] * num_axial,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            {
+                "id": "tangentForce",
+                "lutGravity": [1] * NUM_TANGENT_LINK,
+                "applied": [1] * NUM_TANGENT_LINK,
+                "measured": [1] * NUM_TANGENT_LINK,
+                "hardpointCorrection": [1] * NUM_TANGENT_LINK,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_utility.temperatures, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            {
+                "id": "temperature",
+                "intake": [1] * 2,
+                "exhaust": [1] * 2,
+                "ring": [1] * 12,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_utility.inclinometer, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            {
+                "id": "zenithAngle",
+                "inclinometerProcessed": 1,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            {
+                "id": "axialEncoderPositions",
+                "position": [10000] * num_axial,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            {
+                "id": "tangentEncoderPositions",
+                "position": [10000] * NUM_TANGENT_LINK,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_utility.displacements, timeout=TIMEOUT
+    ):
+        num_sensor = 6
+        model._process_telemetry(
+            {
+                "id": "displacementSensors",
+                "thetaZ": [1] * num_sensor,
+                "deltaZ": [1] * num_sensor,
+            }
+        )
+
+    with qtbot.waitSignals(
+        [
+            model.utility_monitor.signal_utility.power_motor_calibrated,
+            model.utility_monitor.signal_utility.power_communication_calibrated,
+        ],
+        timeout=TIMEOUT,
+    ):
+        num_sensor = 6
+        model._process_telemetry(
+            {
+                "id": "powerStatus",
+                "motorVoltage": 1,
+                "motorCurrent": 1,
+                "commVoltage": 1,
+                "commCurrent": 1,
+            }
+        )
