@@ -32,10 +32,10 @@ __all__ = [
     "is_jenkins",
 ]
 
-import asyncio
 from functools import partial
 from os import getenv
 
+from lsst.ts.m2com import is_coroutine
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import QGroupBox, QLabel, QPushButton, QTableWidget
@@ -292,9 +292,8 @@ async def run_command(command, *args, is_prompted=True, **kwargs):
         True if the command succeeds. Otherwise, False.
     """
 
-    is_coroutine = asyncio.iscoroutine(command) or asyncio.iscoroutinefunction(command)
     try:
-        if is_coroutine:
+        if is_coroutine(command):
             await command(*args, **kwargs)
         else:
             command(*args, **kwargs)

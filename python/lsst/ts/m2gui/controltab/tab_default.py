@@ -124,4 +124,4 @@ class TabDefault(QDockWidget):
     async def __aexit__(self, type, value, traceback):
         """This is an overridden function to support the asynchronous context
         manager."""
-        await self.model.close_tasks()
+        await self.model.controller.close_tasks()

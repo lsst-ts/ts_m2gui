@@ -21,21 +21,15 @@
 
 __all__ = ["Model"]
 
-import asyncio
-import time
-
 from lsst.ts import salobj
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
     ActuatorDisplacementUnit,
-    Controller,
-    MockServer,
+    ControllerCell,
     PowerType,
     get_config_dir,
 )
-from lsst.ts.tcpip import LOCAL_HOST
-from lsst.ts.utils import index_generator, make_done_future
 
 from . import (
     Config,
@@ -99,26 +93,9 @@ class Model(object):
         Fault manager to record the system error.
     utility_monitor : `UtilityMonitor`
         Utility monitor to monitor the utility status.
-    host : `str`
-        Host address.
-    port_command : `int`
-        Command port to connect.
-    port_telemetry : `int`
-        Telemetry port to connect.
-    timeout_connection : `int` or `float`
-        Connection timeout in second.
-    timeout_in_second : `float`
-        Time limit for reading data from the TCP/IP interface (sec).
-    controller : `lsst.ts.m2com.Controller`
+    controller : `lsst.ts.m2com.ControllerCell`
         Controller to do the TCP/IP communication with the servers of M2 cell.
-    stop_loop_timeout : `float`
-        Timeout of stoping loop in second.
-    run_loops : `bool`
-        The event and telemetry loops are running or not.
     """
-
-    # Maximum timeout to wait the telemetry in second
-    TELEMETRY_WAIT_TIMEOUT = 900
 
     def __init__(
         self,
@@ -147,38 +124,17 @@ class Model(object):
         self.fault_manager = FaultManager(self.get_actuator_default_status(False))
         self.utility_monitor = UtilityMonitor()
 
-        # TCP/IP connection information. They will be move to other places in a
-        # latter time
-        self.host = host
-        self.port_command = port_command
-        self.port_telemetry = port_telemetry
-        self.timeout_connection = timeout_connection
-
-        self.timeout_in_second = timeout_in_second
-        self.controller = Controller(
-            log=self.log, timeout_in_second=self.timeout_in_second, is_csc=False
+        self.controller = ControllerCell(
+            log=self.log,
+            timeout_in_second=timeout_in_second,
+            is_csc=False,
+            host=host,
+            port_command=port_command,
+            port_telemetry=port_telemetry,
+            timeout_connection=timeout_connection,
         )
 
         self._is_simulation_mode = is_simulation_mode
-
-        # Mock server that is only needed in the simulation mode
-        self._mock_server = None
-
-        self.stop_loop_timeout = 5.0
-
-        # Sequence generator
-        self._sequence_generator = index_generator()
-
-        self.run_loops = False
-
-        # Task of the telemetry loop from component (asyncio.Future)
-        self._task_telemetry_loop = make_done_future()
-
-        # Task of the event loop from component (asyncio.Future)
-        self._task_event_loop = make_done_future()
-
-        # Task to monitor the connection status actively (asyncio.Future)
-        self._task_connection_monitor_loop = make_done_future()
 
     def _set_system_status(self):
         """Set the default system status.
@@ -634,10 +590,10 @@ class Model(object):
         if port_command == port_telemetry:
             raise ValueError("Command port should be different from telemetry port.")
 
-        self.host = host
-        self.port_command = port_command
-        self.port_telemetry = port_telemetry
-        self.timeout_connection = timeout_connection
+        self.controller.host = host
+        self.controller.port_command = port_command
+        self.controller.port_telemetry = port_telemetry
+        self.controller.timeout_connection = timeout_connection
 
     async def connect(self):
         """Connect to the M2 controller.
@@ -655,82 +611,36 @@ class Model(object):
 
         # Run the mock server in the simulation mode
         if self._is_simulation_mode:
-            await self._run_mock_server()
+            await self.controller.run_mock_server(get_config_dir(), "harrisLUT")
 
         # Run the event and telemetry loops
-        if self.run_loops is False:
+        if self.controller.run_loops is False:
 
-            self.run_loops = True
+            self.controller.run_loops = True
 
             self.log.debug(
                 "Starting event, telemetry and connection monitor loop tasks."
             )
 
-            self._task_event_loop = asyncio.create_task(self._event_loop())
-            self._task_telemetry_loop = asyncio.create_task(self._telemetry_loop())
-            self._task_connection_monitor_loop = asyncio.create_task(
-                self._connection_monitor_loop()
+            self.controller.run_task_event_loop(self._process_event)
+            self.controller.run_task_telemetry_loop(self._process_telemetry)
+            self.controller.run_task_connection_monitor_loop(
+                self.update_system_status, "isCrioConnected", False
             )
 
-        await self._connect_server()
+        await self.controller.connect_server()
 
         self.update_system_status(
             "isCrioConnected", self.controller.are_clients_connected()
         )
 
-    async def _run_mock_server(self):
-        """Run the mock server to support the simulation mode."""
-
-        # Close the running mock server if any
-        if self._mock_server is not None:
-            await self._mock_server.close()
-            self._mock_server = None
-
-        # Run a new mock server
-        self._mock_server = MockServer(
-            LOCAL_HOST,
-            port_command=0,
-            port_telemetry=0,
-            log=self.log,
-            is_csc=False,
-        )
-        self._mock_server.model.configure(get_config_dir(), "harrisLUT")
-        await self._mock_server.start()
-
-    async def _event_loop(self):
-        """Update and output event information from component."""
-
-        self.log.debug("Begin to run the event loop from component.")
-
-        while self.run_loops:
-
-            try:
-                message = (
-                    self.controller.queue_event.get_nowait()
-                    if not self.controller.queue_event.empty()
-                    else await self.controller.queue_event.get()
-                )
-
-            # When there is no instance in the self.controller.queue_event, the
-            # get() will be used to wait for the new coming event. It is a
-            # blocking call and will get the asyncio.CancelledError if we
-            # cancel the self._task_event_loop.
-            except asyncio.CancelledError:
-                message = ""
-
-            self._process_events(message)
-
-            await asyncio.sleep(self.timeout_in_second)
-
-        self.log.debug("Component's event loop exited.")
-
-    def _process_events(self, message):
+    def _process_event(self, message=None):
         """Process the events from the M2 controller.
 
         Parameters
         ----------
-        message : `str`
-            Message from the M2 controller.
+        message : `dict` or None, optional
+            Message from the M2 controller. (the default is None)
         """
 
         name = self._get_message_name(message)
@@ -861,68 +771,13 @@ class Model(object):
 
         return local_mode
 
-    async def _telemetry_loop(self):
-        """Update and output telemetry information from component."""
-
-        self.log.debug("Starting telemetry loop from component.")
-
-        time_wait_telemetry = 0.0
-        is_telemetry_timed_out = False
-
-        while self.run_loops:
-
-            if self.controller.are_clients_connected():
-
-                if (
-                    time_wait_telemetry >= self.TELEMETRY_WAIT_TIMEOUT
-                    and not is_telemetry_timed_out
-                ):
-
-                    self.log.warning(
-                        (
-                            "No telemetry update for more than "
-                            f"{self.TELEMETRY_WAIT_TIMEOUT} seconds. Can you "
-                            f"ping the controller at {self.host} and initiate "
-                            "connection to one of it's ports (at "
-                            f"{self.port_command} and {self.port_telemetry})?"
-                        )
-                    )
-                    time_wait_telemetry = 0.0
-                    is_telemetry_timed_out = True
-
-                # If there is no telemetry, sleep for some time
-                if self.controller.client_telemetry.queue.empty():
-                    await asyncio.sleep(self.timeout_in_second)
-                    time_wait_telemetry += self.timeout_in_second
-                    continue
-
-                # There is the telemetry to publish
-                time_wait_telemetry = 0.0
-                if is_telemetry_timed_out:
-                    self.log.info("Telemetry is up and running after failure.")
-
-                is_telemetry_timed_out = False
-
-                message = self.controller.client_telemetry.queue.get_nowait()
-
-                # Send the signals of telemetry
-                self._process_telemetry(message)
-
-            else:
-                self.log.debug(
-                    f"Clients not connected. Waiting {self.timeout_in_second}s..."
-                )
-                await asyncio.sleep(self.timeout_in_second)
-
-        self.log.debug("The component's telemetry loop exited/ended.")
-
-    def _process_telemetry(self, message):
+    def _process_telemetry(self, message=None):
         """Process the telemetry from the M2 controller.
 
         Parameters
         ----------
-        message : `str`
-            Message from the M2 controller.
+        message : `dict` or None, optional
+            Message from the M2 controller. (the default is None)
         """
 
         name = self._get_message_name(message)
@@ -1082,83 +937,6 @@ class Model(object):
             else:
                 self.log.warning(f"Unspecified telemetry message: {name}, ignoring...")
 
-    async def _connection_monitor_loop(self, period=1):
-        """Actively monitor the connection status from component. Disconnect
-        the system if the connection is lost by itself.
-
-        Parameters
-        ----------
-        period : `float` or `int`, optional
-            Period to check the connection status in second. (the default is 1)
-        """
-
-        self.log.debug("Begin to run the connection monitor loop from component.")
-
-        were_clients_connected = False
-        while self.run_loops:
-
-            if self.controller.are_clients_connected():
-                were_clients_connected = True
-            else:
-                if were_clients_connected:
-                    were_clients_connected = False
-                    self.log.info(
-                        "Lost the TCP/IP connection in the active monitoring loop."
-                    )
-
-                    await self.controller.close()
-                    self.update_system_status(
-                        "isCrioConnected", self.controller.are_clients_connected()
-                    )
-
-            await asyncio.sleep(period)
-
-        self.log.debug("Connection monitor loop from component closed.")
-
-    async def _connect_server(self):
-        """Connect the TCP/IP server.
-
-        Raises
-        ------
-        RuntimeError
-            If timeout in connection.
-        """
-
-        port_command = self.port_command
-        port_telemetry = self.port_telemetry
-
-        # In the simulation mode, the ports of mock server are randomly
-        # assigned by the operation system.
-        if self._is_simulation_mode:
-            port_command = self._mock_server.server_command.port
-            port_telemetry = self._mock_server.server_telemetry.port
-
-        self.log.debug(f"Host in connection request: {self.host}")
-        self.log.debug(f"Command port in connection request: {port_command}")
-        self.log.debug(f"Telemetry port in connection request: {port_telemetry}")
-
-        self.controller.start(
-            self.host,
-            port_command,
-            port_telemetry,
-            sequence_generator=self._sequence_generator,
-            timeout=self.timeout_connection,
-        )
-
-        time_start = time.monotonic()
-        connection_pooling_time = 0.1
-        while not self.controller.are_clients_connected() and (
-            (time.monotonic() - time_start) < self.timeout_connection
-        ):
-            await asyncio.sleep(connection_pooling_time)
-
-        if not self.controller.are_clients_connected():
-            raise RuntimeError(
-                "Timeout in connection - Conection timeouted, connection "
-                f"failed or cannot connect. Host: {self.host}, ports: "
-                f"{port_command} and {port_telemetry}."
-            )
-
     async def disconnect(self):
         """Disconnect from the M2 controller."""
 
@@ -1167,45 +945,10 @@ class Model(object):
         else:
             self.log.info("No connection with the M2 controller.")
 
-        await self.close_tasks()
+        await self.controller.close_tasks()
         self.update_system_status(
             "isCrioConnected", self.controller.are_clients_connected()
         )
-
-    async def close_tasks(self):
-        """Close the asynchronous tasks."""
-
-        await self.controller.close()
-
-        if self._mock_server is not None:
-            # Wait some time to let the mock server notices the controller has
-            # closed the connection.
-            await asyncio.sleep(10)
-
-            await self._mock_server.close()
-            self._mock_server = None
-
-        try:
-            await self._stop_loops()
-        except Exception:
-            self.log.exception("Exception while stopping the loops. Ignoring...")
-
-    async def _stop_loops(self):
-        """Stop the loops."""
-
-        self.run_loops = False
-
-        for task in (
-            self._task_telemetry_loop,
-            self._task_event_loop,
-            self._task_connection_monitor_loop,
-        ):
-            try:
-                await asyncio.wait_for(task, timeout=self.stop_loop_timeout)
-            except asyncio.TimeoutError:
-                self.log.debug("Timed out waiting for the loop to finish. Canceling.")
-
-                task.cancel()
 
     async def __aenter__(self):
         """This is an overridden function to support the asynchronous context
@@ -1215,4 +958,4 @@ class Model(object):
     async def __aexit__(self, type, value, traceback):
         """This is an overridden function to support the asynchronous context
         manager."""
-        await self.close_tasks()
+        await self.controller.close_tasks()

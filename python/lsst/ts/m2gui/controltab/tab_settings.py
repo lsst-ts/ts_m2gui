@@ -91,10 +91,11 @@ class TabSettings(TabDefault):
         )
 
         # Set the default values
-        settings["host"].setText(self.model.host)
-        settings["port_command"].setValue(self.model.port_command)
-        settings["port_telemetry"].setValue(self.model.port_telemetry)
-        settings["timeout_connection"].setValue(self.model.timeout_connection)
+        controller = self.model.controller
+        settings["host"].setText(controller.host)
+        settings["port_command"].setValue(controller.port_command)
+        settings["port_telemetry"].setValue(controller.port_telemetry)
+        settings["timeout_connection"].setValue(controller.timeout_connection)
         settings["log_level"].setValue(self.model.log.level)
 
         self._set_minimum_width_line_edit(settings["host"])
