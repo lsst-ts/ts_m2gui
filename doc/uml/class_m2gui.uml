@@ -8,8 +8,7 @@ package "controltab" #DDDDDD {
 }
 
 package "m2com" #DDDDDD {
-  class MockServer
-  class Controller
+  class ControllerCell
 }
 
 package "widget" #DDDDDD {
@@ -31,8 +30,7 @@ Model *-- SignalStatus : emit()
 Model *-- SignalConfig : emit()
 Model *-- SignalScript : emit()
 Model ..> Config
-Model *-- Controller
-Model o-- MockServer
+Model *-- ControllerCell
 
 FaultManager *-- SignalError : emit()
 FaultManager *-- SignalLimitSwitch : emit()
