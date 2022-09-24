@@ -39,12 +39,12 @@ def widget(qtbot):
 
 def test_init(widget):
 
-    assert widget._settings["host"].text() == widget.model.host
-    assert widget._settings["port_command"].value() == widget.model.port_command
-    assert widget._settings["port_telemetry"].value() == widget.model.port_telemetry
+    controller = widget.model.controller
+    assert widget._settings["host"].text() == controller.host
+    assert widget._settings["port_command"].value() == controller.port_command
+    assert widget._settings["port_telemetry"].value() == controller.port_telemetry
     assert (
-        widget._settings["timeout_connection"].value()
-        == widget.model.timeout_connection
+        widget._settings["timeout_connection"].value() == controller.timeout_connection
     )
     assert widget._settings["log_level"].value() == widget.model.log.level
 
@@ -79,8 +79,9 @@ async def test_callback_apply(qtbot, widget):
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget.model.host == "newHost"
-    assert widget.model.port_command == 1
-    assert widget.model.port_telemetry == 2
-    assert widget.model.timeout_connection == 3
+    controller = widget.model.controller
+    assert controller.host == "newHost"
+    assert controller.port_command == 1
+    assert controller.port_telemetry == 2
+    assert controller.timeout_connection == 3
     assert widget.model.log.level == 11

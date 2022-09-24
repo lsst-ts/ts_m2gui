@@ -248,10 +248,11 @@ def test_update_connection_information(model):
 
     model.update_connection_information("test", 1, 2, 3)
 
-    assert model.host == "test"
-    assert model.port_command == 1
-    assert model.port_telemetry == 2
-    assert model.timeout_connection == 3
+    controller = model.controller
+    assert controller.host == "test"
+    assert controller.port_command == 1
+    assert controller.port_telemetry == 2
+    assert controller.timeout_connection == 3
 
 
 def test_update_connection_information_exception(model):
@@ -272,45 +273,45 @@ async def test_connect_exception(model):
         await model.connect()
 
 
-def test_process_events(qtbot, model):
+def test_process_event(qtbot, model):
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model._process_events({"id": "m2AssemblyInPosition", "inPosition": True})
+        model._process_event({"id": "m2AssemblyInPosition", "inPosition": True})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_events(
+        model._process_event(
             {"id": "summaryState", "summaryState": salobj.State.DISABLED}
         )
     assert model.local_mode == LocalMode.Diagnostic
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model._process_events({"id": "errorCode", "errorCode": 1})
+        model._process_event({"id": "errorCode", "errorCode": 1})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_events({"id": "commandableByDDS", "state": True})
+        model._process_event({"id": "commandableByDDS", "state": True})
     assert model.is_csc_commander is True
 
     with qtbot.waitSignal(
         model.utility_monitor.signal_detailed_force.hard_points, timeout=TIMEOUT
     ):
-        model._process_events({"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]})
+        model._process_event({"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_events({"id": "forceBalanceSystemStatus", "status": True})
+        model._process_event({"id": "forceBalanceSystemStatus", "status": True})
     assert model.is_closed_loop is True
 
     with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
-        model._process_events({"id": "scriptExecutionStatus", "percentage": 1})
+        model._process_event({"id": "scriptExecutionStatus", "percentage": 1})
 
     with qtbot.waitSignal(
         model.utility_monitor.signal_utility.digital_status_output, timeout=TIMEOUT
     ):
-        model._process_events({"id": "digitalOutput", "value": 1})
+        model._process_event({"id": "digitalOutput", "value": 1})
 
     with qtbot.waitSignal(
         model.utility_monitor.signal_utility.digital_status_input, timeout=TIMEOUT
     ):
-        model._process_events({"id": "digitalInput", "value": 1})
+        model._process_event({"id": "digitalInput", "value": 1})
 
 
 def test_get_message_name(model):

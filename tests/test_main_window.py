@@ -54,15 +54,16 @@ def test_init(widget):
 
     assert len(actions) == 4
 
-    assert widget.model.host == "m2-crio-controller01.cp.lsst.org"
-    assert widget.model.port_command == 50010
-    assert widget.model.port_telemetry == 50011
-    assert widget.model.timeout_connection == 10
+    controller = widget.model.controller
+    assert controller.host == "m2-crio-controller01.cp.lsst.org"
+    assert controller.port_command == 50010
+    assert controller.port_telemetry == 50011
+    assert controller.timeout_connection == 10
 
 
 def test_init_sim(widget_sim):
 
-    assert widget_sim.model.host == "127.0.0.1"
+    assert widget_sim.model.controller.host == "127.0.0.1"
 
 
 def test_get_action(widget):
