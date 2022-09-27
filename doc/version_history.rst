@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.2.1:
+
+-------------
+0.2.1
+-------------
+
+* Adapt the **ControllerCell** class in **ts_m2com** to remove the duplicated code.
+
 .. _lsst.ts.m2gui-0.2.0:
 
 -------------
