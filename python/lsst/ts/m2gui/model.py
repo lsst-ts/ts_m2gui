@@ -622,9 +622,9 @@ class Model(object):
                 "Starting event, telemetry and connection monitor loop tasks."
             )
 
-            self.controller.run_task_event_loop(self._process_event)
-            self.controller.run_task_telemetry_loop(self._process_telemetry)
-            self.controller.run_task_connection_monitor_loop(
+            self.controller.start_task_event_loop(self._process_event)
+            self.controller.start_task_telemetry_loop(self._process_telemetry)
+            self.controller.start_task_connection_monitor_loop(
                 self.update_system_status, "isCrioConnected", False
             )
 
