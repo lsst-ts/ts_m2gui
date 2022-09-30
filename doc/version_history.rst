@@ -6,6 +6,17 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.2.2:
+
+-------------
+0.2.2
+-------------
+
+* User can always apply the new general settings.
+* User can update the frequency to refresh the force-related data in tables of
+cell status and detailed force.
+* User can update the point size of application.
+
 .. _lsst.ts.m2gui-0.2.1:
 
 -------------
