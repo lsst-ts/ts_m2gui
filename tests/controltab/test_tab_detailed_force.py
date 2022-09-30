@@ -37,7 +37,24 @@ def widget(qtbot):
 
 
 @pytest.mark.asyncio
-async def test_callback_callback_hard_points(widget):
+async def test_callback_time_out(widget):
+
+    widget._forces_latest.f_hc[3] = 1.234
+    widget._forces_latest.f_cur[5] = 0.2
+    widget._forces_latest.f_error[7] = 0.249
+    widget._forces_latest.position_in_mm[10] = 123
+    widget._forces_latest.step[13] = 34
+    await widget._callback_time_out()
+
+    assert widget._forces["f_hc"][3].text() == "1.23"
+    assert widget._forces["f_cur"][5].text() == "0.20"
+    assert widget._forces["f_error"][7].text() == "0.25"
+    assert widget._forces["position_in_mm"][10].text() == "123.00"
+    assert widget._forces["step"][13].text() == "34"
+
+
+@pytest.mark.asyncio
+async def test_callback_hard_points(widget):
 
     axial = [1, 2, 3]
     tangent = [72, 73, 74]
@@ -51,22 +68,13 @@ async def test_callback_callback_hard_points(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_callback_forces(widget):
+async def test_callback_forces(widget):
 
     forces = ActuatorForce()
-    forces.f_hc[3] = 1.234
     forces.f_cur[5] = 0.2
-    forces.f_error[7] = 0.249
-    forces.position_in_mm[10] = 123
-    forces.step[13] = 34
-
     widget.model.utility_monitor.update_forces(forces)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget._forces["f_hc"][3].text() == "1.23"
-    assert widget._forces["f_cur"][5].text() == "0.20"
-    assert widget._forces["f_error"][7].text() == "0.25"
-    assert widget._forces["position_in_mm"][10].text() == "123.00"
-    assert widget._forces["step"][13].text() == "34"
+    assert id(widget._forces_latest) == id(forces)
