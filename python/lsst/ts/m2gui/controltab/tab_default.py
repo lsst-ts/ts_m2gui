@@ -118,7 +118,7 @@ class TabDefault(QDockWidget):
         return ring_selection
 
     def create_and_start_timer(self, callback_time_out):
-        """Create the timer and start.
+        """Create and start the timer.
 
         Parameters
         ----------

@@ -63,7 +63,7 @@ class TabCellStatus(TabDefault):
 
         self._actuator_data_selection = self._create_actuator_data_selection()
 
-        # Timer to update the forces on cell status
+        # Timer to update cell status forces (and displays)
         self._timer = self.create_and_start_timer(self._callback_time_out)
 
         # Internal layout
@@ -247,12 +247,13 @@ class TabCellStatus(TabDefault):
 
     @asyncSlot()
     async def _callback_time_out(self, threshold=50):
-        """Callback timeout function to update the forces on cell status.
+        """Callback timeout function to update cell status forces (and
+        displays).
 
         Parameters
         ----------
         threshold : `float` or `int`, optional
-            Threshold to decide the update of range. (the default is 50)
+            Threshold for minimum/maximum gauge updates. (the default is 50)
         """
 
         # Cell map
