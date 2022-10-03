@@ -63,6 +63,9 @@ class TabCellStatus(TabDefault):
 
         self._actuator_data_selection = self._create_actuator_data_selection()
 
+        # Timer to update cell status forces (and displays)
+        self._timer = self.create_and_start_timer(self._callback_time_out)
+
         # Internal layout
         self.widget().setLayout(self._create_layout())
 
@@ -242,6 +245,52 @@ class TabCellStatus(TabDefault):
             else:
                 self._figures[figure_type].axis_y.setTitleText("Force (N)")
 
+    @asyncSlot()
+    async def _callback_time_out(self, threshold=50):
+        """Callback timeout function to update cell status forces (and
+        displays).
+
+        Parameters
+        ----------
+        threshold : `float` or `int`, optional
+            Threshold for minimum/maximum gauge updates. (the default is 50)
+        """
+
+        # Cell map
+        force_current_min = -1
+        force_current_max = 1
+        for actuator, force_current in zip(
+            self._view_mirror.actuators, self._forces.f_cur
+        ):
+            actuator.update_magnitude(force_current, self._gauge.min, self._gauge.max)
+
+            # Check the range of current forces
+            if force_current < force_current_min:
+                force_current_min = force_current
+
+            elif force_current > force_current_max:
+                force_current_max = force_current
+
+        # Check we need to update the gauge or not
+        if (abs(self._gauge.min - force_current_min) > threshold) or (
+            abs(self._gauge.max - force_current_max) > threshold
+        ):
+            self._gauge.set_magnitude_range(force_current_min, force_current_max)
+
+        # Figures
+        num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
+        self._figures["realtime"].append_data(
+            np.mean(np.abs(self._forces.f_error[0:num_axial])), idx=0
+        )
+        self._figures["realtime"].append_data(
+            np.mean(np.abs(self._forces.f_error[-NUM_TANGENT_LINK:])), idx=1
+        )
+
+        data_selected, is_displacement = self._get_data_selected()
+        self._update_figures(data_selected, is_displacement)
+
+        self.check_duration_and_restart_timer(self._timer)
+
     def _create_layout(self):
         """Create the layout.
 
@@ -331,7 +380,7 @@ class TabCellStatus(TabDefault):
         signal_detailed_force.forces.connect(self._callback_forces)
 
     @asyncSlot()
-    async def _callback_forces(self, forces, threshold=50):
+    async def _callback_forces(self, forces):
         """Callback of the forces, which contain the look-up table (LUT)
         details.
 
@@ -339,39 +388,5 @@ class TabCellStatus(TabDefault):
         ----------
         forces : `ActuatorForce`
             Detailed actuator forces.
-        threshold : `float` or `int`, optional
-            Threshold to decide the update of range. (the default is 50)
         """
-
         self._forces = forces
-
-        # Cell map
-        force_current_min = -1
-        force_current_max = 1
-        for actuator, force_current in zip(self._view_mirror.actuators, forces.f_cur):
-            actuator.update_magnitude(force_current, self._gauge.min, self._gauge.max)
-
-            # Check the range of current forces
-            if force_current < force_current_min:
-                force_current_min = force_current
-
-            elif force_current > force_current_max:
-                force_current_max = force_current
-
-        # Check we need to update the gauge or not
-        if (abs(self._gauge.min - force_current_min) > threshold) or (
-            abs(self._gauge.max - force_current_max) > threshold
-        ):
-            self._gauge.set_magnitude_range(force_current_min, force_current_max)
-
-        # Figures
-        num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
-        self._figures["realtime"].append_data(
-            np.mean(np.abs(forces.f_error[0:num_axial])), idx=0
-        )
-        self._figures["realtime"].append_data(
-            np.mean(np.abs(forces.f_error[-NUM_TANGENT_LINK:])), idx=1
-        )
-
-        data_selected, is_displacement = self._get_data_selected()
-        self._update_figures(data_selected, is_displacement)

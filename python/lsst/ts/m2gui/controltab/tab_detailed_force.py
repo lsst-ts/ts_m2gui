@@ -31,6 +31,7 @@ from PySide2.QtWidgets import (
 )
 from qasync import asyncSlot
 
+from .. import ActuatorForce
 from ..enums import Ring
 from ..utils import create_group_box, create_label, create_table, get_num_actuator_ring
 from . import TabDefault
@@ -66,8 +67,11 @@ class TabDetailedForce(TabDefault):
             "tangent": create_label(),
         }
 
-        # Detailed force
+        # Detailed forces of the table widget items
         self._forces = self._create_items_force()
+
+        # Latest received actuator forces
+        self._forces_latest = ActuatorForce()
 
         # List of the force details
         self._list_force_details = list(self._forces.keys())
@@ -79,6 +83,9 @@ class TabDetailedForce(TabDefault):
 
         # Table of the detailed force
         self._table_forces = self._create_table_forces()
+
+        # Timer to update the forces on table
+        self._timer = self.create_and_start_timer(self._callback_time_out)
 
         self._set_widget_and_layout()
 
@@ -193,6 +200,24 @@ class TabDetailedForce(TabDefault):
 
         return table
 
+    @asyncSlot()
+    async def _callback_time_out(self):
+        """Callback timeout function to update the force table."""
+
+        # Update the force items on tables
+        for key in vars(self._forces_latest).keys():
+            field = getattr(self._forces_latest, key)
+
+            is_interger = key in ("encoder_count", "step")
+
+            for idx in range(NUM_ACTUATOR):
+                if is_interger:
+                    self._forces[key][idx].setText(str(field[idx]))
+                else:
+                    self._forces[key][idx].setText("%.2f" % field[idx])
+
+        self.check_duration_and_restart_timer(self._timer)
+
     def _set_widget_and_layout(self):
         """Set the widget and layout."""
 
@@ -276,14 +301,4 @@ class TabDetailedForce(TabDefault):
         forces : `ActuatorForce`
             Detailed actuator forces.
         """
-
-        for key in vars(forces).keys():
-            field = getattr(forces, key)
-
-            is_interger = key in ("encoder_count", "step")
-
-            for idx in range(NUM_ACTUATOR):
-                if is_interger:
-                    self._forces[key][idx].setText(str(field[idx]))
-                else:
-                    self._forces[key][idx].setText("%.2f" % field[idx])
+        self._forces_latest = forces

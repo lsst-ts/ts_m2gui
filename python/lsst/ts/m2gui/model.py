@@ -95,6 +95,8 @@ class Model(object):
         Utility monitor to monitor the utility status.
     controller : `lsst.ts.m2com.ControllerCell`
         Controller to do the TCP/IP communication with the servers of M2 cell.
+    duration_refresh : `int`
+        Duration to refresh the data in milliseconds.
     """
 
     def __init__(
@@ -135,6 +137,8 @@ class Model(object):
         )
 
         self._is_simulation_mode = is_simulation_mode
+
+        self.duration_refresh = 100
 
     def _set_system_status(self):
         """Set the default system status.

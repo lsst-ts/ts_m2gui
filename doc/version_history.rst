@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.2.2:
+
+-------------
+0.2.2
+-------------
+
+* New general settings can be applied anytime/in all states.
+* Force-related tables refresh frequency can be modified.
+* Default application point size/ scaling can be modified.
+
 .. _lsst.ts.m2gui-0.2.1:
 
 -------------

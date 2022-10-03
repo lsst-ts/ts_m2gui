@@ -135,17 +135,12 @@ async def test_callback_selection_changed(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_forces(qtbot, widget):
+async def test_callback_time_out(widget):
 
-    actuator_force = ActuatorForce()
-    actuator_force.f_cur[1] = 100
-    actuator_force.f_error[1] = 72
-    actuator_force.f_error[77] = -12
-
-    widget.model.utility_monitor.update_forces(actuator_force)
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    widget._forces.f_cur[1] = 100
+    widget._forces.f_error[1] = 72
+    widget._forces.f_error[77] = -12
+    await widget._callback_time_out()
 
     assert widget._forces.f_cur[1] == 100
     assert widget._view_mirror.actuators[1]._magnitude == 100
@@ -157,3 +152,17 @@ async def test_callback_forces(qtbot, widget):
 
     assert figure_realtime.get_points(0)[0].y() == 1
     assert figure_realtime.get_points(1)[0].y() == 2
+
+
+@pytest.mark.asyncio
+async def test_callback_forces(widget):
+
+    actuator_force = ActuatorForce()
+    actuator_force.f_cur[1] = 100
+
+    widget.model.utility_monitor.update_forces(actuator_force)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert id(widget._forces) == id(actuator_force)

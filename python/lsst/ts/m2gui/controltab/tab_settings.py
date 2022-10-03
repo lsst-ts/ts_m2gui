@@ -22,7 +22,7 @@
 __all__ = ["TabSettings"]
 
 from PySide2.QtWidgets import QFormLayout, QLineEdit, QSpinBox, QVBoxLayout
-from qasync import asyncSlot
+from qasync import QApplication, asyncSlot
 
 from ..utils import create_group_box, run_command, set_button
 from . import TabDefault
@@ -50,14 +50,27 @@ class TabSettings(TabDefault):
     LOG_LEVEL_MINIMUM = 10
     LOG_LEVEL_MAXIMUM = 50
 
+    # The unit is seconds
     TIMEOUT_MINIMUM = 1
+
+    # The unit is Hz
+    REFRESH_FREQUENCY_MINIMUM = 1
+    REFRESH_FREQUENCY_MAXIMUM = 10
+
+    POINT_SIZE_MINIMUM = 9
+    POINT_SIZE_MAXIMUM = 14
 
     def __init__(self, title, model):
         super().__init__(title, model)
 
         self._settings = self._create_settings()
 
-        self._button_apply = set_button("Apply Settings", self._callback_apply)
+        self._button_apply_host = set_button(
+            "Apply Host Settings", self._callback_apply_host
+        )
+        self._button_apply_general = set_button(
+            "Apply General Settings", self._callback_apply_general
+        )
 
         # Internal layout
         self.widget().setLayout(self._create_layout())
@@ -77,6 +90,8 @@ class TabSettings(TabDefault):
             "port_telemetry": QSpinBox(),
             "timeout_connection": QSpinBox(),
             "log_level": QSpinBox(),
+            "refresh_frequency": QSpinBox(),
+            "point_size": QSpinBox(),
         }
 
         for port in ("port_command", "port_telemetry"):
@@ -90,6 +105,19 @@ class TabSettings(TabDefault):
             "CRITICAL (50), ERROR (40), WARNING (30), INFO (20), DEBUG (10)"
         )
 
+        settings["refresh_frequency"].setRange(
+            self.REFRESH_FREQUENCY_MINIMUM, self.REFRESH_FREQUENCY_MAXIMUM
+        )
+        settings["refresh_frequency"].setSuffix(" Hz")
+        settings["refresh_frequency"].setToolTip(
+            "Frequency to refresh the data on tables"
+        )
+
+        settings["point_size"].setRange(
+            self.POINT_SIZE_MINIMUM, self.POINT_SIZE_MAXIMUM
+        )
+        settings["point_size"].setToolTip("Point size of the application.")
+
         # Set the default values
         controller = self.model.controller
         settings["host"].setText(controller.host)
@@ -97,6 +125,13 @@ class TabSettings(TabDefault):
         settings["port_telemetry"].setValue(controller.port_telemetry)
         settings["timeout_connection"].setValue(controller.timeout_connection)
         settings["log_level"].setValue(self.model.log.level)
+
+        # The unit of self.model.duration_refresh is milliseconds
+        frequency = int(1000 / self.model.duration_refresh)
+        settings["refresh_frequency"].setValue(frequency)
+
+        app = QApplication.instance()
+        settings["point_size"].setValue(app.font().pointSize())
 
         self._set_minimum_width_line_edit(settings["host"])
 
@@ -120,15 +155,16 @@ class TabSettings(TabDefault):
         line_edit.setMinimumWidth(width + offset)
 
     @asyncSlot()
-    async def _callback_apply(self):
-        """Callback of the apply button. This will apply the settings."""
+    async def _callback_apply_host(self):
+        """Callback of the apply-host-setting button. This will apply the
+        new host settings to model."""
 
         host = self._settings["host"].text()
         port_command = self._settings["port_command"].value()
         port_telemetry = self._settings["port_telemetry"].value()
         timeout_connection = self._settings["timeout_connection"].value()
 
-        is_successful = await run_command(
+        await run_command(
             self.model.update_connection_information,
             host,
             port_command,
@@ -136,8 +172,23 @@ class TabSettings(TabDefault):
             timeout_connection,
         )
 
-        if is_successful:
-            self.model.log.setLevel(self._settings["log_level"].value())
+    @asyncSlot()
+    async def _callback_apply_general(self):
+        """Callback of the apply-general-setting button. This will apply the
+        new general settings to model."""
+
+        self.model.log.setLevel(self._settings["log_level"].value())
+
+        # The unit of self.model.duration_refresh is milliseconds
+        self.model.duration_refresh = int(
+            1000 / self._settings["refresh_frequency"].value()
+        )
+
+        # Update the point size
+        app = QApplication.instance()
+        font = app.font()
+        font.setPointSize(self._settings["point_size"].value())
+        app.setFont(font)
 
     def _create_layout(self):
         """Create the layout.
@@ -151,8 +202,10 @@ class TabSettings(TabDefault):
         layout = QVBoxLayout()
 
         layout.addWidget(self._create_group_tcpip())
+        layout.addWidget(self._button_apply_host)
+
         layout.addWidget(self._create_group_application())
-        layout.addWidget(self._button_apply)
+        layout.addWidget(self._button_apply_general)
 
         return layout
 
@@ -183,6 +236,8 @@ class TabSettings(TabDefault):
         """
 
         layout = QFormLayout()
+        layout.addRow("Point size:", self._settings["point_size"])
         layout.addRow("Logging level:", self._settings["log_level"])
+        layout.addRow("Refresh frequency:", self._settings["refresh_frequency"])
 
         return create_group_box("Application", layout)

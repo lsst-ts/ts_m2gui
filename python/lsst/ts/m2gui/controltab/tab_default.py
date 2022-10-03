@@ -21,6 +21,7 @@
 
 __all__ = ["TabDefault"]
 
+from PySide2.QtCore import QTimer
 from PySide2.QtWidgets import QComboBox, QDockWidget, QScrollArea, QWidget
 
 from ..enums import Ring
@@ -115,6 +116,42 @@ class TabDefault(QDockWidget):
             ring_selection.currentIndexChanged.connect(callback_current_index_changed)
 
         return ring_selection
+
+    def create_and_start_timer(self, callback_time_out):
+        """Create and start the timer.
+
+        Parameters
+        ----------
+        callback_time_out : `func`
+            Callback function to handle the timeout. You may want to let the
+            "callback_time_out" call the
+            self.check_duration_and_restart_timer() to monitor the duration and
+            restart the timer when the duration is changed.
+
+        Returns
+        -------
+        timer : `PySide2.QtCore.QTimer`
+            Timer.
+        """
+
+        timer = QTimer(self)
+        timer.timeout.connect(callback_time_out)
+        timer.start(self.model.duration_refresh)
+
+        return timer
+
+    def check_duration_and_restart_timer(self, timer):
+        """Check the duration and restart the timer if the duration has been
+        updated.
+
+        Parameters
+        ----------
+        timer : `PySide2.QtCore.QTimer`
+            Timer.
+        """
+
+        if timer.interval() != self.model.duration_refresh:
+            timer.start(self.model.duration_refresh)
 
     async def __aenter__(self):
         """This is an overridden function to support the asynchronous context

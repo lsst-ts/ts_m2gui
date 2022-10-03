@@ -36,7 +36,7 @@ def widget(qtbot):
     return widget
 
 
-def test_init(qtbot, widget):
+def test_init(widget):
 
     assert widget.windowTitle() == "Default"
 
@@ -48,3 +48,22 @@ def test_set_widget_scrollable(widget):
 
     scroll_area_resizable = widget.set_widget_scrollable(QWidget(), is_resizable=True)
     assert scroll_area_resizable.widgetResizable() is True
+
+
+def test_create_and_start_timer(widget):
+
+    timer = widget.create_and_start_timer(None)
+
+    assert timer.interval() == widget.model.duration_refresh
+    assert timer.isActive() is True
+
+
+def test_check_duration_and_restart_timer(widget):
+
+    timer = widget.create_and_start_timer(None)
+
+    widget.model.duration_refresh = 1000
+    widget.check_duration_and_restart_timer(timer)
+
+    assert timer.interval() == widget.model.duration_refresh
+    assert timer.isActive() is True
