@@ -45,7 +45,7 @@ async def model_async():
 
 def test_init(model):
 
-    assert len(model.system_status) == 9
+    assert len(model.system_status) == 7
 
 
 def test_add_error(qtbot, model):
@@ -200,10 +200,11 @@ async def test_reboot_controller_exception(model):
         await model.reboot_controller()
 
 
-def test_set_bit_digital_status_exception(model):
+@pytest.mark.asyncio
+async def test_set_bit_digital_status_exception(model):
 
     with pytest.raises(RuntimeError):
-        model.set_bit_digital_status(0, 1)
+        await model.set_bit_digital_status(0)
 
 
 @pytest.mark.asyncio
@@ -276,42 +277,77 @@ async def test_connect_exception(model):
 def test_process_event(qtbot, model):
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model._process_event({"id": "m2AssemblyInPosition", "inPosition": True})
+        model._process_event(message={"id": "m2AssemblyInPosition", "inPosition": True})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
         model._process_event(
-            {"id": "summaryState", "summaryState": salobj.State.DISABLED}
+            message={"id": "summaryState", "summaryState": salobj.State.DISABLED}
         )
     assert model.local_mode == LocalMode.Diagnostic
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model._process_event({"id": "errorCode", "errorCode": 1})
+        model._process_event(message={"id": "errorCode", "errorCode": 1})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_event({"id": "commandableByDDS", "state": True})
+        model._process_event(message={"id": "commandableByDDS", "state": True})
     assert model.is_csc_commander is True
 
     with qtbot.waitSignal(
         model.utility_monitor.signal_detailed_force.hard_points, timeout=TIMEOUT
     ):
-        model._process_event({"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]})
+        model._process_event(
+            message={"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]}
+        )
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_event({"id": "forceBalanceSystemStatus", "status": True})
+        model._process_event(message={"id": "forceBalanceSystemStatus", "status": True})
     assert model.is_closed_loop is True
 
     with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
-        model._process_event({"id": "scriptExecutionStatus", "percentage": 1})
+        model._process_event(message={"id": "scriptExecutionStatus", "percentage": 1})
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_utility.digital_status_output, timeout=TIMEOUT
+    with qtbot.waitSignals(
+        [
+            model.utility_monitor.signal_utility.digital_status_output,
+            model.signal_status.name_status,
+        ],
+        timeout=TIMEOUT,
     ):
-        model._process_event({"id": "digitalOutput", "value": 1})
+        model._process_event(message={"id": "digitalOutput", "value": 3})
+
+        assert model.system_status["isPowerCommunicationOn"] is True
+        assert model.system_status["isPowerMotorOn"] is True
 
     with qtbot.waitSignal(
         model.utility_monitor.signal_utility.digital_status_input, timeout=TIMEOUT
     ):
-        model._process_event({"id": "digitalInput", "value": 1})
+        model._process_event(message={"id": "digitalInput", "value": 1})
+
+    with qtbot.waitSignal(model.signal_config.config, timeout=TIMEOUT):
+        model._process_event(
+            message={
+                "id": "config",
+                "configuration": "surrogate_handling.csv",
+                "version": "20180831T092556",
+                "controlParameters": "CtrlParameterFiles_surg",
+                "lutParameters": "FinalHandlingLUTs",
+                "powerWarningMotor": 5.0,
+                "powerFaultMotor": 10.0,
+                "powerThresholdMotor": 20.0,
+                "powerWarningComm": 5.0,
+                "powerFaultComm": 10.0,
+                "powerThresholdComm": 10.0,
+                "inPositionAxial": 0.158,
+                "inPositionTangent": 1.1,
+                "inPositionSample": 1.0,
+                "timeoutSal": 15.0,
+                "timeoutCrio": 1.0,
+                "timeoutIlc": 3,
+                "inclinometerDelta": 2.0,
+                "inclinometerDiffEnabled": True,
+                "cellTemperatureDelta": 2.0,
+            }
+        )
 
 
 def test_get_message_name(model):
@@ -346,7 +382,15 @@ def test_process_telemetry(qtbot, model):
         model.utility_monitor.signal_position.position, timeout=TIMEOUT
     ):
         model._process_telemetry(
-            {"id": "position", "x": 1, "y": 1, "z": 1, "xRot": 1, "yRot": 1, "zRot": 1}
+            message={
+                "id": "position",
+                "x": 1,
+                "y": 1,
+                "z": 1,
+                "xRot": 1,
+                "yRot": 1,
+                "zRot": 1,
+            }
         )
 
     num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
@@ -354,7 +398,7 @@ def test_process_telemetry(qtbot, model):
         model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
     ):
         model._process_telemetry(
-            {
+            message={
                 "id": "axialForce",
                 "lutGravity": [1] * num_axial,
                 "lutTemperature": [1] * num_axial,
@@ -368,7 +412,7 @@ def test_process_telemetry(qtbot, model):
         model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
     ):
         model._process_telemetry(
-            {
+            message={
                 "id": "tangentForce",
                 "lutGravity": [1] * NUM_TANGENT_LINK,
                 "applied": [1] * NUM_TANGENT_LINK,
@@ -381,7 +425,7 @@ def test_process_telemetry(qtbot, model):
         model.utility_monitor.signal_utility.temperatures, timeout=TIMEOUT
     ):
         model._process_telemetry(
-            {
+            message={
                 "id": "temperature",
                 "intake": [1] * 2,
                 "exhaust": [1] * 2,
@@ -393,9 +437,19 @@ def test_process_telemetry(qtbot, model):
         model.utility_monitor.signal_utility.inclinometer, timeout=TIMEOUT
     ):
         model._process_telemetry(
-            {
+            message={
                 "id": "zenithAngle",
                 "inclinometerProcessed": 1,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_utility.inclinometer_tma, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            message={
+                "id": "inclinometerAngleTma",
+                "inclinometer": 1,
             }
         )
 
@@ -403,7 +457,7 @@ def test_process_telemetry(qtbot, model):
         model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
     ):
         model._process_telemetry(
-            {
+            message={
                 "id": "axialEncoderPositions",
                 "position": [10000] * num_axial,
             }
@@ -413,7 +467,7 @@ def test_process_telemetry(qtbot, model):
         model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
     ):
         model._process_telemetry(
-            {
+            message={
                 "id": "tangentEncoderPositions",
                 "position": [10000] * NUM_TANGENT_LINK,
             }
@@ -424,7 +478,7 @@ def test_process_telemetry(qtbot, model):
     ):
         num_sensor = 6
         model._process_telemetry(
-            {
+            message={
                 "id": "displacementSensors",
                 "thetaZ": [1] * num_sensor,
                 "deltaZ": [1] * num_sensor,
@@ -440,7 +494,7 @@ def test_process_telemetry(qtbot, model):
     ):
         num_sensor = 6
         model._process_telemetry(
-            {
+            message={
                 "id": "powerStatus",
                 "motorVoltage": 1,
                 "motorCurrent": 1,
@@ -448,3 +502,44 @@ def test_process_telemetry(qtbot, model):
                 "commCurrent": 1,
             }
         )
+
+    with qtbot.waitSignals(
+        [
+            model.utility_monitor.signal_utility.power_motor_raw,
+            model.utility_monitor.signal_utility.power_communication_raw,
+        ],
+        timeout=TIMEOUT,
+    ):
+        num_sensor = 6
+        model._process_telemetry(
+            message={
+                "id": "powerStatusRaw",
+                "motorVoltage": 1,
+                "motorCurrent": 1,
+                "commVoltage": 1,
+                "commCurrent": 1,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_detailed_force.force_error_tangent, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            message={
+                "id": "forceErrorTangent",
+                "force": [1] * NUM_TANGENT_LINK,
+                "weight": 1,
+                "sum": 1,
+            }
+        )
+
+
+def test_process_lost_connection(model):
+
+    model.system_status["isCrioConnected"] = True
+    model.system_status["isTelemetryActive"] = True
+
+    model._process_lost_connection()
+
+    assert model.system_status["isCrioConnected"] is False
+    assert model.system_status["isTelemetryActive"] is False
