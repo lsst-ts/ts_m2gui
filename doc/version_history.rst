@@ -6,6 +6,17 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.2.3:
+
+-------------
+0.2.3
+-------------
+
+* Support the specific command, event, and telemetry for the EUI only.
+* Add the option to disable the logging file for the file permission issue of CentOS host with the docker container.
+In addition, the latest developer docker image has the problem to use the PySide2 with CentOS host as root user.
+Report the bug in DM-36459.
+
 .. _lsst.ts.m2gui-0.2.2:
 
 -------------
