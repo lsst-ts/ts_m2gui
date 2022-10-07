@@ -100,15 +100,23 @@ async def main(argv):
     )
     parser.addOption(option_log_level)
 
+    option_no_log_file = QCommandLineOption(
+        ["no-logfile"], "Do not write log messages to file."
+    )
+    parser.addOption(option_no_log_file)
+
     parser.process(app)
 
     # Get the argument
+    is_output_log_to_file = not parser.isSet(option_no_log_file)
     is_verbose = parser.isSet(option_verbose)
     is_simulation_mode = parser.isSet(option_simulation)
     log_level = int(parser.value(option_log_level))
 
     # Create a Qt main window, which will be our window.
-    window_main = MainWindow(is_verbose, is_simulation_mode, log_level=log_level)
+    window_main = MainWindow(
+        is_output_log_to_file, is_verbose, is_simulation_mode, log_level=log_level
+    )
     window_main.show()
 
     await future

@@ -51,6 +51,8 @@ class MainWindow(QMainWindow):
 
     Parameters
     ----------
+    is_output_log_to_file : `bool`
+        Is outputting the log messages to file or not.
     is_output_log_on_screen : `bool`
         Is outputting the log messages on screen or not.
     is_simulation_mode: `bool`
@@ -71,6 +73,7 @@ class MainWindow(QMainWindow):
 
     def __init__(
         self,
+        is_output_log_to_file,
         is_output_log_on_screen,
         is_simulation_mode,
         log=None,
@@ -84,7 +87,11 @@ class MainWindow(QMainWindow):
         # Set the logger
         message_format = "%(asctime)s, %(levelname)s, %(message)s"
         self.log = self._set_log(
-            message_format, is_output_log_on_screen, log_level, log=log
+            message_format,
+            is_output_log_to_file,
+            is_output_log_on_screen,
+            log_level,
+            log=log,
         )
 
         self.model = self._set_model(is_simulation_mode)
@@ -125,13 +132,22 @@ class MainWindow(QMainWindow):
         if is_simulation_mode:
             self.log.info("Running the simulation mode.")
 
-    def _set_log(self, message_format, is_output_log_on_screen, level, log=None):
+    def _set_log(
+        self,
+        message_format,
+        is_output_log_to_file,
+        is_output_log_on_screen,
+        level,
+        log=None,
+    ):
         """Set the logger.
 
         Parameters
         ----------
         message_format : `str`
             Format of the message.
+        is_output_log_to_file : `bool`
+            Is outputting the log messages to file or not.
         is_output_log_on_screen : `bool`
             Is outputting the log messages on screen or not.
         level : `int`
@@ -151,10 +167,15 @@ class MainWindow(QMainWindow):
         else:
             log = log.getChild(type(self).__name__)
 
-        logging.basicConfig(
-            filename=self._get_log_file_name(),
-            format=message_format,
-        )
+        if is_output_log_to_file:
+            logging.basicConfig(
+                filename=self._get_log_file_name(),
+                format=message_format,
+            )
+        else:
+            logging.basicConfig(
+                format=message_format,
+            )
 
         log.addHandler(LogWindowHandler(self._signal_message, message_format))
 

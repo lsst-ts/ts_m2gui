@@ -64,6 +64,8 @@ class UtilityMonitor(object):
         current is ampere.
     inclinometer_angle : `float`
         Inclinometer angle in degree.
+    inclinometer_angle_tma : `float`
+        Inclinometer angle of telescope mount assembly (TMA) in degree.
     breakers : `dict`
         Breakers. The key is the breaker name. If the breaker is triggered, the
         value is True. Otherwise, False.
@@ -112,6 +114,7 @@ class UtilityMonitor(object):
         self.power_communication_raw = self._get_default_power()
 
         self.inclinometer_angle = 0
+        self.inclinometer_angle_tma = 0
 
         self.breakers = {
             "J1-W9-1": False,
@@ -203,6 +206,7 @@ class UtilityMonitor(object):
         self._report_powers()
 
         self.signal_utility.inclinometer.emit(self.inclinometer_angle)
+        self.signal_utility.inclinometer_tma.emit(self.inclinometer_angle_tma)
 
         for name, status in self.breakers.items():
             self.signal_utility.breaker_status.emit((name, status))
@@ -417,19 +421,37 @@ class UtilityMonitor(object):
 
         self._update_power(power, new_voltage, new_current, signal_name)
 
-    def update_inclinometer_angle(self, new_angle):
+    def update_inclinometer_angle(self, new_angle, is_internal=True):
         """Update the angle of inclinometer.
 
         Parameters
         ----------
         new_angle : `float`
             New angle value in degree.
+        is_internal : `bool`
+            Is the internal inclinometer or not. If False, the new_angle comes
+            from the telescope mount assembly (TMA). (the default is True)
         """
 
+        original_angle = (
+            self.inclinometer_angle if is_internal else self.inclinometer_angle_tma
+        )
+        signal = (
+            self.signal_utility.inclinometer
+            if is_internal
+            else self.signal_utility.inclinometer_tma
+        )
+
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
-        if self._has_changed(self.inclinometer_angle, new_angle, tol):
-            self.inclinometer_angle = round(new_angle, self.NUM_DIGIT_AFTER_DECIMAL)
-            self.signal_utility.inclinometer.emit(self.inclinometer_angle)
+        if self._has_changed(original_angle, new_angle, tol):
+
+            angle_rounded = round(new_angle, self.NUM_DIGIT_AFTER_DECIMAL)
+            signal.emit(angle_rounded)
+
+            if is_internal:
+                self.inclinometer_angle = angle_rounded
+            else:
+                self.inclinometer_angle_tma = angle_rounded
 
     def update_breaker(self, name, new_status):
         """Update the breaker status.
