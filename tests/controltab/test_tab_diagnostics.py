@@ -23,8 +23,10 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
+from lsst.ts import salobj
 from lsst.ts.m2com import PowerType
-from lsst.ts.m2gui import ForceErrorTangent, LocalMode, Model
+from lsst.ts.m2gui import ForceErrorTangent, Model
 from lsst.ts.m2gui.controltab import TabDiagnostics
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
@@ -39,22 +41,40 @@ def widget(qtbot):
     return widget
 
 
+@pytest_asyncio.fixture
+async def widget_async(qtbot):
+    async with TabDiagnostics(
+        "Diagnostics", Model(logging.getLogger(), is_simulation_mode=True)
+    ) as widget_sim:
+        qtbot.addWidget(widget_sim)
+
+        await widget_sim.model.connect()
+        yield widget_sim
+
+
 @pytest.mark.asyncio
-async def test_callback_control_digital_status(qtbot, widget):
+async def test_callback_control_digital_status(qtbot, widget_async):
 
-    widget.model.local_mode = LocalMode.Diagnostic
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
-    control = widget._digital_status_control[2]
-    assert control.isChecked() is False
-    assert control.text() == "OFF"
+    # Should fail in the wrong state
+    control = widget_async._digital_status_control[2]
+    assert control.isChecked() is True
+    assert control.text() == "ON"
+
+    # Go to the DISABLED state (or the Diagnostic state in EUI)
+    await widget_async.model.controller.write_command_to_server(
+        "start", controller_state_expected=salobj.State.DISABLED
+    )
 
     qtbot.mouseClick(control, Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert control.isChecked() is True
-    assert control.text() == "ON"
+    assert control.isChecked() is False
+    assert control.text() == "OFF"
 
 
 @pytest.mark.asyncio

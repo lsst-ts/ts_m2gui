@@ -98,8 +98,11 @@ class SignalUtility(QtCore.QObject):
     power_motor_raw = QtCore.Signal(object)
     power_communication_raw = QtCore.Signal(object)
 
-    # Unit is degree
+    # M2 inclinometer angle in degree
     inclinometer = QtCore.Signal(float)
+
+    # Telescope mount assembly (TMA) inclinometer angle in degree
+    inclinometer_tma = QtCore.Signal(float)
 
     # The breaker_status should be a tuple: (name, status). The data type of
     # "name" is string, and the data type of "status" is bool. If the breaker

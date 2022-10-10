@@ -58,6 +58,7 @@ class TabUtilityView(TabDefault):
             "power_voltage_communication": create_label(),
             "power_current_communication": create_label(),
             "inclinometer": create_label(),
+            "inclinometer_tma": create_label(),
         }
 
         self._breakers = self._create_indicators_breaker()
@@ -264,6 +265,7 @@ class TabUtilityView(TabDefault):
 
         layout = QFormLayout()
         layout.addRow("Inclinometer Angle:", self._power_inclinometer["inclinometer"])
+        layout.addRow("TMA Angle:", self._power_inclinometer["inclinometer_tma"])
 
         return create_group_box("Elevation Angle", layout)
 
@@ -360,6 +362,7 @@ class TabUtilityView(TabDefault):
         )
 
         signal_utility.inclinometer.connect(self._callback_inclinometer)
+        signal_utility.inclinometer_tma.connect(self._callback_inclinometer_tma)
 
         signal_utility.breaker_status.connect(self._callback_breakers)
 
@@ -409,6 +412,20 @@ class TabUtilityView(TabDefault):
             Inclinometer angle in degree.
         """
         self._power_inclinometer["inclinometer"].setText(f"{inclinometer} degree")
+
+    @asyncSlot()
+    async def _callback_inclinometer_tma(self, inclinometer_tma):
+        """Callback of the utility signal for the telescope mount assembly
+        (TMA) inclinometer angle.
+
+        Parameters
+        ----------
+        inclinometer_tma : `float`
+            Inclinometer angle of TMA in degree.
+        """
+        self._power_inclinometer["inclinometer_tma"].setText(
+            f"{inclinometer_tma} degree"
+        )
 
     @asyncSlot()
     async def _callback_breakers(self, breaker_status):

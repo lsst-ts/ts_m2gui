@@ -272,9 +272,7 @@ class TabDiagnostics(TabDefault):
         control = self._digital_status_control[idx]
         is_checked = control.isChecked()
 
-        is_successful = await run_command(
-            self.model.set_bit_digital_status, idx, is_checked
-        )
+        is_successful = await run_command(self.model.set_bit_digital_status, idx)
 
         if is_successful:
             self._update_control_text(control, is_checked)

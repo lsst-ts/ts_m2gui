@@ -27,6 +27,7 @@ from lsst.ts.m2com import (
     NUM_TANGENT_LINK,
     ActuatorDisplacementUnit,
     ControllerCell,
+    DigitalOutput,
     PowerType,
     get_config_dir,
 )
@@ -35,6 +36,7 @@ from . import (
     Config,
     DisplacementSensorDirection,
     FaultManager,
+    ForceErrorTangent,
     LimitSwitchType,
     LocalMode,
     Ring,
@@ -153,8 +155,6 @@ class Model(object):
             "isCrioConnected": False,
             "isTelemetryActive": False,
             "isInPosition": False,
-            "isInMotion": False,
-            "isTcsActive": False,
             "isPowerCommunicationOn": False,
             "isPowerMotorOn": False,
             "isOpenLoopMaxLimitsEnabled": False,
@@ -436,15 +436,13 @@ class Model(object):
                 "Controller can only be rebooted at the standby state with local control."
             )
 
-    def set_bit_digital_status(self, idx, value):
+    async def set_bit_digital_status(self, idx):
         """Set the bit value of digital status.
 
         Parameters
         ----------
         idx : `int`
             Bit index that begins from 0, which should be >= 0.
-        value : `bool`
-            Bit value.
 
         Raises
         ------
@@ -453,8 +451,9 @@ class Model(object):
         """
 
         if self.local_mode == LocalMode.Diagnostic:
-            # TODO: Fix this in DM-36020.
-            self.log.info(f"Set the {idx}th bit of digital status to be {int(value)}.")
+            await self.controller.write_command_to_server(
+                "switchDigitalOutput", message_details={"bit": 2**idx}
+            )
         else:
             raise RuntimeError(
                 "Bit value of digital status can only be set in the diagnostic state."
@@ -629,7 +628,7 @@ class Model(object):
             self.controller.start_task_event_loop(self._process_event)
             self.controller.start_task_telemetry_loop(self._process_telemetry)
             self.controller.start_task_connection_monitor_loop(
-                self.update_system_status, "isCrioConnected", False
+                self._process_lost_connection
             )
 
         await self.controller.connect_server()
@@ -694,10 +693,43 @@ class Model(object):
                 self.report_script_progress(int(message["percentage"]))
 
             elif name == "digitalOutput":
-                self.utility_monitor.update_digital_status_output(message["value"])
+                digital_output = message["value"]
+                self.utility_monitor.update_digital_status_output(digital_output)
+
+                self.update_system_status(
+                    "isPowerCommunicationOn",
+                    bool(digital_output & DigitalOutput.CommunicationPower.value),
+                )
+                self.update_system_status(
+                    "isPowerMotorOn",
+                    bool(digital_output & DigitalOutput.MotorPower.value),
+                )
 
             elif name == "digitalInput":
                 self.utility_monitor.update_digital_status_input(message["value"])
+
+            elif name == "config":
+                self.report_config(
+                    file_configuration=message["configuration"],
+                    file_version=message["version"],
+                    file_control_parameters=message["controlParameters"],
+                    file_lut_parameters=message["lutParameters"],
+                    power_warning_motor=message["powerWarningMotor"],
+                    power_fault_motor=message["powerFaultMotor"],
+                    power_threshold_motor=message["powerThresholdMotor"],
+                    power_warning_communication=message["powerWarningComm"],
+                    power_fault_communication=message["powerFaultComm"],
+                    power_threshold_communication=message["powerThresholdComm"],
+                    in_position_axial=message["inPositionAxial"],
+                    in_position_tangent=message["inPositionTangent"],
+                    in_position_sample=message["inPositionSample"],
+                    timeout_sal=message["timeoutSal"],
+                    timeout_crio=message["timeoutCrio"],
+                    timeout_ilc=message["timeoutIlc"],
+                    misc_range_angle=message["inclinometerDelta"],
+                    misc_diff_enabled=message["inclinometerDiffEnabled"],
+                    misc_range_temperature=message["cellTemperatureDelta"],
+                )
 
             # Ignore these messages because they are specific to CSC
             elif name in (
@@ -787,6 +819,8 @@ class Model(object):
         name = self._get_message_name(message)
 
         if name != "":
+
+            self.update_system_status("isTelemetryActive", True)
 
             num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
 
@@ -881,6 +915,11 @@ class Model(object):
                     message["inclinometerProcessed"]
                 )
 
+            elif name == "inclinometerAngleTma":
+                self.utility_monitor.update_inclinometer_angle(
+                    message["inclinometer"], is_internal=False
+                )
+
             # If the step changes, the position will be changed as well.
             # We base on the change of position to send the "signal" to
             # update the GUI.
@@ -928,6 +967,23 @@ class Model(object):
                     message["commCurrent"],
                 )
 
+            elif name == "powerStatusRaw":
+                self.utility_monitor.update_power_raw(
+                    PowerType.Motor, message["motorVoltage"], message["motorCurrent"]
+                )
+                self.utility_monitor.update_power_raw(
+                    PowerType.Communication,
+                    message["commVoltage"],
+                    message["commCurrent"],
+                )
+
+            elif name == "forceErrorTangent":
+                force_error = ForceErrorTangent()
+                force_error.error_force = message["force"]
+                force_error.error_weight = message["weight"]
+                force_error.error_sum = message["sum"]
+                self.utility_monitor.update_force_error_tangent(force_error)
+
             # Ignore these messages because they are specific to CSC
             elif name in (
                 "forceBalance",
@@ -941,6 +997,12 @@ class Model(object):
             else:
                 self.log.warning(f"Unspecified telemetry message: {name}, ignoring...")
 
+    def _process_lost_connection(self):
+        """Process the lost of connection from the M2 controller."""
+
+        self.update_system_status("isCrioConnected", False)
+        self.update_system_status("isTelemetryActive", False)
+
     async def disconnect(self):
         """Disconnect from the M2 controller."""
 
@@ -950,9 +1012,8 @@ class Model(object):
             self.log.info("No connection with the M2 controller.")
 
         await self.controller.close_tasks()
-        self.update_system_status(
-            "isCrioConnected", self.controller.are_clients_connected()
-        )
+
+        self._process_lost_connection()
 
     async def __aenter__(self):
         """This is an overridden function to support the asynchronous context

@@ -30,7 +30,7 @@ from PySide2.QtWidgets import QToolBar
 @pytest.fixture
 def widget(qtbot):
 
-    widget = MainWindow(False, False, log_level=13)
+    widget = MainWindow(False, False, False, log_level=13)
     qtbot.addWidget(widget)
 
     return widget
@@ -39,7 +39,7 @@ def widget(qtbot):
 @pytest.fixture
 def widget_sim(qtbot):
 
-    widget_sim = MainWindow(False, True)
+    widget_sim = MainWindow(False, False, True)
     qtbot.addWidget(widget_sim)
 
     return widget_sim

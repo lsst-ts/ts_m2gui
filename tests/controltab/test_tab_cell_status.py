@@ -147,11 +147,11 @@ async def test_callback_time_out(widget):
 
     figure_realtime = widget._figures["realtime"]
 
-    assert figure_realtime.get_series(0).count() == 1
-    assert figure_realtime.get_series(1).count() == 1
+    assert figure_realtime.get_series(0).count() > 0
+    assert figure_realtime.get_series(1).count() > 0
 
-    assert figure_realtime.get_points(0)[0].y() == 1
-    assert figure_realtime.get_points(1)[0].y() == 2
+    assert figure_realtime.get_points(0)[-1].y() == 1
+    assert figure_realtime.get_points(1)[-1].y() == 2
 
 
 @pytest.mark.asyncio

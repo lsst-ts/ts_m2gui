@@ -33,7 +33,6 @@ class ForceErrorTangent:
     mirror."""
 
     # The unit of force is Newton.
-
     error_force: List[int] = field(default_factory=lambda: [0] * NUM_TANGENT_LINK)
     error_weight: float = 0
     error_sum: float = 0
