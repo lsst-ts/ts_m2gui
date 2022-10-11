@@ -20,10 +20,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
-from os import getenv
 
 import pytest
-from lsst.ts.m2gui import Ring, get_num_actuator_ring, get_tol, is_jenkins, run_command
+from lsst.ts.m2gui import Ring, get_num_actuator_ring, get_tol, run_command
 
 
 def command_normal(is_failed):
@@ -67,11 +66,3 @@ async def test_run_command(qtbot):
 
     assert await run_command(command_coroutine, False) is True
     assert await run_command(command_coroutine, True, is_prompted=False) is False
-
-
-def test_is_jenkins():
-
-    if getenv("JOB_NAME") is None:
-        assert is_jenkins() is False
-    else:
-        assert is_jenkins() is True

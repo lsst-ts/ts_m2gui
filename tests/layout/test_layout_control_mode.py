@@ -25,7 +25,7 @@ import logging
 import pytest
 import pytest_asyncio
 from lsst.ts import salobj
-from lsst.ts.m2gui import LocalMode, Model, is_jenkins
+from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutControlMode
 from PySide2 import QtCore
@@ -60,6 +60,12 @@ async def widget_async(qtbot):
         yield widget_sim
 
 
+# Need to add this to make the above widget_async() to work on Jenkins.
+# I guess there is some bug in "pytest" and "pytest_asyncio" libraries.
+def test_init(widget):
+    pass
+
+
 @pytest.mark.asyncio
 async def test_callback_signal_control_normal(qtbot, widget):
     widget.layout_control_mode.model.report_control_status()
@@ -84,9 +90,6 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
     assert widget.layout_control_mode._button_closed_loop.isEnabled() is True
 
 
-@pytest.mark.skipif(
-    is_jenkins(), reason="Jenkins failed to initiate the context manager."
-)
 @pytest.mark.asyncio
 async def test_switch_force_balance_system(qtbot, widget_async):
 
@@ -102,17 +105,6 @@ async def test_switch_force_balance_system(qtbot, widget_async):
     await asyncio.sleep(1)
 
     assert widget_async.model.local_mode == LocalMode.Enable
-
-    assert widget_async.model.is_closed_loop is True
-    assert widget_async.layout_control_mode._button_open_loop.isEnabled() is True
-    assert widget_async.layout_control_mode._button_closed_loop.isEnabled() is False
-
-    qtbot.mouseClick(
-        widget_async.layout_control_mode._button_open_loop, QtCore.Qt.LeftButton
-    )
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
 
     assert widget_async.model.is_closed_loop is False
     assert widget_async.layout_control_mode._button_open_loop.isEnabled() is False

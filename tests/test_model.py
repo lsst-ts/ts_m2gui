@@ -24,7 +24,13 @@ import logging
 import pytest
 import pytest_asyncio
 from lsst.ts import salobj
-from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, CommandActuator, CommandScript
+from lsst.ts.m2com import (
+    NUM_ACTUATOR,
+    NUM_TANGENT_LINK,
+    CommandActuator,
+    CommandScript,
+    PowerType,
+)
 from lsst.ts.m2gui import LimitSwitchType, LocalMode, Model, Ring
 
 TIMEOUT = 1000
@@ -242,7 +248,7 @@ async def test_reset_breakers(qtbot, model_async):
     with qtbot.waitSignal(
         model_async.utility_monitor.signal_utility.breaker_status, timeout=TIMEOUT_LONG
     ):
-        await model_async.reset_breakers()
+        await model_async.reset_breakers(PowerType.Motor)
 
 
 def test_update_connection_information(model):
