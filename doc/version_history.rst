@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.2.4:
+
+-------------
+0.2.4
+-------------
+
+* Separate the buttons to reset the breakers of motor and communication.
+* Fix the skipped unit tests on Jenkins.
+
 .. _lsst.ts.m2gui-0.2.3:
 
 -------------
