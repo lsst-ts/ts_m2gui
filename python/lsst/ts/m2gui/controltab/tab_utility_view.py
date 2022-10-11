@@ -62,8 +62,15 @@ class TabUtilityView(TabDefault):
         }
 
         self._breakers = self._create_indicators_breaker()
-        self._button_reset_breakers = set_button(
-            "Reset Breakers", self._callback_reset_breakers
+        self._button_reset_breakers_motor = set_button(
+            "Reset Breakers (Motor)",
+            self._callback_reset_breakers,
+            PowerType.Motor,
+        )
+        self._button_reset_breakers_communication = set_button(
+            "Reset Breakers (Communication)",
+            self._callback_reset_breakers,
+            PowerType.Communication,
         )
 
         self._temperatures = self._create_labels_sensor_data(
@@ -117,19 +124,29 @@ class TabUtilityView(TabDefault):
         indicator.setPalette(palette)
 
     @asyncSlot()
-    async def _callback_reset_breakers(self):
+    async def _callback_reset_breakers(self, power_type):
         """Callback of the reset-breakers button. This will reset all triggered
         breakers.
 
         Disable the reset-breakers button, reset the breakers and re-enable the
         reset-breakers button.
+
+        Parameters
+        ----------
+        power_type : enum `lsst.ts.m2com.PowerType`
+            Power type.
         """
 
-        self._button_reset_breakers.setEnabled(False)
+        button = (
+            self._button_reset_breakers_motor
+            if power_type == PowerType.Motor
+            else self._button_reset_breakers_communication
+        )
+        button.setEnabled(False)
 
-        await run_command(self.model.reset_breakers)
+        await run_command(self.model.reset_breakers, power_type)
 
-        self._button_reset_breakers.setEnabled(True)
+        button.setEnabled(True)
 
     def _create_labels_sensor_data(self, sensor_data):
         """Create the labels of sensor data.
@@ -184,8 +201,9 @@ class TabUtilityView(TabDefault):
         # Second column
         layout_breaker = QVBoxLayout()
         layout_breaker.addWidget(self._create_group_breakers(PowerType.Motor))
+        layout_breaker.addWidget(self._button_reset_breakers_motor)
         layout_breaker.addWidget(self._create_group_breakers(PowerType.Communication))
-        layout_breaker.addWidget(self._button_reset_breakers)
+        layout_breaker.addWidget(self._button_reset_breakers_communication)
 
         layout.addLayout(layout_breaker)
 

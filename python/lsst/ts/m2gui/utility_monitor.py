@@ -469,11 +469,18 @@ class UtilityMonitor(object):
             self.breakers[name] = new_status
             self.signal_utility.breaker_status.emit((name, new_status))
 
-    def reset_breakers(self):
-        """Reset the breakers."""
+    def reset_breakers(self, power_type):
+        """Reset the breakers.
 
-        for name in self.breakers.keys():
-            self.update_breaker(name, False)
+        Parameters
+        ----------
+        power_type : enum `lsst.ts.m2com.PowerType`
+            Power type.
+        """
+
+        breakers = self.get_breakers(power_type)
+        for breaker in breakers:
+            self.update_breaker(breaker, False)
 
     def get_breakers(self, power_type):
         """Get the breakers of the specific power type.
