@@ -23,6 +23,8 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
+from lsst.ts import salobj
 from lsst.ts.m2com import PowerType
 from lsst.ts.m2gui import DisplacementSensorDirection, Model, TemperatureGroup
 from lsst.ts.m2gui.controltab import TabUtilityView
@@ -39,14 +41,42 @@ def widget(qtbot):
     return widget
 
 
-def test_callback_reset_breakers(qtbot, widget):
+@pytest_asyncio.fixture
+async def widget_async(qtbot):
+    async with TabUtilityView(
+        "Utility View", Model(logging.getLogger(), is_simulation_mode=True)
+    ) as widget_sim:
+        qtbot.addWidget(widget_sim)
 
-    name = "J1-W9-3"
-    widget.model.utility_monitor.update_breaker(name, True)
+        await widget_sim.model.connect()
+        yield widget_sim
 
-    qtbot.mouseClick(widget._button_reset_breakers, Qt.LeftButton)
 
-    palette = widget._breakers[name].palette()
+def test_init(widget):
+
+    for breaker in widget._breakers.keys():
+        palette = widget._breakers[breaker].palette()
+        color = palette.color(QPalette.Button)
+        assert color == Qt.green
+
+
+@pytest.mark.asyncio
+async def test_callback_reset_breakers(widget_async):
+
+    # Transition to Disabled state to turn on the communication power
+    await widget_async.model.controller.write_command_to_server(
+        "start", controller_state_expected=salobj.State.DISABLED
+    )
+
+    name = "J3-W14-2"
+    widget_async.model.utility_monitor.update_breaker(name, True)
+
+    await widget_async._callback_reset_breakers(PowerType.Communication)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(8)
+
+    palette = widget_async._breakers[name].palette()
     color = palette.color(QPalette.Button)
     assert color == Qt.green
 

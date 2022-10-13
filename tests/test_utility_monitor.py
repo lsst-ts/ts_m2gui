@@ -213,14 +213,14 @@ def test_reset_breakers(qtbot, utility_monitor):
     # There should be no signal
     signal = utility_monitor.signal_utility.breaker_status
     with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
-        utility_monitor.reset_breakers()
+        utility_monitor.reset_breakers(PowerType.Motor)
 
     # There is the signal
     name = "J1-W9-1"
     utility_monitor.update_breaker(name, True)
 
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
-        utility_monitor.reset_breakers()
+        utility_monitor.reset_breakers(PowerType.Motor)
 
     assert utility_monitor.breakers[name] is False
 

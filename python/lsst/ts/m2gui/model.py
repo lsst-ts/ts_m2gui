@@ -550,18 +550,20 @@ class Model(object):
                 "Failed to command the actuator. Only allow in Enabled state and open-loop control."
             )
 
-    async def reset_breakers(self):
-        """Reset the breakers."""
+    async def reset_breakers(self, power_type):
+        """Reset the breakers.
+
+        Parameters
+        ----------
+        power_type : enum `lsst.ts.m2com.PowerType`
+            Power type.
+        """
 
         await self.controller.write_command_to_server(
-            "resetBreakers", message_details={"powerType": PowerType.Motor}
+            "resetBreakers", message_details={"powerType": power_type}
         )
 
-        await self.controller.write_command_to_server(
-            "resetBreakers", message_details={"powerType": PowerType.Communication}
-        )
-
-        self.utility_monitor.reset_breakers()
+        self.utility_monitor.reset_breakers(power_type)
 
     def update_connection_information(
         self, host, port_command, port_telemetry, timeout_connection

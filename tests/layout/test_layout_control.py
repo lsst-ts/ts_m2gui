@@ -24,7 +24,7 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2gui import LocalMode, Model, is_jenkins
+from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutControl
 from PySide2 import QtCore
@@ -59,6 +59,12 @@ async def widget_async(qtbot):
         yield widget_sim
 
 
+# Need to add this to make the above widget_async() to work on Jenkins.
+# I guess there is some bug in "pytest" and "pytest_asyncio" libraries.
+def test_init(widget):
+    pass
+
+
 @pytest.mark.asyncio
 async def test_callback_signal_control_normal(qtbot, widget):
     widget.layout_control.model.report_control_status()
@@ -83,9 +89,6 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
     assert widget.layout_control._button_local.isEnabled() is False
 
 
-@pytest.mark.skipif(
-    is_jenkins(), reason="Jenkins failed to initiate the context manager."
-)
 @pytest.mark.asyncio
 async def test_set_csc_commander(qtbot, widget_async):
 

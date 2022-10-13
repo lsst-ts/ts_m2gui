@@ -29,11 +29,9 @@ __all__ = [
     "prompt_dialog_warning",
     "run_command",
     "get_button_action",
-    "is_jenkins",
 ]
 
 from functools import partial
-from os import getenv
 
 from lsst.ts.m2com import is_coroutine
 from PySide2.QtCore import Qt
@@ -329,14 +327,3 @@ def get_button_action(tool_bar, name):
             return tool_bar.widgetForAction(action)
 
     return None
-
-
-def is_jenkins():
-    """The running environment is Jenkins or not.
-
-    Returns
-    -------
-    `bool`
-        True if running on Jenkins. Otherwise, False.
-    """
-    return getenv("JOB_NAME") is not None

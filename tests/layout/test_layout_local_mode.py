@@ -24,7 +24,7 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2gui import LocalMode, Model, is_jenkins
+from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutLocalMode
 from PySide2 import QtCore
@@ -57,6 +57,12 @@ async def widget_async(qtbot):
 
         await widget_sim.model.connect()
         yield widget_sim
+
+
+# Need to add this to make the above widget_async() to work on Jenkins.
+# I guess there is some bug in "pytest" and "pytest_asyncio" libraries.
+def test_init(widget):
+    pass
 
 
 @pytest.mark.asyncio
@@ -98,9 +104,6 @@ def _assert_prohibit_transition(widget):
     assert widget.layout_local_mode._button_enable.isEnabled() is False
 
 
-@pytest.mark.skipif(
-    is_jenkins(), reason="Jenkins failed to initiate the context manager."
-)
 @pytest.mark.asyncio
 async def test_set_local_mode(qtbot, widget_async):
 
@@ -139,13 +142,8 @@ async def test_set_local_mode(qtbot, widget_async):
     assert widget_async.model.local_mode == LocalMode.Enable
 
     assert widget_async.layout_local_mode._button_standby.isEnabled() is False
-    assert widget_async.layout_local_mode._button_diagnostic.isEnabled() is False
+    assert widget_async.layout_local_mode._button_diagnostic.isEnabled() is True
     assert widget_async.layout_local_mode._button_enable.isEnabled() is False
-
-    # Turn off the force balance system to enable the open-loop maximum limit
-    await controller.write_command_to_server(
-        "switchForceBalanceSystem", message_details={"status": False}
-    )
 
     await widget_async.model.enable_open_loop_max_limit()
     assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
