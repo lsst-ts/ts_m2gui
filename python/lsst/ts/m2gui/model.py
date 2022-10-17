@@ -27,7 +27,9 @@ from lsst.ts.m2com import (
     NUM_TANGENT_LINK,
     ActuatorDisplacementUnit,
     ControllerCell,
+    DigitalInput,
     DigitalOutput,
+    LimitSwitchType,
     PowerType,
     get_config_dir,
 )
@@ -37,7 +39,6 @@ from . import (
     DisplacementSensorDirection,
     FaultManager,
     ForceErrorTangent,
-    LimitSwitchType,
     LocalMode,
     Ring,
     SignalConfig,
@@ -47,6 +48,7 @@ from . import (
     TemperatureGroup,
     UtilityMonitor,
     get_num_actuator_ring,
+    map_actuator_id_to_alias,
 )
 
 
@@ -275,15 +277,10 @@ class Model(object):
 
         if not self.is_closed_loop:
             await self.controller.write_command_to_server("enableOpenLoopMaxLimit")
-            self.update_system_status("isOpenLoopMaxLimitsEnabled", True)
         else:
             raise RuntimeError(
                 "Failed to enable the maximum limit. Only allow in open-loop control."
             )
-
-    def disable_open_loop_max_limit(self):
-        """Disable the maximum limit in open-loop control."""
-        self.update_system_status("isOpenLoopMaxLimitsEnabled", False)
 
     def update_system_status(self, status_name, new_status):
         """Update the system status.
@@ -559,11 +556,11 @@ class Model(object):
             Power type.
         """
 
+        self.utility_monitor.reset_breakers(power_type)
+
         await self.controller.write_command_to_server(
             "resetBreakers", message_details={"powerType": power_type}
         )
-
-        self.utility_monitor.reset_breakers(power_type)
 
     def update_connection_information(
         self, host, port_command, port_telemetry, timeout_connection
@@ -708,7 +705,9 @@ class Model(object):
                 )
 
             elif name == "digitalInput":
-                self.utility_monitor.update_digital_status_input(message["value"])
+                digital_input = message["value"]
+                self.utility_monitor.update_digital_status_input(digital_input)
+                self._update_breaker(digital_input)
 
             elif name == "config":
                 self.report_config(
@@ -731,6 +730,24 @@ class Model(object):
                     misc_range_angle=message["inclinometerDelta"],
                     misc_diff_enabled=message["inclinometerDiffEnabled"],
                     misc_range_temperature=message["cellTemperatureDelta"],
+                )
+
+            elif name == "openLoopMaxLimit":
+                isOpenLoopMaxLimitsEnabled = message["status"]
+                self.update_system_status(
+                    "isOpenLoopMaxLimitsEnabled", isOpenLoopMaxLimitsEnabled
+                )
+
+                self.log.info(
+                    f"Open-loop maximum limit is enabled: {isOpenLoopMaxLimitsEnabled}."
+                )
+
+            elif name == "limitSwitchStatus":
+                self._report_triggered_limit_switch(
+                    LimitSwitchType.Retract, message["retract"]
+                )
+                self._report_triggered_limit_switch(
+                    LimitSwitchType.Extend, message["extend"]
                 )
 
             # Ignore these messages because they are specific to CSC
@@ -808,6 +825,53 @@ class Model(object):
             )
 
         return local_mode
+
+    def _update_breaker(self, digital_input):
+        """Update the breakers.
+
+        Parameters
+        ----------
+        digital_input : `int`
+            Digital input.
+        """
+
+        # Note the enum_items should have the same order as
+        # self.utility_monitor.breakers
+        enum_items = []
+        for item in DigitalInput:
+            if "PowerBreaker" in item.name:
+                enum_items.append(item)
+
+        for item, enum_item in zip(self.utility_monitor.breakers.keys(), enum_items):
+            self.utility_monitor.update_breaker(
+                item, not (digital_input & enum_item.value)
+            )
+
+    def _report_triggered_limit_switch(self, limit_switch_type, limit_switches):
+        """Report the triggered limit switch.
+
+        Parameters
+        ----------
+        limit_switch_type : enum `lsst.ts.m2com.LimitSwitchType`
+            Type of limit switch.
+        limit_switches : `list`
+            Triggered limit switches.
+        """
+
+        if len(limit_switches) != 0:
+            self.log.info(
+                f"{limit_switch_type!r} limit switches triggered: {limit_switches}."
+            )
+
+        try:
+            for limit_switch in limit_switches:
+                ring, number = map_actuator_id_to_alias(limit_switch)
+                self.fault_manager.update_limit_switch_status(
+                    limit_switch_type, ring, number, True
+                )
+
+        except ValueError:
+            self.log.exception("Unknown limit switches encountered.")
 
     def _process_telemetry(self, message=None):
         """Process the telemetry from the M2 controller.

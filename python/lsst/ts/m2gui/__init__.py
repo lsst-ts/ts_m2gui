@@ -31,7 +31,6 @@ else:
 
 from .enums import (
     LocalMode,
-    LimitSwitchType,
     Ring,
     TemperatureGroup,
     DisplacementSensorDirection,
@@ -45,6 +44,7 @@ from .utils import (
     create_table,
     get_tol,
     get_num_actuator_ring,
+    map_actuator_id_to_alias,
     prompt_dialog_warning,
     run_command,
     get_button_action,

@@ -26,6 +26,7 @@ __all__ = [
     "create_table",
     "get_tol",
     "get_num_actuator_ring",
+    "map_actuator_id_to_alias",
     "prompt_dialog_warning",
     "run_command",
     "get_button_action",
@@ -235,6 +236,43 @@ def get_num_actuator_ring(ring):
         return 18
     else:
         raise ValueError(f"Not supported ring: {ring!r}")
+
+
+def map_actuator_id_to_alias(actuator_id):
+    """Map the actuator ID to the alias.
+
+    Parameters
+    ----------
+    actuator_id : `int`
+        Actuator ID that begins from 0.
+
+    Returns
+    -------
+    ring : enum `Ring`
+        Ring.
+    actuator_id_plus_one : `int`
+        Number of the actuator on the ring.
+
+    Raises
+    ------
+    `ValueError`
+        Unknown actuator ID encountered.
+    """
+
+    # Alias begins from 1 instead of 0
+    actuator_id_plus_one = actuator_id + 1
+
+    # Look for the alias
+    ring_order = (Ring.B, Ring.C, Ring.D, Ring.A)
+    for ring in ring_order:
+        num_actuators = get_num_actuator_ring(ring)
+
+        if actuator_id_plus_one <= num_actuators:
+            return ring, actuator_id_plus_one
+        else:
+            actuator_id_plus_one -= num_actuators
+
+    raise ValueError(f"Unknown actuator ID ({actuator_id}) encountered.")
 
 
 async def prompt_dialog_warning(title, description, is_prompted=True):

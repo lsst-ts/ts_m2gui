@@ -21,7 +21,6 @@
 
 __all__ = [
     "LocalMode",
-    "LimitSwitchType",
     "Ring",
     "TemperatureGroup",
     "DisplacementSensorDirection",
@@ -36,13 +35,6 @@ class LocalMode(IntEnum):
     Standby = 1
     Diagnostic = auto()
     Enable = auto()
-
-
-class LimitSwitchType(IntEnum):
-    """Type of the limit switches on actuators."""
-
-    Retract = 1
-    Extend = auto()
 
 
 class Ring(IntEnum):

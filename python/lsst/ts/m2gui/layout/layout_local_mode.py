@@ -124,19 +124,13 @@ class LayoutLocalMode(LayoutDefault):
     async def _callback_standby(self):
         """Callback of the standby button. The system will transition to the
         standby state."""
-
-        is_successful = await self.set_local_mode(LocalMode.Standby)
-        if is_successful:
-            self.model.disable_open_loop_max_limit()
+        await self.set_local_mode(LocalMode.Standby)
 
     @asyncSlot()
     async def _callback_diagnostic(self):
         """Callback of the diagnostic button. The system will transition to the
         diagnostic state."""
-
-        is_successful = await self.set_local_mode(LocalMode.Diagnostic)
-        if is_successful:
-            self.model.disable_open_loop_max_limit()
+        await self.set_local_mode(LocalMode.Diagnostic)
 
     @asyncSlot()
     async def _callback_enable(self):
