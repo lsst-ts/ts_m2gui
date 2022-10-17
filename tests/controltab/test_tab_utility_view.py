@@ -57,7 +57,7 @@ def test_init(widget):
     for breaker in widget._breakers.keys():
         palette = widget._breakers[breaker].palette()
         color = palette.color(QPalette.Button)
-        assert color == Qt.green
+        assert color == Qt.gray
 
 
 @pytest.mark.asyncio
@@ -140,7 +140,7 @@ async def test_callback_breakers(qtbot, widget):
 
     palette = widget._breakers[name].palette()
     color = palette.color(QPalette.Button)
-    assert color == Qt.red
+    assert color == Qt.green
 
 
 @pytest.mark.asyncio

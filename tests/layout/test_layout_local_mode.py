@@ -168,4 +168,4 @@ async def test_set_local_mode(qtbot, widget_async):
     assert widget_async.layout_local_mode._button_diagnostic.isEnabled() is True
     assert widget_async.layout_local_mode._button_enable.isEnabled() is False
 
-    assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is False
+    assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
