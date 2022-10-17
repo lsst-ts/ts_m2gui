@@ -6,6 +6,19 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.2.5:
+
+-------------
+0.2.5
+-------------
+
+* Subscribe the following events:
+
+  * openLoopMaxLimit
+  * limitSwitchStatus
+
+* Use the enum of **LimitSwitchType** from **ts_m2com**.
+
 .. _lsst.ts.m2gui-0.2.4:
 
 -------------
