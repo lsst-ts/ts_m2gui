@@ -6,10 +6,10 @@
 Version History
 ##################
 
-.. _lsst.ts.m2gui-0.2.5:
+.. _lsst.ts.m2gui-0.3.0:
 
 -------------
-0.2.5
+0.3.0
 -------------
 
 * Subscribe the following events:
