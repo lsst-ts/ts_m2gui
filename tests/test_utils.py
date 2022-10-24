@@ -22,7 +22,13 @@
 import asyncio
 
 import pytest
-from lsst.ts.m2gui import Ring, get_num_actuator_ring, get_tol, run_command
+from lsst.ts.m2gui import (
+    Ring,
+    get_num_actuator_ring,
+    get_tol,
+    map_actuator_id_to_alias,
+    run_command,
+)
 
 
 def command_normal(is_failed):
@@ -54,6 +60,20 @@ def test_get_num_actuator_ring():
 
     with pytest.raises(ValueError):
         get_num_actuator_ring("WrongRing")
+
+
+def test_map_actuator_id_to_alias():
+
+    ring_b, num_b = map_actuator_id_to_alias(3)
+    assert ring_b == Ring.B
+    assert num_b == 4
+
+    ring_a, num_a = map_actuator_id_to_alias(72)
+    assert ring_a == Ring.A
+    assert num_a == 1
+
+    with pytest.raises(ValueError):
+        map_actuator_id_to_alias(78)
 
 
 @pytest.mark.asyncio

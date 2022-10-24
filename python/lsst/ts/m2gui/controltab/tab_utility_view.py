@@ -103,23 +103,23 @@ class TabUtilityView(TabDefault):
 
         return indicators
 
-    def _update_indicator_color(self, indicator, is_fault):
+    def _update_indicator_color(self, indicator, triggered):
         """Update the color of indicator.
 
         Parameters
         ----------
         indicator : `PySide2.QtWidgets.QPushButton`
             Indicator.
-        is_fault : `bool`
-            Is in fault or not.
+        triggered : `bool`
+            Is triggered or not.
         """
 
         palette = indicator.palette()
 
-        if is_fault:
-            palette.setColor(QPalette.Button, Qt.red)
-        else:
+        if triggered:
             palette.setColor(QPalette.Button, Qt.green)
+        else:
+            palette.setColor(QPalette.Button, Qt.gray)
 
         indicator.setPalette(palette)
 

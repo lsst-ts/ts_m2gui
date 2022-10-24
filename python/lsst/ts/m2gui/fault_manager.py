@@ -22,7 +22,9 @@
 __all__ = ["FaultManager"]
 
 
-from . import LimitSwitchType, SignalError, SignalLimitSwitch
+from lsst.ts.m2com import LimitSwitchType
+
+from . import SignalError, SignalLimitSwitch
 
 
 class FaultManager(object):
@@ -110,12 +112,12 @@ class FaultManager(object):
 
         Parameters
         ----------
-        limit_switch_type : enum `LimitSwitchType`
+        limit_switch_type : enum `lsst.ts.m2com.LimitSwitchType`
             Type of limit switch.
 
         Raises
         ------
-        ValueError
+        `ValueError`
             Unsupported limit switch type.
         """
 
@@ -138,7 +140,7 @@ class FaultManager(object):
 
         Parameters
         ----------
-        limit_switch_type : enum `LimitSwitchType`
+        limit_switch_type : enum `lsst.ts.m2com.LimitSwitchType`
             Type of limit switch.
         ring : enum `Ring`
             Name of ring.
@@ -150,9 +152,9 @@ class FaultManager(object):
 
         Raises
         ------
-        ValueError
+        `ValueError`
             Unsupported limit switch type.
-        ValueError
+        `ValueError`
             The limit switch is not in the list.
         """
 

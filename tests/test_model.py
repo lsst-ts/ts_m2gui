@@ -29,9 +29,10 @@ from lsst.ts.m2com import (
     NUM_TANGENT_LINK,
     CommandActuator,
     CommandScript,
+    LimitSwitchType,
     PowerType,
 )
-from lsst.ts.m2gui import LimitSwitchType, LocalMode, Model, Ring
+from lsst.ts.m2gui import LocalMode, Model, Ring
 
 TIMEOUT = 1000
 TIMEOUT_LONG = 2000
@@ -116,15 +117,6 @@ async def test_enable_open_loop_max_limit(model_async):
     await model_async.enable_open_loop_max_limit()
 
     assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is True
-
-
-def test_disable_open_loop_max_limit(model):
-
-    model.system_status["isOpenLoopMaxLimitsEnabled"] = True
-
-    model.disable_open_loop_max_limit()
-
-    assert model.system_status["isOpenLoopMaxLimitsEnabled"] is False
 
 
 def test_update_system_status(qtbot, model):
@@ -353,6 +345,16 @@ def test_process_event(qtbot, model):
                 "inclinometerDiffEnabled": True,
                 "cellTemperatureDelta": 2.0,
             }
+        )
+
+    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+        model._process_event(message={"id": "openLoopMaxLimit", "status": True})
+
+    with qtbot.waitSignal(
+        model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
+    ):
+        model._process_event(
+            message={"id": "limitSwitchStatus", "retract": [1, 2], "extend": []}
         )
 
 

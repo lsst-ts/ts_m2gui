@@ -25,7 +25,8 @@ import pathlib
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2gui import LimitSwitchType, Model, Ring
+from lsst.ts.m2com import LimitSwitchType
+from lsst.ts.m2gui import Model, Ring
 from lsst.ts.m2gui.controltab import TabAlarmWarn
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette

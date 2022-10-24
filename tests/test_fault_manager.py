@@ -22,7 +22,8 @@
 import logging
 
 import pytest
-from lsst.ts.m2gui import FaultManager, LimitSwitchType, Model, Ring
+from lsst.ts.m2com import LimitSwitchType
+from lsst.ts.m2gui import FaultManager, Model, Ring
 
 TIMEOUT = 1000
 

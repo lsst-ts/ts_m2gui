@@ -23,6 +23,7 @@ __all__ = ["TabAlarmWarn"]
 
 import csv
 
+from lsst.ts.m2com import LimitSwitchType
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
@@ -35,7 +36,7 @@ from PySide2.QtWidgets import (
 )
 from qasync import asyncSlot
 
-from ..enums import LimitSwitchType, Ring
+from ..enums import Ring
 from ..utils import create_label, create_table, run_command, set_button
 from . import TabDefault
 
@@ -149,7 +150,7 @@ class TabAlarmWarn(TabDefault):
 
         Parameters
         ----------
-        limit_switch_type : enum `LimitSwitchType`
+        limit_switch_type : enum `lsst.ts.m2com.LimitSwitchType`
             Type of limit switch.
 
         Returns
@@ -255,7 +256,7 @@ class TabAlarmWarn(TabDefault):
 
         Parameters
         ----------
-        limit_switch_type : enum `LimitSwitchType`
+        limit_switch_type : enum `lsst.ts.m2com.LimitSwitchType`
             Type of limit switch.
         ring : enum `Ring`
             Name of ring.
@@ -271,7 +272,7 @@ class TabAlarmWarn(TabDefault):
             label = create_label(name="Retract")
         elif limit_switch_type == LimitSwitchType.Extend:
             indicators = self._indicators_limit_switch_extend
-            label = create_label(name="Extent")
+            label = create_label(name="Extend")
         else:
             raise ValueError(f"Unsupported limit switch type: {limit_switch_type!r}.")
 
@@ -386,8 +387,8 @@ class TabAlarmWarn(TabDefault):
         ----------
         type_name_status : `tuple`
             A tuple: (type, name, status). The data type of type is integer
-            (enum `LimitSwitchType`), the data type of name is string, and the
-            data type of status is bool.
+            (enum `lsst.ts.m2com.LimitSwitchType`), the data type of name is
+            string, and the data type of status is bool.
         """
 
         limit_switch_type = LimitSwitchType(type_name_status[0])
