@@ -266,8 +266,13 @@ class Model(object):
 
         self._check_error_and_update_status()
 
-    async def enable_open_loop_max_limit(self):
+    async def enable_open_loop_max_limit(self, status):
         """Enable the maximum limit in open-loop control.
+
+        Parameters
+        ----------
+        status : `bool`
+            Enable the maximum limit or not.
 
         Raises
         ------
@@ -276,7 +281,9 @@ class Model(object):
         """
 
         if not self.is_closed_loop:
-            await self.controller.write_command_to_server("enableOpenLoopMaxLimit")
+            await self.controller.write_command_to_server(
+                "enableOpenLoopMaxLimit", message_details={"status": status}
+            )
         else:
             raise RuntimeError(
                 "Failed to enable the maximum limit. Only allow in open-loop control."
@@ -978,7 +985,8 @@ class Model(object):
 
             elif name == "zenithAngle":
                 self.utility_monitor.update_inclinometer_angle(
-                    message["inclinometerProcessed"]
+                    message["inclinometerRaw"],
+                    new_angle_processed=message["inclinometerProcessed"],
                 )
 
             elif name == "inclinometerAngleTma":

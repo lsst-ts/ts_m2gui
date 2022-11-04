@@ -291,6 +291,15 @@ class TabCellStatus(TabDefault):
 
         self.check_duration_and_restart_timer(self._timer)
 
+        # Selected actuator force
+        selected_actuator = self._view_mirror.get_selected_actuator()
+        if selected_actuator is not None:
+            text_force = self._view_mirror.get_text_force()
+            text_force.setPlainText(
+                f"Actuator Force:\nID: {selected_actuator.label_id.toPlainText()}, "
+                f"force: {round(selected_actuator.magnitude, 2)} N"
+            )
+
     def _create_layout(self):
         """Create the layout.
 

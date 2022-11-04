@@ -205,7 +205,8 @@ class UtilityMonitor(object):
 
         self._report_powers()
 
-        self.signal_utility.inclinometer.emit(self.inclinometer_angle)
+        self.signal_utility.inclinometer_raw.emit(self.inclinometer_angle)
+        self.signal_utility.inclinometer_processed.emit(self.inclinometer_angle)
         self.signal_utility.inclinometer_tma.emit(self.inclinometer_angle_tma)
 
         for name, status in self.breakers.items():
@@ -421,13 +422,17 @@ class UtilityMonitor(object):
 
         self._update_power(power, new_voltage, new_current, signal_name)
 
-    def update_inclinometer_angle(self, new_angle, is_internal=True):
+    def update_inclinometer_angle(
+        self, new_angle, new_angle_processed=None, is_internal=True
+    ):
         """Update the angle of inclinometer.
 
         Parameters
         ----------
         new_angle : `float`
             New angle value in degree.
+        new_angle_processed : `float` or None, optional
+            New processed angle value in degree.
         is_internal : `bool`
             Is the internal inclinometer or not. If False, the new_angle comes
             from the telescope mount assembly (TMA). (the default is True)
@@ -437,7 +442,7 @@ class UtilityMonitor(object):
             self.inclinometer_angle if is_internal else self.inclinometer_angle_tma
         )
         signal = (
-            self.signal_utility.inclinometer
+            self.signal_utility.inclinometer_raw
             if is_internal
             else self.signal_utility.inclinometer_tma
         )
@@ -447,6 +452,11 @@ class UtilityMonitor(object):
 
             angle_rounded = round(new_angle, self.NUM_DIGIT_AFTER_DECIMAL)
             signal.emit(angle_rounded)
+
+            if is_internal and (new_angle_processed is not None):
+                self.signal_utility.inclinometer_processed.emit(
+                    round(new_angle_processed, self.NUM_DIGIT_AFTER_DECIMAL)
+                )
 
             if is_internal:
                 self.inclinometer_angle = angle_rounded

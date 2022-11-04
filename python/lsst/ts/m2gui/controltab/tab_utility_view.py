@@ -57,7 +57,8 @@ class TabUtilityView(TabDefault):
             "power_current_motor": create_label(),
             "power_voltage_communication": create_label(),
             "power_current_communication": create_label(),
-            "inclinometer": create_label(),
+            "inclinometer_raw": create_label(),
+            "inclinometer_processed": create_label(),
             "inclinometer_tma": create_label(),
         }
 
@@ -282,7 +283,14 @@ class TabUtilityView(TabDefault):
         """
 
         layout = QFormLayout()
-        layout.addRow("Inclinometer Angle:", self._power_inclinometer["inclinometer"])
+        layout.addRow(
+            "Inclinometer Angle (Raw):",
+            self._power_inclinometer["inclinometer_raw"],
+        )
+        layout.addRow(
+            "Inclinometer Angle (Processed):",
+            self._power_inclinometer["inclinometer_processed"],
+        )
         layout.addRow("TMA Angle:", self._power_inclinometer["inclinometer_tma"])
 
         return create_group_box("Elevation Angle", layout)
@@ -379,7 +387,10 @@ class TabUtilityView(TabDefault):
             self._callback_power_communication
         )
 
-        signal_utility.inclinometer.connect(self._callback_inclinometer)
+        signal_utility.inclinometer_raw.connect(self._callback_inclinometer_raw)
+        signal_utility.inclinometer_processed.connect(
+            self._callback_inclinometer_processed
+        )
         signal_utility.inclinometer_tma.connect(self._callback_inclinometer_tma)
 
         signal_utility.breaker_status.connect(self._callback_breakers)
@@ -421,15 +432,30 @@ class TabUtilityView(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_inclinometer(self, inclinometer):
-        """Callback of the utility signal for the inclinometer angle.
+    async def _callback_inclinometer_raw(self, inclinometer_raw):
+        """Callback of the utility signal for the raw inclinometer angle.
 
         Parameters
         ----------
-        inclinometer : `float`
-            Inclinometer angle in degree.
+        inclinometer_raw : `float`
+            Row inclinometer angle in degree.
         """
-        self._power_inclinometer["inclinometer"].setText(f"{inclinometer} degree")
+        self._power_inclinometer["inclinometer_raw"].setText(
+            f"{inclinometer_raw} degree"
+        )
+
+    @asyncSlot()
+    async def _callback_inclinometer_processed(self, inclinometer_processed):
+        """Callback of the utility signal for the processed inclinometer angle.
+
+        Parameters
+        ----------
+        inclinometer_processed : `float`
+            Processed inclinometer angle in degree.
+        """
+        self._power_inclinometer["inclinometer_processed"].setText(
+            f"{inclinometer_processed} degree"
+        )
 
     @asyncSlot()
     async def _callback_inclinometer_tma(self, inclinometer_tma):
