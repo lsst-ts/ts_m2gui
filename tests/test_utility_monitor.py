@@ -49,7 +49,8 @@ def test_report_utility_status(qtbot, utility_monitor):
         utility_monitor.signal_utility.power_communication_calibrated,
         utility_monitor.signal_utility.power_motor_raw,
         utility_monitor.signal_utility.power_communication_raw,
-        utility_monitor.signal_utility.inclinometer,
+        utility_monitor.signal_utility.inclinometer_raw,
+        utility_monitor.signal_utility.inclinometer_processed,
         utility_monitor.signal_utility.inclinometer_tma,
         utility_monitor.signal_utility.breaker_status,
         utility_monitor.signal_utility.temperatures,
@@ -121,14 +122,19 @@ def test_update_power_raw(qtbot, utility_monitor):
 def test_update_inclinometer_angle(qtbot, utility_monitor):
 
     # There is the update
-    signal = utility_monitor.signal_utility.inclinometer
-    with qtbot.waitSignal(signal, timeout=TIMEOUT):
-        utility_monitor.update_inclinometer_angle(0.16)
+    signals = [
+        utility_monitor.signal_utility.inclinometer_raw,
+        utility_monitor.signal_utility.inclinometer_processed,
+    ]
+    with qtbot.waitSignals(signals, timeout=TIMEOUT):
+        utility_monitor.update_inclinometer_angle(0.16, new_angle_processed=1.13)
 
     assert utility_monitor.inclinometer_angle == 0.2
 
     # There should be no update
-    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+    with qtbot.assertNotEmitted(
+        utility_monitor.signal_utility.inclinometer_raw, wait=TIMEOUT
+    ):
         utility_monitor.update_inclinometer_angle(0.203)
 
     assert utility_monitor.inclinometer_angle == 0.2

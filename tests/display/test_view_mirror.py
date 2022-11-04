@@ -20,7 +20,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-from lsst.ts.m2gui.display import ViewMirror
+from lsst.ts.m2gui.display import ItemActuator, ViewMirror
 
 
 @pytest.fixture
@@ -32,6 +32,39 @@ def widget(qtbot):
     qtbot.addWidget(widget)
 
     return widget
+
+
+@pytest.mark.asyncio
+async def test_show_selected_actuator_force(widget):
+
+    text_force = widget.get_text_force()
+    assert text_force.isVisible() is False
+
+    select_actuator(widget)
+    await widget._show_selected_actuator_force()
+
+    assert text_force.isVisible() is True
+
+
+def select_actuator(widget):
+
+    for item in widget.items():
+        if isinstance(item, ItemActuator):
+            item.setSelected(True)
+
+
+def test_get_selected_actuator(widget):
+
+    assert widget.get_selected_actuator() is None
+
+    select_actuator(widget)
+    assert widget.get_selected_actuator()._acutator_id == 1
+
+
+def test_get_text_force(widget):
+
+    text_force = widget.get_text_force()
+    assert text_force.toPlainText().startswith("Actuator Force:") is True
 
 
 def test_add_item_actuator(widget):
