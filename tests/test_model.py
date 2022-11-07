@@ -107,14 +107,14 @@ async def test_enable_open_loop_max_limit(model_async):
     # Should fail for the closed-loop control
     model_async.is_closed_loop = True
     with pytest.raises(RuntimeError):
-        await model_async.enable_open_loop_max_limit()
+        await model_async.enable_open_loop_max_limit(True)
 
     assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is False
 
     # Should succeed for the open-loop control
     model_async.is_closed_loop = False
 
-    await model_async.enable_open_loop_max_limit()
+    await model_async.enable_open_loop_max_limit(True)
 
     assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
@@ -441,12 +441,17 @@ def test_process_telemetry(qtbot, model):
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_utility.inclinometer, timeout=TIMEOUT
+    with qtbot.waitSignals(
+        [
+            model.utility_monitor.signal_utility.inclinometer_raw,
+            model.utility_monitor.signal_utility.inclinometer_processed,
+        ],
+        timeout=TIMEOUT,
     ):
         model._process_telemetry(
             message={
                 "id": "zenithAngle",
+                "inclinometerRaw": 1,
                 "inclinometerProcessed": 1,
             }
         )

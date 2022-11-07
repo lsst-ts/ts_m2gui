@@ -26,6 +26,7 @@ import pathlib
 import pytest
 from lsst.ts.m2gui import ActuatorForce, FigureActuatorData, Model
 from lsst.ts.m2gui.controltab import TabCellStatus
+from lsst.ts.m2gui.display import ItemActuator
 from PySide2.QtCore import Qt
 
 TIMEOUT = 1000
@@ -61,7 +62,7 @@ def test_init(widget):
     assert actuator_77._acutator_id == 77
     assert actuator_77._alias == "A5"
     assert actuator_77.label_id.toPlainText() == "77"
-    assert actuator_77._magnitude == 0
+    assert actuator_77.magnitude == 0
 
 
 def text_callback_show_alias(qtbot, widget):
@@ -137,13 +138,19 @@ async def test_callback_selection_changed(widget):
 @pytest.mark.asyncio
 async def test_callback_time_out(widget):
 
+    # Select the actuator
+    for item in widget._view_mirror.items():
+        if isinstance(item, ItemActuator):
+            if item.label_id.toPlainText() == "2":
+                item.setSelected(True)
+
     widget._forces.f_cur[1] = 100
     widget._forces.f_error[1] = 72
     widget._forces.f_error[77] = -12
     await widget._callback_time_out()
 
     assert widget._forces.f_cur[1] == 100
-    assert widget._view_mirror.actuators[1]._magnitude == 100
+    assert widget._view_mirror.actuators[1].magnitude == 100
 
     figure_realtime = widget._figures["realtime"]
 
@@ -152,6 +159,9 @@ async def test_callback_time_out(widget):
 
     assert figure_realtime.get_points(0)[-1].y() == 1
     assert figure_realtime.get_points(1)[-1].y() == 2
+
+    text_force = widget._view_mirror.get_text_force()
+    assert text_force.toPlainText() == "Actuator Force:\nID: 2, force: 100 N"
 
 
 @pytest.mark.asyncio

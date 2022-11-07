@@ -21,7 +21,9 @@
 
 __all__ = ["ViewMirror"]
 
-from PySide2.QtWidgets import QGraphicsScene, QGraphicsView
+from PySide2.QtGui import QFont
+from PySide2.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsView
+from qasync import asyncSlot
 
 from . import ItemActuator
 
@@ -43,13 +45,79 @@ class ViewMirror(QGraphicsView):
     DIAMETER = 34
 
     def __init__(self):
-        self._mirror = QGraphicsScene(0, 0, self.SIZE_SCENE, self.SIZE_SCENE)
-
+        self._mirror = self._create_mirror()
         super().__init__(self._mirror)
 
         self.actuators = list()
 
         self.mirror_radius = 1
+
+    def _create_mirror(self, point_size=8):
+        """Create the mirror scene.
+
+        Parameters
+        ----------
+        point_size : `int`, optional
+            Point size of the text. (the default is 8)
+
+        Returns
+        -------
+        mirror : `PySide2.QtWidgets.QGraphicsScene`
+            Mirror scene.
+        """
+
+        # Create the mirror
+        mirror = QGraphicsScene(0, 0, self.SIZE_SCENE, self.SIZE_SCENE)
+        mirror.selectionChanged.connect(self._show_selected_actuator_force)
+
+        # Add the text item to mirror
+        font = QFont()
+        font.setPointSize(point_size)
+
+        text_force = mirror.addText("Actuator Force:\nID: -1, force: 0.00 N", font)
+        text_force.setVisible(False)
+
+        return mirror
+
+    @asyncSlot()
+    async def _show_selected_actuator_force(self):
+        """Show the selected actuator force."""
+
+        selected_actuator = self.get_selected_actuator()
+
+        text_force = self.get_text_force()
+        text_force.setVisible(selected_actuator is not None)
+
+    def get_selected_actuator(self):
+        """Get the selected actuator.
+
+        Returns
+        -------
+        `ItemActuator` or None
+            Selected actuator. None if there is no selection.
+        """
+
+        selected_items = self._mirror.selectedItems()
+        if len(selected_items) != 0:
+            return selected_items[0]
+        else:
+            return None
+
+    def get_text_force(self):
+        """Get the text item of actuator force.
+
+        Returns
+        -------
+        `PySide2.QtWidgets.QGraphicsTextItem` or None
+            Text item of the force actuator.
+        """
+
+        for item in self.items():
+            if isinstance(item, QGraphicsTextItem):
+                if item.toPlainText().startswith("Actuator Force:"):
+                    return item
+
+        return None
 
     def add_item_actuator(self, actuator_id, alias, x, y, point_size=8):
         """Add the actuator item.

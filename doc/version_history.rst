@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.1:
+
+-------------
+0.3.1
+-------------
+
+* Show the selected actuator force on mirror's view.
+* Add the **status** to **enableOpenLoopMaxLimit** command.
+* Show the raw and processed inclinometer angles.
+
 .. _lsst.ts.m2gui-0.3.0:
 
 -------------

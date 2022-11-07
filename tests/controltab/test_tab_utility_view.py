@@ -110,12 +110,15 @@ async def test_callback_power_communication(qtbot, widget):
 @pytest.mark.asyncio
 async def test_callback_inclinometer(widget):
 
-    widget.model.utility_monitor.update_inclinometer_angle(0.1)
+    widget.model.utility_monitor.update_inclinometer_angle(
+        0.1, new_angle_processed=0.55
+    )
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget._power_inclinometer["inclinometer"].text() == "0.1 degree"
+    assert widget._power_inclinometer["inclinometer_raw"].text() == "0.1 degree"
+    assert widget._power_inclinometer["inclinometer_processed"].text() == "0.6 degree"
 
 
 @pytest.mark.asyncio

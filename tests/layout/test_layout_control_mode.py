@@ -110,7 +110,7 @@ async def test_switch_force_balance_system(qtbot, widget_async):
     assert widget_async.layout_control_mode._button_open_loop.isEnabled() is False
     assert widget_async.layout_control_mode._button_closed_loop.isEnabled() is True
 
-    await widget_async.model.enable_open_loop_max_limit()
+    await widget_async.model.enable_open_loop_max_limit(True)
     assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
     qtbot.mouseClick(

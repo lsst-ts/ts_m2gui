@@ -99,8 +99,11 @@ class SignalUtility(QtCore.QObject):
     power_motor_raw = QtCore.Signal(object)
     power_communication_raw = QtCore.Signal(object)
 
-    # M2 inclinometer angle in degree
-    inclinometer = QtCore.Signal(float)
+    # M2 inclinometer angle in degree (raw)
+    inclinometer_raw = QtCore.Signal(float)
+
+    # M2 inclinometer angle in degree (processed)
+    inclinometer_processed = QtCore.Signal(float)
 
     # Telescope mount assembly (TMA) inclinometer angle in degree
     inclinometer_tma = QtCore.Signal(float)
