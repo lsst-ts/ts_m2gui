@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.2:
+
+-------------
+0.3.2
+-------------
+
+* Fix the unit test from **ts_m2com** v0.6.3.
+
 .. _lsst.ts.m2gui-0.3.1:
 
 -------------

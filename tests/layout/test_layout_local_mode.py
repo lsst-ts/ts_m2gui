@@ -124,7 +124,7 @@ async def test_set_local_mode(qtbot, widget_async):
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
 
     assert widget_async.model.local_mode == LocalMode.Diagnostic
 
@@ -153,14 +153,14 @@ async def test_set_local_mode(qtbot, widget_async):
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
 
     qtbot.mouseClick(
         widget_async.layout_local_mode._button_standby, QtCore.Qt.LeftButton
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
 
     assert widget_async.model.local_mode == LocalMode.Standby
 

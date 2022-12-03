@@ -211,7 +211,7 @@ async def test_callback_reset(qtbot, widget_async):
     qtbot.mouseClick(widget_async._button_reset, Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(2)
+    await asyncio.sleep(5)
 
     # Check the text of error cause should be cleared
     assert widget_async._text_error_cause.toPlainText() == ""
