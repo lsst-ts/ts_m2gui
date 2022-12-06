@@ -31,6 +31,9 @@ from lsst.ts.m2gui.controltab import TabAlarmWarn
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 
+SLEEP_TIME_SHORT = 1
+SLEEP_TIME_LONG = 5
+
 
 def get_error_list_file():
     policy_dir = pathlib.Path(__file__).parents[0] / ".." / ".." / "policy"
@@ -97,7 +100,7 @@ async def test_callback_selection_changed(qtbot, widget):
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     assert (
         widget._text_error_cause.toPlainText()
@@ -113,7 +116,7 @@ async def test_callback_selection_changed(qtbot, widget):
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     assert (
         widget._text_error_cause.toPlainText()
@@ -129,7 +132,7 @@ async def test_callback_selection_changed(qtbot, widget):
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     assert (
         widget._text_error_cause.toPlainText()
@@ -150,7 +153,7 @@ async def test_callback_signal_error_new(qtbot, widget):
     widget.model.add_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     color_6051 = _get_widget_item_color(widget, "6051")
     assert color_6051 == Qt.red
@@ -158,7 +161,7 @@ async def test_callback_signal_error_new(qtbot, widget):
     widget.model.add_error(6052)
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     color_6052 = _get_widget_item_color(widget, "6052")
     assert color_6052 == Qt.yellow
@@ -178,7 +181,7 @@ async def test_callback_signal_error_cleared(qtbot, widget):
     widget.model.clear_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     # Color should be white
     color_6051 = _get_widget_item_color(widget, "6051")
@@ -200,7 +203,7 @@ async def test_callback_reset(qtbot, widget_async):
     widget_async.model.add_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     # Trigger the limit switch
     widget_async.model.fault_manager.update_limit_switch_status(
@@ -211,7 +214,7 @@ async def test_callback_reset(qtbot, widget_async):
     qtbot.mouseClick(widget_async._button_reset, Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(5)
+    await asyncio.sleep(SLEEP_TIME_LONG)
 
     # Check the text of error cause should be cleared
     assert widget_async._text_error_cause.toPlainText() == ""
@@ -244,7 +247,7 @@ async def test_callback_signal_limit_switch(qtbot, widget):
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(SLEEP_TIME_SHORT)
 
     indicator = widget._indicators_limit_switch_extend["C3"]
     palette = indicator.palette()
