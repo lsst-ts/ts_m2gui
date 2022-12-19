@@ -24,7 +24,6 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts import salobj
 from lsst.ts.m2com import PowerType
 from lsst.ts.m2gui import ForceErrorTangent, Model
 from lsst.ts.m2gui.controltab import TabDiagnostics
@@ -63,10 +62,8 @@ async def test_callback_control_digital_status(qtbot, widget_async):
     assert control.isChecked() is True
     assert control.text() == "ON"
 
-    # Go to the DISABLED state (or the Diagnostic state in EUI)
-    await widget_async.model.controller.write_command_to_server(
-        "start", controller_state_expected=salobj.State.DISABLED
-    )
+    # Go to the Diagnostic state
+    await widget_async.model.start()
 
     qtbot.mouseClick(control, Qt.LeftButton)
 

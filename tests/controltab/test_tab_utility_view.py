@@ -24,7 +24,6 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts import salobj
 from lsst.ts.m2com import PowerType
 from lsst.ts.m2gui import DisplacementSensorDirection, Model, TemperatureGroup
 from lsst.ts.m2gui.controltab import TabUtilityView
@@ -59,14 +58,20 @@ def test_init(widget):
         color = palette.color(QPalette.Button)
         assert color == Qt.gray
 
+    assert widget._power_inclinometer["power_on_motor"].text() == "Off"
+    assert widget._power_inclinometer["power_on_communication"].text() == "Off"
+
+    assert widget._power_inclinometer["power_system_state_motor"].text() == "Init"
+    assert (
+        widget._power_inclinometer["power_system_state_communication"].text() == "Init"
+    )
+
 
 @pytest.mark.asyncio
 async def test_callback_reset_breakers(widget_async):
 
-    # Transition to Disabled state to turn on the communication power
-    await widget_async.model.controller.write_command_to_server(
-        "start", controller_state_expected=salobj.State.DISABLED
-    )
+    # Transition to Diagnostic state to turn on the communication power
+    await widget_async.model.start()
 
     name = "J3-W14-2"
     widget_async.model.utility_monitor.update_breaker(name, True)

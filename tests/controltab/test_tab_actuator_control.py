@@ -24,7 +24,6 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts import salobj
 from lsst.ts.m2com import ActuatorDisplacementUnit
 from lsst.ts.m2gui import ActuatorForce, LocalMode, Model
 from lsst.ts.m2gui.controltab import TabActuatorControl
@@ -74,13 +73,8 @@ async def test_callback_script_load_script(widget_async):
 
 async def _transition_to_enable_state(widget_async):
 
-    controller = widget_async.model.controller
-    await controller.write_command_to_server(
-        "start", controller_state_expected=salobj.State.DISABLED
-    )
-    await controller.write_command_to_server(
-        "enable", controller_state_expected=salobj.State.ENABLED
-    )
+    await widget_async.model.start()
+    await widget_async.model.enable()
 
 
 @pytest.mark.asyncio
