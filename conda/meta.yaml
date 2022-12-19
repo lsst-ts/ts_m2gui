@@ -15,11 +15,8 @@ build:
 test:
   requires:
     - ts-conda-build =0.3
-    - ts-simactuators
     - ts-idl {{ idl_version }}
-    - ts-salobj {{ salobj_version }}
     - ts-tcpip
-    - ts-utils
     - ts-m2com
   source_files:
     - python
@@ -45,10 +42,7 @@ requirements:
     - python {{ python }}
     - setuptools
     - setuptools_scm
-    - ts-salobj {{ salobj_version }}
     - ts-idl {{ idl_version }}
-    - ts-simactuators
     - pandas
     - ts-tcpip
-    - ts-utils
     - ts-m2com
