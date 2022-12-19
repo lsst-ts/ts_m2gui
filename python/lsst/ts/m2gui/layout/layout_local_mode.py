@@ -21,7 +21,6 @@
 
 __all__ = ["LayoutLocalMode"]
 
-from lsst.ts import salobj
 from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
@@ -146,33 +145,29 @@ class LayoutLocalMode(LayoutDefault):
         local_mode : enum `LocalMode`
             Local mode.
 
-        Returns
-        -------
-        `bool`
-            True if the command succeeds. Otherwise, False.
-
         Raises
         ------
         ValueError
             If the input local mode is not supported.
         """
 
+        # Disable all buttons first
+        self._prohibit_transition()
+
+        # Do the state transition
         if local_mode == LocalMode.Standby:
             command = "standby"
-            controller_state_expected = salobj.State.STANDBY
 
         elif local_mode == LocalMode.Diagnostic:
             command = (
                 "start" if self.model.local_mode == LocalMode.Standby else "disable"
             )
-            controller_state_expected = salobj.State.DISABLED
 
         elif local_mode == LocalMode.Enable:
             command = "enable"
-            controller_state_expected = salobj.State.ENABLED
 
-        return await run_command(
-            self.model.controller.write_command_to_server,
-            command,
-            controller_state_expected=controller_state_expected,
-        )
+        is_successful = await run_command(getattr(self.model, command))
+
+        # If fail, we need to make sure the buttons can work after that.
+        if not is_successful:
+            self._update_buttons()

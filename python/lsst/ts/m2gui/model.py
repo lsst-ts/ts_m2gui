@@ -21,11 +21,12 @@
 
 __all__ = ["Model"]
 
-from lsst.ts import salobj
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
     ActuatorDisplacementUnit,
+    ClosedLoopControlMode,
+    CommandScript,
     ControllerCell,
     DigitalInput,
     DigitalOutput,
@@ -43,6 +44,7 @@ from . import (
     Ring,
     SignalConfig,
     SignalControl,
+    SignalPowerSystem,
     SignalScript,
     SignalStatus,
     TemperatureGroup,
@@ -85,6 +87,8 @@ class Model(object):
         Closed-loop control is on or not.
     signal_control : `SignalControl`
         Signal to report the control status.
+    signal_power_system : `SignalPowerSystem`
+        Signal to report the power system status.
     signal_status : `SignalStatus`
         Signal to report the updated status of system.
     signal_config : `SignalConfig`
@@ -121,6 +125,7 @@ class Model(object):
         self.is_closed_loop = False
 
         self.signal_control = SignalControl()
+        self.signal_power_system = SignalPowerSystem()
         self.signal_status = SignalStatus()
         self.signal_config = SignalConfig()
         self.signal_script = SignalScript()
@@ -643,7 +648,7 @@ class Model(object):
             "isCrioConnected", self.controller.are_clients_connected()
         )
 
-    def _process_event(self, message=None):
+    async def _process_event(self, message=None):
         """Process the events from the M2 controller.
 
         Parameters
@@ -659,17 +664,15 @@ class Model(object):
             if name == "m2AssemblyInPosition":
                 self.update_system_status("isInPosition", message["inPosition"])
 
-            elif name == "summaryState":
-                summary_state = salobj.State(message["summaryState"])
-                self.local_mode = self._summary_state_to_local_mode(summary_state)
-                self.report_control_status()
-
-                self.log.info(f"M2 controller has the state: {summary_state!r}.")
-                self.log.info(f"Local mode is: {self.local_mode!r}.")
-
             elif name == "errorCode":
                 error_code = message["errorCode"]
                 self.add_error(error_code)
+
+                # Note some error code might be just the warning. Therefore, we
+                # let the fault_manager to judge and fault the system when
+                # needed.
+                if self.fault_manager.has_error():
+                    await self.fault()
 
                 self.log.warning(f"Receive the error code: {error_code}.")
 
@@ -757,14 +760,24 @@ class Model(object):
                     LimitSwitchType.Extend, message["extend"]
                 )
 
+            elif name == "powerSystemState":
+                self.signal_power_system.is_state_updated.emit(True)
+
+            elif name == "closedLoopControlMode":
+                self.log.info(
+                    f"Closed-loop control mode: {self.controller.closed_loop_control_mode!r}."
+                )
+
             # Ignore these messages because they are specific to CSC
             elif name in (
+                "summaryState",
                 "cellTemperatureHiWarning",
                 "detailedState",
                 "inclinationTelemetrySource",
                 "interlock",
                 "tcpIpConnected",
                 "temperatureOffset",
+                "innerLoopControlMode",
             ):
                 pass
 
@@ -790,48 +803,6 @@ class Model(object):
             return message["id"]
         except (TypeError, KeyError):
             return ""
-
-    def _summary_state_to_local_mode(self, summary_state):
-        """Transform the summary state to local mode.
-
-        Parameters
-        ----------
-        summary_state : enum `lsst.ts.salobj.State`
-            Summary state.
-
-        Returns
-        -------
-        local_mode : enum `LocalMode`
-            Local mode.
-        """
-
-        local_mode = LocalMode.Standby
-
-        if summary_state == salobj.State.STANDBY:
-            local_mode = LocalMode.Standby
-
-        elif summary_state == salobj.State.DISABLED:
-            local_mode = LocalMode.Diagnostic
-
-        elif summary_state == salobj.State.ENABLED:
-            local_mode = LocalMode.Enable
-
-        # Transition to the Diagnostic state if the local mode was the Enable
-        # mode originally.
-        elif summary_state == salobj.State.FAULT:
-            local_mode = (
-                LocalMode.Diagnostic
-                if self.local_mode == LocalMode.Enable
-                else self.local_mode
-            )
-
-        else:
-            self.log.warning(
-                f"Unsupported summary state: {summary_state!r}."
-                f"Use the {local_mode!r} instead."
-            )
-
-        return local_mode
 
     def _update_breaker(self, digital_input):
         """Update the breakers.
@@ -1076,6 +1047,127 @@ class Model(object):
 
         self.update_system_status("isCrioConnected", False)
         self.update_system_status("isTelemetryActive", False)
+
+    async def start(self):
+        """Transition from the Standby mode to the Diagnostic mode.
+
+        Raises
+        ------
+        `RuntimeError`
+            When the system is not in the Standby mode.
+        """
+
+        if self.local_mode != LocalMode.Standby:
+            raise RuntimeError(
+                f"System is in {self.local_mode!r} instead of {LocalMode.Standby!r}."
+            )
+
+        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+        await self.controller.power(PowerType.Communication, True)
+
+        self.local_mode = LocalMode.Diagnostic
+
+        self.report_control_status()
+
+    async def enable(self):
+        """Transition from the Diagnostic mode to the Enable mode.
+
+        Raises
+        ------
+        `RuntimeError`
+            When the system is not in the Diagnostic mode.
+        """
+
+        if self.local_mode != LocalMode.Diagnostic:
+            raise RuntimeError(
+                f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
+            )
+
+        await self.controller.reset_force_offsets()
+        await self.controller.reset_actuator_steps()
+
+        await self.controller.power(PowerType.Motor, True)
+        await self.controller.set_ilc_to_enabled()
+        await self.controller.set_closed_loop_control_mode(
+            ClosedLoopControlMode.OpenLoop
+        )
+
+        self.local_mode = LocalMode.Enable
+
+        self.report_control_status()
+
+    async def disable(self):
+        """Transition from the Enable mode to the Diagnostic mode.
+
+        Raises
+        ------
+        `RuntimeError`
+            When the system is not in the Enable mode.
+        """
+
+        if self.local_mode != LocalMode.Enable:
+            raise RuntimeError(
+                f"System is in {self.local_mode!r} instead of {LocalMode.Enable!r}."
+            )
+
+        await self._basic_cleanup_and_power_off_motor()
+        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+
+        self.local_mode = LocalMode.Diagnostic
+
+        self.report_control_status()
+
+    async def _basic_cleanup_and_power_off_motor(self):
+        """Basic cleanup and power off the motor."""
+
+        try:
+            await self.command_script(CommandScript.Stop)
+            await self.command_script(CommandScript.Clear)
+
+            await self.controller.reset_force_offsets()
+            await self.controller.reset_actuator_steps()
+            await self.controller.set_closed_loop_control_mode(
+                ClosedLoopControlMode.TelemetryOnly
+            )
+
+            await self.controller.power(PowerType.Motor, False)
+
+        except Exception:
+            self.log.exception(
+                "Error when doing the basic cleanup and power off the motor."
+            )
+
+    async def standby(self):
+        """Transition from the Diagnostic mode to the Standby mode.
+
+        Raises
+        ------
+        `RuntimeError`
+            When the system is not in the Diagnostic mode.
+        """
+
+        if self.local_mode != LocalMode.Diagnostic:
+            raise RuntimeError(
+                f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
+            )
+
+        await self.controller.power(PowerType.Communication, False)
+        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+
+        self.local_mode = LocalMode.Standby
+
+        self.report_control_status()
+
+    async def fault(self):
+        """Fault the system and transition to the Diagnostic mode if the
+        system is in the Enable mode originally."""
+
+        if self.local_mode == LocalMode.Enable:
+            await self._basic_cleanup_and_power_off_motor()
+
+            self.local_mode = LocalMode.Diagnostic
+
+        self.report_control_status()
 
     async def disconnect(self):
         """Disconnect from the M2 controller."""

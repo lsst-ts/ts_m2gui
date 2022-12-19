@@ -51,6 +51,7 @@ from .utils import (
 )
 from .signals import (
     SignalControl,
+    SignalPowerSystem,
     SignalMessage,
     SignalError,
     SignalStatus,
