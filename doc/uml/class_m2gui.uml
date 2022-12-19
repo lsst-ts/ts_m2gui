@@ -26,6 +26,7 @@ MainWindow ..> QMessageBoxAsync
 Model *-- FaultManager
 Model *-- UtilityMonitor
 Model *-- SignalControl : emit()
+Model *-- SignalPowerSystem : emit()
 Model *-- SignalStatus : emit()
 Model *-- SignalConfig : emit()
 Model *-- SignalScript : emit()

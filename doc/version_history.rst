@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.3:
+
+-------------
+0.3.3
+-------------
+
+* Adapt the **ts_m2com** v0.8.1 to use the commands related to ILC, CLC, etc. directly.
+* Remove the dependency of **ts_salobj**.
+* Add the **transition_local_mode.uml**.
+
 .. _lsst.ts.m2gui-0.3.2:
 
 -------------

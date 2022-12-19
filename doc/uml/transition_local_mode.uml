@@ -1,0 +1,12 @@
+@startuml
+[*] --> Standby
+Standby --> Diagnostic : start()
+Diagnostic --> Enable : enable()
+
+Enable --> Diagnostic : disable()
+Diagnostic --> Standby : standby()
+
+Standby --> Standby : fault()
+Diagnostic --> Diagnostic : fault()
+Enable --> Diagnostic : fault()
+@enduml
