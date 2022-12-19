@@ -19,7 +19,7 @@ Dependencies
 State
 =====
 
-The state machine is list below.
+The state machine is listed below.
 
 .. uml:: ../uml/transition_local_mode.uml
     :caption: State diagram of local mode.
