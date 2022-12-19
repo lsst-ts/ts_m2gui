@@ -63,7 +63,7 @@ async def test_callback_control_digital_status(qtbot, widget_async):
     assert control.text() == "ON"
 
     # Go to the Diagnostic state
-    await widget_async.model.start()
+    await widget_async.model.enter_diagnostic()
 
     qtbot.mouseClick(control, Qt.LeftButton)
 

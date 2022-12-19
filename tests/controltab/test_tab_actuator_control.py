@@ -73,8 +73,8 @@ async def test_callback_script_load_script(widget_async):
 
 async def _transition_to_enable_state(widget_async):
 
-    await widget_async.model.start()
-    await widget_async.model.enable()
+    await widget_async.model.enter_diagnostic()
+    await widget_async.model.enter_enable()
 
 
 @pytest.mark.asyncio

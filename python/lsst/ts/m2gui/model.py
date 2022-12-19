@@ -1048,7 +1048,7 @@ class Model(object):
         self.update_system_status("isCrioConnected", False)
         self.update_system_status("isTelemetryActive", False)
 
-    async def start(self):
+    async def enter_diagnostic(self):
         """Transition from the Standby mode to the Diagnostic mode.
 
         Raises
@@ -1069,7 +1069,7 @@ class Model(object):
 
         self.report_control_status()
 
-    async def enable(self):
+    async def enter_enable(self):
         """Transition from the Diagnostic mode to the Enable mode.
 
         Raises
@@ -1096,7 +1096,7 @@ class Model(object):
 
         self.report_control_status()
 
-    async def disable(self):
+    async def exit_enable(self):
         """Transition from the Enable mode to the Diagnostic mode.
 
         Raises
@@ -1137,7 +1137,7 @@ class Model(object):
                 "Error when doing the basic cleanup and power off the motor."
             )
 
-    async def standby(self):
+    async def exit_diagnostic(self):
         """Transition from the Diagnostic mode to the Standby mode.
 
         Raises

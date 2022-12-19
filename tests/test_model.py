@@ -552,24 +552,24 @@ def test_process_lost_connection(model):
 @pytest.mark.asyncio
 async def test_state_transition_normal(qtbot, model_async):
 
-    await model_async.start()
+    await model_async.enter_diagnostic()
     assert model_async.local_mode == LocalMode.Diagnostic
 
-    await model_async.enable()
+    await model_async.enter_enable()
     assert model_async.local_mode == LocalMode.Enable
 
-    await model_async.disable()
+    await model_async.exit_enable()
     assert model_async.local_mode == LocalMode.Diagnostic
 
-    await model_async.standby()
+    await model_async.exit_diagnostic()
     assert model_async.local_mode == LocalMode.Standby
 
 
 @pytest.mark.asyncio
 async def test_fault(qtbot, model_async):
 
-    await model_async.start()
-    await model_async.enable()
+    await model_async.enter_diagnostic()
+    await model_async.enter_enable()
 
     await model_async.fault()
     assert model_async.local_mode == LocalMode.Diagnostic

@@ -92,8 +92,8 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
 @pytest.mark.asyncio
 async def test_switch_force_balance_system(qtbot, widget_async):
 
-    await widget_async.model.start()
-    await widget_async.model.enable()
+    await widget_async.model.enter_diagnostic()
+    await widget_async.model.enter_enable()
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(15)

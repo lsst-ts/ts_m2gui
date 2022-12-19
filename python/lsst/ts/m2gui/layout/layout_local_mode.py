@@ -156,15 +156,17 @@ class LayoutLocalMode(LayoutDefault):
 
         # Do the state transition
         if local_mode == LocalMode.Standby:
-            command = "standby"
+            command = "exit_diagnostic"
 
         elif local_mode == LocalMode.Diagnostic:
             command = (
-                "start" if self.model.local_mode == LocalMode.Standby else "disable"
+                "enter_diagnostic"
+                if self.model.local_mode == LocalMode.Standby
+                else "exit_enable"
             )
 
         elif local_mode == LocalMode.Enable:
-            command = "enable"
+            command = "enter_enable"
 
         is_successful = await run_command(getattr(self.model, command))
 
