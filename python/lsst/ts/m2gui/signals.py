@@ -21,6 +21,7 @@
 
 __all__ = [
     "SignalControl",
+    "SignalPowerSystem",
     "SignalError",
     "SignalLimitSwitch",
     "SignalMessage",
@@ -40,6 +41,13 @@ class SignalControl(QtCore.QObject):
     not."""
 
     is_control_updated = QtCore.Signal(bool)
+
+
+class SignalPowerSystem(QtCore.QObject):
+    """Power system signal to send the event that the power system is updated
+    or not."""
+
+    is_state_updated = QtCore.Signal(bool)
 
 
 class SignalError(QtCore.QObject):

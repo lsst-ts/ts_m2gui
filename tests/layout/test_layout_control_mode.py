@@ -24,7 +24,6 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts import salobj
 from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutControlMode
@@ -93,16 +92,11 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
 @pytest.mark.asyncio
 async def test_switch_force_balance_system(qtbot, widget_async):
 
-    controller = widget_async.model.controller
-    await controller.write_command_to_server(
-        "start", controller_state_expected=salobj.State.DISABLED
-    )
-    await controller.write_command_to_server(
-        "enable", controller_state_expected=salobj.State.ENABLED
-    )
+    await widget_async.model.enter_diagnostic()
+    await widget_async.model.enter_enable()
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(15)
 
     assert widget_async.model.local_mode == LocalMode.Enable
 
@@ -111,6 +105,10 @@ async def test_switch_force_balance_system(qtbot, widget_async):
     assert widget_async.layout_control_mode._button_closed_loop.isEnabled() is True
 
     await widget_async.model.enable_open_loop_max_limit(True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
     assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
     qtbot.mouseClick(

@@ -19,11 +19,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import asyncio
 import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts import salobj
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
@@ -115,6 +115,8 @@ async def test_enable_open_loop_max_limit(model_async):
     model_async.is_closed_loop = False
 
     await model_async.enable_open_loop_max_limit(True)
+
+    await asyncio.sleep(1)
 
     assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
@@ -226,14 +228,10 @@ async def test_command_actuator_exception(model):
 @pytest.mark.asyncio
 async def test_reset_breakers(qtbot, model_async):
 
-    # Transition to the Enabled state to power on the motor and communication
+    # Power on the motor and communication first
     controller = model_async.controller
-    await controller.write_command_to_server(
-        "start", controller_state_expected=salobj.State.DISABLED
-    )
-    await controller.write_command_to_server(
-        "enable", controller_state_expected=salobj.State.ENABLED
-    )
+    await controller.power(PowerType.Communication, True)
+    await controller.power(PowerType.Motor, True)
 
     model_async.utility_monitor.update_breaker("J1-W9-1", True)
 
@@ -272,37 +270,38 @@ async def test_connect_exception(model):
         await model.connect()
 
 
-def test_process_event(qtbot, model):
+@pytest.mark.asyncio
+async def test_process_event(qtbot, model):
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model._process_event(message={"id": "m2AssemblyInPosition", "inPosition": True})
-
-    with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_event(
-            message={"id": "summaryState", "summaryState": salobj.State.DISABLED}
+        await model._process_event(
+            message={"id": "m2AssemblyInPosition", "inPosition": True}
         )
-    assert model.local_mode == LocalMode.Diagnostic
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model._process_event(message={"id": "errorCode", "errorCode": 1})
+        await model._process_event(message={"id": "errorCode", "errorCode": 1})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_event(message={"id": "commandableByDDS", "state": True})
+        await model._process_event(message={"id": "commandableByDDS", "state": True})
     assert model.is_csc_commander is True
 
     with qtbot.waitSignal(
         model.utility_monitor.signal_detailed_force.hard_points, timeout=TIMEOUT
     ):
-        model._process_event(
+        await model._process_event(
             message={"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]}
         )
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        model._process_event(message={"id": "forceBalanceSystemStatus", "status": True})
+        await model._process_event(
+            message={"id": "forceBalanceSystemStatus", "status": True}
+        )
     assert model.is_closed_loop is True
 
     with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
-        model._process_event(message={"id": "scriptExecutionStatus", "percentage": 1})
+        await model._process_event(
+            message={"id": "scriptExecutionStatus", "percentage": 1}
+        )
 
     with qtbot.waitSignals(
         [
@@ -311,7 +310,7 @@ def test_process_event(qtbot, model):
         ],
         timeout=TIMEOUT,
     ):
-        model._process_event(message={"id": "digitalOutput", "value": 3})
+        await model._process_event(message={"id": "digitalOutput", "value": 3})
 
         assert model.system_status["isPowerCommunicationOn"] is True
         assert model.system_status["isPowerMotorOn"] is True
@@ -319,10 +318,10 @@ def test_process_event(qtbot, model):
     with qtbot.waitSignal(
         model.utility_monitor.signal_utility.digital_status_input, timeout=TIMEOUT
     ):
-        model._process_event(message={"id": "digitalInput", "value": 1})
+        await model._process_event(message={"id": "digitalInput", "value": 1})
 
     with qtbot.waitSignal(model.signal_config.config, timeout=TIMEOUT):
-        model._process_event(
+        await model._process_event(
             message={
                 "id": "config",
                 "configuration": "surrogate_handling.csv",
@@ -348,13 +347,23 @@ def test_process_event(qtbot, model):
         )
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model._process_event(message={"id": "openLoopMaxLimit", "status": True})
+        await model._process_event(message={"id": "openLoopMaxLimit", "status": True})
 
     with qtbot.waitSignal(
         model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
     ):
-        model._process_event(
+        await model._process_event(
             message={"id": "limitSwitchStatus", "retract": [1, 2], "extend": []}
+        )
+
+    with qtbot.waitSignal(model.signal_power_system.is_state_updated, timeout=TIMEOUT):
+        await model._process_event(
+            message={
+                "id": "powerSystemState",
+                "powerType": 1,
+                "status": False,
+                "state": 1,
+            }
         )
 
 
@@ -364,24 +373,6 @@ def test_get_message_name(model):
     assert model._get_message_name(dict()) == ""
 
     assert model._get_message_name({"id": "test"}) == "test"
-
-
-def test_summary_state_to_local_mode(model):
-
-    assert model._summary_state_to_local_mode(salobj.State.STANDBY) == LocalMode.Standby
-    assert (
-        model._summary_state_to_local_mode(salobj.State.DISABLED)
-        == LocalMode.Diagnostic
-    )
-    assert model._summary_state_to_local_mode(salobj.State.ENABLED) == LocalMode.Enable
-
-    # Check the Fault state
-    assert model._summary_state_to_local_mode(salobj.State.FAULT) == LocalMode.Standby
-
-    model.local_mode = LocalMode.Enable
-    assert (
-        model._summary_state_to_local_mode(salobj.State.FAULT) == LocalMode.Diagnostic
-    )
 
 
 def test_process_telemetry(qtbot, model):
@@ -556,3 +547,29 @@ def test_process_lost_connection(model):
 
     assert model.system_status["isCrioConnected"] is False
     assert model.system_status["isTelemetryActive"] is False
+
+
+@pytest.mark.asyncio
+async def test_state_transition_normal(qtbot, model_async):
+
+    await model_async.enter_diagnostic()
+    assert model_async.local_mode == LocalMode.Diagnostic
+
+    await model_async.enter_enable()
+    assert model_async.local_mode == LocalMode.Enable
+
+    await model_async.exit_enable()
+    assert model_async.local_mode == LocalMode.Diagnostic
+
+    await model_async.exit_diagnostic()
+    assert model_async.local_mode == LocalMode.Standby
+
+
+@pytest.mark.asyncio
+async def test_fault(qtbot, model_async):
+
+    await model_async.enter_diagnostic()
+    await model_async.enter_enable()
+
+    await model_async.fault()
+    assert model_async.local_mode == LocalMode.Diagnostic

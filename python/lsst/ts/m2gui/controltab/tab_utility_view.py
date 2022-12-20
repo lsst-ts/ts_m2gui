@@ -53,8 +53,12 @@ class TabUtilityView(TabDefault):
 
         # Utility data
         self._power_inclinometer = {
+            "power_on_motor": create_label(),
+            "power_system_state_motor": create_label(),
             "power_voltage_motor": create_label(),
             "power_current_motor": create_label(),
+            "power_on_communication": create_label(),
+            "power_system_state_communication": create_label(),
             "power_voltage_communication": create_label(),
             "power_current_communication": create_label(),
             "inclinometer_raw": create_label(),
@@ -84,6 +88,9 @@ class TabUtilityView(TabDefault):
 
         self._set_widget_and_layout()
 
+        self._update_power_system_status()
+
+        self._set_signal_power_system(self.model.signal_power_system)
         self._set_signal_utility(self.model.utility_monitor.signal_utility)
 
     def _create_indicators_breaker(self):
@@ -249,10 +256,12 @@ class TabUtilityView(TabDefault):
         """
 
         layout = QFormLayout()
+        layout.addRow("Power:", self._power_inclinometer["power_on_motor"])
+        layout.addRow("State:", self._power_inclinometer["power_system_state_motor"])
         layout.addRow("Voltage:", self._power_inclinometer["power_voltage_motor"])
         layout.addRow("Current:", self._power_inclinometer["power_current_motor"])
 
-        return create_group_box("Motor Power", layout)
+        return create_group_box("Motor Power System", layout)
 
     def _create_group_power_communication(self):
         """Create the group of communication power.
@@ -264,6 +273,10 @@ class TabUtilityView(TabDefault):
         """
 
         layout = QFormLayout()
+        layout.addRow("Power:", self._power_inclinometer["power_on_communication"])
+        layout.addRow(
+            "State:", self._power_inclinometer["power_system_state_communication"]
+        )
         layout.addRow(
             "Voltage:", self._power_inclinometer["power_voltage_communication"]
         )
@@ -271,7 +284,7 @@ class TabUtilityView(TabDefault):
             "Current:", self._power_inclinometer["power_current_communication"]
         )
 
-        return create_group_box("Communication Power", layout)
+        return create_group_box("Communication Power System", layout)
 
     def _create_group_inclinometer(self):
         """Create the group of inclinometer.
@@ -370,6 +383,58 @@ class TabUtilityView(TabDefault):
             self.add_empty_row_to_form_layout(layout)
 
         return create_group_box("Displacement Sensors", layout)
+
+    def _update_power_system_status(self):
+        """Update the power system status."""
+
+        power_system_status = self.model.controller.power_system_status
+
+        # Power
+        power_motor = "On" if power_system_status["motor_power_is_on"] else "Off"
+        power_communication = (
+            "On" if power_system_status["communication_power_is_on"] else "Off"
+        )
+
+        self._power_inclinometer["power_on_motor"].setText(f"{power_motor}")
+        self._power_inclinometer["power_on_communication"].setText(
+            f"{power_communication}"
+        )
+
+        # State
+        state_motor = power_system_status["motor_power_state"]
+        state_communication = power_system_status["communication_power_state"]
+
+        self._power_inclinometer["power_system_state_motor"].setText(
+            f"{state_motor.name}"
+        )
+        self._power_inclinometer["power_system_state_communication"].setText(
+            f"{state_communication.name}"
+        )
+
+    def _set_signal_power_system(self, signal_power_system):
+        """Set the power system signal with callback function. This signal
+        reports the update of power system status.
+
+        Parameters
+        ----------
+        signal_power_system : `SignalPowerSystem`
+            Signal of the power system.
+        """
+        signal_power_system.is_state_updated.connect(
+            self._callback_update_power_system_status
+        )
+
+    @asyncSlot()
+    async def _callback_update_power_system_status(self, is_state_updated):
+        """Callback of the power system signal to update the power system
+        status.
+
+        Parameters
+        ----------
+        is_state_updated : `bool`
+            Power system state is updated or not.
+        """
+        self._update_power_system_status()
 
     def _set_signal_utility(self, signal_utility):
         """Set the utility signal with callback functions. This signal provides

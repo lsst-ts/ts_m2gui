@@ -146,6 +146,10 @@ async def test_set_local_mode(qtbot, widget_async):
     assert widget_async.layout_local_mode._button_enable.isEnabled() is False
 
     await widget_async.model.enable_open_loop_max_limit(True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(5)
+
     assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
     qtbot.mouseClick(

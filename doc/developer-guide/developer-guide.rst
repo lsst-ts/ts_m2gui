@@ -11,11 +11,21 @@ This GUI is constructed on the top of Qt framework (`Qt for Python <https://wiki
 Dependencies
 ============
 
-* `ts_salobj <https://github.com/lsst-ts/ts_salobj>`_
 * `ts_tcpip <https://github.com/lsst-ts/ts_tcpip>`_
-* `ts_utils <https://github.com/lsst-ts/ts_utils>`_
-* `ts_config_mttcs <https://github.com/lsst-ts/ts_config_mttcs>`_
 * `ts_m2com <https://github.com/lsst-ts/ts_m2com>`_
+
+.. _State:
+
+State
+=====
+
+The state machine is listed below.
+
+.. uml:: ../uml/transition_local_mode.uml
+    :caption: State diagram of local mode.
+
+It is noted that when the fault happens, the **Enable** local mode will transition to the **Diagnostic** local mode.
+The other local modes keep the same.
 
 .. _Architecture:
 
@@ -70,6 +80,7 @@ m2gui.signals
 The available Qt signals are listed below:
 
 * **SignalControl** sends the event that the control is updated or not.
+* **SignalPowerSystem** sends the event that the power system is updated or not.
 * **SignalError** sends the error code.
 * **SignalLimitSwitch** sends the event of limit switch status.
 * **SignalMessage** sends the message event.
