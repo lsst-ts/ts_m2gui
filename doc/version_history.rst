@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.4:
+
+-------------
+0.3.4
+-------------
+
+* Adapt the **ts_tcpip** v1.0.0 to use the **LOCALHOST_IPV4** instead of **LOCAL_HOST**.
+
 .. _lsst.ts.m2gui-0.3.3:
 
 -------------

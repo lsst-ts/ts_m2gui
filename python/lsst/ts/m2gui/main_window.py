@@ -27,7 +27,7 @@ import sys
 from datetime import datetime
 
 from lsst.ts.m2com import read_yaml_file
-from lsst.ts.tcpip import LOCAL_HOST
+from lsst.ts.tcpip import LOCALHOST_IPV4
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
 from qasync import QApplication, asyncSlot
@@ -219,7 +219,7 @@ class MainWindow(QMainWindow):
         default_settings = read_yaml_file(filepath)
 
         if is_simulation_mode:
-            default_settings["host"] = LOCAL_HOST
+            default_settings["host"] = LOCALHOST_IPV4
 
         model = Model(
             self.log,
