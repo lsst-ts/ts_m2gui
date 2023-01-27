@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.5:
+
+-------------
+0.3.5
+-------------
+
+* Remove the **root** workaround from **Jenkinsfile**.
+
 .. _lsst.ts.m2gui-0.3.4:
 
 -------------
