@@ -124,7 +124,7 @@ async def test_set_local_mode(qtbot, widget_async):
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(5)
+    await asyncio.sleep(15)
 
     assert widget_async.model.local_mode == LocalMode.Diagnostic
 
