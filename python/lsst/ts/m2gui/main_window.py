@@ -57,6 +57,8 @@ class MainWindow(QMainWindow):
         Is outputting the log messages on screen or not.
     is_simulation_mode: `bool`
         Is the simulation mode or not.
+    is_crio_simulator : `bool`, optional
+        Is using the M2 cRIO simulator or not. (the default is False)
     log : `logging.Logger` or None, optional
         A logger. If None, a logger will be instantiated. (the default is
         None)
@@ -76,6 +78,7 @@ class MainWindow(QMainWindow):
         is_output_log_to_file,
         is_output_log_on_screen,
         is_simulation_mode,
+        is_crio_simulator=False,
         log=None,
         log_level=logging.WARN,
     ):
@@ -94,7 +97,7 @@ class MainWindow(QMainWindow):
             log=log,
         )
 
-        self.model = self._set_model(is_simulation_mode)
+        self.model = self._set_model(is_simulation_mode, is_crio_simulator)
 
         # Layout of the control panel
         self._layout_control = LayoutControl(self.model)
@@ -131,6 +134,9 @@ class MainWindow(QMainWindow):
 
         if is_simulation_mode:
             self.log.info("Running the simulation mode.")
+
+        if is_crio_simulator:
+            self.log.info("Using the M2 cRIO simulator.")
 
     def _set_log(
         self,
@@ -200,19 +206,29 @@ class MainWindow(QMainWindow):
             pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "log" / name
         )
 
-    def _set_model(self, is_simulation_mode):
+    def _set_model(self, is_simulation_mode, is_crio_simulator):
         """Set the model.
 
         Parameters
         ----------
         is_simulation_mode: `bool`
             Is the simulation mode or not.
+        is_crio_simulator : `bool`
+            Is using the M2 cRIO simulator or not.
 
         Returns
         -------
         model : `Model`
             Model object.
+
+        Raises
+        ------
+        `ValueError`
+            When simulation mode and cRIO simulator are used.
         """
+
+        if is_simulation_mode and is_crio_simulator:
+            raise ValueError("No simulation mode and cRIO simulator at the same time.")
 
         # Read the yaml file
         filepath = self._get_policy_dir() / "default.yaml"
@@ -220,6 +236,8 @@ class MainWindow(QMainWindow):
 
         if is_simulation_mode:
             default_settings["host"] = LOCALHOST_IPV4
+        elif is_crio_simulator:
+            default_settings["host"] = default_settings["host_crio_simulator"]
 
         model = Model(
             self.log,
