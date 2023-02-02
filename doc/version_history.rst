@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.6:
+
+-------------
+0.3.6
+-------------
+
+* Support the cRIO simulator in the configuration file.
+* Issue the load configuration command.
+
 .. _lsst.ts.m2gui-0.3.5:
 
 -------------
