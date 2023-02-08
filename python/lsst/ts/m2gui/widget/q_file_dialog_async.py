@@ -23,7 +23,7 @@ __all__ = ["QFileDialogAsync"]
 
 import sys
 
-from PySide2.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog
 
 from . import connect_signal_to_future
 

@@ -33,7 +33,7 @@ __all__ = [
     "SignalScript",
 ]
 
-from PySide2 import QtCore
+from PySide6 import QtCore
 
 
 class SignalControl(QtCore.QObject):

@@ -29,7 +29,7 @@ def connect_signal_to_future(signal, func):
 
     Parameters
     ----------
-    signal : `PySide2.QtCore.Signal`
+    signal : `PySide6.QtCore.Signal`
         Signal.
     func : `func`
         Function to execute.

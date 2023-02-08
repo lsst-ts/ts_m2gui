@@ -82,7 +82,7 @@ The environment variable **TS_CONFIG_MTTCS_DIR** specifies [ts_config_mttcs](htt
 You can run the unit tests by:
 
 ```bash
-export PYTEST_QT_API="PySide2"
+export PYTEST_QT_API="PySide6"
 pytest tests/
 ```
 

@@ -22,9 +22,9 @@
 __all__ = ["TabUtilityView"]
 
 from lsst.ts.m2com import PowerType
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import DisplacementSensorDirection, TemperatureGroup
@@ -98,7 +98,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        indicators : `dict [PySide2.QtWidgets.QPushButton]`
+        indicators : `dict [PySide6.QtWidgets.QPushButton]`
             Indicators of the breakers. The key is the breaker's name.
         """
 
@@ -116,7 +116,7 @@ class TabUtilityView(TabDefault):
 
         Parameters
         ----------
-        indicator : `PySide2.QtWidgets.QPushButton`
+        indicator : `PySide6.QtWidgets.QPushButton`
             Indicator.
         triggered : `bool`
             Is triggered or not.
@@ -166,7 +166,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        labels_sensor_data : `dict [PySide2.QtWidgets.QLabel]`
+        labels_sensor_data : `dict [PySide6.QtWidgets.QLabel]`
             Labels of the sensor data. The key is the sensor's name.
         """
 
@@ -192,7 +192,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide6.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -251,7 +251,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -268,7 +268,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -291,7 +291,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -318,7 +318,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -342,7 +342,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -364,7 +364,7 @@ class TabUtilityView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

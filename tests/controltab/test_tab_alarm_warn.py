@@ -28,8 +28,8 @@ import pytest_asyncio
 from lsst.ts.m2com import LimitSwitchType
 from lsst.ts.m2gui import Model, Ring
 from lsst.ts.m2gui.controltab import TabAlarmWarn
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
 
 SLEEP_TIME_SHORT = 1
 SLEEP_TIME_LONG = 5

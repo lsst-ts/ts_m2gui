@@ -23,7 +23,7 @@ __all__ = ["TabCellStatus"]
 
 import numpy as np
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
-from PySide2.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
+from PySide6.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from .. import ActuatorForce
@@ -151,7 +151,7 @@ class TabCellStatus(TabDefault):
 
         Returns
         -------
-        actuator_data_selection : `PySide2.QtWidgets.QComboBox`
+        actuator_data_selection : `PySide6.QtWidgets.QComboBox`
             Selection of the actuator data.
         """
 
@@ -305,7 +305,7 @@ class TabCellStatus(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 

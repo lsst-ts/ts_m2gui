@@ -562,7 +562,7 @@ class UtilityMonitor(object):
             Number of digits after the decimal. This should be greater than 0.
         data : `dict`
             Sensor data.
-        signal : `PySide2.QtCore.Signal`
+        signal : `PySide6.QtCore.Signal`
             Signal in QT framework.
         signal_item :
             Item used in the signal's message.

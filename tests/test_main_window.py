@@ -23,8 +23,8 @@ import asyncio
 
 import pytest
 from lsst.ts.m2gui import MainWindow
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QToolBar
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QToolBar
 
 
 @pytest.fixture

@@ -21,7 +21,7 @@
 
 __all__ = ["TabConfigView"]
 
-from PySide2.QtWidgets import QFormLayout, QVBoxLayout
+from PySide6.QtWidgets import QFormLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from ..utils import create_group_box, create_label
@@ -90,7 +90,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -110,7 +110,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -133,7 +133,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -155,7 +155,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -179,7 +179,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -197,7 +197,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -220,7 +220,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -237,7 +237,7 @@ class TabConfigView(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

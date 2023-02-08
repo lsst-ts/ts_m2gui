@@ -21,7 +21,7 @@
 
 __all__ = ["TabRigidBodyPos"]
 
-from PySide2.QtWidgets import QDoubleSpinBox, QFormLayout, QHBoxLayout, QVBoxLayout
+from PySide6.QtWidgets import QDoubleSpinBox, QFormLayout, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from ..utils import create_group_box, create_label, get_tol, run_command, set_button
@@ -103,7 +103,7 @@ class TabRigidBodyPos(TabDefault):
         -------
         position : `dict`
             Target position of the rigid body. The key is the axis. The value
-            is the `PySide2.QtWidgets.QDoubleSpinBox`.
+            is the `PySide6.QtWidgets.QDoubleSpinBox`.
         """
 
         num_digit_after_decimal = self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL
@@ -170,7 +170,7 @@ class TabRigidBodyPos(TabDefault):
         ----------
         target_positions : `dict`
             Target positions of the rigid body. The key is the axis. The value
-            is the `PySide2.QtWidgets.QDoubleSpinBox`.
+            is the `PySide6.QtWidgets.QDoubleSpinBox`.
         """
 
         for target_position in target_positions.values():
@@ -197,7 +197,7 @@ class TabRigidBodyPos(TabDefault):
         -------
         position : `dict`
             Position of the rigid position. The key is the axis. The value is
-            the `PySide2.QtWidgets.QLabel`.
+            the `PySide6.QtWidgets.QLabel`.
         """
 
         position = dict()
@@ -211,7 +211,7 @@ class TabRigidBodyPos(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -243,7 +243,7 @@ class TabRigidBodyPos(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -267,7 +267,7 @@ class TabRigidBodyPos(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -282,7 +282,7 @@ class TabRigidBodyPos(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -309,7 +309,7 @@ class TabRigidBodyPos(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

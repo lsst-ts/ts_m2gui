@@ -22,9 +22,9 @@
 __all__ = ["TabDiagnostics"]
 
 from lsst.ts.m2com import NUM_TANGENT_LINK
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from ..utils import create_group_box, create_label, run_command, set_button
@@ -93,7 +93,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        `dict [PySide2.QtWidgets.QLabel]`
+        `dict [PySide6.QtWidgets.QLabel]`
             Labels of the power. The key is the specific power's name.
         """
 
@@ -134,7 +134,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        indicators_status : `list [PySide2.QtWidgets.QPushButton]`
+        indicators_status : `list [PySide6.QtWidgets.QPushButton]`
             Indicators of the digital status.
         """
 
@@ -152,7 +152,7 @@ class TabDiagnostics(TabDefault):
 
         Parameters
         ----------
-        indicator : `PySide2.QtWidgets.QPushButton`
+        indicator : `PySide6.QtWidgets.QPushButton`
             Indicator.
         is_triggered : `bool`
             The status is triggered or not.
@@ -240,7 +240,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        controls : `list [PySide2.QtWidgets.QPushButton]`
+        controls : `list [PySide6.QtWidgets.QPushButton]`
             List of the controls of digital status.
         """
 
@@ -284,7 +284,7 @@ class TabDiagnostics(TabDefault):
 
         Parameters
         ----------
-        control : `PySide2.QtWidgets.QPushButton`
+        control : `PySide6.QtWidgets.QPushButton`
             Control.
         is_checked : `bool`
             Control is checked or not.
@@ -311,7 +311,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide6.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -372,7 +372,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -397,7 +397,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -424,7 +424,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -442,7 +442,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -458,7 +458,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -474,7 +474,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -490,7 +490,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -515,7 +515,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -572,7 +572,7 @@ class TabDiagnostics(TabDefault):
 
         Parameters
         ----------
-        power : `dict [PySide2.QtWidgets.QLabel]`
+        power : `dict [PySide6.QtWidgets.QLabel]`
             Motor power. The key is the specific power's name.
         voltage : `float`
             Voltage in volt.
@@ -603,7 +603,7 @@ class TabDiagnostics(TabDefault):
 
         Parameters
         ----------
-        power : `dict [PySide2.QtWidgets.QLabel]`
+        power : `dict [PySide6.QtWidgets.QLabel]`
             Communication power. The key is the specific power's name.
         voltage : `float`
             Voltage in volt.
@@ -661,7 +661,7 @@ class TabDiagnostics(TabDefault):
 
         Parameters
         ----------
-        indicators : `list [PySide2.QtWidgets.QPushButton]`
+        indicators : `list [PySide6.QtWidgets.QPushButton]`
             Indicators of the digital status.
         digital_status : `int`
             Digital status. Each bit means different status. 1 means OK or

@@ -24,9 +24,9 @@ __all__ = ["TabAlarmWarn"]
 import csv
 
 from lsst.ts.m2com import LimitSwitchType
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import (
     QHBoxLayout,
     QHeaderView,
     QPlainTextEdit,
@@ -98,7 +98,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        table : `PySide2.QtWidgets.QTableWidget`
+        table : `PySide6.QtWidgets.QTableWidget`
             Table widget.
         """
 
@@ -131,7 +131,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        text_error_cause : `PySide2.QtWidgets.QPlainTextEdit`
+        text_error_cause : `PySide6.QtWidgets.QPlainTextEdit`
             Text of the possible error cause.
         """
 
@@ -186,7 +186,7 @@ class TabAlarmWarn(TabDefault):
 
         Parameters
         ----------
-        indicator : `PySide2.QtWidgets.QPushButton`
+        indicator : `PySide6.QtWidgets.QPushButton`
             Indicator.
         is_fault : `bool`
             Is in fault or not.
@@ -206,7 +206,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -230,7 +230,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        scroll_area : `PySide2.QtWidgets.QScrollArea`
+        scroll_area : `PySide6.QtWidgets.QScrollArea`
             Widget of limit switch.
         """
 
@@ -263,7 +263,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout of limit switch.
         """
 
@@ -334,7 +334,7 @@ class TabAlarmWarn(TabDefault):
 
         Parameters
         ----------
-        item : `PySide2.QtWidgets.QTableWidgetItem`
+        item : `PySide6.QtWidgets.QTableWidgetItem`
             Table widget item.
         status : `str`
             Error status.

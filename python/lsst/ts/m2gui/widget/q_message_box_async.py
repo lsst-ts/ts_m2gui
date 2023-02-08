@@ -21,7 +21,7 @@
 
 __all__ = ["QMessageBoxAsync"]
 
-from PySide2.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QMessageBox
 
 from . import connect_signal_to_future
 

@@ -36,7 +36,7 @@ class LayoutDefault(object):
     ----------
     model : `Model`
         Model class.
-    layout : `PySide2.QtWidgets.QVBoxLayout`
+    layout : `PySide6.QtWidgets.QVBoxLayout`
         Layout.
     """
 
@@ -65,7 +65,7 @@ class LayoutDefault(object):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
         raise NotImplementedError("Child class needs to realize this function.")

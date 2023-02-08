@@ -27,7 +27,7 @@ import os
 import sys
 
 import qasync
-from PySide2.QtCore import QCommandLineOption, QCommandLineParser
+from PySide6.QtCore import QCommandLineOption, QCommandLineParser
 
 from . import MainWindow
 
@@ -42,8 +42,8 @@ def run_application(argv):
     """
 
     if "QT_API" not in os.environ:
-        os.environ.setdefault("QT_API", "PySide2")
-        print("qasync: QT_API not set, defaulting to PySide2.")
+        os.environ.setdefault("QT_API", "PySide6")
+        print("qasync: QT_API not set, defaulting to PySide6.")
 
     try:
         qasync.run(main(argv))

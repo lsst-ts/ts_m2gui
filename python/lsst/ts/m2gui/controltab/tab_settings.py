@@ -21,7 +21,7 @@
 
 __all__ = ["TabSettings"]
 
-from PySide2.QtWidgets import QFormLayout, QLineEdit, QSpinBox, QVBoxLayout
+from PySide6.QtWidgets import QFormLayout, QLineEdit, QSpinBox, QVBoxLayout
 from qasync import QApplication, asyncSlot
 
 from ..utils import create_group_box, run_command, set_button
@@ -142,7 +142,7 @@ class TabSettings(TabDefault):
 
         Parameters
         ----------
-        line_edit : `PySide2.QtWidgets.QLineEdit`
+        line_edit : `PySide6.QtWidgets.QLineEdit`
             Line edit.
         offset : `int`, optional
             Offset of the width. (the default is 20)
@@ -195,7 +195,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -214,7 +214,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -231,7 +231,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

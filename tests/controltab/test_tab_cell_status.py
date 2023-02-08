@@ -27,7 +27,7 @@ import pytest
 from lsst.ts.m2gui import ActuatorForce, FigureActuatorData, Model
 from lsst.ts.m2gui.controltab import TabCellStatus
 from lsst.ts.m2gui.display import ItemActuator
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 
 TIMEOUT = 1000
 
