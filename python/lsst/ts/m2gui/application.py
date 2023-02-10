@@ -121,8 +121,10 @@ async def main(argv):
     is_crio_simulator = parser.isSet(option_is_crio_simulator)
 
     if is_simulation_mode and is_crio_simulator:
-        print("No simulation mode and cRIO simulator at the same time.")
-        sys.exit(0)
+        print(
+            "No simulation mode and cRIO simulator at the same time.", file=sys.stderr
+        )
+        sys.exit(1)
 
     # Create a Qt main window, which will be our window.
     window_main = MainWindow(
