@@ -88,6 +88,8 @@ pytest tests/
 
 If you have the **Xvfb** and **pytest-xvfb** installed, you will not see the prompted windows when running the unit tests.
 
+Note: If the variable of `PYTEST_QT_API` is not set, you might get the core dump error in the test.
+
 ## Class Diagrams
 
 The class diagrams are in [here](doc/uml).

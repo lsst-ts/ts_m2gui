@@ -68,6 +68,8 @@ pipeline {
 
                         cd ${WORK_HOME}
                         setup -k -r .
+
+                        export PYTEST_QT_API="PySide2"
                         pytest tests/ --cov-report html --cov=${env.MODULE_NAME} --junitxml=${env.XML_REPORT}
                     """
                 }

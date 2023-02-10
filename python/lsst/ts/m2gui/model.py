@@ -1062,7 +1062,12 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Standby!r}."
             )
 
+        await self.controller.load_configuration()
+
         await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+        await self.controller.reset_force_offsets()
+        await self.controller.reset_actuator_steps()
+
         await self.controller.power(PowerType.Communication, True)
 
         self.local_mode = LocalMode.Diagnostic
@@ -1082,9 +1087,6 @@ class Model(object):
             raise RuntimeError(
                 f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
             )
-
-        await self.controller.reset_force_offsets()
-        await self.controller.reset_actuator_steps()
 
         await self.controller.power(PowerType.Motor, True)
         await self.controller.set_ilc_to_enabled()

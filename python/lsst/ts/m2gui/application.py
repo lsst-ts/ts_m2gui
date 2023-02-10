@@ -105,17 +105,34 @@ async def main(argv):
     )
     parser.addOption(option_no_log_file)
 
+    option_is_crio_simulator = QCommandLineOption(
+        ["use-crio-simulator"],
+        "Use the M2 cRIO simulator. This is different from the simulation mode.",
+    )
+    parser.addOption(option_is_crio_simulator)
+
     parser.process(app)
 
-    # Get the argument
+    # Get the argument and check the values
     is_output_log_to_file = not parser.isSet(option_no_log_file)
     is_verbose = parser.isSet(option_verbose)
     is_simulation_mode = parser.isSet(option_simulation)
     log_level = int(parser.value(option_log_level))
+    is_crio_simulator = parser.isSet(option_is_crio_simulator)
+
+    if is_simulation_mode and is_crio_simulator:
+        print(
+            "No simulation mode and cRIO simulator at the same time.", file=sys.stderr
+        )
+        sys.exit(1)
 
     # Create a Qt main window, which will be our window.
     window_main = MainWindow(
-        is_output_log_to_file, is_verbose, is_simulation_mode, log_level=log_level
+        is_output_log_to_file,
+        is_verbose,
+        is_simulation_mode,
+        is_crio_simulator=is_crio_simulator,
+        log_level=log_level,
     )
     window_main.show()
 

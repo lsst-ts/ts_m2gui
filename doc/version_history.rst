@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.6:
+
+-------------
+0.3.6
+-------------
+
+* Support the cRIO simulator in the configuration file.
+* Issue the load configuration command.
+* Export the **PYTEST_QT_API** variable in **Jenkinsfile**.
+
 .. _lsst.ts.m2gui-0.3.5:
 
 -------------

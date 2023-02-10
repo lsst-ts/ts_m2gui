@@ -61,6 +61,18 @@ def test_init(widget):
     assert controller.timeout_connection == 10
 
 
+def test_set_model(widget):
+
+    model_local_host = widget._set_model(True, False)
+    assert model_local_host.controller.host == "127.0.0.1"
+
+    model_crio_simulator = widget._set_model(False, True)
+    assert model_crio_simulator.controller.host == "m2-crio-simulator.ls.lsst.org"
+
+    with pytest.raises(ValueError):
+        widget._set_model(True, True)
+
+
 def test_init_sim(widget_sim):
 
     assert widget_sim.model.controller.host == "127.0.0.1"
