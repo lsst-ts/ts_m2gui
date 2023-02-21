@@ -24,7 +24,13 @@ import logging
 import pathlib
 
 import pytest
-from lsst.ts.m2gui import ActuatorForce, FigureActuatorData, Model
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
+from lsst.ts.m2gui import (
+    ActuatorForce,
+    CellActuatorGroupData,
+    FigureActuatorData,
+    Model,
+)
 from lsst.ts.m2gui.controltab import TabCellStatus
 from lsst.ts.m2gui.display import ItemActuator
 from PySide2.QtCore import Qt
@@ -56,13 +62,15 @@ def test_init(widget):
 
     actuators = mirror.actuators
 
-    assert len(actuators) == 78
+    assert len(actuators) == NUM_ACTUATOR
 
     actuator_77 = actuators[76]
-    assert actuator_77._acutator_id == 77
+    assert actuator_77.acutator_id == 77
     assert actuator_77._alias == "A5"
     assert actuator_77.label_id.toPlainText() == "77"
     assert actuator_77.magnitude == 0
+
+    assert len(widget._visible_actuator_ids) == NUM_ACTUATOR
 
 
 def text_callback_show_alias(qtbot, widget):
@@ -71,6 +79,48 @@ def text_callback_show_alias(qtbot, widget):
 
     actuators = widget._view_mirror.actuators
     assert actuators[0].label_id.toPlainText() == "B1"
+
+
+@pytest.mark.asyncio
+async def test_callback_selection_changed_group(widget):
+
+    # Index begins from 0 instead of 1 in QComboBox
+    index_group = CellActuatorGroupData.Tangent.value - 1
+    widget._group_data_selector.setCurrentIndex(index_group)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    num = 0
+    for actuator in widget._view_mirror.actuators:
+        if actuator.isVisible():
+            num += 1
+
+    assert num == NUM_TANGENT_LINK
+
+
+def test_get_visible_actuator_ids(widget):
+
+    visible_actuators_all = widget.get_visible_actuator_ids(index_group_data_selector=0)
+    assert len(visible_actuators_all) == NUM_ACTUATOR
+    assert min(visible_actuators_all) == 1
+    assert max(visible_actuators_all) == NUM_ACTUATOR
+
+    visible_actuators_axial = widget.get_visible_actuator_ids(
+        index_group_data_selector=1
+    )
+
+    num_actuators_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
+    assert len(visible_actuators_axial) == num_actuators_axial
+    assert min(visible_actuators_axial) == 1
+    assert max(visible_actuators_axial) == num_actuators_axial
+
+    visible_actuators_tangent = widget.get_visible_actuator_ids(
+        index_group_data_selector=2
+    )
+    assert len(visible_actuators_tangent) == NUM_TANGENT_LINK
+    assert min(visible_actuators_tangent) == num_actuators_axial + 1
+    assert max(visible_actuators_tangent) == NUM_ACTUATOR
 
 
 def test_get_data_selected(widget):

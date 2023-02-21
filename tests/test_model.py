@@ -24,6 +24,7 @@ import logging
 
 import pytest
 import pytest_asyncio
+from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
@@ -52,7 +53,7 @@ async def model_async():
 
 def test_init(model):
 
-    assert len(model.system_status) == 7
+    assert len(model.system_status) == 9
 
 
 def test_add_error(qtbot, model):
@@ -364,6 +365,30 @@ async def test_process_event(qtbot, model):
                 "status": False,
                 "state": 1,
             }
+        )
+
+    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+        await model._process_event(
+            message={"id": "tcpIpConnected", "isConnected": True}
+        )
+
+    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+        await model._process_event(message={"id": "interlock", "state": True})
+
+    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+        await model._process_event(
+            message={"id": "cellTemperatureHiWarning", "hiWarning": True}
+        )
+
+    with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
+        await model._process_event(
+            message={"id": "inclinationTelemetrySource", "source": 2}
+        )
+    assert model.inclination_source == MTM2.InclinationTelemetrySource.MTMOUNT
+
+    with qtbot.waitSignal(model.signal_ilc_status.address_mode, timeout=TIMEOUT):
+        await model._process_event(
+            message={"id": "innerLoopControlMode", "address": 1, "mode": 2}
         )
 
 
