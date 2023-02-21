@@ -23,12 +23,13 @@ __all__ = ["TabCellStatus"]
 
 import numpy as np
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from .. import ActuatorForce
 from ..display import FigureConstant, Gauge, ViewMirror
-from ..enums import FigureActuatorData
+from ..enums import CellActuatorGroupData, FigureActuatorData
 from ..utils import set_button
 from . import TabDefault
 
@@ -54,13 +55,20 @@ class TabCellStatus(TabDefault):
 
         self._view_mirror = ViewMirror()
         self._button_show_alias = set_button(
-            "Show Alias", self._callback_show_alias, is_checkable=True
+            "Show Actuator Alias", self._callback_show_alias, is_checkable=True
         )
+
+        # Selector of the actuator group
+        self._group_data_selector = self._create_group_data_selection()
+
+        # Visible actuator IDs on the cell map
+        self._visible_actuator_ids = self.get_visible_actuator_ids()
 
         self._forces = ActuatorForce()
         self._figures = self._create_figures()
         self._gauge = Gauge(-1, 1)
 
+        # Selector of the actuator
         self._actuator_data_selection = self._create_actuator_data_selection()
 
         # Timer to update cell status forces (and displays)
@@ -83,6 +91,97 @@ class TabCellStatus(TabDefault):
 
         is_alias = self._button_show_alias.isChecked()
         self._view_mirror.show_alias(is_alias)
+
+    def _create_group_data_selection(self):
+        """Create the selection of actuator group data on the cell map.
+
+        Returns
+        -------
+        group_data_selection : `PySide2.QtWidgets.QComboBox`
+            Selection of the actuator group data.
+        """
+
+        # Add the item and tip. Note the index begins from 0 in QComboBox.
+        group_data_selection = QComboBox()
+        group_data_selection.setToolTip("Select actuator group on cell map")
+
+        for specific_data in CellActuatorGroupData:
+            group = specific_data.name
+            group_data_selection.addItem(group)
+            group_data_selection.setItemData(
+                specific_data.value - 1,
+                f"Show {group.lower()} actuators on cell map",
+                Qt.ToolTipRole,
+            )
+
+        # Index begins from 0 instead of 1 in QComboBox
+        index_all = CellActuatorGroupData.All.value - 1
+        group_data_selection.setCurrentIndex(index_all)
+
+        group_data_selection.currentIndexChanged.connect(
+            self._callback_selection_changed_group
+        )
+
+        return group_data_selection
+
+    @asyncSlot()
+    async def _callback_selection_changed_group(self, index):
+        """Callback of the changed selection of actuator group. This will
+        show the selected actuator group on the cell map.
+
+        Parameters
+        ----------
+        index : `int`
+            Current index.
+        """
+
+        self._visible_actuator_ids = self.get_visible_actuator_ids(index)
+        for actuator in self._view_mirror.actuators:
+            actuator.setVisible(actuator.acutator_id in self._visible_actuator_ids)
+
+    def get_visible_actuator_ids(self, index_group_data_selector=None):
+        """Get the IDs of visible actuators.
+
+        Parameters
+        ----------
+        index_group_data_selector : `int` or `None`, optional
+            Index value of the data selector of actuator group. (the default is
+            None.)
+
+        Returns
+        -------
+        `range`
+            IDs of visible actuators.
+        """
+
+        selected_index = (
+            self._group_data_selector.currentIndex()
+            if index_group_data_selector is None
+            else index_group_data_selector
+        )
+
+        # Index begins from 0 instead of 1 in QComboBox
+        group_data = CellActuatorGroupData(selected_index + 1)
+
+        start_acutator_id = 1
+        visible_actuators = range(0)
+        if group_data == CellActuatorGroupData.All:
+            visible_actuators = range(
+                start_acutator_id, NUM_ACTUATOR + start_acutator_id
+            )
+
+        elif group_data == CellActuatorGroupData.Axial:
+            visible_actuators = range(
+                start_acutator_id, NUM_ACTUATOR - NUM_TANGENT_LINK + start_acutator_id
+            )
+
+        elif group_data == CellActuatorGroupData.Tangent:
+            visible_actuators = range(
+                NUM_ACTUATOR - NUM_TANGENT_LINK + start_acutator_id,
+                NUM_ACTUATOR + start_acutator_id,
+            )
+
+        return visible_actuators
 
     def _create_figures(self, num_realtime=200):
         """Create the figures to show the actuator forces.
@@ -155,9 +254,20 @@ class TabCellStatus(TabDefault):
             Selection of the actuator data.
         """
 
+        # Add the item and tip. Note the index begins from 0 in QComboBox.
         actuator_data_selection = QComboBox()
-        for specific_data in FigureActuatorData:
+        actuator_data_selection.setToolTip("Select the force/displacement")
+
+        tips = [
+            "Show the measured force",
+            "Show the force error",
+            "Show the displacement",
+        ]
+        for specific_data, tip in zip(FigureActuatorData, tips):
             actuator_data_selection.addItem(specific_data.name)
+            actuator_data_selection.setItemData(
+                specific_data.value - 1, tip, Qt.ToolTipRole
+            )
 
         # Index begins from 0 instead of 1 in QComboBox
         index_force_measured = FigureActuatorData.ForceMeasured.value - 1
@@ -262,14 +372,17 @@ class TabCellStatus(TabDefault):
         for actuator, force_current in zip(
             self._view_mirror.actuators, self._forces.f_cur
         ):
-            actuator.update_magnitude(force_current, self._gauge.min, self._gauge.max)
+            if actuator.acutator_id in self._visible_actuator_ids:
+                actuator.update_magnitude(
+                    force_current, self._gauge.min, self._gauge.max
+                )
 
-            # Check the range of current forces
-            if force_current < force_current_min:
-                force_current_min = force_current
+                # Check the range of current forces
+                if force_current < force_current_min:
+                    force_current_min = force_current
 
-            elif force_current > force_current_max:
-                force_current_max = force_current
+                elif force_current > force_current_max:
+                    force_current_max = force_current
 
         # Check we need to update the gauge or not
         if (abs(self._gauge.min - force_current_min) > threshold) or (
@@ -316,6 +429,7 @@ class TabCellStatus(TabDefault):
         layout_mirror.addWidget(self._view_mirror)
         layout_mirror.addWidget(self._figures["realtime"])
         layout_mirror.addWidget(self._button_show_alias)
+        layout_mirror.addWidget(self._group_data_selector)
 
         layout.addLayout(layout_mirror)
 

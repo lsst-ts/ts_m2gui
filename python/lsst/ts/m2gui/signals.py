@@ -31,6 +31,7 @@ __all__ = [
     "SignalDetailedForce",
     "SignalPosition",
     "SignalScript",
+    "SignalIlcStatus",
 ]
 
 from PySide2 import QtCore
@@ -64,7 +65,7 @@ class SignalLimitSwitch(QtCore.QObject):
     """Status signal to send the event of limit switch status."""
 
     # The type_name_status should be a tuple: (type, name, status). The data
-    # type of "type" is integer (enum "lsst.ts.m2com.LimitSwitchType"), the
+    # type of "type" is integer (enum `lsst.ts.m2com.LimitSwitchType`), the
     # data type of "name" is string, and the data type of "status" is bool. If
     # the limit switch is triggered, put the "status" as True, otherwise,
     # False.
@@ -173,3 +174,12 @@ class SignalScript(QtCore.QObject):
 
     # Progress of the script execution.
     progress = QtCore.Signal(int)
+
+
+class SignalIlcStatus(QtCore.QObject):
+    """Script signal to send the status of inner-loop controller (ILC)."""
+
+    # Address and mode as a tuple: (address, mode). The data type of address is
+    # integer and the data type of mode is interger
+    # (enum `lsst.ts.m2com.InnerLoopControlMode`).
+    address_mode = QtCore.Signal(object)

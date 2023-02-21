@@ -256,6 +256,7 @@ class MainWindow(QMainWindow):
         self._set_tab_overview()
         self._set_tab_alarm_warn()
         self._set_tab_cell_status()
+        self._set_tab_ilc_status()
 
     def _set_tab_overview(self):
         """Set the table of overview."""
@@ -290,6 +291,14 @@ class MainWindow(QMainWindow):
 
         tab_cell_status = self._control_tabs.get_tab("Cell Status")[1]
         tab_cell_status.read_cell_geometry_file(filepath)
+
+    def _set_tab_ilc_status(self):
+        """Set the table of inner-loop controller (ILC) status."""
+
+        filepath = self._get_policy_dir() / "ilc_details.yaml"
+
+        tab_ilc_status = self._control_tabs.get_tab("ILC Status")[1]
+        tab_ilc_status.read_ilc_details_file(filepath)
 
     def _create_layout(self):
         """Create the layout.
