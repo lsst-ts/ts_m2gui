@@ -9,4 +9,5 @@ TabDefault <|-- TabOverview
 TabDefault <|-- TabRigidBodyPos
 TabDefault <|-- TabUtilityView
 TabDefault <|-- TabSettings
+TabDefault <|-- TabIlcStatus
 @enduml
