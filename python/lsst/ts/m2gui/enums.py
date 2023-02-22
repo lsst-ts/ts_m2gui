@@ -24,6 +24,8 @@ __all__ = [
     "Ring",
     "TemperatureGroup",
     "DisplacementSensorDirection",
+    "FigureActuatorData",
+    "CellActuatorGroupData",
 ]
 
 from enum import IntEnum, auto
@@ -71,3 +73,11 @@ class FigureActuatorData(IntEnum):
     ForceMeasured = 1
     ForceError = auto()
     Displacement = auto()
+
+
+class CellActuatorGroupData(IntEnum):
+    """Select the actuator group data to show on the cell map."""
+
+    All = 1
+    Axial = auto()
+    Tangent = auto()

@@ -47,7 +47,7 @@ def widget(qtbot):
 
 
 def test_init(qtbot, widget):
-    assert widget.layout_control_tabs._list_widget.count() == 9
+    assert widget.layout_control_tabs._list_widget.count() == 10
 
 
 def test_get_tab(qtbot, widget):
@@ -100,6 +100,7 @@ async def test_show(qtbot, widget):
         "Detailed Force",
         "Diagnostics",
         "Alarms/Warnings",
+        "ILC Status",
     ]
 
     for name in names:

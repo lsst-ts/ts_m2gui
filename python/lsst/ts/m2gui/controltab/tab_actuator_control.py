@@ -34,7 +34,6 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
     QFormLayout,
-    QGridLayout,
     QHBoxLayout,
     QProgressBar,
     QVBoxLayout,
@@ -42,7 +41,13 @@ from PySide2.QtWidgets import (
 from qasync import asyncSlot
 
 from ..enums import Ring
-from ..utils import create_group_box, create_label, run_command, set_button
+from ..utils import (
+    create_grid_layout_buttons,
+    create_group_box,
+    create_label,
+    run_command,
+    set_button,
+)
 from ..widget import QFileDialogAsync
 from . import TabDefault
 
@@ -402,46 +407,9 @@ class TabActuatorControl(TabDefault):
 
         layout.addLayout(layout_file)
 
-        layout.addLayout(self._create_grid_layout_buttons(self._buttons_script, 3))
+        layout.addLayout(create_grid_layout_buttons(self._buttons_script, 3))
 
         return create_group_box("Script Control", layout)
-
-    def _create_grid_layout_buttons(self, buttons, num_column):
-        """Create the grid layout of buttons.
-
-        Parameters
-        ----------
-        buttons : `dict` or `list`
-            Buttons to put on the grid layout.
-        num_column : `int`
-            Number of column on the grid layput.
-
-        Returns
-        -------
-        layout : `PySide2.QtWidgets.QGridLayout`
-            Grid layout of buttons.
-        """
-
-        # Use the list in the following
-        if isinstance(buttons, dict):
-            items = list(buttons.values())
-        else:
-            items = buttons
-
-        # Add the item to the layout
-        layout = QGridLayout()
-
-        column = 0
-        row = 0
-        for item in items:
-            layout.addWidget(item, row, column)
-
-            column += 1
-            if column >= num_column:
-                column = 0
-                row += 1
-
-        return layout
 
     def _create_group_force_summary(self):
         """Create the group of force summary. This is just for the high-level
@@ -487,7 +455,7 @@ class TabActuatorControl(TabDefault):
 
         layout = QVBoxLayout()
 
-        layout_actuator_selection = self._create_grid_layout_buttons(
+        layout_actuator_selection = create_grid_layout_buttons(
             self._buttons_actuator_selection, num_column
         )
         layout_actuator_selection.setSpacing(spacing)

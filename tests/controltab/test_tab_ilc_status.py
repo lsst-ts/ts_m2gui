@@ -1,0 +1,82 @@
+# This file is part of ts_m2gui.
+#
+# Developed for the LSST Telescope and Site Systems.
+# This product includes software developed by the LSST Project
+# (https://www.lsst.org).
+# See the COPYRIGHT file at the top-level directory of this distribution
+# for details of code ownership.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import asyncio
+import logging
+import pathlib
+
+import pytest
+from lsst.ts.m2com import NUM_INNER_LOOP_CONTROLLER, InnerLoopControlMode
+from lsst.ts.m2gui import Model
+from lsst.ts.m2gui.controltab import TabIlcStatus
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPalette
+
+
+def get_ilc_details_file():
+    policy_dir = pathlib.Path(__file__).parents[0] / ".." / ".." / "policy"
+
+    return policy_dir / "ilc_details.yaml"
+
+
+@pytest.fixture
+def widget(qtbot):
+
+    widget = TabIlcStatus("ILC Status", Model(logging.getLogger()))
+    qtbot.addWidget(widget)
+
+    return widget
+
+
+def test_init(widget):
+    assert len(widget._indicators_ilc) == NUM_INNER_LOOP_CONTROLLER
+
+
+def test_get_indicator_color(widget):
+
+    assert widget._get_indicator_color(InnerLoopControlMode.Standby) == Qt.cyan
+    assert widget._get_indicator_color(InnerLoopControlMode.Disabled) == Qt.blue
+    assert widget._get_indicator_color(InnerLoopControlMode.Enabled) == Qt.green
+    assert widget._get_indicator_color(InnerLoopControlMode.Fault) == Qt.red
+    assert widget._get_indicator_color(InnerLoopControlMode.Unknown) == Qt.gray
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_ilc_status(qtbot, widget):
+
+    mode = InnerLoopControlMode.Disabled
+    widget.model._report_ilc_status(1, mode.value)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    palette = widget._indicators_ilc[1].palette()
+    color = palette.color(QPalette.Button)
+
+    assert color == widget._get_indicator_color(mode)
+
+
+def test_read_ilc_details_file(widget):
+
+    widget.read_ilc_details_file(get_ilc_details_file())
+
+    assert widget._indicators_ilc[0].toolTip() == "Axial actuator: B1"
+    assert widget._indicators_ilc[-1].toolTip() == "Inclinometer"

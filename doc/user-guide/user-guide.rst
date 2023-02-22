@@ -6,7 +6,7 @@ User Guide
 
 This GUI is a Qt-based graphical user interface which provides an interface for controlling the actuators, observing sensor telemetry, showing the configurable parameter settings of the M2 cell control system, resetting faults, and diagnosing issues observed during operation.
 This GUI is supposed to be used by the hardware engineers or operators to have a more detailed control of hardware compared with the automatic mode: `ts_m2 <https://ts-m2.lsst.io/>`_.
-Functionality of the GUI will be discussed in detail to provide the reader a comprehensive source for understanding the operation of the GUI.
+Functionality of the GUI will be discussed in detail to provide the reader a comprehensive source for understanding the operation of the GUI.
 
 .. _Operation:
 
@@ -285,3 +285,21 @@ Warning conditions are not latched, therefore, when the violating condition is r
 
 In some cases, you may want to use the button of "Enable Open-Loop Max Limits" to allow a increased force range to move some specific actuators back to safer positions.
 This can only be done under the open-loop control, and it will be reset back a smaller force range after the system transitions to the closed-loop control.
+
+.. _lsst.ts.m2gui-ilc_status:
+
+Inner-Loop Controller (ILC) Status
+----------------------------------
+
+.. figure:: ../screenshot/ilc_status.png
+  :width: 550
+
+  ILC status
+
+The ILC status view provides the detailed mode of each ILC with the ModBUS ID.
+There are 84 ILCs: 72 for the axial actuators, 6 for the tangent links, and 6 for the sensors.
+Please note that the actuator ILC and sensor ILC have different state machines.
+For the actuator ILC, the state machine starts in the Standby state, transitions to Disable state, and then Enable state.
+For the sensor ILC, the Standby state transitions to the Enabled state directly without the Disabled state in between.
+Both state machines transition to the Fault state when the fault happens.
+See the document of **MODBUS Protocol Interface Control Document for M2 Support System** for more details.

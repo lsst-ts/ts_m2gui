@@ -11,6 +11,7 @@ This GUI is constructed on the top of Qt framework (`Qt for Python <https://wiki
 Dependencies
 ============
 
+* `ts_idl <https://github.com/lsst-ts/ts_idl>`_
 * `ts_tcpip <https://github.com/lsst-ts/ts_tcpip>`_
 * `ts_m2com <https://github.com/lsst-ts/ts_m2com>`_
 
@@ -90,6 +91,7 @@ The available Qt signals are listed below:
 * **SignalDetailedForce** sends the calculated and measured force details contains LUT, force balance system, etc.
 * **SignalPosition** sends the rigid body position.
 * **SignalScript** sends the status of script progress.
+* **SignalIlcStatus** sends the status of inner-loop controller (ILC).
 
 .. _lsst.ts.m2gui-modules_m2gui_layout:
 
@@ -151,6 +153,7 @@ m2gui.controltab
 * **TabRigidBodyPos** controls the rigid body position.
 * **TabUtilityView** shows the utility status.
 * **TabSettings** shows the settings of GUI.
+* **TabIlcStatus** shows the inner-loop controller (ILC) status.
 
 The class diagrams for each table child class are listed below to give you the idea of class relationship.
 
@@ -233,6 +236,14 @@ m2gui.controltab.TabSettings
 
 .. uml:: ../uml/controltab/class_tab_settings.uml
     :caption: Class diagram of TabSettings class
+
+.. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_ilc_status:
+
+m2gui.controltab.TabIlcStatus
+----------------------------
+
+.. uml:: ../uml/controltab/class_tab_ilc_status.uml
+    :caption: Class diagram of TabIlcStatus class
 
 .. _API:
 

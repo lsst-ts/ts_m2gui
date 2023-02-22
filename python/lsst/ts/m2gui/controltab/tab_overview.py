@@ -53,6 +53,7 @@ class TabOverview(TabDefault):
         self._label_control = create_label()
         self._label_control_mode = create_label()
         self._label_local_mode = create_label()
+        self._label_inclination_source = create_label()
 
         # Indicators of the system status
         self._indicators_status = self._set_indicators_status()
@@ -138,7 +139,11 @@ class TabOverview(TabDefault):
             Color of indicator.
         """
 
-        if indicator.text() == "isAlarmWarningOn":
+        if indicator.text() in (
+            "isAlarmWarningOn",
+            "isInterlockOn",
+            "isCellTemperatureHigh",
+        ):
             return Qt.red
         else:
             return Qt.green
@@ -173,6 +178,7 @@ class TabOverview(TabDefault):
         layout.addWidget(self._label_control)
         layout.addWidget(self._label_control_mode)
         layout.addWidget(self._label_local_mode)
+        layout.addWidget(self._label_inclination_source)
 
         for indicator in self._indicators_status.values():
             layout.addWidget(indicator)
@@ -226,6 +232,10 @@ class TabOverview(TabDefault):
             else "Control Loop: Open-Loop Control"
         )
         self._label_local_mode.setText(text_local_mode)
+
+        self._label_inclination_source.setText(
+            f"Inclination Source: {self.model.inclination_source.name}"
+        )
 
     def _set_signal_status(self, signal_status):
         """Set the status signal.

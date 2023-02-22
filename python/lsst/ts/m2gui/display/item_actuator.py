@@ -49,6 +49,8 @@ class ItemActuator(QGraphicsEllipseItem):
 
     Attributes
     ----------
+    actuator_id : `int`
+        Actuator ID.
     magnitude : `float`
         Magnitude to decide the color of actuator on the mirror's view.
     label_id : `PySide2.QtWidgets.QGraphicsTextItem`
@@ -58,7 +60,7 @@ class ItemActuator(QGraphicsEllipseItem):
     def __init__(self, x, y, diameter, actuator_id, alias, point_size):
         super().__init__(x, y, diameter, diameter)
 
-        self._acutator_id = actuator_id
+        self.acutator_id = actuator_id
         self._alias = alias
 
         self.magnitude = 0
@@ -116,7 +118,7 @@ class ItemActuator(QGraphicsEllipseItem):
         if is_alias:
             self.label_id.setPlainText(self._alias)
         else:
-            self.label_id.setPlainText(str(self._acutator_id))
+            self.label_id.setPlainText(str(self.acutator_id))
 
     def update_magnitude(self, magnitude, magnitude_min, magnitude_max):
         """Update the magnitude. This will update the color of actuator on the

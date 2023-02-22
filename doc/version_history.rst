@@ -6,6 +6,21 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.3.7:
+
+-------------
+0.3.7
+-------------
+
+* Select the actuator group to show in the cell map.
+* Process the events:
+  * tcpIpConnected
+  * interlock
+  * cellTemperatureHiWarning
+  * inclinationTelemetrySource
+* Add the **TabIlcStatus** class.
+* Adapt black v22.12.0.
+
 .. _lsst.ts.m2gui-0.3.6:
 
 -------------

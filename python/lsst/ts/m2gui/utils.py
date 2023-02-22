@@ -21,6 +21,7 @@
 
 __all__ = [
     "set_button",
+    "create_grid_layout_buttons",
     "create_label",
     "create_group_box",
     "create_table",
@@ -37,7 +38,7 @@ from functools import partial
 from lsst.ts.m2com import is_coroutine
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QGroupBox, QLabel, QPushButton, QTableWidget
+from PySide2.QtWidgets import QGridLayout, QGroupBox, QLabel, QPushButton, QTableWidget
 
 from . import Ring
 from .widget import QMessageBoxAsync
@@ -103,6 +104,44 @@ def set_button(
         button.setToolTip(tool_tip)
 
     return button
+
+
+def create_grid_layout_buttons(buttons, num_column):
+    """Create the grid layout of buttons.
+
+    Parameters
+    ----------
+    buttons : `dict` or `list`
+        Buttons to put on the grid layout.
+    num_column : `int`
+        Number of column on the grid layput.
+
+    Returns
+    -------
+    layout : `PySide2.QtWidgets.QGridLayout`
+        Grid layout of buttons.
+    """
+
+    # Use the list in the following
+    if isinstance(buttons, dict):
+        items = list(buttons.values())
+    else:
+        items = buttons
+
+    # Add the item to the layout
+    layout = QGridLayout()
+
+    column = 0
+    row = 0
+    for item in items:
+        layout.addWidget(item, row, column)
+
+        column += 1
+        if column >= num_column:
+            column = 0
+            row += 1
+
+    return layout
 
 
 def create_label(name="", point_size=None, is_bold=False):

@@ -58,7 +58,7 @@ def test_get_selected_actuator(widget):
     assert widget.get_selected_actuator() is None
 
     select_actuator(widget)
-    assert widget.get_selected_actuator()._acutator_id == 1
+    assert widget.get_selected_actuator().acutator_id == 1
 
 
 def test_get_text_force(widget):

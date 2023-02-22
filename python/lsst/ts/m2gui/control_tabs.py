@@ -32,6 +32,7 @@ from .controltab import (
     TabConfigView,
     TabDetailedForce,
     TabDiagnostics,
+    TabIlcStatus,
     TabOverview,
     TabRigidBodyPos,
     TabUtilityView,
@@ -83,6 +84,7 @@ class ControlTabs(object):
             TabDetailedForce("Detailed Force", model),
             TabDiagnostics("Diagnostics", model),
             TabAlarmWarn("Alarms/Warnings", model),
+            TabIlcStatus("ILC Status", model),
         ]
 
         for tab in self._tabs:

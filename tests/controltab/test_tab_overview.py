@@ -24,6 +24,7 @@ import logging
 
 import pytest
 import pytest_asyncio
+from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2gui import LocalMode, Model, SignalMessage
 from lsst.ts.m2gui.controltab import TabOverview
 from PySide2.QtCore import Qt
@@ -55,6 +56,7 @@ def test_init(qtbot, widget):
     assert widget._label_control.text() == "Commander is: EUI"
     assert widget._label_control_mode.text() == "Control Mode: Standby"
     assert widget._label_local_mode.text() == "Control Loop: Open-Loop Control"
+    assert widget._label_inclination_source.text() == "Inclination Source: ONBOARD"
 
     assert widget._window_log.isReadOnly() is True
     assert widget._window_log.placeholderText() == "Log Message"
@@ -74,11 +76,13 @@ def test_update_control_status(qtbot, widget):
     widget.model.is_csc_commander = True
     widget.model.local_mode = LocalMode.Enable
     widget.model.is_closed_loop = True
+    widget.model.inclination_source = MTM2.InclinationTelemetrySource.MTMOUNT
     widget._update_control_status()
 
     assert widget._label_control.text() == "Commander is: CSC"
     assert widget._label_control_mode.text() == "Control Mode: Enable"
     assert widget._label_local_mode.text() == "Control Loop: Closed-Loop Control"
+    assert widget._label_inclination_source.text() == "Inclination Source: MTMOUNT"
 
 
 @pytest.mark.asyncio

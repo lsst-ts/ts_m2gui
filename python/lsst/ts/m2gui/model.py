@@ -21,6 +21,7 @@
 
 __all__ = ["Model"]
 
+from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
@@ -44,6 +45,7 @@ from . import (
     Ring,
     SignalConfig,
     SignalControl,
+    SignalIlcStatus,
     SignalPowerSystem,
     SignalScript,
     SignalStatus,
@@ -85,6 +87,8 @@ class Model(object):
         Local model.
     is_closed_loop : `bool`
         Closed-loop control is on or not.
+    inclination_source : enum `MTM2.InclinationTelemetrySource`
+        Inclination telemetry source.
     signal_control : `SignalControl`
         Signal to report the control status.
     signal_power_system : `SignalPowerSystem`
@@ -95,6 +99,8 @@ class Model(object):
         Signal to send the configuration.
     signal_script : `SignalScript`
         Signal to send the script progress.
+    signal_ilc_status : `SignalIlcStatus`
+        Signal to send the inner-loop controller (ILC) status.
     system_status : `dict`
         System status.
     fault_manager : `FaultManager`
@@ -123,12 +129,14 @@ class Model(object):
         self.is_csc_commander = False
         self.local_mode = LocalMode.Standby
         self.is_closed_loop = False
+        self.inclination_source = MTM2.InclinationTelemetrySource.ONBOARD
 
         self.signal_control = SignalControl()
         self.signal_power_system = SignalPowerSystem()
         self.signal_status = SignalStatus()
         self.signal_config = SignalConfig()
         self.signal_script = SignalScript()
+        self.signal_ilc_status = SignalIlcStatus()
 
         self.system_status = self._set_system_status()
 
@@ -166,6 +174,8 @@ class Model(object):
             "isPowerMotorOn": False,
             "isOpenLoopMaxLimitsEnabled": False,
             "isAlarmWarningOn": False,
+            "isInterlockOn": False,
+            "isCellTemperatureHigh": False,
         }
 
         return system_status
@@ -644,10 +654,6 @@ class Model(object):
 
         await self.controller.connect_server()
 
-        self.update_system_status(
-            "isCrioConnected", self.controller.are_clients_connected()
-        )
-
     async def _process_event(self, message=None):
         """Process the events from the M2 controller.
 
@@ -768,16 +774,31 @@ class Model(object):
                     f"Closed-loop control mode: {self.controller.closed_loop_control_mode!r}."
                 )
 
+            elif name == "tcpIpConnected":
+                self.update_system_status("isCrioConnected", message["isConnected"])
+
+            elif name == "interlock":
+                self.update_system_status("isInterlockOn", message["state"])
+
+            elif name == "cellTemperatureHiWarning":
+                self.update_system_status("isCellTemperatureHigh", message["hiWarning"])
+
+            elif name == "inclinationTelemetrySource":
+                self.inclination_source = MTM2.InclinationTelemetrySource(
+                    message["source"]
+                )
+                self.report_control_status()
+
+                self.log.info(f"Inclination source: {self.inclination_source!r}.")
+
+            elif name == "innerLoopControlMode":
+                self._report_ilc_status(message["address"], message["mode"])
+
             # Ignore these messages because they are specific to CSC
             elif name in (
                 "summaryState",
-                "cellTemperatureHiWarning",
                 "detailedState",
-                "inclinationTelemetrySource",
-                "interlock",
-                "tcpIpConnected",
                 "temperatureOffset",
-                "innerLoopControlMode",
             ):
                 pass
 
@@ -850,6 +871,18 @@ class Model(object):
 
         except ValueError:
             self.log.exception("Unknown limit switches encountered.")
+
+    def _report_ilc_status(self, address, mode):
+        """Report the status of inner-loop controller (ILC).
+
+        Parameters
+        ----------
+        address : `int`
+            0-based address.
+        mode : `int`
+            Inner-loop control mode.
+        """
+        self.signal_ilc_status.address_mode.emit((address, mode))
 
     def _process_telemetry(self, message=None):
         """Process the telemetry from the M2 controller.

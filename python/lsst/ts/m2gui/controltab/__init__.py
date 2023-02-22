@@ -30,3 +30,4 @@ from .tab_overview import TabOverview
 from .tab_rigid_body_pos import TabRigidBodyPos
 from .tab_utility_view import TabUtilityView
 from .tab_settings import TabSettings
+from .tab_ilc_status import TabIlcStatus

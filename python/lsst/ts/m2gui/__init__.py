@@ -35,10 +35,12 @@ from .enums import (
     TemperatureGroup,
     DisplacementSensorDirection,
     FigureActuatorData,
+    CellActuatorGroupData,
 )
 from .widget import QMessageBoxAsync, QFileDialogAsync
 from .utils import (
     set_button,
+    create_grid_layout_buttons,
     create_label,
     create_group_box,
     create_table,
@@ -61,6 +63,7 @@ from .signals import (
     SignalDetailedForce,
     SignalPosition,
     SignalScript,
+    SignalIlcStatus,
 )
 from .log_window_handler import LogWindowHandler
 from .fault_manager import FaultManager
