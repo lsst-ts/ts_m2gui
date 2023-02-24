@@ -39,7 +39,6 @@ def get_ilc_details_file():
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabIlcStatus("ILC Status", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -51,7 +50,6 @@ def test_init(widget):
 
 
 def test_get_indicator_color(widget):
-
     assert widget._get_indicator_color(InnerLoopControlMode.Standby) == Qt.cyan
     assert widget._get_indicator_color(InnerLoopControlMode.Disabled) == Qt.blue
     assert widget._get_indicator_color(InnerLoopControlMode.Enabled) == Qt.green
@@ -61,7 +59,6 @@ def test_get_indicator_color(widget):
 
 @pytest.mark.asyncio
 async def test_callback_signal_ilc_status(qtbot, widget):
-
     mode = InnerLoopControlMode.Disabled
     widget.model._report_ilc_status(1, mode.value)
 
@@ -75,7 +72,6 @@ async def test_callback_signal_ilc_status(qtbot, widget):
 
 
 def test_read_ilc_details_file(widget):
-
     widget.read_ilc_details_file(get_ilc_details_file())
 
     assert widget._indicators_ilc[0].toolTip() == "Axial actuator: B1"

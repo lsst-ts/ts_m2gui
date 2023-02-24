@@ -32,7 +32,6 @@ from PySide2.QtCore import Qt
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabActuatorControl("Actuator Control", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -51,7 +50,6 @@ async def widget_async(qtbot):
 
 
 def test_init(widget):
-
     progress = widget._info_script["progress"]
     assert progress.minimum() == 0
     assert progress.maximum() == 100
@@ -61,7 +59,6 @@ def test_init(widget):
 
 @pytest.mark.asyncio
 async def test_callback_script_load_script(widget_async):
-
     await _transition_to_enable_state(widget_async)
 
     file_name = "/a/b/c"
@@ -72,14 +69,12 @@ async def test_callback_script_load_script(widget_async):
 
 
 async def _transition_to_enable_state(widget_async):
-
     await widget_async.model.enter_diagnostic()
     await widget_async.model.enter_enable()
 
 
 @pytest.mark.asyncio
 async def test_callback_script_command(qtbot, widget_async):
-
     await _transition_to_enable_state(widget_async)
 
     widget_async._callback_script_load_script(file_name="/a/b/c")
@@ -92,7 +87,6 @@ async def test_callback_script_command(qtbot, widget_async):
 
 
 def test_set_target_displacement(widget):
-
     widget._set_target_displacement(ActuatorDisplacementUnit.Millimeter)
 
     assert (
@@ -117,14 +111,12 @@ def test_set_target_displacement(widget):
 
 
 def test_set_target_displacement_exception(widget):
-
     with pytest.raises(ValueError):
         widget._set_target_displacement("Wrong Unit")
 
 
 @pytest.mark.asyncio
 async def test_callback_selection_changed(widget):
-
     assert (
         widget._target_displacement.decimals()
         == widget.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
@@ -142,7 +134,6 @@ async def test_callback_selection_changed(widget):
 
 @pytest.mark.asyncio
 async def test_callback_select_ring(qtbot, widget):
-
     qtbot.mouseClick(
         widget._buttons_actuator_selection_support["select_ring"], Qt.LeftButton
     )
@@ -160,7 +151,6 @@ async def test_callback_select_ring(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_clear_all(qtbot, widget):
-
     # Select an actuator
     idx = 2
     qtbot.mouseClick(widget._buttons_actuator_selection[idx], Qt.LeftButton)
@@ -183,7 +173,6 @@ async def test_callback_clear_all(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_actuator_start(qtbot, widget_async):
-
     # Transition to the enabled state with the open-loop control
     await _transition_to_enable_state(widget_async)
 
@@ -228,7 +217,6 @@ async def test_callback_actuator_start(qtbot, widget_async):
 
 @pytest.mark.asyncio
 async def test_callback_progress(widget):
-
     progress = 20
     widget.model.report_script_progress(progress)
 
@@ -240,7 +228,6 @@ async def test_callback_progress(widget):
 
 @pytest.mark.asyncio
 async def test_callback_forces(widget):
-
     actuator_force = ActuatorForce()
     actuator_force.f_cur[0] = -1
     actuator_force.f_cur[71] = 2

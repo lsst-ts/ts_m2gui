@@ -37,13 +37,11 @@ def utility_monitor():
 
 
 def test_get_forces(utility_monitor):
-
     forces = utility_monitor.get_forces()
     assert id(forces) != id(utility_monitor.forces)
 
 
 def test_report_utility_status(qtbot, utility_monitor):
-
     signals = [
         utility_monitor.signal_utility.power_motor_calibrated,
         utility_monitor.signal_utility.power_communication_calibrated,
@@ -67,7 +65,6 @@ def test_report_utility_status(qtbot, utility_monitor):
 
 
 def test_update_power_calibrated(qtbot, utility_monitor):
-
     # Moter
 
     # There is the update
@@ -97,7 +94,6 @@ def test_update_power_calibrated(qtbot, utility_monitor):
 
 
 def test_update_power_raw(qtbot, utility_monitor):
-
     # Moter
 
     # There is the update
@@ -120,7 +116,6 @@ def test_update_power_raw(qtbot, utility_monitor):
 
 
 def test_update_inclinometer_angle(qtbot, utility_monitor):
-
     # There is the update
     signals = [
         utility_monitor.signal_utility.inclinometer_raw,
@@ -141,7 +136,6 @@ def test_update_inclinometer_angle(qtbot, utility_monitor):
 
 
 def test_update_inclinometer_angle_tma(qtbot, utility_monitor):
-
     # There is the update
     signal = utility_monitor.signal_utility.inclinometer_tma
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
@@ -157,7 +151,6 @@ def test_update_inclinometer_angle_tma(qtbot, utility_monitor):
 
 
 def test_get_temperature_sensors(utility_monitor):
-
     sensors_intake = utility_monitor.get_temperature_sensors(TemperatureGroup.Intake)
     assert sensors_intake == ["Intake-1", "Intake-2"]
 
@@ -175,7 +168,6 @@ def test_get_temperature_sensors(utility_monitor):
 
 
 def test_get_displacement_sensors(utility_monitor):
-
     sensors_theta = utility_monitor.get_displacement_sensors(
         DisplacementSensorDirection.Theta
     )
@@ -204,7 +196,6 @@ def test_get_displacement_sensors(utility_monitor):
 
 
 def test_update_breaker(qtbot, utility_monitor):
-
     name = "J1-W9-1"
     with qtbot.waitSignal(
         utility_monitor.signal_utility.breaker_status, timeout=TIMEOUT
@@ -215,7 +206,6 @@ def test_update_breaker(qtbot, utility_monitor):
 
 
 def test_reset_breakers(qtbot, utility_monitor):
-
     # There should be no signal
     signal = utility_monitor.signal_utility.breaker_status
     with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
@@ -232,13 +222,11 @@ def test_reset_breakers(qtbot, utility_monitor):
 
 
 def test_get_breakers(utility_monitor):
-
     assert len(utility_monitor.get_breakers(PowerType.Motor)) == 9
     assert len(utility_monitor.get_breakers(PowerType.Communication)) == 6
 
 
 def test_update_temperature(qtbot, utility_monitor):
-
     # There is the update
     temperatures_group = TemperatureGroup.LG2
     temperatures = [1.1, 2.2, 3.3, 4.4]
@@ -262,13 +250,11 @@ def test_update_temperature(qtbot, utility_monitor):
 
 
 def test_update_temperature_exception(qtbot, utility_monitor):
-
     with pytest.raises(ValueError):
         utility_monitor.update_temperature(TemperatureGroup.Intake, [1.1] * 3)
 
 
 def test_update_displacements(qtbot, utility_monitor):
-
     # There is the update
     direction = DisplacementSensorDirection.Theta
     displacements = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6]
@@ -293,7 +279,6 @@ def test_update_displacements(qtbot, utility_monitor):
 
 
 def test_update_digital_status_input(qtbot, utility_monitor):
-
     # There is an update
     signal = utility_monitor.signal_utility.digital_status_input
     new_status = 1
@@ -308,7 +293,6 @@ def test_update_digital_status_input(qtbot, utility_monitor):
 
 
 def test_process_digital_status_input(utility_monitor):
-
     value = (
         DigitalInput.J1_W9_1_MotorPowerBreaker.value
         + DigitalInput.InterlockPowerReplay.value
@@ -326,7 +310,6 @@ def test_process_digital_status_input(utility_monitor):
 
 
 def test_update_digital_status_output(qtbot, utility_monitor):
-
     # There is an update
     signal = utility_monitor.signal_utility.digital_status_output
     new_status = 1
@@ -341,7 +324,6 @@ def test_update_digital_status_output(qtbot, utility_monitor):
 
 
 def test_update_hard_points(qtbot, utility_monitor):
-
     axial = [1, 2, 3]
     tangent = [72, 73, 74]
     with qtbot.waitSignal(
@@ -354,19 +336,16 @@ def test_update_hard_points(qtbot, utility_monitor):
 
 
 def test_update_hard_points_exception(utility_monitor):
-
     with pytest.raises(ValueError):
         utility_monitor.update_hard_points([1], [2])
 
 
 def test_update_forces_exception(utility_monitor):
-
     with pytest.raises(ValueError):
         utility_monitor.update_forces(utility_monitor.forces)
 
 
 def test_update_forces(qtbot, utility_monitor):
-
     # Current force is changed
     actuator_force = utility_monitor.get_forces()
     actuator_force.f_cur[1] = 100
@@ -396,7 +375,6 @@ def test_update_forces(qtbot, utility_monitor):
 
 
 def test_update_force_error_tangent(qtbot, utility_monitor):
-
     # Tangent force error is changed
     force_error_tangent = ForceErrorTangent()
     force_error_tangent.error_force[1] = 1.24
@@ -430,7 +408,6 @@ def test_update_force_error_tangent(qtbot, utility_monitor):
 
 
 def test_update_position(qtbot, utility_monitor):
-
     signal = utility_monitor.signal_position.position
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
         utility_monitor.update_position(0.1, 0.23, 0.62, 3, 1.03, 1.06)

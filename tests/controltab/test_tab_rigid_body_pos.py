@@ -30,7 +30,6 @@ from PySide2.QtCore import Qt
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabRigidBodyPos("Rigid Body Position", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -38,7 +37,6 @@ def widget(qtbot):
 
 
 def test_init(widget):
-
     num_digit_after_decimal = widget.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL
     assert widget._target_position_relative["x"].decimals() == num_digit_after_decimal
 
@@ -61,7 +59,6 @@ def test_init(widget):
 
 @pytest.mark.asyncio
 async def test_callback_clear_values_relative(qtbot, widget):
-
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_relative[axis].setValue(idx)
 
@@ -76,7 +73,6 @@ async def test_callback_clear_values_relative(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_clear_values_absolute(qtbot, widget):
-
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_absolute[axis].setValue(idx)
 
@@ -91,7 +87,6 @@ async def test_callback_clear_values_absolute(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_position(widget):
-
     widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6)
 
     # Sleep so the event loop can access CPU to handle the signal

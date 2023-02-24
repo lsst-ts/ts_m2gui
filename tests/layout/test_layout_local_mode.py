@@ -41,7 +41,6 @@ class MockWidget(TabDefault):
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = MockWidget("Mock", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -106,7 +105,6 @@ def _assert_prohibit_transition(widget):
 
 @pytest.mark.asyncio
 async def test_set_local_mode(qtbot, widget_async):
-
     controller = widget_async.model.controller
     await controller.write_command_to_server(
         "switchCommandSource", message_details={"isRemote": False}

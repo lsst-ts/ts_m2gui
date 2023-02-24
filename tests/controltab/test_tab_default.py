@@ -29,7 +29,6 @@ from PySide2.QtWidgets import QScrollArea, QWidget
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabDefault("Default", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -37,12 +36,10 @@ def widget(qtbot):
 
 
 def test_init(widget):
-
     assert widget.windowTitle() == "Default"
 
 
 def test_set_widget_scrollable(widget):
-
     scroll_area = widget.set_widget_scrollable(QWidget())
     assert type(scroll_area) is QScrollArea
 
@@ -51,7 +48,6 @@ def test_set_widget_scrollable(widget):
 
 
 def test_create_and_start_timer(widget):
-
     timer = widget.create_and_start_timer(None)
 
     assert timer.interval() == widget.model.duration_refresh
@@ -59,7 +55,6 @@ def test_create_and_start_timer(widget):
 
 
 def test_check_duration_and_restart_timer(widget):
-
     timer = widget.create_and_start_timer(None)
 
     widget.model.duration_refresh = 1000

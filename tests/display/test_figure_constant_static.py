@@ -25,7 +25,6 @@ from lsst.ts.m2gui.display import FigureConstant
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = FigureConstant(
         2,
         5,
@@ -42,7 +41,6 @@ def widget(qtbot):
 
 
 def test_init(widget):
-
     assert widget.axis_x.min() == 2
     assert widget.axis_x.max() == 5
 
@@ -60,7 +58,6 @@ def test_init(widget):
 
 
 def test_get_points(widget):
-
     for idx in range(0, 2):
         points = widget.get_points(0)
         for point in points:
@@ -71,14 +68,12 @@ def test_get_points(widget):
 
 
 def test_get_series(widget):
-
     for idx in range(0, 2):
         series = widget.get_series(idx)
         assert series.count() == 10
 
 
 def test_update_range_axis_y(widget):
-
     # The new minimum is smaller than the axis
     widget._value_y_min = -100
     widget._update_range_axis_y()
@@ -109,7 +104,6 @@ def test_update_range_axis_y(widget):
 
 
 def test_update_data_exception(widget):
-
     data = range(0, 12)
 
     with pytest.raises(ValueError):
@@ -117,7 +111,6 @@ def test_update_data_exception(widget):
 
 
 def test_update_data(widget):
-
     # Update the first series
     data_x = range(2, 12)
     data_y_0 = range(3, 13)
@@ -143,7 +136,6 @@ def test_update_data(widget):
 
 
 def test_adjust_range_axis_y(widget):
-
     data_x = range(2, 12)
     data_y_0 = range(3, 13)
     widget.update_data(data_x, data_y_0, idx=0)
@@ -161,7 +153,6 @@ def test_adjust_range_axis_y(widget):
 
 
 def test_get_range_points(widget):
-
     data_x = range(2, 12)
     data_y = range(3, 13)
     widget.update_data(data_x, data_y, idx=0)
@@ -173,6 +164,5 @@ def test_get_range_points(widget):
 
 
 def test_append_data_exception(widget):
-
     with pytest.raises(RuntimeError):
         widget.append_data(1)

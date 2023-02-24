@@ -31,7 +31,6 @@ from qasync import QApplication
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabSettings("Settings", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -39,7 +38,6 @@ def widget(qtbot):
 
 
 def test_init(widget):
-
     controller = widget.model.controller
     assert widget._settings["host"].text() == controller.host
     assert widget._settings["port_command"].value() == controller.port_command
@@ -86,7 +84,6 @@ def test_init(widget):
 
 @pytest.mark.asyncio
 async def test_callback_apply_host(qtbot, widget):
-
     widget._settings["host"].setText("newHost")
     widget._settings["port_command"].setValue(1)
     widget._settings["port_telemetry"].setValue(2)
@@ -106,7 +103,6 @@ async def test_callback_apply_host(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_apply_general(qtbot, widget):
-
     widget._settings["log_level"].setValue(11)
     widget._settings["refresh_frequency"].setValue(5)
     widget._settings["point_size"].setValue(12)

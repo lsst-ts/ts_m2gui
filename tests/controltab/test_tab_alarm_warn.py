@@ -43,7 +43,6 @@ def get_error_list_file():
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabAlarmWarn("Alarms/Warnings", Model(logging.getLogger()))
     widget.read_error_list_file(get_error_list_file())
 
@@ -65,7 +64,6 @@ async def widget_async(qtbot):
 
 
 def test_init(qtbot, widget):
-
     assert len(widget._error_list) == 39
     assert len(widget._error_list["6051"]) == 6
 
@@ -88,7 +86,6 @@ def test_init(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_selection_changed(qtbot, widget):
-
     assert widget._text_error_cause.toPlainText() == ""
 
     # Select the first error code
@@ -141,7 +138,6 @@ async def test_callback_selection_changed(qtbot, widget):
 
 
 def _get_widget_item_center(widget, item_text):
-
     items = widget._table_error.findItems(item_text, Qt.MatchExactly)
     rect = widget._table_error.visualItemRect(items[0])
     return rect.center()
@@ -149,7 +145,6 @@ def _get_widget_item_center(widget, item_text):
 
 @pytest.mark.asyncio
 async def test_callback_signal_error_new(qtbot, widget):
-
     widget.model.add_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -168,14 +163,12 @@ async def test_callback_signal_error_new(qtbot, widget):
 
 
 def _get_widget_item_color(widget, item_text):
-
     items = widget._table_error.findItems(item_text, Qt.MatchExactly)
     return items[0].background().color()
 
 
 @pytest.mark.asyncio
 async def test_callback_signal_error_cleared(qtbot, widget):
-
     widget.model.add_error(6051)
 
     widget.model.clear_error(6051)
@@ -190,7 +183,6 @@ async def test_callback_signal_error_cleared(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_reset(qtbot, widget_async):
-
     # Update the text of error cause
     center = _get_widget_item_center(widget_async, "6054")
     qtbot.mouseClick(
@@ -234,14 +226,12 @@ async def test_callback_reset(qtbot, widget_async):
 
 
 def test_set_error_item_color_error(qtbot, widget):
-
     with pytest.raises(ValueError):
         widget._set_error_item_color(None, "wrong_status")
 
 
 @pytest.mark.asyncio
 async def test_callback_signal_limit_switch(qtbot, widget):
-
     widget.model.fault_manager.update_limit_switch_status(
         LimitSwitchType.Extend, Ring.C, 3, True
     )

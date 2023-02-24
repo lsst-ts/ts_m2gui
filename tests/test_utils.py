@@ -32,13 +32,11 @@ from lsst.ts.m2gui import (
 
 
 def command_normal(is_failed):
-
     if is_failed:
         raise RuntimeError("Command is failed.")
 
 
 async def command_coroutine(is_failed):
-
     await asyncio.sleep(0.5)
 
     if is_failed:
@@ -46,13 +44,11 @@ async def command_coroutine(is_failed):
 
 
 def test_get_tol():
-
     assert get_tol(1) == 0.1
     assert get_tol(2) == 0.01
 
 
 def test_get_num_actuator_ring():
-
     assert get_num_actuator_ring(Ring.A) == 6
     assert get_num_actuator_ring(Ring.B) == 30
     assert get_num_actuator_ring(Ring.C) == 24
@@ -63,7 +59,6 @@ def test_get_num_actuator_ring():
 
 
 def test_map_actuator_id_to_alias():
-
     ring_b, num_b = map_actuator_id_to_alias(3)
     assert ring_b == Ring.B
     assert num_b == 4

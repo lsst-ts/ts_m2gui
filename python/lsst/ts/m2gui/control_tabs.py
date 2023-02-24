@@ -54,7 +54,6 @@ class ControlTabs(object):
     """
 
     def __init__(self, model):
-
         # List of the control tables
         self._tabs = list()
 
