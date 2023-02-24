@@ -25,7 +25,6 @@ from lsst.ts.m2gui.display import Gauge
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = Gauge(1, 2)
     qtbot.addWidget(widget)
 
@@ -33,13 +32,11 @@ def widget(qtbot):
 
 
 def test_init(widget):
-
     assert widget.min == 1
     assert widget.max == 2
 
 
 def test_set_magnitude_exception(widget):
-
     with pytest.raises(ValueError):
         widget.set_magnitude_range(2, 1)
 
@@ -48,7 +45,6 @@ def test_set_magnitude_exception(widget):
 
 
 def test_set_magnitude_range(widget):
-
     widget.set_magnitude_range(-3, 4)
 
     assert widget.min == -3
@@ -56,7 +52,6 @@ def test_set_magnitude_range(widget):
 
 
 def test_get_color():
-
     # For the yellow color, the hue is 60 degree in HSV model
     color_yellow = Gauge.get_color(1)
 

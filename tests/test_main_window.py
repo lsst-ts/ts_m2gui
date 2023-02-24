@@ -29,7 +29,6 @@ from PySide2.QtWidgets import QToolBar
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = MainWindow(False, False, False, log_level=13)
     qtbot.addWidget(widget)
 
@@ -38,7 +37,6 @@ def widget(qtbot):
 
 @pytest.fixture
 def widget_sim(qtbot):
-
     widget_sim = MainWindow(False, False, True)
     qtbot.addWidget(widget_sim)
 
@@ -46,7 +44,6 @@ def widget_sim(qtbot):
 
 
 def test_init(widget):
-
     assert widget.log.level == 13
 
     tool_bar = widget.findChildren(QToolBar)[0]
@@ -62,7 +59,6 @@ def test_init(widget):
 
 
 def test_set_model(widget):
-
     model_local_host = widget._set_model(True, False)
     assert model_local_host.controller.host == "127.0.0.1"
 
@@ -74,12 +70,10 @@ def test_set_model(widget):
 
 
 def test_init_sim(widget_sim):
-
     assert widget_sim.model.controller.host == "127.0.0.1"
 
 
 def test_get_action(widget):
-
     button_exit = widget._get_action("Exit")
     assert button_exit.text() == "Exit"
 
@@ -89,7 +83,6 @@ def test_get_action(widget):
 
 @pytest.mark.asyncio
 async def test_callback_settings(qtbot, widget):
-
     assert widget._tab_settings.isVisible() is False
 
     button_settings = widget._get_action("Settings")

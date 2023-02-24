@@ -46,7 +46,6 @@ class LayoutControlMode(LayoutDefault):
     """
 
     def __init__(self, model):
-
         # Open-loop button
         self._button_open_loop = None
 

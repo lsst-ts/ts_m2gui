@@ -123,7 +123,6 @@ class Model(object):
         timeout_in_second=0.05,
         is_simulation_mode=False,
     ):
-
         self.log = log
 
         self.is_csc_commander = False
@@ -495,7 +494,6 @@ class Model(object):
         """
 
         if self.local_mode == LocalMode.Enable:
-
             message_details = {"scriptCommand": command}
             if script_name is not None:
                 message_details["scriptName"] = script_name
@@ -548,7 +546,6 @@ class Model(object):
             target_displacement = int(target_displacement)
 
         if self.is_enabled_and_open_loop_control():
-
             message_details = {"actuatorCommand": command}
             if actuators is not None:
                 message_details.update(
@@ -639,7 +636,6 @@ class Model(object):
 
         # Run the event and telemetry loops
         if self.controller.run_loops is False:
-
             self.controller.run_loops = True
 
             self.log.debug(
@@ -666,7 +662,6 @@ class Model(object):
         name = self._get_message_name(message)
 
         if name != "":
-
             if name == "m2AssemblyInPosition":
                 self.update_system_status("isInPosition", message["inPosition"])
 
@@ -896,7 +891,6 @@ class Model(object):
         name = self._get_message_name(message)
 
         if name != "":
-
             self.update_system_status("isTelemetryActive", True)
 
             num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK

@@ -33,7 +33,6 @@ from PySide2.QtGui import QPalette
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabOverview("Overview", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -52,7 +51,6 @@ async def widget_async(qtbot):
 
 
 def test_init(qtbot, widget):
-
     assert widget._label_control.text() == "Commander is: EUI"
     assert widget._label_control_mode.text() == "Control Mode: Standby"
     assert widget._label_local_mode.text() == "Control Loop: Open-Loop Control"
@@ -72,7 +70,6 @@ def test_init(qtbot, widget):
 
 
 def test_update_control_status(qtbot, widget):
-
     widget.model.is_csc_commander = True
     widget.model.local_mode = LocalMode.Enable
     widget.model.is_closed_loop = True
@@ -87,7 +84,6 @@ def test_update_control_status(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_signal_message(qtbot, widget):
-
     assert widget._window_log.toPlainText() == ""
 
     signal_message = SignalMessage()
@@ -103,7 +99,6 @@ async def test_callback_signal_message(qtbot, widget):
 
 
 def test_callback_clear(qtbot, widget):
-
     signal_message = SignalMessage()
     widget.set_signal_message(signal_message)
 
@@ -117,7 +112,6 @@ def test_callback_clear(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_signal_status(qtbot, widget):
-
     name = "isTelemetryActive"
     widget.model.update_system_status(name, True)
 
@@ -132,7 +126,6 @@ async def test_callback_signal_status(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget_async):
-
     # Default color
     assert _get_color_is_alarm_warning_on(widget_async) == Qt.gray
 
@@ -154,6 +147,5 @@ async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget_async):
 
 
 def _get_color_is_alarm_warning_on(widget):
-
     palette = widget._indicators_status["isAlarmWarningOn"].palette()
     return palette.color(QPalette.Button)

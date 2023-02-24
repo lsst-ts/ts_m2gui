@@ -33,7 +33,6 @@ from PySide2.QtGui import QPalette
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabUtilityView("Utility View", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -52,7 +51,6 @@ async def widget_async(qtbot):
 
 
 def test_init(widget):
-
     for breaker in widget._breakers.keys():
         palette = widget._breakers[breaker].palette()
         color = palette.color(QPalette.Button)
@@ -69,7 +67,6 @@ def test_init(widget):
 
 @pytest.mark.asyncio
 async def test_callback_reset_breakers(widget_async):
-
     # Transition to Diagnostic state to turn on the communication power
     await widget_async.model.enter_diagnostic()
 
@@ -88,7 +85,6 @@ async def test_callback_reset_breakers(widget_async):
 
 @pytest.mark.asyncio
 async def test_callback_power_motor(qtbot, widget):
-
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -100,7 +96,6 @@ async def test_callback_power_motor(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_power_communication(qtbot, widget):
-
     widget.model.utility_monitor.update_power_calibrated(
         PowerType.Communication, 0.1, 0.2
     )
@@ -114,7 +109,6 @@ async def test_callback_power_communication(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_inclinometer(widget):
-
     widget.model.utility_monitor.update_inclinometer_angle(
         0.1, new_angle_processed=0.55
     )
@@ -128,7 +122,6 @@ async def test_callback_inclinometer(widget):
 
 @pytest.mark.asyncio
 async def test_callback_inclinometer_tma(widget):
-
     widget.model.utility_monitor.update_inclinometer_angle(0.1, is_internal=False)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -139,7 +132,6 @@ async def test_callback_inclinometer_tma(widget):
 
 @pytest.mark.asyncio
 async def test_callback_breakers(qtbot, widget):
-
     name = "J1-W9-3"
     widget.model.utility_monitor.update_breaker(name, True)
 
@@ -153,7 +145,6 @@ async def test_callback_breakers(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_temperatures(qtbot, widget):
-
     temperature_group = TemperatureGroup.LG3
     temperatures = list(range(1, 5))
 
@@ -170,7 +161,6 @@ async def test_callback_temperatures(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_displacements(qtbot, widget):
-
     direction = DisplacementSensorDirection.Delta
     displacements = list(range(1, 7))
 

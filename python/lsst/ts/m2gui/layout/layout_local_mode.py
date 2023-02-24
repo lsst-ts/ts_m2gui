@@ -46,7 +46,6 @@ class LayoutLocalMode(LayoutDefault):
     """
 
     def __init__(self, model):
-
         # Standby button
         self._button_standby = None
 

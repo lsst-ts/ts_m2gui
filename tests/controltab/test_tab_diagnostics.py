@@ -33,7 +33,6 @@ from PySide2.QtGui import QPalette
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabDiagnostics("Diagnostics", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -53,7 +52,6 @@ async def widget_async(qtbot):
 
 @pytest.mark.asyncio
 async def test_callback_control_digital_status(qtbot, widget_async):
-
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
@@ -76,7 +74,6 @@ async def test_callback_control_digital_status(qtbot, widget_async):
 
 @pytest.mark.asyncio
 async def test_callback_power_motor_calibrated(widget):
-
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -88,7 +85,6 @@ async def test_callback_power_motor_calibrated(widget):
 
 @pytest.mark.asyncio
 async def test_callback_power_communication_calibrated(widget):
-
     widget.model.utility_monitor.update_power_calibrated(
         PowerType.Communication, 0.3, 0.4
     )
@@ -102,7 +98,6 @@ async def test_callback_power_communication_calibrated(widget):
 
 @pytest.mark.asyncio
 async def test_callback_power_motor_raw(widget):
-
     widget.model.utility_monitor.update_power_raw(PowerType.Motor, 0.5, 0.6)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -114,7 +109,6 @@ async def test_callback_power_motor_raw(widget):
 
 @pytest.mark.asyncio
 async def test_callback_power_communication_raw(widget):
-
     widget.model.utility_monitor.update_power_raw(PowerType.Communication, 0.7, 0.8)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -126,7 +120,6 @@ async def test_callback_power_communication_raw(widget):
 
 @pytest.mark.asyncio
 async def test_callback_digital_status_input(widget):
-
     widget.model.utility_monitor.update_digital_status_input(3)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -138,14 +131,12 @@ async def test_callback_digital_status_input(widget):
 
 
 def _assert_indicator_color(indicator, target_color):
-
     palette = indicator.palette()
     assert palette.color(QPalette.Button) == target_color
 
 
 @pytest.mark.asyncio
 async def test_callback_digital_status_output(widget):
-
     widget.model.utility_monitor.update_digital_status_output(6)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -169,7 +160,6 @@ async def test_callback_digital_status_output(widget):
 
 @pytest.mark.asyncio
 async def test_callback_force_error_tangent(widget):
-
     force_error_tangent = ForceErrorTangent()
     force_error_tangent.error_force = [1.2, 0.233, -1.334, 0, 31.34, -2.29]
     force_error_tangent.error_weight = 13.331

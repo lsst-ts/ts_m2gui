@@ -46,7 +46,6 @@ class LayoutControl(LayoutDefault):
     """
 
     def __init__(self, model):
-
         # Remote button
         self._button_remote = None
 

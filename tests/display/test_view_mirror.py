@@ -25,7 +25,6 @@ from lsst.ts.m2gui.display import ItemActuator, ViewMirror
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = ViewMirror()
     widget.add_item_actuator(1, "alias", 0, 0.5)
 
@@ -36,7 +35,6 @@ def widget(qtbot):
 
 @pytest.mark.asyncio
 async def test_show_selected_actuator_force(widget):
-
     text_force = widget.get_text_force()
     assert text_force.isVisible() is False
 
@@ -47,14 +45,12 @@ async def test_show_selected_actuator_force(widget):
 
 
 def select_actuator(widget):
-
     for item in widget.items():
         if isinstance(item, ItemActuator):
             item.setSelected(True)
 
 
 def test_get_selected_actuator(widget):
-
     assert widget.get_selected_actuator() is None
 
     select_actuator(widget)
@@ -62,19 +58,16 @@ def test_get_selected_actuator(widget):
 
 
 def test_get_text_force(widget):
-
     text_force = widget.get_text_force()
     assert text_force.toPlainText().startswith("Actuator Force:") is True
 
 
 def test_add_item_actuator(widget):
-
     # The actuator was added in the widget() by widget.add_item_actuator()
     assert len(widget.actuators) == 1
 
 
 def test_show_alias(widget):
-
     actuator = widget.actuators[0]
 
     widget.show_alias(False)
@@ -85,7 +78,6 @@ def test_show_alias(widget):
 
 
 def test_item_actuator(widget):
-
     actuator = widget.actuators[0]
 
     assert actuator.rect().x() == (widget.SIZE_SCENE - widget.DIAMETER) // 2
@@ -101,7 +93,6 @@ def test_item_actuator(widget):
 
 
 def test_item_actuator_update_magnitude_exception(widget):
-
     actuator = widget.actuators[0]
     with pytest.raises(ValueError):
         actuator.update_magnitude(0, 1, 1)
@@ -111,7 +102,6 @@ def test_item_actuator_update_magnitude_exception(widget):
 
 
 def test_item_actuator_update_magnitude(widget):
-
     actuator = widget.actuators[0]
 
     actuator.update_magnitude(0, -700, 700)

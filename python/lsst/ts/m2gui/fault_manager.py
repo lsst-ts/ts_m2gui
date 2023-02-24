@@ -54,7 +54,6 @@ class FaultManager(object):
     """
 
     def __init__(self, limit_switch_status):
-
         self.signal_error = SignalError()
         self.signal_limit_switch = SignalLimitSwitch()
 

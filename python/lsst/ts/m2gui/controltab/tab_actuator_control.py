@@ -217,13 +217,11 @@ class TabActuatorControl(TabDefault):
         """
 
         if displacement_unit == ActuatorDisplacementUnit.Millimeter:
-
             decimal = self.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT
             max_range = self.MAX_DISPLACEMENT_MM
             suffix = " mm"
 
         elif displacement_unit == ActuatorDisplacementUnit.Step:
-
             decimal = 0
             max_range = self.MAX_DISPLACEMENT_STEP
             suffix = " step"

@@ -41,7 +41,6 @@ class MockWidget(TabDefault):
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = MockWidget("Mock", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -91,7 +90,6 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_switch_force_balance_system(qtbot, widget_async):
-
     await widget_async.model.enter_diagnostic()
     await widget_async.model.enter_enable()
 

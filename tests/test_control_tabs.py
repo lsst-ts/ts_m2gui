@@ -39,7 +39,6 @@ class MockWidget(QWidget):
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = MockWidget()
     qtbot.addWidget(widget)
 
@@ -62,14 +61,12 @@ def test_get_tab(qtbot, widget):
 
 
 def test_flag_default(qtbot, widget):
-
     name = "Overview"
     tab_item = widget.layout_control_tabs.get_tab(name)[0]
     assert tab_item.isSelected() is True
 
 
 def test_flag(qtbot, widget):
-
     name = "Diagnostics"
     tab_item, control_tab = widget.layout_control_tabs.get_tab(name)
     assert tab_item.isSelected() is False
@@ -89,7 +86,6 @@ def test_flag(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_show(qtbot, widget):
-
     names = [
         "Overview",
         "Actuator Control",
@@ -104,7 +100,6 @@ async def test_show(qtbot, widget):
     ]
 
     for name in names:
-
         tab_item, control_tab = widget.layout_control_tabs.get_tab(name)
         assert control_tab.isVisible() is False
 

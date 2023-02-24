@@ -46,7 +46,6 @@ def get_cell_geometry_file():
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = TabCellStatus("Cell Status", Model(logging.getLogger()))
     widget.read_cell_geometry_file(get_cell_geometry_file())
     qtbot.addWidget(widget)
@@ -55,7 +54,6 @@ def widget(qtbot):
 
 
 def test_init(widget):
-
     mirror = widget._view_mirror
 
     assert mirror.mirror_radius == 1.780189734
@@ -74,7 +72,6 @@ def test_init(widget):
 
 
 def text_callback_show_alias(qtbot, widget):
-
     qtbot.mouseClick(widget._button_show_alias, Qt.LeftButton)
 
     actuators = widget._view_mirror.actuators
@@ -83,7 +80,6 @@ def text_callback_show_alias(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_callback_selection_changed_group(widget):
-
     # Index begins from 0 instead of 1 in QComboBox
     index_group = CellActuatorGroupData.Tangent.value - 1
     widget._group_data_selector.setCurrentIndex(index_group)
@@ -100,7 +96,6 @@ async def test_callback_selection_changed_group(widget):
 
 
 def test_get_visible_actuator_ids(widget):
-
     visible_actuators_all = widget.get_visible_actuator_ids(index_group_data_selector=0)
     assert len(visible_actuators_all) == NUM_ACTUATOR
     assert min(visible_actuators_all) == 1
@@ -124,7 +119,6 @@ def test_get_visible_actuator_ids(widget):
 
 
 def test_get_data_selected(widget):
-
     # Update the internal holded force data
     widget._forces.f_cur[0] = 1
 
@@ -135,7 +129,6 @@ def test_get_data_selected(widget):
 
 @pytest.mark.asyncio
 async def test_callback_selection_changed(widget):
-
     # Update the internal holded actuator data
     widget._forces.position_in_mm[0] = 3000
     widget._forces.position_in_mm[-1] = -3000
@@ -187,7 +180,6 @@ async def test_callback_selection_changed(widget):
 
 @pytest.mark.asyncio
 async def test_callback_time_out(widget):
-
     # Select the actuator
     for item in widget._view_mirror.items():
         if isinstance(item, ItemActuator):
@@ -216,7 +208,6 @@ async def test_callback_time_out(widget):
 
 @pytest.mark.asyncio
 async def test_callback_forces(widget):
-
     actuator_force = ActuatorForce()
     actuator_force.f_cur[1] = 100
 

@@ -25,7 +25,6 @@ from lsst.ts.m2gui.display import FigureConstant
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = FigureConstant(
         2,
         5,
@@ -43,7 +42,6 @@ def widget(qtbot):
 
 
 def test_update_data_exception(widget):
-
     data = range(0, 11)
 
     with pytest.raises(RuntimeError):
@@ -51,7 +49,6 @@ def test_update_data_exception(widget):
 
 
 def test_append_data(widget):
-
     widget.append_data(-20, idx=0)
 
     assert widget.get_series(0).count() == 1
@@ -66,7 +63,6 @@ def test_append_data(widget):
 
 
 def test_append_point(widget):
-
     # No point yet
     points = widget.get_points(0)
     widget._append_point(points, 1)

@@ -52,12 +52,10 @@ async def model_async():
 
 
 def test_init(model):
-
     assert len(model.system_status) == 9
 
 
 def test_add_error(qtbot, model):
-
     error = 3
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
         model.add_error(error)
@@ -66,7 +64,6 @@ def test_add_error(qtbot, model):
 
 
 def test_clear_error(qtbot, model):
-
     error = 3
     model.add_error(error)
 
@@ -78,7 +75,6 @@ def test_clear_error(qtbot, model):
 
 @pytest.mark.asyncio
 async def test_reset_errors(qtbot, model_async):
-
     assert model_async.controller.are_clients_connected() is True
 
     model_async.add_error(3)
@@ -104,7 +100,6 @@ async def test_reset_errors(qtbot, model_async):
 
 @pytest.mark.asyncio
 async def test_enable_open_loop_max_limit(model_async):
-
     # Should fail for the closed-loop control
     model_async.is_closed_loop = True
     with pytest.raises(RuntimeError):
@@ -123,7 +118,6 @@ async def test_enable_open_loop_max_limit(model_async):
 
 
 def test_update_system_status(qtbot, model):
-
     status_name = "isTelemetryActive"
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
@@ -133,13 +127,11 @@ def test_update_system_status(qtbot, model):
 
 
 def test_update_system_status_exception(model):
-
     with pytest.raises(ValueError):
         model.update_system_status("wrong_name", True)
 
 
 def test_report_config(qtbot, model):
-
     file_configuration = "test"
 
     with qtbot.waitSignal(model.signal_config.config, timeout=TIMEOUT):
@@ -149,19 +141,16 @@ def test_report_config(qtbot, model):
 
 
 def test_report_script_progress(qtbot, model):
-
     with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
         model.report_script_progress(30)
 
 
 def test_report_config_exception(model):
-
     with pytest.raises(KeyError):
         model.report_config(wrong_name=0)
 
 
 def test_is_enabled_and_open_loop_control(model):
-
     assert model.is_enabled_and_open_loop_control() is False
 
     model.local_mode = LocalMode.Enable
@@ -172,7 +161,6 @@ def test_is_enabled_and_open_loop_control(model):
 
 
 def test_is_enabled_and_closed_loop_control(model):
-
     assert model.is_enabled_and_closed_loop_control() is False
 
     model.local_mode = LocalMode.Enable
@@ -184,14 +172,12 @@ def test_is_enabled_and_closed_loop_control(model):
 
 @pytest.mark.asyncio
 async def test_go_to_position_exception(model):
-
     with pytest.raises(RuntimeError):
         await model.go_to_position(0, 0, 0, 0, 0, 0)
 
 
 @pytest.mark.asyncio
 async def test_reboot_controller_exception(model):
-
     with pytest.raises(RuntimeError):
         model.local_mode = LocalMode.Diagnostic
         await model.reboot_controller()
@@ -203,21 +189,18 @@ async def test_reboot_controller_exception(model):
 
 @pytest.mark.asyncio
 async def test_set_bit_digital_status_exception(model):
-
     with pytest.raises(RuntimeError):
         await model.set_bit_digital_status(0)
 
 
 @pytest.mark.asyncio
 async def test_command_script_exception(model):
-
     with pytest.raises(RuntimeError):
         await model.command_script(CommandScript.LoadScript)
 
 
 @pytest.mark.asyncio
 async def test_command_actuator_exception(model):
-
     with pytest.raises(RuntimeError):
         await model.command_actuator(CommandActuator.Stop)
 
@@ -228,7 +211,6 @@ async def test_command_actuator_exception(model):
 
 @pytest.mark.asyncio
 async def test_reset_breakers(qtbot, model_async):
-
     # Power on the motor and communication first
     controller = model_async.controller
     await controller.power(PowerType.Communication, True)
@@ -243,7 +225,6 @@ async def test_reset_breakers(qtbot, model_async):
 
 
 def test_update_connection_information(model):
-
     model.update_connection_information("test", 1, 2, 3)
 
     controller = model.controller
@@ -254,7 +235,6 @@ def test_update_connection_information(model):
 
 
 def test_update_connection_information_exception(model):
-
     with pytest.raises(ValueError):
         model.update_connection_information("test", 1, 1, 3)
 
@@ -265,7 +245,6 @@ def test_update_connection_information_exception(model):
 
 @pytest.mark.asyncio
 async def test_connect_exception(model):
-
     model.system_status["isCrioConnected"] = True
     with pytest.raises(RuntimeError):
         await model.connect()
@@ -273,7 +252,6 @@ async def test_connect_exception(model):
 
 @pytest.mark.asyncio
 async def test_process_event(qtbot, model):
-
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
         await model._process_event(
             message={"id": "m2AssemblyInPosition", "inPosition": True}
@@ -393,7 +371,6 @@ async def test_process_event(qtbot, model):
 
 
 def test_get_message_name(model):
-
     assert model._get_message_name("") == ""
     assert model._get_message_name(dict()) == ""
 
@@ -401,7 +378,6 @@ def test_get_message_name(model):
 
 
 def test_process_telemetry(qtbot, model):
-
     with qtbot.waitSignal(
         model.utility_monitor.signal_position.position, timeout=TIMEOUT
     ):
@@ -564,7 +540,6 @@ def test_process_telemetry(qtbot, model):
 
 
 def test_process_lost_connection(model):
-
     model.system_status["isCrioConnected"] = True
     model.system_status["isTelemetryActive"] = True
 
@@ -576,7 +551,6 @@ def test_process_lost_connection(model):
 
 @pytest.mark.asyncio
 async def test_state_transition_normal(qtbot, model_async):
-
     await model_async.enter_diagnostic()
     assert model_async.local_mode == LocalMode.Diagnostic
 
@@ -592,7 +566,6 @@ async def test_state_transition_normal(qtbot, model_async):
 
 @pytest.mark.asyncio
 async def test_fault(qtbot, model_async):
-
     await model_async.enter_diagnostic()
     await model_async.enter_enable()
 

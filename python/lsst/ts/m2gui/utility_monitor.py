@@ -102,7 +102,6 @@ class UtilityMonitor(object):
     NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT = 3
 
     def __init__(self):
-
         self.signal_utility = SignalUtility()
         self.signal_detailed_force = SignalDetailedForce()
         self.signal_position = SignalPosition()
@@ -362,7 +361,6 @@ class UtilityMonitor(object):
         if self._has_changed(power["voltage"], new_voltage, tol) or self._has_changed(
             power["current"], new_current, tol
         ):
-
             power["voltage"] = round(new_voltage, self.NUM_DIGIT_AFTER_DECIMAL)
             power["current"] = round(new_current, self.NUM_DIGIT_AFTER_DECIMAL)
 
@@ -449,7 +447,6 @@ class UtilityMonitor(object):
 
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
         if self._has_changed(original_angle, new_angle, tol):
-
             angle_rounded = round(new_angle, self.NUM_DIGIT_AFTER_DECIMAL)
             signal.emit(angle_rounded)
 

@@ -41,7 +41,6 @@ class MockWidget(TabDefault):
 
 @pytest.fixture
 def widget(qtbot):
-
     widget = MockWidget("Mock", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -91,7 +90,6 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
 
 @pytest.mark.asyncio
 async def test_set_csc_commander(qtbot, widget_async):
-
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
