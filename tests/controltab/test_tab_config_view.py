@@ -25,10 +25,11 @@ import logging
 import pytest
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabConfigView
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabConfigView:
     widget = TabConfigView("Configuration View", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -36,7 +37,7 @@ def widget(qtbot):
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_config(qtbot, widget):
+async def test_callback_signal_config(qtbot: QtBot, widget: TabConfigView) -> None:
     widget.model.report_config(
         file_configuration="a",
         file_version="b",

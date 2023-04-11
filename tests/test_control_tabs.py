@@ -26,10 +26,11 @@ import pytest
 from lsst.ts.m2gui import ControlTabs, Model
 from PySide2 import QtCore
 from PySide2.QtWidgets import QWidget
+from pytestqt.qtbot import QtBot
 
 
 class MockWidget(QWidget):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.layout_control_tabs = ControlTabs(Model(logging.getLogger()))
@@ -38,18 +39,18 @@ class MockWidget(QWidget):
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> MockWidget:
     widget = MockWidget()
     qtbot.addWidget(widget)
 
     return widget
 
 
-def test_init(qtbot, widget):
+def test_init(qtbot: QtBot, widget: MockWidget) -> None:
     assert widget.layout_control_tabs._list_widget.count() == 10
 
 
-def test_get_tab(qtbot, widget):
+def test_get_tab(qtbot: QtBot, widget: MockWidget) -> None:
     tab_item, control_tab = widget.layout_control_tabs.get_tab("None")
     assert tab_item is None
     assert control_tab is None
@@ -60,13 +61,13 @@ def test_get_tab(qtbot, widget):
     assert control_tab.windowTitle() == name
 
 
-def test_flag_default(qtbot, widget):
+def test_flag_default(qtbot: QtBot, widget: MockWidget) -> None:
     name = "Overview"
     tab_item = widget.layout_control_tabs.get_tab(name)[0]
     assert tab_item.isSelected() is True
 
 
-def test_flag(qtbot, widget):
+def test_flag(qtbot: QtBot, widget: MockWidget) -> None:
     name = "Diagnostics"
     tab_item, control_tab = widget.layout_control_tabs.get_tab(name)
     assert tab_item.isSelected() is False
@@ -85,7 +86,7 @@ def test_flag(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_show(qtbot, widget):
+async def test_show(qtbot: QtBot, widget: MockWidget) -> None:
     names = [
         "Overview",
         "Actuator Control",

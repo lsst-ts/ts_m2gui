@@ -26,18 +26,19 @@ import pytest
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabSettings
 from PySide2.QtCore import Qt
+from pytestqt.qtbot import QtBot
 from qasync import QApplication
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabSettings:
     widget = TabSettings("Settings", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
     return widget
 
 
-def test_init(widget):
+def test_init(widget: TabSettings) -> None:
     controller = widget.model.controller
     assert widget._settings["host"].text() == controller.host
     assert widget._settings["port_command"].value() == controller.port_command
@@ -83,7 +84,7 @@ def test_init(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_apply_host(qtbot, widget):
+async def test_callback_apply_host(qtbot: QtBot, widget: TabSettings) -> None:
     widget._settings["host"].setText("newHost")
     widget._settings["port_command"].setValue(1)
     widget._settings["port_telemetry"].setValue(2)
@@ -102,7 +103,7 @@ async def test_callback_apply_host(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_apply_general(qtbot, widget):
+async def test_callback_apply_general(qtbot: QtBot, widget: TabSettings) -> None:
     widget._settings["log_level"].setValue(11)
     widget._settings["refresh_frequency"].setValue(5)
     widget._settings["point_size"].setValue(12)

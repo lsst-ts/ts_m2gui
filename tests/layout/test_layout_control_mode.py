@@ -21,6 +21,7 @@
 
 import asyncio
 import logging
+import typing
 
 import pytest
 import pytest_asyncio
@@ -28,10 +29,11 @@ from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutControlMode
 from PySide2 import QtCore
+from pytestqt.qtbot import QtBot
 
 
 class MockWidget(TabDefault):
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         self.layout_control_mode = LayoutControlMode(self.model)
@@ -40,7 +42,7 @@ class MockWidget(TabDefault):
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> MockWidget:
     widget = MockWidget("Mock", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -48,7 +50,7 @@ def widget(qtbot):
 
 
 @pytest_asyncio.fixture
-async def widget_async(qtbot):
+async def widget_async(qtbot: QtBot) -> typing.AsyncGenerator:
     async with MockWidget(
         "Mock", Model(logging.getLogger(), is_simulation_mode=True)
     ) as widget_sim:
@@ -60,12 +62,12 @@ async def widget_async(qtbot):
 
 # Need to add this to make the above widget_async() to work on Jenkins.
 # I guess there is some bug in "pytest" and "pytest_asyncio" libraries.
-def test_init(widget):
+def test_init(widget: MockWidget) -> None:
     pass
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_control_normal(qtbot, widget):
+async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) -> None:
     widget.layout_control_mode.model.report_control_status()
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -76,7 +78,9 @@ async def test_callback_signal_control_normal(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_control_prohibit_control(qtbot, widget):
+async def test_callback_signal_control_prohibit_control(
+    qtbot: QtBot, widget: MockWidget
+) -> None:
     widget.layout_control_mode.model.local_mode = LocalMode.Enable
 
     widget.layout_control_mode.model.report_control_status()
@@ -89,7 +93,9 @@ async def test_callback_signal_control_prohibit_control(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_switch_force_balance_system(qtbot, widget_async):
+async def test_switch_force_balance_system(
+    qtbot: QtBot, widget_async: MockWidget
+) -> None:
     await widget_async.model.enter_diagnostic()
     await widget_async.model.enter_enable()
 

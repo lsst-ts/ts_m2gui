@@ -22,27 +22,29 @@
 import asyncio
 import logging
 import pathlib
+from pathlib import Path
 
 import pytest
 import pytest_asyncio
 from lsst.ts.m2com import LimitSwitchType
 from lsst.ts.m2gui import Model, Ring
 from lsst.ts.m2gui.controltab import TabAlarmWarn
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
+from PySide2.QtCore import QPoint, Qt
+from PySide2.QtGui import QColor, QPalette
+from pytestqt.qtbot import QtBot
 
 SLEEP_TIME_SHORT = 1
 SLEEP_TIME_LONG = 5
 
 
-def get_error_list_file():
+def get_error_list_file() -> Path:
     policy_dir = pathlib.Path(__file__).parents[0] / ".." / ".." / "policy"
 
     return policy_dir / "error_code_m2.tsv"
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabAlarmWarn:
     widget = TabAlarmWarn("Alarms/Warnings", Model(logging.getLogger()))
     widget.read_error_list_file(get_error_list_file())
 
@@ -52,7 +54,7 @@ def widget(qtbot):
 
 
 @pytest_asyncio.fixture
-async def widget_async(qtbot):
+async def widget_async(qtbot: QtBot) -> TabAlarmWarn:
     async with TabAlarmWarn(
         "Alarms/Warnings", Model(logging.getLogger(), is_simulation_mode=True)
     ) as widget_sim:
@@ -63,7 +65,7 @@ async def widget_async(qtbot):
         yield widget_sim
 
 
-def test_init(qtbot, widget):
+def test_init(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     assert len(widget._error_list) == 39
     assert len(widget._error_list["6051"]) == 6
 
@@ -85,7 +87,7 @@ def test_init(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_selection_changed(qtbot, widget):
+async def test_callback_selection_changed(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     assert widget._text_error_cause.toPlainText() == ""
 
     # Select the first error code
@@ -137,14 +139,14 @@ async def test_callback_selection_changed(qtbot, widget):
     )
 
 
-def _get_widget_item_center(widget, item_text):
+def _get_widget_item_center(widget: TabAlarmWarn, item_text: str) -> QPoint:
     items = widget._table_error.findItems(item_text, Qt.MatchExactly)
     rect = widget._table_error.visualItemRect(items[0])
     return rect.center()
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_error_new(qtbot, widget):
+async def test_callback_signal_error_new(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     widget.model.add_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -162,13 +164,15 @@ async def test_callback_signal_error_new(qtbot, widget):
     assert color_6052 == Qt.yellow
 
 
-def _get_widget_item_color(widget, item_text):
+def _get_widget_item_color(widget: TabAlarmWarn, item_text: str) -> QColor:
     items = widget._table_error.findItems(item_text, Qt.MatchExactly)
     return items[0].background().color()
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_error_cleared(qtbot, widget):
+async def test_callback_signal_error_cleared(
+    qtbot: QtBot, widget: TabAlarmWarn
+) -> None:
     widget.model.add_error(6051)
 
     widget.model.clear_error(6051)
@@ -182,7 +186,7 @@ async def test_callback_signal_error_cleared(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_reset(qtbot, widget_async):
+async def test_callback_reset(qtbot: QtBot, widget_async: TabAlarmWarn) -> None:
     # Update the text of error cause
     center = _get_widget_item_center(widget_async, "6054")
     qtbot.mouseClick(
@@ -225,13 +229,13 @@ async def test_callback_reset(qtbot, widget_async):
     assert color == Qt.green
 
 
-def test_set_error_item_color_error(qtbot, widget):
+def test_set_error_item_color_error(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     with pytest.raises(ValueError):
         widget._set_error_item_color(None, "wrong_status")
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_limit_switch(qtbot, widget):
+async def test_callback_signal_limit_switch(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     widget.model.fault_manager.update_limit_switch_status(
         LimitSwitchType.Extend, Ring.C, 3, True
     )

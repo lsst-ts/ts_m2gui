@@ -26,17 +26,18 @@ import pytest
 from lsst.ts.m2gui import Model, get_tol
 from lsst.ts.m2gui.controltab import TabRigidBodyPos
 from PySide2.QtCore import Qt
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabRigidBodyPos:
     widget = TabRigidBodyPos("Rigid Body Position", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
     return widget
 
 
-def test_init(widget):
+def test_init(widget: TabRigidBodyPos) -> None:
     num_digit_after_decimal = widget.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL
     assert widget._target_position_relative["x"].decimals() == num_digit_after_decimal
 
@@ -58,7 +59,9 @@ def test_init(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_clear_values_relative(qtbot, widget):
+async def test_callback_clear_values_relative(
+    qtbot: QtBot, widget: TabRigidBodyPos
+) -> None:
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_relative[axis].setValue(idx)
 
@@ -72,7 +75,9 @@ async def test_callback_clear_values_relative(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_clear_values_absolute(qtbot, widget):
+async def test_callback_clear_values_absolute(
+    qtbot: QtBot, widget: TabRigidBodyPos
+) -> None:
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_absolute[axis].setValue(idx)
 
@@ -86,7 +91,7 @@ async def test_callback_clear_values_absolute(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_position(widget):
+async def test_callback_position(widget: TabRigidBodyPos) -> None:
     widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6)
 
     # Sleep so the event loop can access CPU to handle the signal

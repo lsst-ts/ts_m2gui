@@ -21,10 +21,11 @@
 
 import pytest
 from lsst.ts.m2gui.display import FigureConstant
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> FigureConstant:
     widget = FigureConstant(
         2,
         5,
@@ -40,7 +41,7 @@ def widget(qtbot):
     return widget
 
 
-def test_init(widget):
+def test_init(widget: FigureConstant) -> None:
     assert widget.axis_x.min() == 2
     assert widget.axis_x.max() == 5
 
@@ -57,7 +58,7 @@ def test_init(widget):
     assert markers[1].label() == "text_legend_2"
 
 
-def test_get_points(widget):
+def test_get_points(widget: FigureConstant) -> None:
     for idx in range(0, 2):
         points = widget.get_points(0)
         for point in points:
@@ -67,13 +68,13 @@ def test_get_points(widget):
         assert points[-1].x() == 5
 
 
-def test_get_series(widget):
+def test_get_series(widget: FigureConstant) -> None:
     for idx in range(0, 2):
         series = widget.get_series(idx)
         assert series.count() == 10
 
 
-def test_update_range_axis_y(widget):
+def test_update_range_axis_y(widget: FigureConstant) -> None:
     # The new minimum is smaller than the axis
     widget._value_y_min = -100
     widget._update_range_axis_y()
@@ -103,14 +104,14 @@ def test_update_range_axis_y(widget):
     assert widget.axis_y.max() == 11
 
 
-def test_update_data_exception(widget):
+def test_update_data_exception(widget: FigureConstant) -> None:
     data = range(0, 12)
 
     with pytest.raises(ValueError):
         widget.update_data(data, data)
 
 
-def test_update_data(widget):
+def test_update_data(widget: FigureConstant) -> None:
     # Update the first series
     data_x = range(2, 12)
     data_y_0 = range(3, 13)
@@ -135,7 +136,7 @@ def test_update_data(widget):
     assert widget.axis_y.max() == 13
 
 
-def test_adjust_range_axis_y(widget):
+def test_adjust_range_axis_y(widget: FigureConstant) -> None:
     data_x = range(2, 12)
     data_y_0 = range(3, 13)
     widget.update_data(data_x, data_y_0, idx=0)
@@ -152,7 +153,7 @@ def test_adjust_range_axis_y(widget):
     assert widget.axis_y.max() == 13
 
 
-def test_get_range_points(widget):
+def test_get_range_points(widget: FigureConstant) -> None:
     data_x = range(2, 12)
     data_y = range(3, 13)
     widget.update_data(data_x, data_y, idx=0)
@@ -163,6 +164,6 @@ def test_get_range_points(widget):
     assert value_max == max(data_y)
 
 
-def test_append_data_exception(widget):
+def test_append_data_exception(widget: FigureConstant) -> None:
     with pytest.raises(RuntimeError):
         widget.append_data(1)

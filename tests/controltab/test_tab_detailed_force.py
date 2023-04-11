@@ -25,10 +25,11 @@ import logging
 import pytest
 from lsst.ts.m2gui import ActuatorForce, Model
 from lsst.ts.m2gui.controltab import TabDetailedForce
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabDetailedForce:
     widget = TabDetailedForce("Detailed Force", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -36,7 +37,7 @@ def widget(qtbot):
 
 
 @pytest.mark.asyncio
-async def test_callback_time_out(widget):
+async def test_callback_time_out(widget: TabDetailedForce) -> None:
     widget._forces_latest.f_hc[3] = 1.234
     widget._forces_latest.f_cur[5] = 0.2
     widget._forces_latest.f_error[7] = 0.249
@@ -52,7 +53,7 @@ async def test_callback_time_out(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_hard_points(widget):
+async def test_callback_hard_points(widget: TabDetailedForce) -> None:
     axial = [1, 2, 3]
     tangent = [72, 73, 74]
     widget.model.utility_monitor.update_hard_points(axial, tangent)
@@ -65,7 +66,7 @@ async def test_callback_hard_points(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_forces(widget):
+async def test_callback_forces(widget: TabDetailedForce) -> None:
     forces = ActuatorForce()
     forces.f_cur[5] = 0.2
     widget.model.utility_monitor.update_forces(forces)
