@@ -18,6 +18,7 @@
 - [black](https://github.com/psf/black) (23.1.0, optional)
 - [flake8](https://github.com/PyCQA/flake8) (4.0.1, optional)
 - [isort](https://github.com/PyCQA/isort) (5.12.0, optional)
+- [mypy](https://github.com/python/mypy) (1.0.0, optional)
 - [documenteer](https://github.com/lsst-sqre/documenteer) (optional)
 - pytest (optional, install by `conda`)
 - pytest-flake8 (optional, install by `conda -c conda-forge`)
