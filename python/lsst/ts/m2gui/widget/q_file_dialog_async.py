@@ -21,6 +21,7 @@
 
 __all__ = ["QFileDialogAsync"]
 
+import asyncio
 import sys
 
 from PySide2.QtWidgets import QFileDialog
@@ -31,7 +32,7 @@ from . import connect_signal_to_future
 class QFileDialogAsync(QFileDialog):
     """QT file dialog in the asynchronous version."""
 
-    async def get_open_filename_async(self):
+    async def get_open_filename_async(self) -> str:
         """Get the existed file selected by the user.
 
         Returns
@@ -57,7 +58,7 @@ class QFileDialogAsync(QFileDialog):
         else:
             return ""
 
-    def show(self):
+    def show(self) -> asyncio.Future:
         """This is an overridden function.
 
         See QMessageBoxAsync.show() for the details.

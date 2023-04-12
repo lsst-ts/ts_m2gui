@@ -21,6 +21,8 @@
 
 __all__ = ["QMessageBoxAsync"]
 
+import asyncio
+
 from PySide2.QtWidgets import QMessageBox
 
 from . import connect_signal_to_future
@@ -29,7 +31,7 @@ from . import connect_signal_to_future
 class QMessageBoxAsync(QMessageBox):
     """QT message box in the asynchronous version."""
 
-    def show(self):
+    def show(self) -> asyncio.Future:
         """This is an overridden function.
 
         Based on the QT documents, we should avoid the use of exec().

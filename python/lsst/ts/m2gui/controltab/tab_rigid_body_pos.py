@@ -21,9 +21,20 @@
 
 __all__ = ["TabRigidBodyPos"]
 
-from PySide2.QtWidgets import QDoubleSpinBox, QFormLayout, QHBoxLayout, QVBoxLayout
+import typing
+
+from PySide2.QtWidgets import (
+    QDoubleSpinBox,
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QVBoxLayout,
+)
 from qasync import asyncSlot
 
+from ..model import Model
+from ..signals import SignalPosition
 from ..utils import create_group_box, create_label, get_tol, run_command, set_button
 from . import TabDefault
 
@@ -58,7 +69,7 @@ class TabRigidBodyPos(TabDefault):
     # (20000 urad ~ 4125.296 arcsec)
     MAX_ROTATION_IN_ARCSEC = 4125
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # Relative target position
@@ -96,7 +107,7 @@ class TabRigidBodyPos(TabDefault):
 
         self._set_signal_position(self.model.utility_monitor.signal_position)
 
-    def _set_target_position(self):
+    def _set_target_position(self) -> typing.Dict[str, QDoubleSpinBox]:
         """Set the target position of rigid body.
 
         Returns
@@ -128,25 +139,25 @@ class TabRigidBodyPos(TabDefault):
         return position
 
     @asyncSlot()
-    async def _callback_save_position(self):
+    async def _callback_save_position(self) -> None:
         """Callback of the save-position button. This will save the current
         position to a file."""
         await run_command(self.model.save_position)
 
     @asyncSlot()
-    async def _callback_go_to_home(self):
+    async def _callback_go_to_home(self) -> None:
         """Callback of the go-to-home button. This will move the M2 to the
         home position."""
         await run_command(self.model.go_to_position, 0, 0, 0, 0, 0, 0)
 
     @asyncSlot()
-    async def _callback_set_home(self):
+    async def _callback_set_home(self) -> None:
         """Callback of the set-home button. This will set the new home position
         of M2."""
         await run_command(self.model.set_home)
 
     @asyncSlot()
-    async def _callback_jog(self):
+    async def _callback_jog(self) -> None:
         """Callback of the jog button. This will move the M2 to the new
         position based on the relative offsets."""
 
@@ -162,7 +173,9 @@ class TabRigidBodyPos(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_clear_values(self, target_positions):
+    async def _callback_clear_values(
+        self, target_positions: typing.Dict[str, QDoubleSpinBox]
+    ) -> None:
         """Callback of the clear-values button. This will clear the values of
         new target positions.
 
@@ -177,7 +190,7 @@ class TabRigidBodyPos(TabDefault):
             target_position.setValue(0)
 
     @asyncSlot()
-    async def _callback_go_to_position(self):
+    async def _callback_go_to_position(self) -> None:
         """Callback of the go-to-position button. This will move the M2 to the
         new absolute position."""
         await run_command(
@@ -190,7 +203,7 @@ class TabRigidBodyPos(TabDefault):
             self._target_position_absolute["rz"].value(),
         )
 
-    def _set_position(self):
+    def _set_position(self) -> typing.Dict[str, QLabel]:
         """Set the position of rigid body.
 
         Returns
@@ -206,12 +219,12 @@ class TabRigidBodyPos(TabDefault):
 
         return position
 
-    def _create_layout(self):
+    def _create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide2.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -238,7 +251,7 @@ class TabRigidBodyPos(TabDefault):
 
         return layout
 
-    def _create_group_current_position(self):
+    def _create_group_current_position(self) -> QGroupBox:
         """Create the group of current position.
 
         Returns
@@ -262,7 +275,7 @@ class TabRigidBodyPos(TabDefault):
 
         return create_group_box("Current Position Relative to Home", layout)
 
-    def _create_group_home_position(self):
+    def _create_group_home_position(self) -> QGroupBox:
         """Create the group of home position.
 
         Returns
@@ -277,7 +290,7 @@ class TabRigidBodyPos(TabDefault):
 
         return create_group_box("Home Position", layout)
 
-    def _create_group_move_relative(self):
+    def _create_group_move_relative(self) -> QGroupBox:
         """Create the group of relative movement to the current position.
 
         Returns
@@ -304,7 +317,7 @@ class TabRigidBodyPos(TabDefault):
 
         return create_group_box("Move with Offset Relative to Current Position", layout)
 
-    def _create_group_move_absolute(self):
+    def _create_group_move_absolute(self) -> QGroupBox:
         """Create the group of absolute movement to the home position.
 
         Returns
@@ -331,7 +344,7 @@ class TabRigidBodyPos(TabDefault):
 
         return create_group_box("Move to Position Relative to Home", layout)
 
-    def _set_signal_position(self, signal_position):
+    def _set_signal_position(self, signal_position: SignalPosition) -> None:
         """Set the position signal with callback function. This signal provides
         the rigid body position.
 
@@ -344,7 +357,7 @@ class TabRigidBodyPos(TabDefault):
         signal_position.position.connect(self._callback_position)
 
     @asyncSlot()
-    async def _callback_position(self, position):
+    async def _callback_position(self, position: list) -> None:
         """Callback of the position signal for the rigid body position.
 
         Parameters

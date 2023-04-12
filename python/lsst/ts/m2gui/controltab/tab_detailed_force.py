@@ -21,18 +21,24 @@
 
 __all__ = ["TabDetailedForce"]
 
+import typing
+
 from lsst.ts.m2com import NUM_ACTUATOR
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QAbstractItemView,
     QFormLayout,
+    QGroupBox,
+    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
 )
 from qasync import asyncSlot
 
-from .. import ActuatorForce
+from ..actuator_force import ActuatorForce
 from ..enums import Ring
+from ..model import Model
+from ..signals import SignalDetailedForce
 from ..utils import create_group_box, create_label, create_table, get_num_actuator_ring
 from . import TabDefault
 
@@ -58,7 +64,7 @@ class TabDetailedForce(TabDefault):
     MIN_WIDTH = 600
     MIN_HEIGHT = 400
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # List of the hard points
@@ -93,7 +99,7 @@ class TabDetailedForce(TabDefault):
             self.model.utility_monitor.signal_detailed_force
         )
 
-    def _create_items_force(self):
+    def _create_items_force(self) -> typing.Dict[str, typing.List[QTableWidgetItem]]:
         """Create the items of force.
 
         Returns
@@ -122,7 +128,7 @@ class TabDetailedForce(TabDefault):
         return items_force
 
     @asyncSlot()
-    async def _callback_selection_changed(self, index):
+    async def _callback_selection_changed(self, index: int) -> None:
         """Callback of the changed selection. This will scroll the table to
         make sure the user can see the actuators of selected ring.
 
@@ -142,7 +148,7 @@ class TabDetailedForce(TabDefault):
                 items[0], hint=QAbstractItemView.PositionAtTop
             )
 
-    def _create_table_forces(self):
+    def _create_table_forces(self) -> QTableWidget:
         """Create the table widget of detailed forces.
 
         Returns
@@ -156,7 +162,7 @@ class TabDetailedForce(TabDefault):
 
         return self._resize_table(table)
 
-    def _add_detailed_force_to_table(self, table):
+    def _add_detailed_force_to_table(self, table: QTableWidget) -> QTableWidget:
         """Add the detailed force to table.
 
         Parameters
@@ -181,7 +187,7 @@ class TabDetailedForce(TabDefault):
 
         return table
 
-    def _resize_table(self, table):
+    def _resize_table(self, table: QTableWidget) -> QTableWidget:
         """Resize the table.
 
         Parameters
@@ -201,7 +207,7 @@ class TabDetailedForce(TabDefault):
         return table
 
     @asyncSlot()
-    async def _callback_time_out(self):
+    async def _callback_time_out(self) -> None:
         """Callback timeout function to update the force table."""
 
         # Update the force items on tables
@@ -218,7 +224,7 @@ class TabDetailedForce(TabDefault):
 
         self.check_duration_and_restart_timer(self._timer)
 
-    def _set_widget_and_layout(self):
+    def _set_widget_and_layout(self) -> None:
         """Set the widget and layout."""
 
         widget = self.widget()
@@ -226,12 +232,12 @@ class TabDetailedForce(TabDefault):
 
         self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
 
-    def _create_layout(self):
+    def _create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide2.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -247,7 +253,7 @@ class TabDetailedForce(TabDefault):
 
         return layout
 
-    def _create_hard_points(self):
+    def _create_hard_points(self) -> QGroupBox:
         """Create the group of hard points.
 
         Returns
@@ -262,7 +268,9 @@ class TabDetailedForce(TabDefault):
 
         return create_group_box("Hard Points", layout)
 
-    def _set_signal_detailed_force(self, signal_detailed_force):
+    def _set_signal_detailed_force(
+        self, signal_detailed_force: SignalDetailedForce
+    ) -> None:
         """Set the detailed force signal with callback functions. This signal
         provides the calculated and measured force details contains the look-up
         table (LUT)
@@ -277,7 +285,7 @@ class TabDetailedForce(TabDefault):
         signal_detailed_force.forces.connect(self._callback_forces)
 
     @asyncSlot()
-    async def _callback_hard_points(self, hard_points):
+    async def _callback_hard_points(self, hard_points: typing.List[int]) -> None:
         """Callback of the hard points (axial and tangential directions).
 
         Parameters
@@ -292,7 +300,7 @@ class TabDetailedForce(TabDefault):
         self._hard_points["tangent"].setText(f"{hard_points[3:]}")
 
     @asyncSlot()
-    async def _callback_forces(self, forces):
+    async def _callback_forces(self, forces: ActuatorForce) -> None:
         """Callback of the forces, which contain the look-up table (LUT)
         details.
 

@@ -21,9 +21,10 @@
 
 __all__ = ["TabSettings"]
 
-from PySide2.QtWidgets import QFormLayout, QLineEdit, QSpinBox, QVBoxLayout
+from PySide2.QtWidgets import QFormLayout, QGroupBox, QLineEdit, QSpinBox, QVBoxLayout
 from qasync import QApplication, asyncSlot
 
+from ..model import Model
 from ..utils import create_group_box, run_command, set_button
 from . import TabDefault
 
@@ -60,7 +61,7 @@ class TabSettings(TabDefault):
     POINT_SIZE_MINIMUM = 9
     POINT_SIZE_MAXIMUM = 14
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         self._settings = self._create_settings()
@@ -75,7 +76,7 @@ class TabSettings(TabDefault):
         # Internal layout
         self.widget().setLayout(self._create_layout())
 
-    def _create_settings(self):
+    def _create_settings(self) -> dict:
         """Create the settings.
 
         Returns
@@ -137,7 +138,9 @@ class TabSettings(TabDefault):
 
         return settings
 
-    def _set_minimum_width_line_edit(self, line_edit, offset=20):
+    def _set_minimum_width_line_edit(
+        self, line_edit: QLineEdit, offset: int = 20
+    ) -> None:
         """Set the minimum width of line edit.
 
         Parameters
@@ -155,7 +158,7 @@ class TabSettings(TabDefault):
         line_edit.setMinimumWidth(width + offset)
 
     @asyncSlot()
-    async def _callback_apply_host(self):
+    async def _callback_apply_host(self) -> None:
         """Callback of the apply-host-setting button. This will apply the
         new host settings to model."""
 
@@ -173,7 +176,7 @@ class TabSettings(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_apply_general(self):
+    async def _callback_apply_general(self) -> None:
         """Callback of the apply-general-setting button. This will apply the
         new general settings to model."""
 
@@ -190,7 +193,7 @@ class TabSettings(TabDefault):
         font.setPointSize(self._settings["point_size"].value())
         app.setFont(font)
 
-    def _create_layout(self):
+    def _create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
@@ -209,7 +212,7 @@ class TabSettings(TabDefault):
 
         return layout
 
-    def _create_group_tcpip(self):
+    def _create_group_tcpip(self) -> QGroupBox:
         """Create the group of TCP/IP connection.
 
         Returns
@@ -226,7 +229,7 @@ class TabSettings(TabDefault):
 
         return create_group_box("Tcp/Ip Connection", layout)
 
-    def _create_group_application(self):
+    def _create_group_application(self) -> QGroupBox:
         """Create the group of application.
 
         Returns

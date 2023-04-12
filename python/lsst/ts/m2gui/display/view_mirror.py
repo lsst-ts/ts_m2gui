@@ -21,6 +21,8 @@
 
 __all__ = ["ViewMirror"]
 
+import typing
+
 from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsView
 from qasync import asyncSlot
@@ -44,15 +46,15 @@ class ViewMirror(QGraphicsView):
     # Diameter of the actuator on the scene
     DIAMETER = 34
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._mirror = self._create_mirror()
         super().__init__(self._mirror)
 
-        self.actuators = list()
+        self.actuators: typing.List[ItemActuator] = list()
 
         self.mirror_radius = 1
 
-    def _create_mirror(self, point_size=8):
+    def _create_mirror(self, point_size: int = 8) -> QGraphicsScene:
         """Create the mirror scene.
 
         Parameters
@@ -80,15 +82,16 @@ class ViewMirror(QGraphicsView):
         return mirror
 
     @asyncSlot()
-    async def _show_selected_actuator_force(self):
+    async def _show_selected_actuator_force(self) -> None:
         """Show the selected actuator force."""
 
         selected_actuator = self.get_selected_actuator()
 
         text_force = self.get_text_force()
-        text_force.setVisible(selected_actuator is not None)
+        if text_force is not None:
+            text_force.setVisible(selected_actuator is not None)
 
-    def get_selected_actuator(self):
+    def get_selected_actuator(self) -> ItemActuator | None:
         """Get the selected actuator.
 
         Returns
@@ -103,7 +106,7 @@ class ViewMirror(QGraphicsView):
         else:
             return None
 
-    def get_text_force(self):
+    def get_text_force(self) -> QGraphicsTextItem | None:
         """Get the text item of actuator force.
 
         Returns
@@ -119,7 +122,9 @@ class ViewMirror(QGraphicsView):
 
         return None
 
-    def add_item_actuator(self, actuator_id, alias, x, y, point_size=8):
+    def add_item_actuator(
+        self, actuator_id: int, alias: str, x: float, y: float, point_size: int = 8
+    ) -> None:
         """Add the actuator item.
 
         Parameters
@@ -158,7 +163,7 @@ class ViewMirror(QGraphicsView):
 
         self._mirror.addItem(actuator)
 
-    def _calculate_magnification(self, margin=10):
+    def _calculate_magnification(self, margin: int = 10) -> int:
         """Calculate the magnification. This is to re-dimensition the physical
         position of actuator to the graphical scene.
 
@@ -176,7 +181,7 @@ class ViewMirror(QGraphicsView):
             self.SIZE_SCENE // 2 - self.DIAMETER // 2 - margin
         ) // self.mirror_radius
 
-    def show_alias(self, is_alias):
+    def show_alias(self, is_alias: bool) -> None:
         """Show the alias of actuator or not.
 
         Parameters

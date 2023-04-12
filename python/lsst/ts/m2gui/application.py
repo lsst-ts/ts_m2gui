@@ -32,7 +32,7 @@ from PySide2.QtCore import QCommandLineOption, QCommandLineParser
 from . import MainWindow
 
 
-def run_application(argv):
+def run_application(argv: list) -> None:
     """Run the application.
 
     Parameters
@@ -51,7 +51,7 @@ def run_application(argv):
         sys.exit(0)
 
 
-async def main(argv):
+async def main(argv: list) -> bool:
     """Main application.
 
     Parameters
@@ -62,7 +62,7 @@ async def main(argv):
 
     # The set of "aboutToQuit" comes from "qasync/examples/aiohttp_fetch.py"
     loop = asyncio.get_event_loop()
-    future = asyncio.Future()
+    future: asyncio.Future = asyncio.Future()
 
     # You need one (and only one) QApplication instance per application.
     # There is one QApplication instance in "qasync" already.
@@ -143,7 +143,7 @@ async def main(argv):
     return True
 
 
-def close_future(future, loop):
+def close_future(future: asyncio.Future, loop: asyncio.AbstractEventLoop) -> None:
     """Close the future.
 
     This is needed to ensure that all pre- and post-processing for the event

@@ -25,6 +25,7 @@ from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
+from ..model import Model
 from ..utils import run_command, set_button
 from . import LayoutDefault
 
@@ -45,31 +46,39 @@ class LayoutLocalMode(LayoutDefault):
         Layout.
     """
 
-    def __init__(self, model):
+    def __init__(self, model: Model) -> None:
         # Standby button
-        self._button_standby = None
+        self._button_standby = set_button(
+            "Standby", self._callback_standby, tool_tip="Transition to standby state"
+        )
 
         # Diagnostic button
-        self._button_diagnostic = None
+        self._button_diagnostic = set_button(
+            "Diagnostic",
+            self._callback_diagnostic,
+            tool_tip="Transition to diagnostic state",
+        )
 
         # Enable button
-        self._button_enable = None
+        self._button_enable = set_button(
+            "Enable", self._callback_enable, tool_tip="Transition to enable state"
+        )
 
         super().__init__(model)
 
     @asyncSlot()
-    async def _callback_signal_control(self, is_control_updated):
+    async def _callback_signal_control(self, is_control_updated: bool) -> None:
         if (not self.model.is_csc_commander) and (not self.model.is_closed_loop):
             self._update_buttons()
         else:
             self._prohibit_transition()
 
-    def _update_buttons(self):
+    def _update_buttons(self) -> None:
         """Update the buttons.
 
         Raises
         ------
-        ValueError
+        `ValueError`
             If the input local mode is not supported.
         """
         local_mode = self.model.local_mode
@@ -92,25 +101,14 @@ class LayoutLocalMode(LayoutDefault):
         else:
             raise ValueError(f"Input local mode: {local_mode} is not supported.")
 
-    def _prohibit_transition(self):
+    def _prohibit_transition(self) -> None:
         """Prohibit the transition of local mode."""
+
         self._button_standby.setEnabled(False)
         self._button_diagnostic.setEnabled(False)
         self._button_enable.setEnabled(False)
 
-    def _set_layout(self):
-        self._button_standby = set_button(
-            "Standby", self._callback_standby, tool_tip="Transition to standby state"
-        )
-        self._button_diagnostic = set_button(
-            "Diagnostic",
-            self._callback_diagnostic,
-            tool_tip="Transition to diagnostic state",
-        )
-        self._button_enable = set_button(
-            "Enable", self._callback_enable, tool_tip="Transition to enable state"
-        )
-
+    def _set_layout(self) -> QVBoxLayout:
         layout = QVBoxLayout()
         layout.addWidget(self._button_standby)
         layout.addWidget(self._button_diagnostic)
@@ -119,24 +117,24 @@ class LayoutLocalMode(LayoutDefault):
         return layout
 
     @asyncSlot()
-    async def _callback_standby(self):
+    async def _callback_standby(self) -> None:
         """Callback of the standby button. The system will transition to the
         standby state."""
         await self.set_local_mode(LocalMode.Standby)
 
     @asyncSlot()
-    async def _callback_diagnostic(self):
+    async def _callback_diagnostic(self) -> None:
         """Callback of the diagnostic button. The system will transition to the
         diagnostic state."""
         await self.set_local_mode(LocalMode.Diagnostic)
 
     @asyncSlot()
-    async def _callback_enable(self):
+    async def _callback_enable(self) -> None:
         """Callback of the enable button. The system will transition to the
         enable state."""
         await self.set_local_mode(LocalMode.Enable)
 
-    async def set_local_mode(self, local_mode):
+    async def set_local_mode(self, local_mode: LocalMode) -> None:
         """Set the local mode.
 
         Parameters
@@ -146,7 +144,7 @@ class LayoutLocalMode(LayoutDefault):
 
         Raises
         ------
-        ValueError
+        `ValueError`
             If the input local mode is not supported.
         """
 

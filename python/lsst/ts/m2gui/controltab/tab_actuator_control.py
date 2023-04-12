@@ -21,6 +21,7 @@
 
 __all__ = ["TabActuatorControl"]
 
+import typing
 from pathlib import Path
 
 import numpy as np
@@ -34,13 +35,17 @@ from PySide2.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
     QFormLayout,
+    QGroupBox,
     QHBoxLayout,
     QProgressBar,
     QVBoxLayout,
 )
 from qasync import asyncSlot
 
+from ..actuator_force import ActuatorForce
 from ..enums import Ring
+from ..model import Model
+from ..signals import SignalDetailedForce, SignalScript
 from ..utils import (
     create_grid_layout_buttons,
     create_group_box,
@@ -71,7 +76,7 @@ class TabActuatorControl(TabDefault):
     MAX_DISPLACEMENT_MM = 200
     MAX_DISPLACEMENT_STEP = 10**7
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         progress_bar = QProgressBar()
@@ -148,7 +153,7 @@ class TabActuatorControl(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_script_load_script(self, file_name=""):
+    async def _callback_script_load_script(self, file_name: str = "") -> str:
         """Callback of the load-script button in script control. The cell
         controller will load the script.
 
@@ -174,7 +179,9 @@ class TabActuatorControl(TabDefault):
             name = file_path.name
 
             is_successful = await run_command(
-                self.model.command_script, CommandScript.LoadScript, script_name=name
+                self.model.command_script,
+                CommandScript.LoadScript,
+                script_name=name,  # type: ignore[arg-type]
             )
 
             if is_successful:
@@ -183,7 +190,7 @@ class TabActuatorControl(TabDefault):
         return name
 
     @asyncSlot()
-    async def _callback_script_command(self, command):
+    async def _callback_script_command(self, command: CommandScript) -> None:
         """Callback of the command buttons in script control. The cell
         controller will run the related command.
 
@@ -199,7 +206,9 @@ class TabActuatorControl(TabDefault):
             self._info_script["file"].setText("")
             self._info_script["progress"].setValue(0)
 
-    def _set_target_displacement(self, displacement_unit):
+    def _set_target_displacement(
+        self, displacement_unit: ActuatorDisplacementUnit
+    ) -> None:
         """Set the target displacement.
 
         The available decimal, range, suffix, and single step in box will be
@@ -234,7 +243,9 @@ class TabActuatorControl(TabDefault):
         self._target_displacement.setSuffix(suffix)
         self._target_displacement.setSingleStep(10**-decimal)
 
-    def _create_displacement_unit_selection(self, displacement_unit):
+    def _create_displacement_unit_selection(
+        self, displacement_unit: ActuatorDisplacementUnit
+    ) -> QComboBox:
         """Create the combo box of displacement unit selection.
 
         Parameters
@@ -262,7 +273,7 @@ class TabActuatorControl(TabDefault):
         return unit_selection
 
     @asyncSlot()
-    async def _callback_selection_changed(self, index):
+    async def _callback_selection_changed(self, index: int) -> None:
         """Callback of the changed selection. This will update the decimals in
         the target displacement.
 
@@ -277,7 +288,7 @@ class TabActuatorControl(TabDefault):
         self._set_target_displacement(selected_unit)
 
     @asyncSlot()
-    async def _callback_select_ring(self):
+    async def _callback_select_ring(self) -> None:
         """Callback of the select-ring button in actuator selector. All
         actuators in the specific ring will be selected."""
 
@@ -289,7 +300,7 @@ class TabActuatorControl(TabDefault):
                 actuator.setChecked(True)
 
     @asyncSlot()
-    async def _callback_clear_all(self):
+    async def _callback_clear_all(self) -> None:
         """Callback of the clear-all button in actuator selector. All of the
         selected actuators will be cleared/unchecked."""
 
@@ -297,7 +308,9 @@ class TabActuatorControl(TabDefault):
             button.setChecked(False)
 
     @asyncSlot()
-    async def _callback_actuator_start(self):
+    async def _callback_actuator_start(
+        self,
+    ) -> typing.Tuple[list, float | int, ActuatorDisplacementUnit]:
         """Callback of the start button in actuator control. The cell
         controller will start to move the actuators.
 
@@ -326,7 +339,7 @@ class TabActuatorControl(TabDefault):
         await run_command(
             self.model.command_actuator,
             CommandActuator.Start,
-            actuators=actuators,
+            actuators=actuators,  # type: ignore[arg-type]
             target_displacement=target_displacement,
             unit=displacement_unit,
         )
@@ -334,7 +347,7 @@ class TabActuatorControl(TabDefault):
         return actuators, target_displacement, displacement_unit
 
     @asyncSlot()
-    async def _callback_actuator_command(self, command):
+    async def _callback_actuator_command(self, command: CommandActuator) -> None:
         """Callback of the actuator buttons in actuator control. The cell
         controller will run the related command.
 
@@ -345,7 +358,7 @@ class TabActuatorControl(TabDefault):
         """
         await run_command(self.model.command_actuator, command)
 
-    def _set_widget_and_layout(self):
+    def _set_widget_and_layout(self) -> None:
         """Set the widget and layout."""
 
         widget = self.widget()
@@ -356,7 +369,7 @@ class TabActuatorControl(TabDefault):
 
         self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
 
-    def _create_layout(self):
+    def _create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns
@@ -387,7 +400,7 @@ class TabActuatorControl(TabDefault):
 
         return layout
 
-    def _create_group_script_control(self):
+    def _create_group_script_control(self) -> QGroupBox:
         """Create the group of script control. The cell control system reads
         the binary script to perform a seris of actuator motions.
 
@@ -409,7 +422,7 @@ class TabActuatorControl(TabDefault):
 
         return create_group_box("Script Control", layout)
 
-    def _create_group_force_summary(self):
+    def _create_group_force_summary(self) -> QGroupBox:
         """Create the group of force summary. This is just for the high-level
         overview of force status.
 
@@ -433,7 +446,9 @@ class TabActuatorControl(TabDefault):
 
         return create_group_box("Measured Force Summary", layout)
 
-    def _create_group_actuator_selector(self, spacing=1, num_column=10):
+    def _create_group_actuator_selector(
+        self, spacing: int = 1, num_column: int = 10
+    ) -> QGroupBox:
         """Create the group of actuator selector to select single or multiple
         actuators to do the movements.
 
@@ -467,7 +482,7 @@ class TabActuatorControl(TabDefault):
 
         return create_group_box("Actuator Selector", layout)
 
-    def _create_group_actuator_control(self):
+    def _create_group_actuator_control(self) -> QGroupBox:
         """Create the group of actuator control for single or multiple
         actuators. This is different from the script control, which focus on a
         continuous motion. This actuator control is just a one-time movement.
@@ -491,7 +506,7 @@ class TabActuatorControl(TabDefault):
 
         return create_group_box("Actuator Control", layout)
 
-    def _set_signal_script(self, signal_script):
+    def _set_signal_script(self, signal_script: SignalScript) -> None:
         """Set the script signal with callback function.
 
         Parameters
@@ -502,7 +517,7 @@ class TabActuatorControl(TabDefault):
         signal_script.progress.connect(self._callback_progress)
 
     @asyncSlot()
-    async def _callback_progress(self, progress):
+    async def _callback_progress(self, progress: int) -> None:
         """Callback of the script signal for the progress of script execution.
 
         Parameters
@@ -512,7 +527,9 @@ class TabActuatorControl(TabDefault):
         """
         self._info_script["progress"].setValue(progress)
 
-    def _set_signal_detailed_force(self, signal_detailed_force):
+    def _set_signal_detailed_force(
+        self, signal_detailed_force: SignalDetailedForce
+    ) -> None:
         """Set the detailed force signal with callback function. This signal
         provides the calculated and measured force details contains the look-up
         table (LUT).
@@ -525,7 +542,7 @@ class TabActuatorControl(TabDefault):
         signal_detailed_force.forces.connect(self._callback_forces)
 
     @asyncSlot()
-    async def _callback_forces(self, forces):
+    async def _callback_forces(self, forces: ActuatorForce) -> None:
         """Callback of the forces, which contain the look-up table (LUT)
         details.
 

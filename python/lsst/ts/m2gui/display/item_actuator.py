@@ -57,13 +57,21 @@ class ItemActuator(QGraphicsEllipseItem):
         Label of the actuator ID.
     """
 
-    def __init__(self, x, y, diameter, actuator_id, alias, point_size):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        diameter: float | int,
+        actuator_id: int,
+        alias: str,
+        point_size: int,
+    ) -> None:
         super().__init__(x, y, diameter, diameter)
 
         self.acutator_id = actuator_id
         self._alias = alias
 
-        self.magnitude = 0
+        self.magnitude = 0.0
 
         # Note that the ItemActuator class will become the parent of
         # self.label_id
@@ -71,7 +79,7 @@ class ItemActuator(QGraphicsEllipseItem):
 
         self._set_default(point_size)
 
-    def _set_default(self, point_size, width_pen=1):
+    def _set_default(self, point_size: int, width_pen: int = 1) -> None:
         """Do the default settings.
 
         Parameters
@@ -94,7 +102,7 @@ class ItemActuator(QGraphicsEllipseItem):
 
         self.setFlag(QGraphicsEllipseItem.ItemIsSelectable)
 
-    def set_position_label_id(self, x, y):
+    def set_position_label_id(self, x: float, y: float) -> None:
         """Set the position of actuator ID label.
 
         Parameters
@@ -106,7 +114,7 @@ class ItemActuator(QGraphicsEllipseItem):
         """
         self.label_id.setPos(x, y)
 
-    def show_alias(self, is_alias):
+    def show_alias(self, is_alias: bool) -> None:
         """Show the alias of actuator or not.
 
         Parameters
@@ -120,7 +128,9 @@ class ItemActuator(QGraphicsEllipseItem):
         else:
             self.label_id.setPlainText(str(self.acutator_id))
 
-    def update_magnitude(self, magnitude, magnitude_min, magnitude_max):
+    def update_magnitude(
+        self, magnitude: float, magnitude_min: float, magnitude_max: float
+    ) -> None:
         """Update the magnitude. This will update the color of actuator on the
         mirror's view. If the magnitude is out of range, the limit of range
         will be used to show the color of magnitude on the view of mirror.

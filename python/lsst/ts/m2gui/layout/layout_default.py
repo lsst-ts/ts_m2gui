@@ -21,7 +21,10 @@
 
 __all__ = ["LayoutDefault"]
 
+from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
+
+from ..model import Model
 
 
 class LayoutDefault(object):
@@ -40,7 +43,7 @@ class LayoutDefault(object):
         Layout.
     """
 
-    def __init__(self, model):
+    def __init__(self, model: Model) -> None:
         self.model = model
         self.model.signal_control.is_control_updated.connect(
             self._callback_signal_control
@@ -49,7 +52,7 @@ class LayoutDefault(object):
         self.layout = self._set_layout()
 
     @asyncSlot()
-    async def _callback_signal_control(self, is_control_updated):
+    async def _callback_signal_control(self, is_control_updated: bool) -> None:
         """Callback of the control signal.
 
         Parameters
@@ -59,7 +62,7 @@ class LayoutDefault(object):
         """
         raise NotImplementedError("Child class needs to realize this function.")
 
-    def _set_layout(self):
+    def _set_layout(self) -> QVBoxLayout:
         """Set the layout.
 
         Returns

@@ -22,6 +22,8 @@
 __all__ = ["TabAlarmWarn"]
 
 import csv
+import typing
+from pathlib import Path
 
 from lsst.ts.m2com import LimitSwitchType
 from PySide2.QtCore import Qt
@@ -30,6 +32,9 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QHeaderView,
     QPlainTextEdit,
+    QPushButton,
+    QScrollArea,
+    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
@@ -37,6 +42,8 @@ from PySide2.QtWidgets import (
 from qasync import asyncSlot
 
 from ..enums import Ring
+from ..model import Model
+from ..signals import SignalError, SignalLimitSwitch
 from ..utils import create_label, create_table, run_command, set_button
 from . import TabDefault
 
@@ -57,11 +64,11 @@ class TabAlarmWarn(TabDefault):
         Model class.
     """
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # List of the errors
-        self._error_list = dict()
+        self._error_list: typing.Dict = dict()
 
         # Table of the errors
         self._table_error = self._create_table_error()
@@ -93,7 +100,7 @@ class TabAlarmWarn(TabDefault):
         self._set_signal_error(self.model.fault_manager.signal_error)
         self._set_signal_limit_switch(self.model.fault_manager.signal_limit_switch)
 
-    def _create_table_error(self):
+    def _create_table_error(self) -> QTableWidget:
         """Create the table widget of error code.
 
         Returns
@@ -113,7 +120,7 @@ class TabAlarmWarn(TabDefault):
         return table
 
     @asyncSlot()
-    async def _callback_selection_changed(self):
+    async def _callback_selection_changed(self) -> None:
         """Callback of the selection changed on table."""
 
         items = self._table_error.selectedItems()
@@ -126,7 +133,7 @@ class TabAlarmWarn(TabDefault):
         except KeyError:
             pass
 
-    def _create_text_error_cause(self):
+    def _create_text_error_cause(self) -> QPlainTextEdit:
         """Create the text of possible error cause.
 
         Returns
@@ -145,7 +152,9 @@ class TabAlarmWarn(TabDefault):
 
         return text_error_cause
 
-    def _create_indicators_limit_switch(self, limit_switch_type):
+    def _create_indicators_limit_switch(
+        self, limit_switch_type: LimitSwitchType
+    ) -> typing.Dict[str, QPushButton]:
         """Creates indicators for limit switches.
 
         Parameters
@@ -181,7 +190,7 @@ class TabAlarmWarn(TabDefault):
 
         return indicators
 
-    def _update_indicator_color(self, indicator, is_fault):
+    def _update_indicator_color(self, indicator: QPushButton, is_fault: bool) -> None:
         """Update the color of indicator.
 
         Parameters
@@ -201,7 +210,7 @@ class TabAlarmWarn(TabDefault):
 
         indicator.setPalette(palette)
 
-    def _create_layout(self):
+    def _create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
@@ -225,7 +234,7 @@ class TabAlarmWarn(TabDefault):
 
         return layout
 
-    def _get_widget_limit_switch(self):
+    def _get_widget_limit_switch(self) -> QScrollArea:
         """Get the widget of limit switch.
 
         Returns
@@ -251,7 +260,9 @@ class TabAlarmWarn(TabDefault):
 
         return self.set_widget_scrollable(widget)
 
-    def _get_layout_limit_switch_specific_ring(self, limit_switch_type, ring):
+    def _get_layout_limit_switch_specific_ring(
+        self, limit_switch_type: LimitSwitchType, ring: Ring
+    ) -> QVBoxLayout:
         """Get the layout of limit switch in specific ring.
 
         Parameters
@@ -287,7 +298,7 @@ class TabAlarmWarn(TabDefault):
         return layout
 
     @asyncSlot()
-    async def _callback_reset(self):
+    async def _callback_reset(self) -> None:
         """Callback of the reset button to reset all alarms and warnings."""
 
         self._text_error_cause.clear()
@@ -295,12 +306,12 @@ class TabAlarmWarn(TabDefault):
         await run_command(self.model.reset_errors)
 
     @asyncSlot()
-    async def _callback_enable_open_loop_max_limit(self):
+    async def _callback_enable_open_loop_max_limit(self) -> None:
         """Callback of the enable button to enable the maximum limit of
         open-loop control."""
         await run_command(self.model.enable_open_loop_max_limit, True)
 
-    def _set_signal_error(self, signal_error):
+    def _set_signal_error(self, signal_error: SignalError) -> None:
         """Set the error signal with callback functions.
 
         Parameters
@@ -313,7 +324,7 @@ class TabAlarmWarn(TabDefault):
         signal_error.error_cleared.connect(self._callback_signal_error_cleared)
 
     @asyncSlot()
-    async def _callback_signal_error_new(self, error_code):
+    async def _callback_signal_error_new(self, error_code: int) -> None:
         """Callback of the error signal for the new error. This function will
         highlight the error.
 
@@ -329,7 +340,7 @@ class TabAlarmWarn(TabDefault):
             status = error_detail[1].strip()
             self._set_error_item_color(items[0], status)
 
-    def _set_error_item_color(self, item, status):
+    def _set_error_item_color(self, item: QTableWidgetItem, status: str) -> None:
         """Set the error/warning item with specific color.
 
         Parameters
@@ -353,7 +364,7 @@ class TabAlarmWarn(TabDefault):
             raise ValueError(f"Unsupported status: {status} to highlight the error.")
 
     @asyncSlot()
-    async def _callback_signal_error_cleared(self, error_code):
+    async def _callback_signal_error_cleared(self, error_code: int) -> None:
         """Callback of the error signal for the cleared error. This function
         will deemphasize the error.
 
@@ -368,7 +379,7 @@ class TabAlarmWarn(TabDefault):
             item = items[0]
             item.setBackground(Qt.white)
 
-    def _set_signal_limit_switch(self, signal_limit_switch):
+    def _set_signal_limit_switch(self, signal_limit_switch: SignalLimitSwitch) -> None:
         """Set the limit switch signal with callback function.
 
         Parameters
@@ -380,7 +391,7 @@ class TabAlarmWarn(TabDefault):
         signal_limit_switch.type_name_status.connect(self._callback_signal_limit_switch)
 
     @asyncSlot()
-    async def _callback_signal_limit_switch(self, type_name_status):
+    async def _callback_signal_limit_switch(self, type_name_status: tuple) -> None:
         """Callback of the limit switch signal.
 
         Parameters
@@ -401,7 +412,7 @@ class TabAlarmWarn(TabDefault):
         is_fault = type_name_status[2]
         self._update_indicator_color(indicators[name], is_fault)
 
-    def read_error_list_file(self, filepath):
+    def read_error_list_file(self, filepath: str | Path) -> None:
         """Read the tsv file of error list.
 
         Parameters
@@ -424,7 +435,7 @@ class TabAlarmWarn(TabDefault):
         self._add_error_list_to_table()
         self._resize_table_error()
 
-    def _add_error_list_to_table(self):
+    def _add_error_list_to_table(self) -> None:
         """Add the error list to table."""
 
         self._table_error.setRowCount(len(self._error_list))
@@ -435,7 +446,7 @@ class TabAlarmWarn(TabDefault):
             self._table_error.setItem(idx, 0, item_code)
             self._table_error.setItem(idx, 1, item_error_reported)
 
-    def _resize_table_error(self, margin=50):
+    def _resize_table_error(self, margin: int = 50) -> None:
         """Resize the table of error list.
 
         Parameters

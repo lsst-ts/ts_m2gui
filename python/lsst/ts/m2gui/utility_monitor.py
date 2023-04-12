@@ -22,10 +22,13 @@
 __all__ = ["UtilityMonitor"]
 
 import re
+import typing
 from copy import deepcopy
 
 import numpy as np
+import numpy.typing
 from lsst.ts.m2com import DigitalInput, PowerType
+from PySide2.QtCore import Signal
 
 from . import (
     ActuatorForce,
@@ -101,7 +104,7 @@ class UtilityMonitor(object):
     # Number of digits after the decimal for the displacement sensors
     NUM_DIGIT_AFTER_DECIMAL_DISPLACEMENT = 3
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.signal_utility = SignalUtility()
         self.signal_detailed_force = SignalDetailedForce()
         self.signal_position = SignalPosition()
@@ -112,8 +115,8 @@ class UtilityMonitor(object):
         self.power_motor_raw = self._get_default_power()
         self.power_communication_raw = self._get_default_power()
 
-        self.inclinometer_angle = 0
-        self.inclinometer_angle_tma = 0
+        self.inclinometer_angle = 0.0
+        self.inclinometer_angle_tma = 0.0
 
         self.breakers = {
             "J1-W9-1": False,
@@ -175,9 +178,9 @@ class UtilityMonitor(object):
         self.forces = ActuatorForce()
         self.force_error_tangent = ForceErrorTangent()
 
-        self.position = [0, 0, 0, 0, 0, 0]
+        self.position = [0.0] * 6
 
-    def _get_default_power(self):
+    def _get_default_power(self) -> dict:
         """Get the default power data.
 
         Returns
@@ -189,17 +192,17 @@ class UtilityMonitor(object):
 
         return {"voltage": 0, "current": 0}
 
-    def get_forces(self):
+    def get_forces(self) -> ActuatorForce:
         """Get the forces.
 
-        Parameters
-        ----------
+        Returns
+        -------
         `ActuatorForce`
             Detailed actuator forces as a new copy of internal data.
         """
         return deepcopy(self.forces)
 
-    def report_utility_status(self):
+    def report_utility_status(self) -> None:
         """Report the utility status."""
 
         self._report_powers()
@@ -219,7 +222,7 @@ class UtilityMonitor(object):
 
         self.signal_position.position.emit(self.position)
 
-    def _report_powers(self):
+    def _report_powers(self) -> None:
         """Report the powers."""
 
         self.signal_utility.power_motor_calibrated.emit(
@@ -234,7 +237,7 @@ class UtilityMonitor(object):
             tuple(self.power_communication_raw.values())
         )
 
-    def _report_temperatures(self):
+    def _report_temperatures(self) -> None:
         """Report the temperatures."""
 
         for temperature_group in TemperatureGroup:
@@ -246,7 +249,7 @@ class UtilityMonitor(object):
 
             self.signal_utility.temperatures.emit((temperature_group, temperatures))
 
-    def _report_displacements(self):
+    def _report_displacements(self) -> None:
         """Report the displacements."""
 
         for direction in DisplacementSensorDirection:
@@ -255,13 +258,13 @@ class UtilityMonitor(object):
 
             self.signal_utility.displacements.emit((direction, displacements))
 
-    def _report_digital_status(self):
+    def _report_digital_status(self) -> None:
         """Report the digital input/output status."""
 
         self.signal_utility.digital_status_input.emit(self.digital_status_input)
         self.signal_utility.digital_status_output.emit(self.digital_status_output)
 
-    def _report_forces(self):
+    def _report_forces(self) -> None:
         """Report the forces."""
 
         self.signal_detailed_force.hard_points.emit(
@@ -270,7 +273,9 @@ class UtilityMonitor(object):
         self.signal_detailed_force.forces.emit(self.forces)
         self.signal_detailed_force.force_error_tangent.emit(self.force_error_tangent)
 
-    def get_temperature_sensors(self, temperature_group):
+    def get_temperature_sensors(
+        self, temperature_group: TemperatureGroup
+    ) -> typing.List[str]:
         """Get the temperature sensors in a specific group.
 
         Parameters
@@ -291,7 +296,9 @@ class UtilityMonitor(object):
 
         return sensors
 
-    def get_displacement_sensors(self, direction):
+    def get_displacement_sensors(
+        self, direction: DisplacementSensorDirection
+    ) -> typing.List[str]:
         """Get the displacement sensors in a specific direction.
 
         Parameters
@@ -305,7 +312,7 @@ class UtilityMonitor(object):
             List of the sensors.
         """
 
-        sensors = []
+        sensors = list()
         for sensor in self.displacements.keys():
             result = re.match(rf"\AA\d-{direction.name}_z", sensor)
             if result is not None:
@@ -313,7 +320,9 @@ class UtilityMonitor(object):
 
         return sensors
 
-    def update_power_calibrated(self, power_type, new_voltage, new_current):
+    def update_power_calibrated(
+        self, power_type: PowerType, new_voltage: float, new_current: float
+    ) -> None:
         """Update the calibrated power data.
 
         Parameters
@@ -342,7 +351,9 @@ class UtilityMonitor(object):
 
         self._update_power(power, new_voltage, new_current, signal_name)
 
-    def _update_power(self, power, new_voltage, new_current, signal_name):
+    def _update_power(
+        self, power: dict, new_voltage: float, new_current: float, signal_name: str
+    ) -> None:
         """Update the power data.
 
         Parameters
@@ -368,7 +379,12 @@ class UtilityMonitor(object):
                 (power["voltage"], power["current"])
             )
 
-    def _has_changed(self, value_old, value_new, tol):
+    def _has_changed(
+        self,
+        value_old: float | numpy.typing.NDArray[np.float64],
+        value_new: float | numpy.typing.NDArray[np.float64],
+        tol: float,
+    ) -> bool:
         """The value has changed or not based on the tolerance.
 
         If the input values are arrays, compare the maximum change in arrays
@@ -391,7 +407,9 @@ class UtilityMonitor(object):
 
         return np.max(np.abs(value_old - value_new)) >= tol
 
-    def update_power_raw(self, power_type, new_voltage, new_current):
+    def update_power_raw(
+        self, power_type: PowerType, new_voltage: float, new_current: float
+    ) -> None:
         """Update the raw power data.
 
         Parameters
@@ -421,8 +439,11 @@ class UtilityMonitor(object):
         self._update_power(power, new_voltage, new_current, signal_name)
 
     def update_inclinometer_angle(
-        self, new_angle, new_angle_processed=None, is_internal=True
-    ):
+        self,
+        new_angle: float,
+        new_angle_processed: float | None = None,
+        is_internal: bool = True,
+    ) -> None:
         """Update the angle of inclinometer.
 
         Parameters
@@ -460,14 +481,14 @@ class UtilityMonitor(object):
             else:
                 self.inclinometer_angle_tma = angle_rounded
 
-    def update_breaker(self, name, new_status):
+    def update_breaker(self, name: str, new_status: bool) -> None:
         """Update the breaker status.
 
         Parameters
         ----------
         name : `str`
             Breaker name, which is in the keys of self.breakers.
-        new_status : `float`
+        new_status : `bool`
             New status of breaker. If the breake is triggered, put True,
             otherwise, False.
         """
@@ -476,7 +497,7 @@ class UtilityMonitor(object):
             self.breakers[name] = new_status
             self.signal_utility.breaker_status.emit((name, new_status))
 
-    def reset_breakers(self, power_type):
+    def reset_breakers(self, power_type: PowerType) -> None:
         """Reset the breakers.
 
         Parameters
@@ -489,7 +510,7 @@ class UtilityMonitor(object):
         for breaker in breakers:
             self.update_breaker(breaker, False)
 
-    def get_breakers(self, power_type):
+    def get_breakers(self, power_type: PowerType) -> typing.List[str]:
         """Get the breakers of the specific power type.
 
         Parameters
@@ -511,6 +532,10 @@ class UtilityMonitor(object):
         breakers = list()
         for breaker in self.breakers.keys():
             result = re.match(r"\AJ\d-W(\d+)-\d", breaker)
+
+            # Workaround of the mypy checking
+            assert result is not None
+
             value = int(result.groups()[0])
 
             if value in breaker_range:
@@ -518,7 +543,9 @@ class UtilityMonitor(object):
 
         return breakers
 
-    def update_temperature(self, temperature_group, new_temperatures):
+    def update_temperature(
+        self, temperature_group: TemperatureGroup, new_temperatures: typing.List[float]
+    ) -> None:
         """Update the temperature data.
 
         This function assumes the temperature's fluctuation is usually
@@ -544,8 +571,14 @@ class UtilityMonitor(object):
         )
 
     def _update_sensors(
-        self, sensors, new_values, num_digit_after_decimal, data, signal, signal_item
-    ):
+        self,
+        sensors: typing.List[str],
+        new_values: typing.List[float],
+        num_digit_after_decimal: int,
+        data: dict,
+        signal: Signal,
+        signal_item: typing.Any,
+    ) -> None:
         """Update the sensor data.
 
         Parameters
@@ -561,7 +594,7 @@ class UtilityMonitor(object):
             Sensor data.
         signal : `PySide2.QtCore.Signal`
             Signal in QT framework.
-        signal_item :
+        signal_item : `any`
             Item used in the signal's message.
 
         Raises
@@ -593,7 +626,11 @@ class UtilityMonitor(object):
 
             signal.emit((signal_item, values_updated))
 
-    def update_displacements(self, direction, new_displacements):
+    def update_displacements(
+        self,
+        direction: DisplacementSensorDirection,
+        new_displacements: typing.List[float],
+    ) -> None:
         """Update the displacement sensor data.
 
         This function assumes the mirror's movement is usually in a specific
@@ -618,7 +655,7 @@ class UtilityMonitor(object):
             direction,
         )
 
-    def update_digital_status_input(self, new_status):
+    def update_digital_status_input(self, new_status: int) -> None:
         """Update the digital input status (32 bits).
 
         Parameters
@@ -633,7 +670,7 @@ class UtilityMonitor(object):
             value_update = self._process_digital_status_input(new_status)
             self.signal_utility.digital_status_input.emit(value_update)
 
-    def _process_digital_status_input(self, value):
+    def _process_digital_status_input(self, value: int) -> int:
         """Process the digital input status.
 
         This is based on the Model.processPowerStatusTelemetry.vi in ts_mtm2.
@@ -656,7 +693,7 @@ class UtilityMonitor(object):
 
         return value_update
 
-    def update_digital_status_output(self, new_status):
+    def update_digital_status_output(self, new_status: int) -> None:
         """Update the digital output status (8 bits).
 
         Parameters
@@ -669,7 +706,9 @@ class UtilityMonitor(object):
             self.digital_status_output = int(new_status)
             self.signal_utility.digital_status_output.emit(self.digital_status_output)
 
-    def update_hard_points(self, axial, tangent):
+    def update_hard_points(
+        self, axial: typing.List[int], tangent: typing.List[int]
+    ) -> None:
         """Update the hard points.
 
         Parameters
@@ -699,7 +738,7 @@ class UtilityMonitor(object):
             self.hard_points["axial"] + self.hard_points["tangent"]
         )
 
-    def update_forces(self, actuator_force):
+    def update_forces(self, actuator_force: ActuatorForce) -> None:
         """Update the forces.
 
         Parameters
@@ -727,7 +766,9 @@ class UtilityMonitor(object):
             self.forces = actuator_force
             self.signal_detailed_force.forces.emit(self.forces)
 
-    def update_force_error_tangent(self, force_error_tangent):
+    def update_force_error_tangent(
+        self, force_error_tangent: ForceErrorTangent
+    ) -> None:
         """Update the tangential force error that monitors the supporting
         force of mirror.
 
@@ -761,7 +802,9 @@ class UtilityMonitor(object):
                 self.force_error_tangent
             )
 
-    def update_position(self, x, y, z, rx, ry, rz):
+    def update_position(
+        self, x: float, y: float, z: float, rx: float, ry: float, rz: float
+    ) -> None:
         """Update the position of rigid body.
 
         Parameters

@@ -21,12 +21,24 @@
 
 __all__ = ["TabDiagnostics"]
 
+import typing
+
 from lsst.ts.m2com import NUM_TANGENT_LINK
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QFormLayout, QHBoxLayout, QVBoxLayout
+from PySide2.QtWidgets import (
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+)
 from qasync import asyncSlot
 
+from ..force_error_tangent import ForceErrorTangent
+from ..model import Model
+from ..signals import SignalDetailedForce, SignalUtility
 from ..utils import create_group_box, create_label, run_command, set_button
 from ..widget import QMessageBoxAsync
 from . import TabDefault
@@ -48,7 +60,7 @@ class TabDiagnostics(TabDefault):
         Model class.
     """
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # Utility data
@@ -88,7 +100,7 @@ class TabDiagnostics(TabDefault):
             self.model.utility_monitor.signal_detailed_force
         )
 
-    def _create_labels_power(self):
+    def _create_labels_power(self) -> typing.Dict[str, QLabel]:
         """Create the labels of power.
 
         Returns
@@ -105,7 +117,7 @@ class TabDiagnostics(TabDefault):
         }
 
     @asyncSlot()
-    async def _callback_reboot_controller(self):
+    async def _callback_reboot_controller(self) -> None:
         """Callback of the reboot-cell-controller button. This will ask the
         user to confirm this command again."""
 
@@ -124,7 +136,9 @@ class TabDiagnostics(TabDefault):
         if decision == QMessageBoxAsync.Ok:
             await run_command(self.model.reboot_controller)
 
-    def _create_indicators_digital_status(self, list_digital_status):
+    def _create_indicators_digital_status(
+        self, list_digital_status: list
+    ) -> typing.List[QPushButton]:
         """Create the indicators of digital status.
 
         Parameters
@@ -147,7 +161,9 @@ class TabDiagnostics(TabDefault):
 
         return indicators_status
 
-    def _update_indicator_color(self, indicator, is_triggered):
+    def _update_indicator_color(
+        self, indicator: QPushButton, is_triggered: bool
+    ) -> None:
         """Update the color of indicator.
 
         Parameters
@@ -167,7 +183,7 @@ class TabDiagnostics(TabDefault):
 
         indicator.setPalette(palette)
 
-    def _get_list_digital_status_input(self):
+    def _get_list_digital_status_input(self) -> list:
         """Get the list of digital input status from the bit 0 to 31.
 
         Returns
@@ -211,7 +227,7 @@ class TabDiagnostics(TabDefault):
             "Interlock Power Replay On",
         ]
 
-    def _get_list_digital_status_output(self):
+    def _get_list_digital_status_output(self) -> list:
         """Get the list of digital output status from the bit 0 to 7.
 
         Returns
@@ -230,7 +246,7 @@ class TabDiagnostics(TabDefault):
             "Spare Output 7",
         ]
 
-    def _create_controls_digital_status(self, number):
+    def _create_controls_digital_status(self, number: int) -> typing.List[QPushButton]:
         """Create the controls of digital status.
 
         Parameters
@@ -256,7 +272,7 @@ class TabDiagnostics(TabDefault):
         return controls
 
     @asyncSlot()
-    async def _callback_control_digital_status(self, idx):
+    async def _callback_control_digital_status(self, idx: int) -> None:
         """Callback of the digital-status-control button.
 
         This allows the user to command individual binary signals to the cell
@@ -279,7 +295,7 @@ class TabDiagnostics(TabDefault):
         else:
             control.setChecked(not is_checked)
 
-    def _update_control_text(self, control, is_checked):
+    def _update_control_text(self, control: QPushButton, is_checked: bool) -> None:
         """Update the text of control.
 
         Parameters
@@ -295,7 +311,7 @@ class TabDiagnostics(TabDefault):
         else:
             control.setText("OFF")
 
-    def _set_widget_and_layout(self):
+    def _set_widget_and_layout(self) -> None:
         """Set the widget and layout."""
 
         widget = self.widget()
@@ -306,7 +322,7 @@ class TabDiagnostics(TabDefault):
 
         self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
 
-    def _create_layout(self):
+    def _create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns
@@ -367,7 +383,7 @@ class TabDiagnostics(TabDefault):
 
         return layout
 
-    def _create_group_power_motor(self):
+    def _create_group_power_motor(self) -> QGroupBox:
         """Create the group of motor power.
 
         Returns
@@ -392,7 +408,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Motor Power", layout)
 
-    def _create_group_power_communication(self):
+    def _create_group_power_communication(self) -> QGroupBox:
         """Create the group of communication power.
 
         Returns
@@ -419,7 +435,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Communication Power", layout)
 
-    def _create_group_force_error_load(self):
+    def _create_group_force_error_load(self) -> QGroupBox:
         """Create the group of force error of individual load link.
 
         Returns
@@ -437,7 +453,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Individual Tangent Weight Error", layout)
 
-    def _create_group_force_error_non_load(self):
+    def _create_group_force_error_non_load(self) -> QGroupBox:
         """Create the group of force error of non-load link.
 
         Returns
@@ -453,7 +469,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Non-load Bearing Tangent Error", layout)
 
-    def _create_group_force_error_total(self):
+    def _create_group_force_error_total(self) -> QGroupBox:
         """Create the group of total force error.
 
         Returns
@@ -469,7 +485,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Summary of Tangent Force Error", layout)
 
-    def _create_group_digital_status_output(self):
+    def _create_group_digital_status_output(self) -> QGroupBox:
         """Create the group of digital output status.
 
         Returns
@@ -485,7 +501,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Digital Output Status", layout)
 
-    def _create_group_digital_status_control(self):
+    def _create_group_digital_status_control(self) -> QGroupBox:
         """Create the group of control of digital status.
 
         Returns
@@ -501,7 +517,9 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Digital Output Controls", layout)
 
-    def _create_group_digital_status_input(self, idx_start, idx_end, group_name):
+    def _create_group_digital_status_input(
+        self, idx_start: int, idx_end: int, group_name: str
+    ) -> QGroupBox:
         """Create the group of digital input status.
 
         Parameters
@@ -528,7 +546,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box(group_name, layout)
 
-    def _set_signal_utility(self, signal_utility):
+    def _set_signal_utility(self, signal_utility: SignalUtility) -> None:
         """Set the utility signal with callback functions.
 
         Parameters
@@ -555,7 +573,7 @@ class TabDiagnostics(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_power_motor_calibrated(self, power_motor):
+    async def _callback_power_motor_calibrated(self, power_motor: tuple) -> None:
         """Callback of the utility signal for the calibrated motor power.
 
         Parameters
@@ -567,7 +585,9 @@ class TabDiagnostics(TabDefault):
 
         self._update_power_motor(self._power_calibrated, power_motor[0], power_motor[1])
 
-    def _update_power_motor(self, power, voltage, current):
+    def _update_power_motor(
+        self, power: typing.Dict[str, QLabel], voltage: float, current: float
+    ) -> None:
         """Update the power of motor.
 
         Parameters
@@ -584,7 +604,9 @@ class TabDiagnostics(TabDefault):
         power["power_current_motor"].setText(f"{current} A")
 
     @asyncSlot()
-    async def _callback_power_communication_calibrated(self, power_communication):
+    async def _callback_power_communication_calibrated(
+        self, power_communication: tuple
+    ) -> None:
         """Callback of the utility signal for the communication power.
 
         Parameters
@@ -598,7 +620,9 @@ class TabDiagnostics(TabDefault):
             self._power_calibrated, power_communication[0], power_communication[1]
         )
 
-    def _update_power_communication(self, power, voltage, current):
+    def _update_power_communication(
+        self, power: typing.Dict[str, QLabel], voltage: float, current: float
+    ) -> None:
         """Update the power of communication.
 
         Parameters
@@ -615,7 +639,7 @@ class TabDiagnostics(TabDefault):
         power["power_current_communication"].setText(f"{current} A")
 
     @asyncSlot()
-    async def _callback_power_motor_raw(self, power_motor):
+    async def _callback_power_motor_raw(self, power_motor: tuple) -> None:
         """Callback of the utility signal for the raw motor power.
 
         Parameters
@@ -628,7 +652,9 @@ class TabDiagnostics(TabDefault):
         self._update_power_motor(self._power_raw, power_motor[0], power_motor[1])
 
     @asyncSlot()
-    async def _callback_power_communication_raw(self, power_communication):
+    async def _callback_power_communication_raw(
+        self, power_communication: tuple
+    ) -> None:
         """Callback of the utility signal for the raw communication power.
 
         Parameters
@@ -643,7 +669,7 @@ class TabDiagnostics(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_digital_status_input(self, digital_status_input):
+    async def _callback_digital_status_input(self, digital_status_input: int) -> None:
         """Callback of the utility signal for the digital input status.
 
         Parameters
@@ -655,8 +681,11 @@ class TabDiagnostics(TabDefault):
         self._decode_digital_status(self._digital_status_input, digital_status_input)
 
     def _decode_digital_status(
-        self, indicators, digital_status, is_digital_status_output=False
-    ):
+        self,
+        indicators: typing.List[QPushButton],
+        digital_status: int,
+        is_digital_status_output: bool = False,
+    ) -> None:
         """Decode the digital status and update the related label.
 
         Parameters
@@ -680,7 +709,7 @@ class TabDiagnostics(TabDefault):
                 self._update_control_text(control, is_bit_on)
 
     @asyncSlot()
-    async def _callback_digital_status_output(self, digital_status_output):
+    async def _callback_digital_status_output(self, digital_status_output: int) -> None:
         """Callback of the utility signal for the digital output status.
 
         Parameters
@@ -695,7 +724,9 @@ class TabDiagnostics(TabDefault):
             is_digital_status_output=True,
         )
 
-    def _set_signal_detailed_force(self, signal_detailed_force):
+    def _set_signal_detailed_force(
+        self, signal_detailed_force: SignalDetailedForce
+    ) -> None:
         """Set the detailed force signal with callback function.
 
         Parameters
@@ -708,7 +739,9 @@ class TabDiagnostics(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_force_error_tangent(self, force_error_tangent):
+    async def _callback_force_error_tangent(
+        self, force_error_tangent: ForceErrorTangent
+    ) -> None:
         """Callback of the detailed force signal for tangential force error
         that monitors the supporting force of mirror.
 

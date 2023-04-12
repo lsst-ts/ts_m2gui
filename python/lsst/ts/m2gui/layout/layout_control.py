@@ -25,6 +25,7 @@ from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
+from ..model import Model
 from ..utils import run_command, set_button
 from . import LayoutDefault
 
@@ -45,42 +46,39 @@ class LayoutControl(LayoutDefault):
         Layout.
     """
 
-    def __init__(self, model):
+    def __init__(self, model: Model):
         # Remote button
-        self._button_remote = None
-
-        # Local button
-        self._button_local = None
-
-        super().__init__(model)
-
-    @asyncSlot()
-    async def _callback_signal_control(self, is_control_updated):
-        if self.model.local_mode == LocalMode.Standby:
-            self._update_buttons()
-        else:
-            self._prohibit_control()
-
-    def _update_buttons(self):
-        """Update the buttons."""
-        self._button_remote.setEnabled(not self.model.is_csc_commander)
-        self._button_local.setEnabled(self.model.is_csc_commander)
-
-    def _prohibit_control(self):
-        """Prohibit the control."""
-        self._button_remote.setEnabled(False)
-        self._button_local.setEnabled(False)
-
-    def _set_layout(self):
         self._button_remote = set_button(
             "Remote",
             self._callback_remote,
             tool_tip="Remote control mode by commandable SAL component",
         )
+
+        # Local button
         self._button_local = set_button(
             "Local", self._callback_local, tool_tip="Local control mode by engineer"
         )
 
+        super().__init__(model)
+
+    @asyncSlot()
+    async def _callback_signal_control(self, is_control_updated: bool) -> None:
+        if self.model.local_mode == LocalMode.Standby:
+            self._update_buttons()
+        else:
+            self._prohibit_control()
+
+    def _update_buttons(self) -> None:
+        """Update the buttons."""
+        self._button_remote.setEnabled(not self.model.is_csc_commander)
+        self._button_local.setEnabled(self.model.is_csc_commander)
+
+    def _prohibit_control(self) -> None:
+        """Prohibit the control."""
+        self._button_remote.setEnabled(False)
+        self._button_local.setEnabled(False)
+
+    def _set_layout(self) -> QVBoxLayout:
         layout = QVBoxLayout()
         layout.addWidget(self._button_remote)
         layout.addWidget(self._button_local)
@@ -88,18 +86,18 @@ class LayoutControl(LayoutDefault):
         return layout
 
     @asyncSlot()
-    async def _callback_remote(self):
+    async def _callback_remote(self) -> None:
         """Callback of the remote button. The commander will be the commandable
         SAL component (CSC)"""
         await self.set_csc_commander(True)
 
     @asyncSlot()
-    async def _callback_local(self):
+    async def _callback_local(self) -> None:
         """Callback of the local button. The commander will be the graphical
         use interface (GUI)."""
         await self.set_csc_commander(False)
 
-    async def set_csc_commander(self, is_commander):
+    async def set_csc_commander(self, is_commander: bool) -> None:
         """Set the commandable SAL component (CSC) as the commander.
 
         If CSC is the commander, graphical user interface (GUI) can not

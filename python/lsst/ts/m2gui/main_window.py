@@ -29,7 +29,7 @@ from datetime import datetime
 from lsst.ts.m2com import read_yaml_file
 from lsst.ts.tcpip import LOCALHOST_IPV4
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
+from PySide2.QtWidgets import QAction, QMainWindow, QToolBar, QVBoxLayout, QWidget
 from qasync import QApplication, asyncSlot
 
 from . import (
@@ -75,13 +75,13 @@ class MainWindow(QMainWindow):
 
     def __init__(
         self,
-        is_output_log_to_file,
-        is_output_log_on_screen,
-        is_simulation_mode,
-        is_crio_simulator=False,
-        log=None,
-        log_level=logging.WARN,
-    ):
+        is_output_log_to_file: bool,
+        is_output_log_on_screen: bool,
+        is_simulation_mode: bool,
+        is_crio_simulator: bool = False,
+        log: logging.Logger | None = None,
+        log_level: int = logging.WARN,
+    ) -> None:
         super().__init__()
 
         # Signal of message
@@ -140,12 +140,12 @@ class MainWindow(QMainWindow):
 
     def _set_log(
         self,
-        message_format,
-        is_output_log_to_file,
-        is_output_log_on_screen,
-        level,
-        log=None,
-    ):
+        message_format: str,
+        is_output_log_to_file: bool,
+        is_output_log_on_screen: bool,
+        level: int,
+        log: logging.Logger | None = None,
+    ) -> logging.Logger:
         """Set the logger.
 
         Parameters
@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
 
         return log
 
-    def _get_log_file_name(self):
+    def _get_log_file_name(self) -> pathlib.Path:
         """Get the log file name.
 
         Returns
@@ -206,7 +206,7 @@ class MainWindow(QMainWindow):
             pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "log" / name
         )
 
-    def _set_model(self, is_simulation_mode, is_crio_simulator):
+    def _set_model(self, is_simulation_mode: bool, is_crio_simulator: bool) -> Model:
         """Set the model.
 
         Parameters
@@ -250,7 +250,7 @@ class MainWindow(QMainWindow):
 
         return model
 
-    def _set_control_tabs(self):
+    def _set_control_tabs(self) -> None:
         """Set the control tables"""
 
         self._set_tab_overview()
@@ -258,22 +258,30 @@ class MainWindow(QMainWindow):
         self._set_tab_cell_status()
         self._set_tab_ilc_status()
 
-    def _set_tab_overview(self):
+    def _set_tab_overview(self) -> None:
         """Set the table of overview."""
 
         tab_overview = self._control_tabs.get_tab("Overview")[1]
+
+        # Workaround of the mypy checking
+        assert tab_overview is not None
+
         tab_overview.set_signal_control(self.model.signal_control)
         tab_overview.set_signal_message(self._signal_message)
 
-    def _set_tab_alarm_warn(self):
+    def _set_tab_alarm_warn(self) -> None:
         """Set the table of alarms and warnings."""
 
         filepath = self._get_policy_dir() / "error_code_m2.tsv"
 
         tab_alarm_warn = self._control_tabs.get_tab("Alarms/Warnings")[1]
+
+        # Workaround of the mypy checking
+        assert tab_alarm_warn is not None
+
         tab_alarm_warn.read_error_list_file(filepath)
 
-    def _get_policy_dir(self):
+    def _get_policy_dir(self) -> pathlib.Path:
         """Get the policy directory.
 
         Returns
@@ -284,23 +292,31 @@ class MainWindow(QMainWindow):
 
         return pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "policy"
 
-    def _set_tab_cell_status(self):
+    def _set_tab_cell_status(self) -> None:
         """Set the table of cell status."""
 
         filepath = self._get_policy_dir() / "cell_geometry.yaml"
 
         tab_cell_status = self._control_tabs.get_tab("Cell Status")[1]
+
+        # Workaround of the mypy checking
+        assert tab_cell_status is not None
+
         tab_cell_status.read_cell_geometry_file(filepath)
 
-    def _set_tab_ilc_status(self):
+    def _set_tab_ilc_status(self) -> None:
         """Set the table of inner-loop controller (ILC) status."""
 
         filepath = self._get_policy_dir() / "ilc_details.yaml"
 
         tab_ilc_status = self._control_tabs.get_tab("ILC Status")[1]
+
+        # Workaround of the mypy checking
+        assert tab_ilc_status is not None
+
         tab_ilc_status.read_ilc_details_file(filepath)
 
-    def _create_layout(self):
+    def _create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
@@ -323,7 +339,7 @@ class MainWindow(QMainWindow):
 
         return layout
 
-    def _add_tool_bar(self):
+    def _add_tool_bar(self) -> None:
         """Add the tool bar."""
 
         tool_bar = self.addToolBar("ToolBar")
@@ -343,7 +359,7 @@ class MainWindow(QMainWindow):
         action_settings.setToolTip("Show the application settings")
 
     @asyncSlot()
-    async def _callback_exit(self):
+    async def _callback_exit(self) -> None:
         """Exit the application.
 
         The 'exit' action will be disabled during the call. If the user cancels
@@ -377,7 +393,7 @@ class MainWindow(QMainWindow):
 
         action_exit.setEnabled(True)
 
-    def _get_action(self, name):
+    def _get_action(self, name: str) -> QAction:
         """Get the action.
 
         Parameters
@@ -394,7 +410,7 @@ class MainWindow(QMainWindow):
         tool_bar = self.findChildren(QToolBar)[0]
         return get_button_action(tool_bar, name)
 
-    def _create_dialog_exit(self):
+    def _create_dialog_exit(self) -> QMessageBoxAsync:
         """Create the exit dialog.
 
         Returns
@@ -421,7 +437,7 @@ class MainWindow(QMainWindow):
         return dialog
 
     @asyncSlot()
-    async def _callback_connect(self):
+    async def _callback_connect(self) -> None:
         """Callback function to connect to the M2 controller.
 
         Disable the 'connect' action, open the connection and re-enable the
@@ -441,7 +457,7 @@ class MainWindow(QMainWindow):
         action_connect.setEnabled(True)
 
     @asyncSlot()
-    async def _callback_disconnect(self):
+    async def _callback_disconnect(self) -> None:
         """Callback function to disconnect from the M2 controller.
 
         The 'connect', 'disconnect' and 'exit' actions wiil be disabled before
@@ -467,11 +483,11 @@ class MainWindow(QMainWindow):
         action_exit.setEnabled(True)
 
     @asyncSlot()
-    async def _callback_settings(self):
+    async def _callback_settings(self) -> None:
         """Callback function to show the settings."""
         self._tab_settings.show()
 
-    def _set_default(self):
+    def _set_default(self) -> None:
         """Set the default condition."""
 
         self.model.report_config()
