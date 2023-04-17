@@ -22,7 +22,6 @@
 __all__ = ["TabAlarmWarn"]
 
 import csv
-import typing
 from pathlib import Path
 
 from lsst.ts.m2com import LimitSwitchType
@@ -68,7 +67,7 @@ class TabAlarmWarn(TabDefault):
         super().__init__(title, model)
 
         # List of the errors
-        self._error_list: typing.Dict = dict()
+        self._error_list: dict = dict()
 
         # Table of the errors
         self._table_error = self._create_table_error()
@@ -154,7 +153,7 @@ class TabAlarmWarn(TabDefault):
 
     def _create_indicators_limit_switch(
         self, limit_switch_type: LimitSwitchType
-    ) -> typing.Dict[str, QPushButton]:
+    ) -> dict[str, QPushButton]:
         """Creates indicators for limit switches.
 
         Parameters

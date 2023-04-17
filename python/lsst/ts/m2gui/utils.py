@@ -118,7 +118,7 @@ def set_button(
 
 
 def create_grid_layout_buttons(
-    buttons: typing.Dict[str, QPushButton] | typing.List[QPushButton], num_column: int
+    buttons: dict[str, QPushButton] | list[QPushButton], num_column: int
 ) -> QGridLayout:
     """Create the grid layout of buttons.
 
@@ -216,7 +216,7 @@ def create_group_box(name: str, layout: QtWidgets) -> QGroupBox:
 
 
 def create_table(
-    header_text: typing.List[str], is_disabled_selection: bool = False
+    header_text: list[str], is_disabled_selection: bool = False
 ) -> QTableWidget:
     """Create the table.
 
@@ -294,7 +294,7 @@ def get_num_actuator_ring(ring: Ring) -> int:
         raise ValueError(f"Not supported ring: {ring!r}")
 
 
-def map_actuator_id_to_alias(actuator_id: int) -> typing.Tuple[Ring, int]:
+def map_actuator_id_to_alias(actuator_id: int) -> tuple[Ring, int]:
     """Map the actuator ID to the alias.
 
     Parameters
@@ -366,7 +366,7 @@ async def run_command(
     command: typing.Callable | typing.Coroutine,
     *args: typing.Any,
     is_prompted: bool = True,
-    **kwargs: typing.Dict[str, typing.Any],
+    **kwargs: dict[str, typing.Any],
 ) -> bool:
     """Run the command, which can be a normal function or a coroutine.
 

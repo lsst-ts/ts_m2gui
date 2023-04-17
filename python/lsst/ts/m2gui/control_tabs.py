@@ -21,8 +21,6 @@
 
 __all__ = ["ControlTabs"]
 
-import typing
-
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout
 from qasync import asyncSlot
@@ -59,7 +57,7 @@ class ControlTabs(object):
 
     def __init__(self, model: Model) -> None:
         # List of the control tables
-        self._tabs: typing.List[TabDefault] = list()
+        self._tabs: list[TabDefault] = list()
 
         # Widget to have the list of control tables
         self._list_widget = QListWidget()
@@ -129,9 +127,7 @@ class ControlTabs(object):
         if control_tab is not None:
             control_tab.show()
 
-    def get_tab(
-        self, name: str
-    ) -> typing.Tuple[QListWidgetItem | None, TabDefault | None]:
+    def get_tab(self, name: str) -> tuple[QListWidgetItem | None, TabDefault | None]:
         """Get the table.
 
         Parameters

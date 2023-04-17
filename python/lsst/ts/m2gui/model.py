@@ -161,7 +161,7 @@ class Model(object):
 
         self.duration_refresh = 100
 
-    def _set_system_status(self) -> typing.Dict[str, bool]:
+    def _set_system_status(self) -> dict[str, bool]:
         """Set the default system status.
 
         Returns
@@ -198,7 +198,7 @@ class Model(object):
             Collection of default actuator status.
         """
 
-        collection: typing.Dict = dict()
+        collection: dict = dict()
         collection = self._set_actuator_default_status_specific_ring(
             Ring.B, collection, status
         )
@@ -335,7 +335,7 @@ class Model(object):
                 f"{status_name} not in the {list(self.system_status.keys())}."
             )
 
-    def report_config(self, **kwargs: typing.Dict[str, typing.Any]) -> Config:
+    def report_config(self, **kwargs: dict[str, typing.Any]) -> Config:
         """Report the configuration defined in `Config` class.
 
         Parameters
@@ -522,7 +522,7 @@ class Model(object):
     async def command_actuator(
         self,
         command: CommandActuator,
-        actuators: typing.List[int] | None = None,
+        actuators: list[int] | None = None,
         target_displacement: float | int = 0,
         unit: ActuatorDisplacementUnit = ActuatorDisplacementUnit.Millimeter,
     ) -> None:
@@ -860,7 +860,7 @@ class Model(object):
             )
 
     def _report_triggered_limit_switch(
-        self, limit_switch_type: LimitSwitchType, limit_switches: typing.List[int]
+        self, limit_switch_type: LimitSwitchType, limit_switches: list[int]
     ) -> None:
         """Report the triggered limit switch.
 

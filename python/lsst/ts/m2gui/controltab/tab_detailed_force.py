@@ -21,8 +21,6 @@
 
 __all__ = ["TabDetailedForce"]
 
-import typing
-
 from lsst.ts.m2com import NUM_ACTUATOR
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
@@ -99,7 +97,7 @@ class TabDetailedForce(TabDefault):
             self.model.utility_monitor.signal_detailed_force
         )
 
-    def _create_items_force(self) -> typing.Dict[str, typing.List[QTableWidgetItem]]:
+    def _create_items_force(self) -> dict[str, list[QTableWidgetItem]]:
         """Create the items of force.
 
         Returns
@@ -285,7 +283,7 @@ class TabDetailedForce(TabDefault):
         signal_detailed_force.forces.connect(self._callback_forces)
 
     @asyncSlot()
-    async def _callback_hard_points(self, hard_points: typing.List[int]) -> None:
+    async def _callback_hard_points(self, hard_points: list[int]) -> None:
         """Callback of the hard points (axial and tangential directions).
 
         Parameters

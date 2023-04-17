@@ -21,8 +21,6 @@
 
 __all__ = ["TabOverview"]
 
-import typing
-
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette
 from PySide2.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
@@ -75,7 +73,7 @@ class TabOverview(TabDefault):
 
         self._set_signal_status(self.model.signal_status)
 
-    def _set_indicators_status(self) -> typing.Dict[str, QPushButton]:
+    def _set_indicators_status(self) -> dict[str, QPushButton]:
         """Set the indicators of system status.
 
         Returns

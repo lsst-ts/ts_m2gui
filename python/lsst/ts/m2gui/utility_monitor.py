@@ -273,9 +273,7 @@ class UtilityMonitor(object):
         self.signal_detailed_force.forces.emit(self.forces)
         self.signal_detailed_force.force_error_tangent.emit(self.force_error_tangent)
 
-    def get_temperature_sensors(
-        self, temperature_group: TemperatureGroup
-    ) -> typing.List[str]:
+    def get_temperature_sensors(self, temperature_group: TemperatureGroup) -> list[str]:
         """Get the temperature sensors in a specific group.
 
         Parameters
@@ -298,7 +296,7 @@ class UtilityMonitor(object):
 
     def get_displacement_sensors(
         self, direction: DisplacementSensorDirection
-    ) -> typing.List[str]:
+    ) -> list[str]:
         """Get the displacement sensors in a specific direction.
 
         Parameters
@@ -510,7 +508,7 @@ class UtilityMonitor(object):
         for breaker in breakers:
             self.update_breaker(breaker, False)
 
-    def get_breakers(self, power_type: PowerType) -> typing.List[str]:
+    def get_breakers(self, power_type: PowerType) -> list[str]:
         """Get the breakers of the specific power type.
 
         Parameters
@@ -544,7 +542,7 @@ class UtilityMonitor(object):
         return breakers
 
     def update_temperature(
-        self, temperature_group: TemperatureGroup, new_temperatures: typing.List[float]
+        self, temperature_group: TemperatureGroup, new_temperatures: list[float]
     ) -> None:
         """Update the temperature data.
 
@@ -572,8 +570,8 @@ class UtilityMonitor(object):
 
     def _update_sensors(
         self,
-        sensors: typing.List[str],
-        new_values: typing.List[float],
+        sensors: list[str],
+        new_values: list[float],
         num_digit_after_decimal: int,
         data: dict,
         signal: Signal,
@@ -629,7 +627,7 @@ class UtilityMonitor(object):
     def update_displacements(
         self,
         direction: DisplacementSensorDirection,
-        new_displacements: typing.List[float],
+        new_displacements: list[float],
     ) -> None:
         """Update the displacement sensor data.
 
@@ -706,9 +704,7 @@ class UtilityMonitor(object):
             self.digital_status_output = int(new_status)
             self.signal_utility.digital_status_output.emit(self.digital_status_output)
 
-    def update_hard_points(
-        self, axial: typing.List[int], tangent: typing.List[int]
-    ) -> None:
+    def update_hard_points(self, axial: list[int], tangent: list[int]) -> None:
         """Update the hard points.
 
         Parameters

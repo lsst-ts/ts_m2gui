@@ -21,8 +21,6 @@
 
 __all__ = ["TabRigidBodyPos"]
 
-import typing
-
 from PySide2.QtWidgets import (
     QDoubleSpinBox,
     QFormLayout,
@@ -107,7 +105,7 @@ class TabRigidBodyPos(TabDefault):
 
         self._set_signal_position(self.model.utility_monitor.signal_position)
 
-    def _set_target_position(self) -> typing.Dict[str, QDoubleSpinBox]:
+    def _set_target_position(self) -> dict[str, QDoubleSpinBox]:
         """Set the target position of rigid body.
 
         Returns
@@ -174,7 +172,7 @@ class TabRigidBodyPos(TabDefault):
 
     @asyncSlot()
     async def _callback_clear_values(
-        self, target_positions: typing.Dict[str, QDoubleSpinBox]
+        self, target_positions: dict[str, QDoubleSpinBox]
     ) -> None:
         """Callback of the clear-values button. This will clear the values of
         new target positions.
@@ -203,7 +201,7 @@ class TabRigidBodyPos(TabDefault):
             self._target_position_absolute["rz"].value(),
         )
 
-    def _set_position(self) -> typing.Dict[str, QLabel]:
+    def _set_position(self) -> dict[str, QLabel]:
         """Set the position of rigid body.
 
         Returns

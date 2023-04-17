@@ -21,7 +21,6 @@
 
 __all__ = ["TabIlcStatus"]
 
-import typing
 from pathlib import Path
 
 from lsst.ts.m2com import (
@@ -78,7 +77,7 @@ class TabIlcStatus(TabDefault):
         # Set the callback of signal
         self._set_signal_ilc_status(self.model.signal_ilc_status)
 
-    def _create_indicators_ilc(self, number: int) -> typing.List[QPushButton]:
+    def _create_indicators_ilc(self, number: int) -> list[QPushButton]:
         """Creates indicators for the inner-loop controller (ILC).
 
         Parameters
@@ -231,7 +230,7 @@ class TabIlcStatus(TabDefault):
         return label
 
     def _create_group_grid_layout(
-        self, name: str, indicators: typing.List[QPushButton], num_column: int
+        self, name: str, indicators: list[QPushButton], num_column: int
     ) -> QGroupBox:
         """Create the group of grid layout.
 

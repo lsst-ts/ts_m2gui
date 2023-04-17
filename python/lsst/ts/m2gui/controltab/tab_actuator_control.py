@@ -21,7 +21,6 @@
 
 __all__ = ["TabActuatorControl"]
 
-import typing
 from pathlib import Path
 
 import numpy as np
@@ -310,7 +309,7 @@ class TabActuatorControl(TabDefault):
     @asyncSlot()
     async def _callback_actuator_start(
         self,
-    ) -> typing.Tuple[list, float | int, ActuatorDisplacementUnit]:
+    ) -> tuple[list, float | int, ActuatorDisplacementUnit]:
         """Callback of the start button in actuator control. The cell
         controller will start to move the actuators.
 

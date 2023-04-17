@@ -21,8 +21,6 @@
 
 __all__ = ["FigureConstant"]
 
-import typing
-
 import numpy as np
 from PySide2.QtCharts import QtCharts
 from PySide2.QtCore import QPointF, Qt
@@ -82,7 +80,7 @@ class FigureConstant(QtCharts.QChartView):
         title_x: str,
         title_y: str,
         title_figure: str,
-        legends: typing.List[str],
+        legends: list[str],
         num_lines: int = 1,
         is_realtime: bool = False,
     ) -> None:
@@ -147,7 +145,7 @@ class FigureConstant(QtCharts.QChartView):
         range_x_min: float | int,
         range_x_max: float | int,
         num_lines: int,
-        text_legends: typing.List[str],
+        text_legends: list[str],
     ) -> None:
         """Set the default series.
 
@@ -187,7 +185,7 @@ class FigureConstant(QtCharts.QChartView):
         if not is_set_legend:
             chart.legend().hide()
 
-    def get_points(self, idx: int) -> typing.List[QPointF]:
+    def get_points(self, idx: int) -> list[QPointF]:
         """Get the points.
 
         Parameters
@@ -312,7 +310,7 @@ class FigureConstant(QtCharts.QChartView):
         self._value_y_max = max(values)
         self._update_range_axis_y(threshold=1)
 
-    def _get_range_points(self, idx: int) -> typing.Tuple[float, float]:
+    def _get_range_points(self, idx: int) -> tuple[float, float]:
         """Get the range of points in a specific series.
 
         Parameters
@@ -372,7 +370,7 @@ class FigureConstant(QtCharts.QChartView):
         self._value_y_min = min(self._value_y_min, value)
         self._update_range_axis_y()
 
-    def _append_point(self, points: typing.List[QPointF], value: float) -> None:
+    def _append_point(self, points: list[QPointF], value: float) -> None:
         """Append the point.
 
         Parameters

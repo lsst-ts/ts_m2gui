@@ -13,6 +13,7 @@ Version History
 -------------
 
 * Support the mypy.
+* Simplify the **import** method in **__init__.py**.
 
 .. _lsst.ts.m2gui-0.3.8:
 

@@ -21,8 +21,6 @@
 
 __all__ = ["TabDiagnostics"]
 
-import typing
-
 from lsst.ts.m2com import NUM_TANGENT_LINK
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
@@ -100,7 +98,7 @@ class TabDiagnostics(TabDefault):
             self.model.utility_monitor.signal_detailed_force
         )
 
-    def _create_labels_power(self) -> typing.Dict[str, QLabel]:
+    def _create_labels_power(self) -> dict[str, QLabel]:
         """Create the labels of power.
 
         Returns
@@ -138,7 +136,7 @@ class TabDiagnostics(TabDefault):
 
     def _create_indicators_digital_status(
         self, list_digital_status: list
-    ) -> typing.List[QPushButton]:
+    ) -> list[QPushButton]:
         """Create the indicators of digital status.
 
         Parameters
@@ -246,7 +244,7 @@ class TabDiagnostics(TabDefault):
             "Spare Output 7",
         ]
 
-    def _create_controls_digital_status(self, number: int) -> typing.List[QPushButton]:
+    def _create_controls_digital_status(self, number: int) -> list[QPushButton]:
         """Create the controls of digital status.
 
         Parameters
@@ -586,7 +584,7 @@ class TabDiagnostics(TabDefault):
         self._update_power_motor(self._power_calibrated, power_motor[0], power_motor[1])
 
     def _update_power_motor(
-        self, power: typing.Dict[str, QLabel], voltage: float, current: float
+        self, power: dict[str, QLabel], voltage: float, current: float
     ) -> None:
         """Update the power of motor.
 
@@ -621,7 +619,7 @@ class TabDiagnostics(TabDefault):
         )
 
     def _update_power_communication(
-        self, power: typing.Dict[str, QLabel], voltage: float, current: float
+        self, power: dict[str, QLabel], voltage: float, current: float
     ) -> None:
         """Update the power of communication.
 
@@ -682,7 +680,7 @@ class TabDiagnostics(TabDefault):
 
     def _decode_digital_status(
         self,
-        indicators: typing.List[QPushButton],
+        indicators: list[QPushButton],
         digital_status: int,
         is_digital_status_output: bool = False,
     ) -> None:

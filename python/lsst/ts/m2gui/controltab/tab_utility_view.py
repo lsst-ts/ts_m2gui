@@ -21,8 +21,6 @@
 
 __all__ = ["TabUtilityView"]
 
-import typing
-
 from lsst.ts.m2com import PowerType
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
@@ -104,7 +102,7 @@ class TabUtilityView(TabDefault):
         self._set_signal_power_system(self.model.signal_power_system)
         self._set_signal_utility(self.model.utility_monitor.signal_utility)
 
-    def _create_indicators_breaker(self) -> typing.Dict[str, QPushButton]:
+    def _create_indicators_breaker(self) -> dict[str, QPushButton]:
         """Create the indicators of breakers.
 
         Returns
@@ -167,7 +165,7 @@ class TabUtilityView(TabDefault):
 
         button.setEnabled(True)
 
-    def _create_labels_sensor_data(self, sensor_data: dict) -> typing.Dict[str, QLabel]:
+    def _create_labels_sensor_data(self, sensor_data: dict) -> dict[str, QLabel]:
         """Create the labels of sensor data.
 
         Parameters
@@ -342,7 +340,7 @@ class TabUtilityView(TabDefault):
         return create_group_box(f"{power_type.name} Breakers", layout)
 
     def _create_group_temperatures(
-        self, temperature_groups: typing.List[TemperatureGroup], group_title: str
+        self, temperature_groups: list[TemperatureGroup], group_title: str
     ) -> QGroupBox:
         """Create the group of temperature sensors.
 

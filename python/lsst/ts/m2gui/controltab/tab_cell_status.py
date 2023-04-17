@@ -21,7 +21,6 @@
 
 __all__ = ["TabCellStatus"]
 
-import typing
 from pathlib import Path
 
 import numpy as np
@@ -303,7 +302,7 @@ class TabCellStatus(TabDefault):
         for specific_type in ("axial", "tangent"):
             self._figures[specific_type].adjust_range_axis_y()
 
-    def _get_data_selected(self, index: int | None = None) -> typing.Tuple[list, bool]:
+    def _get_data_selected(self, index: int | None = None) -> tuple[list, bool]:
         """Get the selected actuator data.
 
         Parameters

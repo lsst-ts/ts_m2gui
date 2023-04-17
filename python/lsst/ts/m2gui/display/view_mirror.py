@@ -21,8 +21,6 @@
 
 __all__ = ["ViewMirror"]
 
-import typing
-
 from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsView
 from qasync import asyncSlot
@@ -50,7 +48,7 @@ class ViewMirror(QGraphicsView):
         self._mirror = self._create_mirror()
         super().__init__(self._mirror)
 
-        self.actuators: typing.List[ItemActuator] = list()
+        self.actuators: list[ItemActuator] = list()
 
         self.mirror_radius = 1
 
