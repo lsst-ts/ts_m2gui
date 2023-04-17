@@ -34,28 +34,29 @@ from lsst.ts.m2com import (
     PowerType,
 )
 from lsst.ts.m2gui import LocalMode, Model, Ring
+from pytestqt.qtbot import QtBot
 
 TIMEOUT = 1000
 TIMEOUT_LONG = 2000
 
 
 @pytest.fixture
-def model():
+def model() -> Model:
     return Model(logging.getLogger())
 
 
 @pytest_asyncio.fixture
-async def model_async():
+async def model_async() -> Model:
     async with Model(logging.getLogger(), is_simulation_mode=True) as model_sim:
         await model_sim.connect()
         yield model_sim
 
 
-def test_init(model):
+def test_init(model: Model) -> None:
     assert len(model.system_status) == 9
 
 
-def test_add_error(qtbot, model):
+def test_add_error(qtbot: QtBot, model: Model) -> None:
     error = 3
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
         model.add_error(error)
@@ -63,7 +64,7 @@ def test_add_error(qtbot, model):
     assert model.fault_manager.errors == {error}
 
 
-def test_clear_error(qtbot, model):
+def test_clear_error(qtbot: QtBot, model: Model) -> None:
     error = 3
     model.add_error(error)
 
@@ -74,7 +75,7 @@ def test_clear_error(qtbot, model):
 
 
 @pytest.mark.asyncio
-async def test_reset_errors(qtbot, model_async):
+async def test_reset_errors(qtbot: QtBot, model_async: Model) -> None:
     assert model_async.controller.are_clients_connected() is True
 
     model_async.add_error(3)
@@ -99,7 +100,7 @@ async def test_reset_errors(qtbot, model_async):
 
 
 @pytest.mark.asyncio
-async def test_enable_open_loop_max_limit(model_async):
+async def test_enable_open_loop_max_limit(model_async: Model) -> None:
     # Should fail for the closed-loop control
     model_async.is_closed_loop = True
     with pytest.raises(RuntimeError):
@@ -117,7 +118,7 @@ async def test_enable_open_loop_max_limit(model_async):
     assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
 
-def test_update_system_status(qtbot, model):
+def test_update_system_status(qtbot: QtBot, model: Model) -> None:
     status_name = "isTelemetryActive"
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
@@ -126,12 +127,12 @@ def test_update_system_status(qtbot, model):
     assert model.system_status[status_name] is True
 
 
-def test_update_system_status_exception(model):
+def test_update_system_status_exception(model: Model) -> None:
     with pytest.raises(ValueError):
         model.update_system_status("wrong_name", True)
 
 
-def test_report_config(qtbot, model):
+def test_report_config(qtbot: QtBot, model: Model) -> None:
     file_configuration = "test"
 
     with qtbot.waitSignal(model.signal_config.config, timeout=TIMEOUT):
@@ -140,17 +141,17 @@ def test_report_config(qtbot, model):
     assert config.file_configuration == file_configuration
 
 
-def test_report_script_progress(qtbot, model):
+def test_report_script_progress(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
         model.report_script_progress(30)
 
 
-def test_report_config_exception(model):
+def test_report_config_exception(model: Model) -> None:
     with pytest.raises(KeyError):
         model.report_config(wrong_name=0)
 
 
-def test_is_enabled_and_open_loop_control(model):
+def test_is_enabled_and_open_loop_control(model: Model) -> None:
     assert model.is_enabled_and_open_loop_control() is False
 
     model.local_mode = LocalMode.Enable
@@ -160,7 +161,7 @@ def test_is_enabled_and_open_loop_control(model):
     assert model.is_enabled_and_open_loop_control() is False
 
 
-def test_is_enabled_and_closed_loop_control(model):
+def test_is_enabled_and_closed_loop_control(model: Model) -> None:
     assert model.is_enabled_and_closed_loop_control() is False
 
     model.local_mode = LocalMode.Enable
@@ -171,13 +172,13 @@ def test_is_enabled_and_closed_loop_control(model):
 
 
 @pytest.mark.asyncio
-async def test_go_to_position_exception(model):
+async def test_go_to_position_exception(model: Model) -> None:
     with pytest.raises(RuntimeError):
         await model.go_to_position(0, 0, 0, 0, 0, 0)
 
 
 @pytest.mark.asyncio
-async def test_reboot_controller_exception(model):
+async def test_reboot_controller_exception(model: Model) -> None:
     with pytest.raises(RuntimeError):
         model.local_mode = LocalMode.Diagnostic
         await model.reboot_controller()
@@ -188,19 +189,19 @@ async def test_reboot_controller_exception(model):
 
 
 @pytest.mark.asyncio
-async def test_set_bit_digital_status_exception(model):
+async def test_set_bit_digital_status_exception(model: Model) -> None:
     with pytest.raises(RuntimeError):
         await model.set_bit_digital_status(0)
 
 
 @pytest.mark.asyncio
-async def test_command_script_exception(model):
+async def test_command_script_exception(model: Model) -> None:
     with pytest.raises(RuntimeError):
         await model.command_script(CommandScript.LoadScript)
 
 
 @pytest.mark.asyncio
-async def test_command_actuator_exception(model):
+async def test_command_actuator_exception(model: Model) -> None:
     with pytest.raises(RuntimeError):
         await model.command_actuator(CommandActuator.Stop)
 
@@ -210,7 +211,7 @@ async def test_command_actuator_exception(model):
 
 
 @pytest.mark.asyncio
-async def test_reset_breakers(qtbot, model_async):
+async def test_reset_breakers(qtbot: QtBot, model_async: Model) -> None:
     # Power on the motor and communication first
     controller = model_async.controller
     await controller.power(PowerType.Communication, True)
@@ -224,7 +225,7 @@ async def test_reset_breakers(qtbot, model_async):
         await model_async.reset_breakers(PowerType.Motor)
 
 
-def test_update_connection_information(model):
+def test_update_connection_information(model: Model) -> None:
     model.update_connection_information("test", 1, 2, 3)
 
     controller = model.controller
@@ -234,7 +235,7 @@ def test_update_connection_information(model):
     assert controller.timeout_connection == 3
 
 
-def test_update_connection_information_exception(model):
+def test_update_connection_information_exception(model: Model) -> None:
     with pytest.raises(ValueError):
         model.update_connection_information("test", 1, 1, 3)
 
@@ -244,14 +245,14 @@ def test_update_connection_information_exception(model):
 
 
 @pytest.mark.asyncio
-async def test_connect_exception(model):
+async def test_connect_exception(model: Model) -> None:
     model.system_status["isCrioConnected"] = True
     with pytest.raises(RuntimeError):
         await model.connect()
 
 
 @pytest.mark.asyncio
-async def test_process_event(qtbot, model):
+async def test_process_event(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
         await model._process_event(
             message={"id": "m2AssemblyInPosition", "inPosition": True}
@@ -370,14 +371,14 @@ async def test_process_event(qtbot, model):
         )
 
 
-def test_get_message_name(model):
+def test_get_message_name(model: Model) -> None:
     assert model._get_message_name("") == ""
     assert model._get_message_name(dict()) == ""
 
     assert model._get_message_name({"id": "test"}) == "test"
 
 
-def test_process_telemetry(qtbot, model):
+def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_position.position, timeout=TIMEOUT
     ):
@@ -539,7 +540,7 @@ def test_process_telemetry(qtbot, model):
         )
 
 
-def test_process_lost_connection(model):
+def test_process_lost_connection(model: Model) -> None:
     model.system_status["isCrioConnected"] = True
     model.system_status["isTelemetryActive"] = True
 
@@ -550,7 +551,7 @@ def test_process_lost_connection(model):
 
 
 @pytest.mark.asyncio
-async def test_state_transition_normal(qtbot, model_async):
+async def test_state_transition_normal(qtbot: QtBot, model_async: Model) -> None:
     await model_async.enter_diagnostic()
     assert model_async.local_mode == LocalMode.Diagnostic
 
@@ -565,7 +566,7 @@ async def test_state_transition_normal(qtbot, model_async):
 
 
 @pytest.mark.asyncio
-async def test_fault(qtbot, model_async):
+async def test_fault(qtbot: QtBot, model_async: Model) -> None:
     await model_async.enter_diagnostic()
     await model_async.enter_enable()
 

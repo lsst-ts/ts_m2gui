@@ -21,10 +21,11 @@
 
 __all__ = ["FaultManager"]
 
+import typing
 
 from lsst.ts.m2com import LimitSwitchType
 
-from . import SignalError, SignalLimitSwitch
+from . import Ring, SignalError, SignalLimitSwitch
 
 
 class FaultManager(object):
@@ -53,16 +54,16 @@ class FaultManager(object):
         otherwise, False.
     """
 
-    def __init__(self, limit_switch_status):
+    def __init__(self, limit_switch_status: dict) -> None:
         self.signal_error = SignalError()
         self.signal_limit_switch = SignalLimitSwitch()
 
-        self.errors = set()
+        self.errors: typing.Set[int] = set()
 
         self.limit_switch_status_retract = limit_switch_status.copy()
         self.limit_switch_status_extend = limit_switch_status.copy()
 
-    def add_error(self, error):
+    def add_error(self, error: int) -> None:
         """Add the error.
 
         Parameters
@@ -75,7 +76,7 @@ class FaultManager(object):
             self.errors.add(error)
             self.signal_error.error_new.emit(error)
 
-    def clear_error(self, error):
+    def clear_error(self, error: int) -> None:
         """Clear the error.
 
         Parameters
@@ -88,14 +89,14 @@ class FaultManager(object):
             self.errors.discard(error)
             self.signal_error.error_cleared.emit(error)
 
-    def reset_errors(self):
+    def reset_errors(self) -> None:
         """Reset errors."""
 
         errors = list(self.errors)
         for error in errors:
             self.clear_error(error)
 
-    def has_error(self):
+    def has_error(self) -> bool:
         """Has the error or not.
 
         Returns
@@ -104,9 +105,9 @@ class FaultManager(object):
             True if there is the error. Otherwise, False.
         """
 
-        return True if len(self.errors) != 0 else False
+        return len(self.errors) != 0
 
-    def reset_limit_switch_status(self, limit_switch_type):
+    def reset_limit_switch_status(self, limit_switch_type: LimitSwitchType) -> None:
         """Reset the limit switch status.
 
         Parameters
@@ -134,7 +135,13 @@ class FaultManager(object):
                     (limit_switch_type, limit_switch, False)
                 )
 
-    def update_limit_switch_status(self, limit_switch_type, ring, number, new_status):
+    def update_limit_switch_status(
+        self,
+        limit_switch_type: LimitSwitchType,
+        ring: Ring,
+        number: int,
+        new_status: bool,
+    ) -> None:
         """Update the limit switch status.
 
         Parameters

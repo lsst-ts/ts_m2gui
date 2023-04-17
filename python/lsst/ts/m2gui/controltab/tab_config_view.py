@@ -21,9 +21,12 @@
 
 __all__ = ["TabConfigView"]
 
-from PySide2.QtWidgets import QFormLayout, QVBoxLayout
+from PySide2.QtWidgets import QFormLayout, QGroupBox, QVBoxLayout
 from qasync import asyncSlot
 
+from ..config import Config
+from ..model import Model
+from ..signals import SignalConfig
 from ..utils import create_group_box, create_label
 from . import TabDefault
 
@@ -44,7 +47,7 @@ class TabConfigView(TabDefault):
         Model class.
     """
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # Configuration parameters
@@ -74,7 +77,7 @@ class TabConfigView(TabDefault):
 
         self._set_signal_config(self.model.signal_config)
 
-    def _set_widget_and_layout(self):
+    def _set_widget_and_layout(self) -> None:
         """Set the widget and layout."""
 
         widget = self.widget()
@@ -85,7 +88,7 @@ class TabConfigView(TabDefault):
 
         self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
 
-    def _create_layout(self):
+    def _create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
@@ -105,7 +108,7 @@ class TabConfigView(TabDefault):
 
         return layout
 
-    def _create_group_file_version(self):
+    def _create_group_file_version(self) -> QGroupBox:
         """Create the group of files and version.
 
         Returns
@@ -128,7 +131,7 @@ class TabConfigView(TabDefault):
 
         return create_group_box("File Paths and Version", layout)
 
-    def _create_group_power_motor(self):
+    def _create_group_power_motor(self) -> QGroupBox:
         """Create the group of motor power.
 
         Returns
@@ -150,7 +153,7 @@ class TabConfigView(TabDefault):
 
         return create_group_box("Motor Power Supply Monitoring", layout)
 
-    def _create_group_power_communication(self):
+    def _create_group_power_communication(self) -> QGroupBox:
         """Create the group of communication power.
 
         Returns
@@ -174,7 +177,7 @@ class TabConfigView(TabDefault):
 
         return create_group_box("Communication Power Supply Monitoring", layout)
 
-    def _create_group_in_position_flag(self):
+    def _create_group_in_position_flag(self) -> QGroupBox:
         """Create the group of in-position flag.
 
         Returns
@@ -192,7 +195,7 @@ class TabConfigView(TabDefault):
 
         return create_group_box("In-Position Flag", layout)
 
-    def _create_group_communication_timeout(self):
+    def _create_group_communication_timeout(self) -> QGroupBox:
         """Create the group of communication timeout.
 
         Returns
@@ -215,7 +218,7 @@ class TabConfigView(TabDefault):
 
         return create_group_box("Communication Timeout", layout)
 
-    def _create_group_misc_inclinometer(self):
+    def _create_group_misc_inclinometer(self) -> QGroupBox:
         """Create the group of miscellaneous of inclinometer.
 
         Returns
@@ -232,7 +235,7 @@ class TabConfigView(TabDefault):
 
         return create_group_box("Miscellaneous (Inclinometer)", layout)
 
-    def _create_group_misc_temperature(self):
+    def _create_group_misc_temperature(self) -> QGroupBox:
         """Create the group of miscellaneous of temperature.
 
         Returns
@@ -249,7 +252,7 @@ class TabConfigView(TabDefault):
 
         return create_group_box("Miscellaneous (Temperature)", layout)
 
-    def _set_signal_config(self, signal_config):
+    def _set_signal_config(self, signal_config: SignalConfig) -> None:
         """Set the config signal with callback function. This signal provides
         the details of configuration in the controller.
 
@@ -262,7 +265,7 @@ class TabConfigView(TabDefault):
         signal_config.config.connect(self._callback_signal_config)
 
     @asyncSlot()
-    async def _callback_signal_config(self, config):
+    async def _callback_signal_config(self, config: Config) -> None:
         """Callback of the config signal for the new configuration.
 
         Parameters

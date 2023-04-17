@@ -21,15 +21,19 @@
 
 __all__ = ["TabCellStatus"]
 
+from pathlib import Path
+
 import numpy as np
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
-from .. import ActuatorForce
+from ..actuator_force import ActuatorForce
 from ..display import FigureConstant, Gauge, ViewMirror
 from ..enums import CellActuatorGroupData, FigureActuatorData
+from ..model import Model
+from ..signals import SignalDetailedForce
 from ..utils import set_button
 from . import TabDefault
 
@@ -50,7 +54,7 @@ class TabCellStatus(TabDefault):
         Model class.
     """
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         self._view_mirror = ViewMirror()
@@ -85,14 +89,14 @@ class TabCellStatus(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_show_alias(self):
+    async def _callback_show_alias(self) -> None:
         """Callback of the show-alias button. The actuator will show the alias
         or the actuator ID based on this."""
 
         is_alias = self._button_show_alias.isChecked()
         self._view_mirror.show_alias(is_alias)
 
-    def _create_group_data_selection(self):
+    def _create_group_data_selection(self) -> QComboBox:
         """Create the selection of actuator group data on the cell map.
 
         Returns
@@ -125,7 +129,7 @@ class TabCellStatus(TabDefault):
         return group_data_selection
 
     @asyncSlot()
-    async def _callback_selection_changed_group(self, index):
+    async def _callback_selection_changed_group(self, index: int) -> None:
         """Callback of the changed selection of actuator group. This will
         show the selected actuator group on the cell map.
 
@@ -139,7 +143,9 @@ class TabCellStatus(TabDefault):
         for actuator in self._view_mirror.actuators:
             actuator.setVisible(actuator.acutator_id in self._visible_actuator_ids)
 
-    def get_visible_actuator_ids(self, index_group_data_selector=None):
+    def get_visible_actuator_ids(
+        self, index_group_data_selector: int | None = None
+    ) -> range:
         """Get the IDs of visible actuators.
 
         Parameters
@@ -183,7 +189,7 @@ class TabCellStatus(TabDefault):
 
         return visible_actuators
 
-    def _create_figures(self, num_realtime=200):
+    def _create_figures(self, num_realtime: int = 200) -> dict:
         """Create the figures to show the actuator forces.
 
         Parameters
@@ -245,7 +251,7 @@ class TabCellStatus(TabDefault):
 
         return figures
 
-    def _create_actuator_data_selection(self):
+    def _create_actuator_data_selection(self) -> QComboBox:
         """Create the selection of actuator data.
 
         Returns
@@ -280,7 +286,7 @@ class TabCellStatus(TabDefault):
         return actuator_data_selection
 
     @asyncSlot()
-    async def _callback_selection_changed(self, index):
+    async def _callback_selection_changed(self, index: int) -> None:
         """Callback of the changed selection. This will update the actuator
         data on figures.
 
@@ -296,7 +302,7 @@ class TabCellStatus(TabDefault):
         for specific_type in ("axial", "tangent"):
             self._figures[specific_type].adjust_range_axis_y()
 
-    def _get_data_selected(self, index=None):
+    def _get_data_selected(self, index: int | None = None) -> tuple[list, bool]:
         """Get the selected actuator data.
 
         Parameters
@@ -328,7 +334,7 @@ class TabCellStatus(TabDefault):
 
         return list(), False
 
-    def _update_figures(self, values, is_displacement):
+    def _update_figures(self, values: list, is_displacement: bool) -> None:
         """Update the figures.
 
         Parameters
@@ -356,7 +362,7 @@ class TabCellStatus(TabDefault):
                 self._figures[figure_type].axis_y.setTitleText("Force (N)")
 
     @asyncSlot()
-    async def _callback_time_out(self, threshold=50):
+    async def _callback_time_out(self, threshold: float | int = 50) -> None:
         """Callback timeout function to update cell status forces (and
         displays).
 
@@ -408,17 +414,19 @@ class TabCellStatus(TabDefault):
         selected_actuator = self._view_mirror.get_selected_actuator()
         if selected_actuator is not None:
             text_force = self._view_mirror.get_text_force()
-            text_force.setPlainText(
-                f"Actuator Force:\nID: {selected_actuator.label_id.toPlainText()}, "
-                f"force: {round(selected_actuator.magnitude, 2)} N"
-            )
 
-    def _create_layout(self):
+            if text_force is not None:
+                text_force.setPlainText(
+                    f"Actuator Force:\nID: {selected_actuator.label_id.toPlainText()}, "
+                    f"force: {round(selected_actuator.magnitude, 2)} N"
+                )
+
+    def _create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide2.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -445,7 +453,7 @@ class TabCellStatus(TabDefault):
 
         return layout
 
-    def read_cell_geometry_file(self, filepath):
+    def read_cell_geometry_file(self, filepath: str | Path) -> None:
         """Read the file of cell geometry.
 
         Parameters
@@ -490,7 +498,9 @@ class TabCellStatus(TabDefault):
             self._view_mirror.add_item_actuator(id_tangent, aliases[idx_alias], x, y)
             idx_alias += 1
 
-    def _set_signal_detailed_force(self, signal_detailed_force):
+    def _set_signal_detailed_force(
+        self, signal_detailed_force: SignalDetailedForce
+    ) -> None:
         """Set the detailed force signal with callback functions. This signal
         provides the calculated and measured force details contains the look-up
         table (LUT)
@@ -503,7 +513,7 @@ class TabCellStatus(TabDefault):
         signal_detailed_force.forces.connect(self._callback_forces)
 
     @asyncSlot()
-    async def _callback_forces(self, forces):
+    async def _callback_forces(self, forces: ActuatorForce) -> None:
         """Callback of the forces, which contain the look-up table (LUT)
         details.
 

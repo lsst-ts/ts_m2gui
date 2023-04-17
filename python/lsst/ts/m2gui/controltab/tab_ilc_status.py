@@ -21,6 +21,8 @@
 
 __all__ = ["TabIlcStatus"]
 
+from pathlib import Path
+
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_INNER_LOOP_CONTROLLER,
@@ -29,10 +31,12 @@ from lsst.ts.m2com import (
     read_yaml_file,
 )
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtGui import QColor, QPalette
+from PySide2.QtWidgets import QGroupBox, QLabel, QPushButton, QVBoxLayout
 from qasync import asyncSlot
 
+from ..model import Model
+from ..signals import SignalIlcStatus
 from ..utils import (
     create_grid_layout_buttons,
     create_group_box,
@@ -58,7 +62,7 @@ class TabIlcStatus(TabDefault):
         Model class.
     """
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # Indicators of the ILCs
@@ -73,7 +77,7 @@ class TabIlcStatus(TabDefault):
         # Set the callback of signal
         self._set_signal_ilc_status(self.model.signal_ilc_status)
 
-    def _create_indicators_ilc(self, number):
+    def _create_indicators_ilc(self, number: int) -> list[QPushButton]:
         """Creates indicators for the inner-loop controller (ILC).
 
         Parameters
@@ -101,7 +105,9 @@ class TabIlcStatus(TabDefault):
 
         return indicators
 
-    def _update_indicator_color(self, indicator, mode):
+    def _update_indicator_color(
+        self, indicator: QPushButton, mode: InnerLoopControlMode
+    ) -> None:
         """Update the color of indicator.
 
         Parameters
@@ -117,7 +123,7 @@ class TabIlcStatus(TabDefault):
 
         indicator.setPalette(palette)
 
-    def _get_indicator_color(self, mode):
+    def _get_indicator_color(self, mode: InnerLoopControlMode) -> QColor:
         """Get the indicator color based on the mode.
 
         Parameters
@@ -146,7 +152,7 @@ class TabIlcStatus(TabDefault):
         else:
             return Qt.gray
 
-    def _create_layout(self):
+    def _create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
@@ -188,7 +194,7 @@ class TabIlcStatus(TabDefault):
 
         return layout
 
-    def _create_label_mode(self):
+    def _create_label_mode(self) -> QLabel:
         """Create the label of inner-loop controller (ILC) mode.
 
         Returns
@@ -223,7 +229,9 @@ class TabIlcStatus(TabDefault):
 
         return label
 
-    def _create_group_grid_layout(self, name, indicators, num_column):
+    def _create_group_grid_layout(
+        self, name: str, indicators: list[QPushButton], num_column: int
+    ) -> QGroupBox:
         """Create the group of grid layout.
 
         Parameters
@@ -244,7 +252,7 @@ class TabIlcStatus(TabDefault):
         layout = create_grid_layout_buttons(indicators, num_column)
         return create_group_box(name, layout)
 
-    def _set_signal_ilc_status(self, signal_ilc_status):
+    def _set_signal_ilc_status(self, signal_ilc_status: SignalIlcStatus) -> None:
         """Set the inner-loop controller (ILC) status signal with callback
         function.
 
@@ -256,7 +264,7 @@ class TabIlcStatus(TabDefault):
         signal_ilc_status.address_mode.connect(self._callback_signal_ilc_status)
 
     @asyncSlot()
-    async def _callback_signal_ilc_status(self, address_mode):
+    async def _callback_signal_ilc_status(self, address_mode: tuple) -> None:
         """Callback of the inner-loop controller (ILC) status signal.
 
         Parameters
@@ -271,7 +279,7 @@ class TabIlcStatus(TabDefault):
         mode = InnerLoopControlMode(address_mode[1])
         self._update_indicator_color(self._indicators_ilc[address], mode)
 
-    def read_ilc_details_file(self, filepath):
+    def read_ilc_details_file(self, filepath: str | Path) -> None:
         """Read the file of inner-loop controller (ILC) details.
 
         Parameters

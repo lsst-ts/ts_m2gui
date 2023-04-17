@@ -22,10 +22,12 @@
 __all__ = ["TabOverview"]
 
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QPlainTextEdit, QVBoxLayout
+from PySide2.QtGui import QColor, QPalette
+from PySide2.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
 from qasync import asyncSlot
 
+from ..model import Model
+from ..signals import SignalControl, SignalMessage, SignalStatus
 from ..utils import create_label, set_button
 from . import TabDefault
 
@@ -46,7 +48,7 @@ class TabOverview(TabDefault):
         Model class.
     """
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # Labels
@@ -71,7 +73,7 @@ class TabOverview(TabDefault):
 
         self._set_signal_status(self.model.signal_status)
 
-    def _set_indicators_status(self):
+    def _set_indicators_status(self) -> dict[str, QPushButton]:
         """Set the indicators of system status.
 
         Returns
@@ -100,7 +102,9 @@ class TabOverview(TabDefault):
 
         return indicators_status
 
-    def _update_indicator_color(self, indicator, is_status_on):
+    def _update_indicator_color(
+        self, indicator: QPushButton, is_status_on: bool
+    ) -> None:
         """Update the color of indicator.
 
         Parameters
@@ -122,7 +126,7 @@ class TabOverview(TabDefault):
 
         indicator.setPalette(palette)
 
-    def _get_indicator_color_status_on(self, indicator):
+    def _get_indicator_color_status_on(self, indicator: QPushButton) -> QColor:
         """Get the indicator color of the "ON" status.
 
         This function is to handle the condition that some indicators need the
@@ -148,7 +152,7 @@ class TabOverview(TabDefault):
         else:
             return Qt.green
 
-    def _set_window_log(self):
+    def _set_window_log(self) -> QPlainTextEdit:
         """Set the log window.
 
         Returns
@@ -163,7 +167,7 @@ class TabOverview(TabDefault):
 
         return window_log
 
-    def _create_layout(self):
+    def _create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
@@ -189,12 +193,12 @@ class TabOverview(TabDefault):
         return layout
 
     @asyncSlot()
-    async def _callback_clear(self):
+    async def _callback_clear(self) -> None:
         """Callback of the clear button - removes all log messages from the
         widget."""
         self._window_log.clear()
 
-    def set_signal_message(self, signal_message):
+    def set_signal_message(self, signal_message: SignalMessage) -> None:
         """Set the message signal.
 
         Parameters
@@ -206,7 +210,7 @@ class TabOverview(TabDefault):
         signal_message.message.connect(self._callback_signal_message)
 
     @asyncSlot()
-    async def _callback_signal_message(self, message):
+    async def _callback_signal_message(self, message: str) -> None:
         """Callback of the message signal.
 
         Parameters
@@ -216,7 +220,7 @@ class TabOverview(TabDefault):
         """
         self._window_log.appendPlainText(message)
 
-    def _update_control_status(self):
+    def _update_control_status(self) -> None:
         """Update the control status."""
 
         text_control = (
@@ -237,7 +241,7 @@ class TabOverview(TabDefault):
             f"Inclination Source: {self.model.inclination_source.name}"
         )
 
-    def _set_signal_status(self, signal_status):
+    def _set_signal_status(self, signal_status: SignalStatus) -> None:
         """Set the status signal.
 
         Parameters
@@ -249,7 +253,7 @@ class TabOverview(TabDefault):
         signal_status.name_status.connect(self._callback_signal_status)
 
     @asyncSlot()
-    async def _callback_signal_status(self, name_status):
+    async def _callback_signal_status(self, name_status: tuple) -> None:
         """Callback of the status signal.
 
         Parameters
@@ -263,7 +267,7 @@ class TabOverview(TabDefault):
             self._indicators_status[name_status[0]], name_status[1]
         )
 
-    def set_signal_control(self, signal_control):
+    def set_signal_control(self, signal_control: SignalControl) -> None:
         """Set the control signal.
 
         Parameters
@@ -275,7 +279,7 @@ class TabOverview(TabDefault):
         signal_control.is_control_updated.connect(self._callback_signal_control)
 
     @asyncSlot()
-    async def _callback_signal_control(self, is_control_updated):
+    async def _callback_signal_control(self, is_control_updated: bool) -> None:
         """Callback of the control signal.
 
         Parameters

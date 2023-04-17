@@ -19,6 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .tools import connect_signal_to_future
-from .q_message_box_async import QMessageBoxAsync
-from .q_file_dialog_async import QFileDialogAsync
+from .tools import *
+from .q_message_box_async import *
+from .q_file_dialog_async import *

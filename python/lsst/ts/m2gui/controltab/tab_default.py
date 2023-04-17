@@ -21,10 +21,14 @@
 
 __all__ = ["TabDefault"]
 
+import types
+import typing
+
 from PySide2.QtCore import QTimer
-from PySide2.QtWidgets import QComboBox, QDockWidget, QScrollArea, QWidget
+from PySide2.QtWidgets import QComboBox, QDockWidget, QFormLayout, QScrollArea, QWidget
 
 from ..enums import Ring
+from ..model import Model
 
 
 class TabDefault(QDockWidget):
@@ -43,7 +47,7 @@ class TabDefault(QDockWidget):
         Model class.
     """
 
-    def __init__(self, title, model):
+    def __init__(self, title: str, model: Model) -> None:
         super().__init__()
         self.setWindowTitle(title)
 
@@ -57,7 +61,9 @@ class TabDefault(QDockWidget):
         # features bring more troubles than the benifits.
         self.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
-    def set_widget_scrollable(self, widget, is_resizable=False):
+    def set_widget_scrollable(
+        self, widget: QWidget, is_resizable: bool = False
+    ) -> QScrollArea:
         """Set the widget to be scrollable.
 
         Parameters
@@ -79,7 +85,7 @@ class TabDefault(QDockWidget):
 
         return scroll_area
 
-    def add_empty_row_to_form_layout(self, layout):
+    def add_empty_row_to_form_layout(self, layout: QFormLayout) -> None:
         """Add the empty row to the form layout.
 
         Parameters
@@ -89,7 +95,9 @@ class TabDefault(QDockWidget):
         """
         layout.addRow(" ", None)
 
-    def create_combo_box_ring_selection(self, callback_current_index_changed=None):
+    def create_combo_box_ring_selection(
+        self, callback_current_index_changed: typing.Callable | None = None
+    ) -> QComboBox:
         """Create the combo box of ring selection.
 
         Parameters
@@ -117,7 +125,7 @@ class TabDefault(QDockWidget):
 
         return ring_selection
 
-    def create_and_start_timer(self, callback_time_out):
+    def create_and_start_timer(self, callback_time_out: typing.Callable) -> QTimer:
         """Create and start the timer.
 
         Parameters
@@ -140,7 +148,7 @@ class TabDefault(QDockWidget):
 
         return timer
 
-    def check_duration_and_restart_timer(self, timer):
+    def check_duration_and_restart_timer(self, timer: QTimer) -> None:
         """Check the duration and restart the timer if the duration has been
         updated.
 
@@ -153,12 +161,17 @@ class TabDefault(QDockWidget):
         if timer.interval() != self.model.duration_refresh:
             timer.start(self.model.duration_refresh)
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> QDockWidget:
         """This is an overridden function to support the asynchronous context
         manager."""
         return self
 
-    async def __aexit__(self, type, value, traceback):
+    async def __aexit__(
+        self,
+        type: typing.Type[BaseException] | None,
+        value: BaseException | None,
+        traceback: types.TracebackType | None,
+    ) -> None:
         """This is an overridden function to support the asynchronous context
         manager."""
         await self.model.controller.close_tasks()

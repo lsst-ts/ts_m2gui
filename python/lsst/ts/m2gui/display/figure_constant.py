@@ -74,16 +74,16 @@ class FigureConstant(QtCharts.QChartView):
 
     def __init__(
         self,
-        range_x_min,
-        range_x_max,
-        num_points,
-        title_x,
-        title_y,
-        title_figure,
-        legends,
-        num_lines=1,
-        is_realtime=False,
-    ):
+        range_x_min: float | int,
+        range_x_max: float | int,
+        num_points: int,
+        title_x: str,
+        title_y: str,
+        title_figure: str,
+        legends: list[str],
+        num_lines: int = 1,
+        is_realtime: bool = False,
+    ) -> None:
         super().__init__()
 
         self.axis_x = self._create_default_axis(range_x_min, range_x_max, title_x)
@@ -91,8 +91,8 @@ class FigureConstant(QtCharts.QChartView):
 
         # Track the maximum and minimum y values in points. These are used to
         # decide the range of y-axis.
-        self._value_y_min = 0
-        self._value_y_max = 0
+        self._value_y_min = 0.0
+        self._value_y_max = 0.0
 
         self._num_points = num_points
         self._is_realtime = is_realtime
@@ -104,7 +104,9 @@ class FigureConstant(QtCharts.QChartView):
         self.setRenderHint(QPainter.Antialiasing)
         self.setMinimumWidth(self.MINIMUM_WIDTH)
 
-    def _create_default_axis(self, range_min, range_max, title):
+    def _create_default_axis(
+        self, range_min: float | int, range_max: float | int, title: str
+    ) -> QtCharts.QValueAxis:
         """Create the default axis.
 
         Parameters
@@ -123,7 +125,7 @@ class FigureConstant(QtCharts.QChartView):
 
         return axis
 
-    def _set_chart(self, title):
+    def _set_chart(self, title: str) -> None:
         """Set the chart.
 
         Parameters
@@ -138,7 +140,13 @@ class FigureConstant(QtCharts.QChartView):
         chart.addAxis(self.axis_y, Qt.AlignLeft)
         self.setChart(chart)
 
-    def _set_default_series(self, range_x_min, range_x_max, num_lines, text_legends):
+    def _set_default_series(
+        self,
+        range_x_min: float | int,
+        range_x_max: float | int,
+        num_lines: int,
+        text_legends: list[str],
+    ) -> None:
         """Set the default series.
 
         Parameters
@@ -177,7 +185,7 @@ class FigureConstant(QtCharts.QChartView):
         if not is_set_legend:
             chart.legend().hide()
 
-    def get_points(self, idx):
+    def get_points(self, idx: int) -> list[QPointF]:
         """Get the points.
 
         Parameters
@@ -192,7 +200,7 @@ class FigureConstant(QtCharts.QChartView):
         """
         return self.get_series(idx).points()
 
-    def get_series(self, idx):
+    def get_series(self, idx: int) -> QtCharts.QLineSeries:
         """Get the series.
 
         Parameters
@@ -207,7 +215,7 @@ class FigureConstant(QtCharts.QChartView):
         """
         return self.chart().series()[idx]
 
-    def update_data(self, list_x, list_y, idx=0):
+    def update_data(self, list_x: list, list_y: list, idx: int = 0) -> None:
         """Update the data in figure.
 
         This can not be used for the realtime data.
@@ -257,7 +265,7 @@ class FigureConstant(QtCharts.QChartView):
         self._value_y_max = max(self._value_y_max, *list_y)
         self._update_range_axis_y()
 
-    def _update_range_axis_y(self, threshold=50):
+    def _update_range_axis_y(self, threshold: float | int = 50) -> None:
         """Update the range of y-axis.
 
         This is used internally to track the incoming data and update the range
@@ -282,7 +290,7 @@ class FigureConstant(QtCharts.QChartView):
                 self._value_y_min - self.OFFSET_Y, self._value_y_max + self.OFFSET_Y
             )
 
-    def adjust_range_axis_y(self):
+    def adjust_range_axis_y(self) -> None:
         """Adjust the range of y-axis.
 
         This is different from the self._update_range_axis_y(). Sometimes, it
@@ -302,7 +310,7 @@ class FigureConstant(QtCharts.QChartView):
         self._value_y_max = max(values)
         self._update_range_axis_y(threshold=1)
 
-    def _get_range_points(self, idx):
+    def _get_range_points(self, idx: int) -> tuple[float, float]:
         """Get the range of points in a specific series.
 
         Parameters
@@ -326,7 +334,7 @@ class FigureConstant(QtCharts.QChartView):
 
         return min(values), max(values)
 
-    def append_data(self, value, idx=0):
+    def append_data(self, value: float, idx: int = 0) -> None:
         """Append the data. This is only useful if the realtime data is
         applied.
 
@@ -362,7 +370,7 @@ class FigureConstant(QtCharts.QChartView):
         self._value_y_min = min(self._value_y_min, value)
         self._update_range_axis_y()
 
-    def _append_point(self, points, value):
+    def _append_point(self, points: list[QPointF], value: float) -> None:
         """Append the point.
 
         Parameters

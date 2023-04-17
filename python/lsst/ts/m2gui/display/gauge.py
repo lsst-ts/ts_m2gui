@@ -22,7 +22,7 @@
 __all__ = ["Gauge"]
 
 from PySide2.QtCore import QSize, Qt
-from PySide2.QtGui import QColor, QPainter
+from PySide2.QtGui import QColor, QPainter, QPaintEvent
 from PySide2.QtWidgets import QWidget
 
 
@@ -47,20 +47,22 @@ class Gauge(QWidget):
     # Minimum size of widget
     MIN_SIZE = 100
 
-    def __init__(self, magnitude_min, magnitude_max):
+    def __init__(self, magnitude_min: float | int, magnitude_max: float | int) -> None:
         super().__init__()
 
         # These two new attributes decide the color range in this class. The
         # following self.set_magnitude_range() will check the inputs are
         # reasonable or not.
-        self.min = 0
-        self.max = 0
+        self.min = 0.0
+        self.max = 0.0
         self.set_magnitude_range(magnitude_min, magnitude_max)
 
         self.setMinimumSize(self.MIN_SIZE, self.MIN_SIZE)
         self.setMaximumWidth(2 * self.MIN_SIZE)
 
-    def set_magnitude_range(self, magnitude_min, magnitude_max):
+    def set_magnitude_range(
+        self, magnitude_min: float | int, magnitude_max: float | int
+    ) -> None:
         """Set the magnitude range. Color is mapped between magnitude_min and
         magnitude_max.
 
@@ -85,11 +87,11 @@ class Gauge(QWidget):
 
         self.update()
 
-    def sizeHint(self):
+    def sizeHint(self) -> QSize:
         """Overridden method. This is to provide the hint of size."""
         return QSize(self.MIN_SIZE, self.MIN_SIZE)
 
-    def paintEvent(self, event):
+    def paintEvent(self, event: QPaintEvent) -> None:
         """Overridden method. Paint gauge as series of lines, and add text
         labels.
 
@@ -136,7 +138,7 @@ class Gauge(QWidget):
         )
 
     @staticmethod
-    def get_color(magnitude):
+    def get_color(magnitude: float) -> QColor:
         """Get the color.
 
         Mimic the following colorbar as the default one in MATLAB:

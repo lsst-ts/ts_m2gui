@@ -28,11 +28,12 @@ from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2gui import LocalMode, Model, SignalMessage
 from lsst.ts.m2gui.controltab import TabOverview
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
+from PySide2.QtGui import QColor, QPalette
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabOverview:
     widget = TabOverview("Overview", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -40,7 +41,7 @@ def widget(qtbot):
 
 
 @pytest_asyncio.fixture
-async def widget_async(qtbot):
+async def widget_async(qtbot: QtBot) -> TabOverview:
     async with TabOverview(
         "Overview", Model(logging.getLogger(), is_simulation_mode=True)
     ) as widget_sim:
@@ -50,7 +51,7 @@ async def widget_async(qtbot):
         yield widget_sim
 
 
-def test_init(qtbot, widget):
+def test_init(qtbot: QtBot, widget: TabOverview) -> None:
     assert widget._label_control.text() == "Commander is: EUI"
     assert widget._label_control_mode.text() == "Control Mode: Standby"
     assert widget._label_local_mode.text() == "Control Loop: Open-Loop Control"
@@ -69,7 +70,7 @@ def test_init(qtbot, widget):
         assert color == Qt.gray
 
 
-def test_update_control_status(qtbot, widget):
+def test_update_control_status(qtbot: QtBot, widget: TabOverview) -> None:
     widget.model.is_csc_commander = True
     widget.model.local_mode = LocalMode.Enable
     widget.model.is_closed_loop = True
@@ -83,7 +84,7 @@ def test_update_control_status(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_message(qtbot, widget):
+async def test_callback_signal_message(qtbot: QtBot, widget: TabOverview) -> None:
     assert widget._window_log.toPlainText() == ""
 
     signal_message = SignalMessage()
@@ -98,7 +99,7 @@ async def test_callback_signal_message(qtbot, widget):
     assert widget._window_log.toPlainText() == message
 
 
-def test_callback_clear(qtbot, widget):
+def test_callback_clear(qtbot: QtBot, widget: TabOverview) -> None:
     signal_message = SignalMessage()
     widget.set_signal_message(signal_message)
 
@@ -111,7 +112,7 @@ def test_callback_clear(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_status(qtbot, widget):
+async def test_callback_signal_status(qtbot: QtBot, widget: TabOverview) -> None:
     name = "isTelemetryActive"
     widget.model.update_system_status(name, True)
 
@@ -125,7 +126,9 @@ async def test_callback_signal_status(qtbot, widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget_async):
+async def test_callback_signal_status_is_alarm_warning_on(
+    qtbot: QtBot, widget_async: TabOverview
+) -> None:
     # Default color
     assert _get_color_is_alarm_warning_on(widget_async) == Qt.gray
 
@@ -146,6 +149,6 @@ async def test_callback_signal_status_is_alarm_warning_on(qtbot, widget_async):
     assert _get_color_is_alarm_warning_on(widget_async) == Qt.gray
 
 
-def _get_color_is_alarm_warning_on(widget):
+def _get_color_is_alarm_warning_on(widget: TabOverview) -> QColor:
     palette = widget._indicators_status["isAlarmWarningOn"].palette()
     return palette.color(QPalette.Button)

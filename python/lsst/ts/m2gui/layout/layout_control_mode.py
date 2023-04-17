@@ -25,6 +25,7 @@ from PySide2.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
+from ..model import Model
 from ..utils import run_command, set_button
 from . import LayoutDefault
 
@@ -45,44 +46,41 @@ class LayoutControlMode(LayoutDefault):
         Layout.
     """
 
-    def __init__(self, model):
+    def __init__(self, model: Model) -> None:
         # Open-loop button
-        self._button_open_loop = None
-
-        # Closed-loop button
-        self._button_closed_loop = None
-
-        super().__init__(model)
-
-    @asyncSlot()
-    async def _callback_signal_control(self, is_control_updated):
-        if self.model.local_mode == LocalMode.Enable:
-            self._update_buttons()
-        else:
-            self._prohibit_control_mode()
-
-    def _update_buttons(self):
-        """Update the buttons."""
-        self._button_open_loop.setEnabled(self.model.is_closed_loop)
-        self._button_closed_loop.setEnabled(not self.model.is_closed_loop)
-
-    def _prohibit_control_mode(self):
-        """Prohibit the control mode."""
-        self._button_open_loop.setEnabled(False)
-        self._button_closed_loop.setEnabled(False)
-
-    def _set_layout(self):
         self._button_open_loop = set_button(
             "Enter open-loop control",
             self._callback_open_loop,
             tool_tip="No look-up table correction applied",
         )
+
+        # Closed-loop button
         self._button_closed_loop = set_button(
             "Enter closed-loop control",
             self._callback_closed_loop,
             tool_tip="Look-up table correction is applied",
         )
 
+        super().__init__(model)
+
+    @asyncSlot()
+    async def _callback_signal_control(self, is_control_updated: bool) -> None:
+        if self.model.local_mode == LocalMode.Enable:
+            self._update_buttons()
+        else:
+            self._prohibit_control_mode()
+
+    def _update_buttons(self) -> None:
+        """Update the buttons."""
+        self._button_open_loop.setEnabled(self.model.is_closed_loop)
+        self._button_closed_loop.setEnabled(not self.model.is_closed_loop)
+
+    def _prohibit_control_mode(self) -> None:
+        """Prohibit the control mode."""
+        self._button_open_loop.setEnabled(False)
+        self._button_closed_loop.setEnabled(False)
+
+    def _set_layout(self) -> QVBoxLayout:
         layout = QVBoxLayout()
         layout.addWidget(self._button_open_loop)
         layout.addWidget(self._button_closed_loop)
@@ -90,19 +88,19 @@ class LayoutControlMode(LayoutDefault):
         return layout
 
     @asyncSlot()
-    async def _callback_open_loop(self):
+    async def _callback_open_loop(self) -> None:
         """Callback of the open-loop button. The system will turn off the force
         balance system."""
         await self.switch_force_balance_system(False)
 
     @asyncSlot()
-    async def _callback_closed_loop(self):
+    async def _callback_closed_loop(self) -> None:
         """Callback of the closed-loop button. The system will turn off the
         force balance system."""
         await run_command(self.model.enable_open_loop_max_limit, False)
         await self.switch_force_balance_system(True)
 
-    async def switch_force_balance_system(self, status):
+    async def switch_force_balance_system(self, status: bool) -> None:
         """Switch the force balance system.
 
         Parameters

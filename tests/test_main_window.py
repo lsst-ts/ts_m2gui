@@ -25,10 +25,11 @@ import pytest
 from lsst.ts.m2gui import MainWindow
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QToolBar
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> MainWindow:
     widget = MainWindow(False, False, False, log_level=13)
     qtbot.addWidget(widget)
 
@@ -36,14 +37,14 @@ def widget(qtbot):
 
 
 @pytest.fixture
-def widget_sim(qtbot):
+def widget_sim(qtbot: QtBot) -> MainWindow:
     widget_sim = MainWindow(False, False, True)
     qtbot.addWidget(widget_sim)
 
     return widget_sim
 
 
-def test_init(widget):
+def test_init(widget: MainWindow) -> None:
     assert widget.log.level == 13
 
     tool_bar = widget.findChildren(QToolBar)[0]
@@ -58,7 +59,7 @@ def test_init(widget):
     assert controller.timeout_connection == 10
 
 
-def test_set_model(widget):
+def test_set_model(widget: MainWindow) -> None:
     model_local_host = widget._set_model(True, False)
     assert model_local_host.controller.host == "127.0.0.1"
 
@@ -69,11 +70,11 @@ def test_set_model(widget):
         widget._set_model(True, True)
 
 
-def test_init_sim(widget_sim):
+def test_init_sim(widget_sim: MainWindow) -> None:
     assert widget_sim.model.controller.host == "127.0.0.1"
 
 
-def test_get_action(widget):
+def test_get_action(widget: MainWindow) -> None:
     button_exit = widget._get_action("Exit")
     assert button_exit.text() == "Exit"
 
@@ -82,7 +83,7 @@ def test_get_action(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_settings(qtbot, widget):
+async def test_callback_settings(qtbot: QtBot, widget: MainWindow) -> None:
     assert widget._tab_settings.isVisible() is False
 
     button_settings = widget._get_action("Settings")

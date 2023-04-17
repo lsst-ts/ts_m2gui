@@ -22,14 +22,16 @@
 __all__ = ["ControlTabs"]
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QListWidget, QVBoxLayout
+from PySide2.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout
 from qasync import asyncSlot
 
+from . import Model
 from .controltab import (
     TabActuatorControl,
     TabAlarmWarn,
     TabCellStatus,
     TabConfigView,
+    TabDefault,
     TabDetailedForce,
     TabDiagnostics,
     TabIlcStatus,
@@ -53,9 +55,9 @@ class ControlTabs(object):
         Layout.
     """
 
-    def __init__(self, model):
+    def __init__(self, model: Model) -> None:
         # List of the control tables
-        self._tabs = list()
+        self._tabs: list[TabDefault] = list()
 
         # Widget to have the list of control tables
         self._list_widget = QListWidget()
@@ -64,7 +66,7 @@ class ControlTabs(object):
 
         self.layout = self._set_layout()
 
-    def _setup_tabs_and_list_widget(self, model):
+    def _setup_tabs_and_list_widget(self, model: Model) -> None:
         """Setup the tables and list widget.
 
         Parameters
@@ -96,7 +98,7 @@ class ControlTabs(object):
 
         self._list_widget.itemDoubleClicked.connect(self._callback_show)
 
-    def _set_layout(self):
+    def _set_layout(self) -> QVBoxLayout:
         """Set the layout.
 
         Returns
@@ -111,7 +113,7 @@ class ControlTabs(object):
         return layout
 
     @asyncSlot()
-    async def _callback_show(self, item):
+    async def _callback_show(self, item: QListWidgetItem) -> None:
         """Callback function to show the selected table.
 
         Parameters
@@ -121,9 +123,11 @@ class ControlTabs(object):
         """
 
         control_tab = self._get_control_tab(item.text())
-        control_tab.show()
 
-    def get_tab(self, name):
+        if control_tab is not None:
+            control_tab.show()
+
+    def get_tab(self, name: str) -> tuple[QListWidgetItem | None, TabDefault | None]:
         """Get the table.
 
         Parameters
@@ -147,7 +151,7 @@ class ControlTabs(object):
         except IndexError:
             return None, None
 
-    def _get_control_tab(self, title):
+    def _get_control_tab(self, title: str) -> TabDefault | None:
         """Get the control table.
 
         Parameters

@@ -21,12 +21,17 @@
 
 __all__ = ["Model"]
 
+import logging
+import types
+import typing
+
 from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
     ActuatorDisplacementUnit,
     ClosedLoopControlMode,
+    CommandActuator,
     CommandScript,
     ControllerCell,
     DigitalInput,
@@ -69,8 +74,8 @@ class Model(object):
         Command port to connect. (the default is 50010)
     port_telemetry : `int`, optional
         Telemetry port to connect. (the default is 50011)
-    timeout_connection : `int` or `float`, optional
-        Connection timeout in second. (the default is 10)
+    timeout_connection : `float`, optional
+        Connection timeout in second. (the default is 10.0)
     timeout_in_second : `float`, optional
         Time limit for reading data from the TCP/IP interface (sec). (the
         default is 0.05)
@@ -115,14 +120,14 @@ class Model(object):
 
     def __init__(
         self,
-        log,
-        host="localhost",
-        port_command=50010,
-        port_telemetry=50011,
-        timeout_connection=10,
-        timeout_in_second=0.05,
-        is_simulation_mode=False,
-    ):
+        log: logging.Logger,
+        host: str = "localhost",
+        port_command: int = 50010,
+        port_telemetry: int = 50011,
+        timeout_connection: float = 10.0,
+        timeout_in_second: float = 0.05,
+        is_simulation_mode: bool = False,
+    ) -> None:
         self.log = log
 
         self.is_csc_commander = False
@@ -156,7 +161,7 @@ class Model(object):
 
         self.duration_refresh = 100
 
-    def _set_system_status(self):
+    def _set_system_status(self) -> dict[str, bool]:
         """Set the default system status.
 
         Returns
@@ -179,7 +184,7 @@ class Model(object):
 
         return system_status
 
-    def get_actuator_default_status(self, status):
+    def get_actuator_default_status(self, status: typing.Any) -> dict:
         """Get the default actuator status.
 
         Parameters
@@ -193,7 +198,7 @@ class Model(object):
             Collection of default actuator status.
         """
 
-        collection = dict()
+        collection: dict = dict()
         collection = self._set_actuator_default_status_specific_ring(
             Ring.B, collection, status
         )
@@ -209,7 +214,9 @@ class Model(object):
 
         return collection
 
-    def _set_actuator_default_status_specific_ring(self, ring, collection, status):
+    def _set_actuator_default_status_specific_ring(
+        self, ring: Ring, collection: dict, status: typing.Any
+    ) -> dict:
         """Set the default actuator status in specific ring.
 
         Parameters
@@ -234,11 +241,11 @@ class Model(object):
 
         return collection
 
-    def report_control_status(self):
+    def report_control_status(self) -> None:
         """Report the control status."""
         self.signal_control.is_control_updated.emit(True)
 
-    def add_error(self, error):
+    def add_error(self, error: int) -> None:
         """Add the error.
 
         Parameters
@@ -250,14 +257,14 @@ class Model(object):
         self.fault_manager.add_error(error)
         self._check_error_and_update_status()
 
-    def _check_error_and_update_status(self):
+    def _check_error_and_update_status(self) -> None:
         """Check whenever the error is triggered, and update the related
         internal status."""
 
         is_error_on = self.fault_manager.has_error()
         self.update_system_status("isAlarmWarningOn", is_error_on)
 
-    def clear_error(self, error):
+    def clear_error(self, error: int) -> None:
         """Clear the error.
 
         Parameters
@@ -269,7 +276,7 @@ class Model(object):
         self.fault_manager.clear_error(error)
         self._check_error_and_update_status()
 
-    async def reset_errors(self):
+    async def reset_errors(self) -> None:
         """Reset errors."""
 
         await self.controller.clear_errors()
@@ -280,7 +287,7 @@ class Model(object):
 
         self._check_error_and_update_status()
 
-    async def enable_open_loop_max_limit(self, status):
+    async def enable_open_loop_max_limit(self, status: bool) -> None:
         """Enable the maximum limit in open-loop control.
 
         Parameters
@@ -303,7 +310,7 @@ class Model(object):
                 "Failed to enable the maximum limit. Only allow in open-loop control."
             )
 
-    def update_system_status(self, status_name, new_status):
+    def update_system_status(self, status_name: str, new_status: bool) -> None:
         """Update the system status.
 
         Parameters
@@ -328,7 +335,7 @@ class Model(object):
                 f"{status_name} not in the {list(self.system_status.keys())}."
             )
 
-    def report_config(self, **kwargs):
+    def report_config(self, **kwargs: dict[str, typing.Any]) -> Config:
         """Report the configuration defined in `Config` class.
 
         Parameters
@@ -359,7 +366,7 @@ class Model(object):
 
         return config
 
-    def report_script_progress(self, progress):
+    def report_script_progress(self, progress: int) -> None:
         """Report the script progress.
 
         Parameters
@@ -369,11 +376,13 @@ class Model(object):
         """
         self.signal_script.progress.emit(int(progress))
 
-    async def save_position(self):
+    async def save_position(self) -> None:
         """Save the rigid body position."""
         await self.controller.write_command_to_server("saveMirrorPosition")
 
-    async def go_to_position(self, x, y, z, rx, ry, rz):
+    async def go_to_position(
+        self, x: float, y: float, z: float, rx: float, ry: float, rz: float
+    ) -> None:
         """Go to the position.
 
         Parameters
@@ -412,7 +421,7 @@ class Model(object):
         else:
             raise RuntimeError("Mirror can be positioned only in closed-loop control.")
 
-    def is_enabled_and_open_loop_control(self):
+    def is_enabled_and_open_loop_control(self) -> bool:
         """The system is in the Enabled state and open-loop control or not.
 
         Returns
@@ -423,7 +432,7 @@ class Model(object):
         """
         return self.local_mode == LocalMode.Enable and not self.is_closed_loop
 
-    def is_enabled_and_closed_loop_control(self):
+    def is_enabled_and_closed_loop_control(self) -> bool:
         """The system is in the Enabled state and closed-loop control or not.
 
         Returns
@@ -434,11 +443,11 @@ class Model(object):
         """
         return self.local_mode == LocalMode.Enable and self.is_closed_loop
 
-    async def set_home(self):
+    async def set_home(self) -> None:
         """Set the home position."""
         await self.controller.write_command_to_server("setMirrorHome")
 
-    async def reboot_controller(self):
+    async def reboot_controller(self) -> None:
         """Reboot the cell controller.
 
         Raises
@@ -454,7 +463,7 @@ class Model(object):
                 "Controller can only be rebooted at the standby state with local control."
             )
 
-    async def set_bit_digital_status(self, idx):
+    async def set_bit_digital_status(self, idx: int) -> None:
         """Set the bit value of digital status.
 
         Parameters
@@ -477,7 +486,9 @@ class Model(object):
                 "Bit value of digital status can only be set in the diagnostic state."
             )
 
-    async def command_script(self, command, script_name=None):
+    async def command_script(
+        self, command: CommandScript, script_name: str | None = None
+    ) -> None:
         """Run the script command.
 
         Parameters
@@ -510,11 +521,11 @@ class Model(object):
 
     async def command_actuator(
         self,
-        command,
-        actuators=None,
-        target_displacement=0,
-        unit=ActuatorDisplacementUnit.Millimeter,
-    ):
+        command: CommandActuator,
+        actuators: list[int] | None = None,
+        target_displacement: float | int = 0,
+        unit: ActuatorDisplacementUnit = ActuatorDisplacementUnit.Millimeter,
+    ) -> None:
         """Run the actuator command.
 
         Parameters
@@ -566,7 +577,7 @@ class Model(object):
                 "Failed to command the actuator. Only allow in Enabled state and open-loop control."
             )
 
-    async def reset_breakers(self, power_type):
+    async def reset_breakers(self, power_type: PowerType) -> None:
         """Reset the breakers.
 
         Parameters
@@ -582,8 +593,12 @@ class Model(object):
         )
 
     def update_connection_information(
-        self, host, port_command, port_telemetry, timeout_connection
-    ):
+        self,
+        host: str,
+        port_command: int,
+        port_telemetry: int,
+        timeout_connection: float,
+    ) -> None:
         """Update the connection information.
 
         Parameters
@@ -594,7 +609,7 @@ class Model(object):
             Command port to connect.
         port_telemetry : `int`
             Telemetry port to connect.
-        timeout_connection : `int` or `float`
+        timeout_connection : `float`
             Connection timeout in second.
 
         Raises
@@ -616,7 +631,7 @@ class Model(object):
         self.controller.port_telemetry = port_telemetry
         self.controller.timeout_connection = timeout_connection
 
-    async def connect(self):
+    async def connect(self) -> None:
         """Connect to the M2 controller.
 
         Raises
@@ -650,7 +665,7 @@ class Model(object):
 
         await self.controller.connect_server()
 
-    async def _process_event(self, message=None):
+    async def _process_event(self, message: dict | None = None) -> None:
         """Process the events from the M2 controller.
 
         Parameters
@@ -661,7 +676,7 @@ class Model(object):
 
         name = self._get_message_name(message)
 
-        if name != "":
+        if name != "" and message is not None:
             if name == "m2AssemblyInPosition":
                 self.update_system_status("isInPosition", message["inPosition"])
 
@@ -800,12 +815,12 @@ class Model(object):
             else:
                 self.log.warning(f"Unspecified event message: {name}, ignoring...")
 
-    def _get_message_name(self, message):
+    def _get_message_name(self, message: dict | None) -> str:
         """Get the name of message.
 
         Parameters
         ----------
-        message : `dict`
+        message : `dict` or `None`
             Message.
 
         Returns
@@ -815,12 +830,15 @@ class Model(object):
             string.
         """
 
+        if message is None:
+            return ""
+
         try:
             return message["id"]
         except (TypeError, KeyError):
             return ""
 
-    def _update_breaker(self, digital_input):
+    def _update_breaker(self, digital_input: int) -> None:
         """Update the breakers.
 
         Parameters
@@ -841,7 +859,9 @@ class Model(object):
                 item, not (digital_input & enum_item.value)
             )
 
-    def _report_triggered_limit_switch(self, limit_switch_type, limit_switches):
+    def _report_triggered_limit_switch(
+        self, limit_switch_type: LimitSwitchType, limit_switches: list[int]
+    ) -> None:
         """Report the triggered limit switch.
 
         Parameters
@@ -867,7 +887,7 @@ class Model(object):
         except ValueError:
             self.log.exception("Unknown limit switches encountered.")
 
-    def _report_ilc_status(self, address, mode):
+    def _report_ilc_status(self, address: int, mode: int) -> None:
         """Report the status of inner-loop controller (ILC).
 
         Parameters
@@ -879,7 +899,7 @@ class Model(object):
         """
         self.signal_ilc_status.address_mode.emit((address, mode))
 
-    def _process_telemetry(self, message=None):
+    def _process_telemetry(self, message: dict | None = None) -> None:
         """Process the telemetry from the M2 controller.
 
         Parameters
@@ -890,7 +910,7 @@ class Model(object):
 
         name = self._get_message_name(message)
 
-        if name != "":
+        if name != "" and message is not None:
             self.update_system_status("isTelemetryActive", True)
 
             num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
@@ -1069,13 +1089,13 @@ class Model(object):
             else:
                 self.log.warning(f"Unspecified telemetry message: {name}, ignoring...")
 
-    def _process_lost_connection(self):
+    def _process_lost_connection(self) -> None:
         """Process the lost of connection from the M2 controller."""
 
         self.update_system_status("isCrioConnected", False)
         self.update_system_status("isTelemetryActive", False)
 
-    async def enter_diagnostic(self):
+    async def enter_diagnostic(self) -> None:
         """Transition from the Standby mode to the Diagnostic mode.
 
         Raises
@@ -1101,7 +1121,7 @@ class Model(object):
 
         self.report_control_status()
 
-    async def enter_enable(self):
+    async def enter_enable(self) -> None:
         """Transition from the Diagnostic mode to the Enable mode.
 
         Raises
@@ -1125,7 +1145,7 @@ class Model(object):
 
         self.report_control_status()
 
-    async def exit_enable(self):
+    async def exit_enable(self) -> None:
         """Transition from the Enable mode to the Diagnostic mode.
 
         Raises
@@ -1146,7 +1166,7 @@ class Model(object):
 
         self.report_control_status()
 
-    async def _basic_cleanup_and_power_off_motor(self):
+    async def _basic_cleanup_and_power_off_motor(self) -> None:
         """Basic cleanup and power off the motor."""
 
         try:
@@ -1166,7 +1186,7 @@ class Model(object):
                 "Error when doing the basic cleanup and power off the motor."
             )
 
-    async def exit_diagnostic(self):
+    async def exit_diagnostic(self) -> None:
         """Transition from the Diagnostic mode to the Standby mode.
 
         Raises
@@ -1187,7 +1207,7 @@ class Model(object):
 
         self.report_control_status()
 
-    async def fault(self):
+    async def fault(self) -> None:
         """Fault the system and transition to the Diagnostic mode if the
         system is in the Enable mode originally."""
 
@@ -1198,7 +1218,7 @@ class Model(object):
 
         self.report_control_status()
 
-    async def disconnect(self):
+    async def disconnect(self) -> None:
         """Disconnect from the M2 controller."""
 
         if self.controller.are_clients_connected():
@@ -1210,12 +1230,17 @@ class Model(object):
 
         self._process_lost_connection()
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> object:
         """This is an overridden function to support the asynchronous context
         manager."""
         return self
 
-    async def __aexit__(self, type, value, traceback):
+    async def __aexit__(
+        self,
+        type: typing.Type[BaseException] | None,
+        value: BaseException | None,
+        traceback: types.TracebackType | None,
+    ) -> None:
         """This is an overridden function to support the asynchronous context
         manager."""
         await self.controller.close_tasks()

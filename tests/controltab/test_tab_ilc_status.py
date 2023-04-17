@@ -22,6 +22,7 @@
 import asyncio
 import logging
 import pathlib
+from pathlib import Path
 
 import pytest
 from lsst.ts.m2com import NUM_INNER_LOOP_CONTROLLER, InnerLoopControlMode
@@ -29,27 +30,28 @@ from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabIlcStatus
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
+from pytestqt.qtbot import QtBot
 
 
-def get_ilc_details_file():
+def get_ilc_details_file() -> Path:
     policy_dir = pathlib.Path(__file__).parents[0] / ".." / ".." / "policy"
 
     return policy_dir / "ilc_details.yaml"
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabIlcStatus:
     widget = TabIlcStatus("ILC Status", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
     return widget
 
 
-def test_init(widget):
+def test_init(widget: TabIlcStatus) -> None:
     assert len(widget._indicators_ilc) == NUM_INNER_LOOP_CONTROLLER
 
 
-def test_get_indicator_color(widget):
+def test_get_indicator_color(widget: TabIlcStatus) -> None:
     assert widget._get_indicator_color(InnerLoopControlMode.Standby) == Qt.cyan
     assert widget._get_indicator_color(InnerLoopControlMode.Disabled) == Qt.blue
     assert widget._get_indicator_color(InnerLoopControlMode.Enabled) == Qt.green
@@ -58,7 +60,7 @@ def test_get_indicator_color(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_ilc_status(qtbot, widget):
+async def test_callback_signal_ilc_status(qtbot: QtBot, widget: TabIlcStatus) -> None:
     mode = InnerLoopControlMode.Disabled
     widget.model._report_ilc_status(1, mode.value)
 
@@ -71,7 +73,7 @@ async def test_callback_signal_ilc_status(qtbot, widget):
     assert color == widget._get_indicator_color(mode)
 
 
-def test_read_ilc_details_file(widget):
+def test_read_ilc_details_file(widget: TabIlcStatus) -> None:
     widget.read_ilc_details_file(get_ilc_details_file())
 
     assert widget._indicators_ilc[0].toolTip() == "Axial actuator: B1"

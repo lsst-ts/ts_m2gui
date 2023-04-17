@@ -19,6 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import typing
+
 __all__ = [
     "set_button",
     "create_grid_layout_buttons",
@@ -36,23 +38,32 @@ __all__ = [
 from functools import partial
 
 from lsst.ts.m2com import is_coroutine
+from PySide2 import QtWidgets
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QGridLayout, QGroupBox, QLabel, QPushButton, QTableWidget
+from PySide2.QtWidgets import (
+    QAction,
+    QGridLayout,
+    QGroupBox,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QToolBar,
+)
 
 from . import Ring
 from .widget import QMessageBoxAsync
 
 
 def set_button(
-    name,
-    callback,
-    *args,
-    is_checkable=False,
-    is_indicator=False,
-    is_adjust_size=False,
-    tool_tip=None,
-):
+    name: str,
+    callback: typing.Callable | None,
+    *args: typing.Any,
+    is_checkable: bool = False,
+    is_indicator: bool = False,
+    is_adjust_size: bool = False,
+    tool_tip: str | None = None,
+) -> QPushButton:
     """Set the button.
 
     Parameters
@@ -106,7 +117,9 @@ def set_button(
     return button
 
 
-def create_grid_layout_buttons(buttons, num_column):
+def create_grid_layout_buttons(
+    buttons: dict[str, QPushButton] | list[QPushButton], num_column: int
+) -> QGridLayout:
     """Create the grid layout of buttons.
 
     Parameters
@@ -144,7 +157,9 @@ def create_grid_layout_buttons(buttons, num_column):
     return layout
 
 
-def create_label(name="", point_size=None, is_bold=False):
+def create_label(
+    name: str = "", point_size: int | None = None, is_bold: bool = False
+) -> QLabel:
     """Create the label.
 
     Parameters
@@ -178,7 +193,7 @@ def create_label(name="", point_size=None, is_bold=False):
     return label
 
 
-def create_group_box(name, layout):
+def create_group_box(name: str, layout: QtWidgets) -> QGroupBox:
     """Create the group box.
 
     Parameters
@@ -200,7 +215,9 @@ def create_group_box(name, layout):
     return group_box
 
 
-def create_table(header_text, is_disabled_selection=False):
+def create_table(
+    header_text: list[str], is_disabled_selection: bool = False
+) -> QTableWidget:
     """Create the table.
 
     Parameters
@@ -229,7 +246,7 @@ def create_table(header_text, is_disabled_selection=False):
     return table
 
 
-def get_tol(num_digit_after_decimal):
+def get_tol(num_digit_after_decimal: int) -> float:
     """Get the tolerance.
 
     Parameters
@@ -246,7 +263,7 @@ def get_tol(num_digit_after_decimal):
     return 10 ** -int(num_digit_after_decimal)
 
 
-def get_num_actuator_ring(ring):
+def get_num_actuator_ring(ring: Ring) -> int:
     """Get the number of actuators on the specific ring.
 
     Parameters
@@ -277,7 +294,7 @@ def get_num_actuator_ring(ring):
         raise ValueError(f"Not supported ring: {ring!r}")
 
 
-def map_actuator_id_to_alias(actuator_id):
+def map_actuator_id_to_alias(actuator_id: int) -> tuple[Ring, int]:
     """Map the actuator ID to the alias.
 
     Parameters
@@ -314,7 +331,9 @@ def map_actuator_id_to_alias(actuator_id):
     raise ValueError(f"Unknown actuator ID ({actuator_id}) encountered.")
 
 
-async def prompt_dialog_warning(title, description, is_prompted=True):
+async def prompt_dialog_warning(
+    title: str, description: str, is_prompted: bool = True
+) -> None:
     """Shows a warning dialog.
 
     The user must react to this dialog. The rest of the GUI is blocked until
@@ -343,7 +362,12 @@ async def prompt_dialog_warning(title, description, is_prompted=True):
         await dialog.show()
 
 
-async def run_command(command, *args, is_prompted=True, **kwargs):
+async def run_command(
+    command: typing.Callable | typing.Coroutine,
+    *args: typing.Any,
+    is_prompted: bool = True,
+    **kwargs: dict[str, typing.Any],
+) -> bool:
     """Run the command, which can be a normal function or a coroutine.
 
     If the command fails and is_prompted is True, a dialog to warn the users
@@ -369,9 +393,9 @@ async def run_command(command, *args, is_prompted=True, **kwargs):
 
     try:
         if is_coroutine(command):
-            await command(*args, **kwargs)
+            await command(*args, **kwargs)  # type: ignore[operator]
         else:
-            command(*args, **kwargs)
+            command(*args, **kwargs)  # type: ignore[operator]
     except Exception as error:
         await prompt_dialog_warning(
             f"{command.__name__}()", str(error), is_prompted=is_prompted
@@ -382,7 +406,7 @@ async def run_command(command, *args, is_prompted=True, **kwargs):
     return True
 
 
-def get_button_action(tool_bar, name):
+def get_button_action(tool_bar: QToolBar, name: str) -> QAction:
     """Get the button widget of action in tool bar.
 
     Parameters

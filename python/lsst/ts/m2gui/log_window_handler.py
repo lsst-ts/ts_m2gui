@@ -23,6 +23,8 @@ __all__ = ["LogWindowHandler"]
 
 import logging
 
+from . import SignalMessage
+
 
 class LogWindowHandler(logging.Handler):
     """Log window handler.
@@ -35,11 +37,11 @@ class LogWindowHandler(logging.Handler):
         Format of the message.
     """
 
-    def __init__(self, signal_message, message_format):
+    def __init__(self, signal_message: SignalMessage, message_format: str) -> None:
         super().__init__()
 
         self._signal_message = signal_message
         self._formatter = logging.Formatter(message_format)
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord) -> None:
         self._signal_message.message.emit(self._formatter.format(record))

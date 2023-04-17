@@ -28,11 +28,13 @@ from lsst.ts.m2com import PowerType
 from lsst.ts.m2gui import ForceErrorTangent, Model
 from lsst.ts.m2gui.controltab import TabDiagnostics
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
+from PySide2.QtGui import QColor, QPalette
+from PySide2.QtWidgets import QPushButton
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabDiagnostics:
     widget = TabDiagnostics("Diagnostics", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
@@ -40,7 +42,7 @@ def widget(qtbot):
 
 
 @pytest_asyncio.fixture
-async def widget_async(qtbot):
+async def widget_async(qtbot: QtBot) -> TabDiagnostics:
     async with TabDiagnostics(
         "Diagnostics", Model(logging.getLogger(), is_simulation_mode=True)
     ) as widget_sim:
@@ -51,7 +53,9 @@ async def widget_async(qtbot):
 
 
 @pytest.mark.asyncio
-async def test_callback_control_digital_status(qtbot, widget_async):
+async def test_callback_control_digital_status(
+    qtbot: QtBot, widget_async: TabDiagnostics
+) -> None:
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
@@ -73,7 +77,7 @@ async def test_callback_control_digital_status(qtbot, widget_async):
 
 
 @pytest.mark.asyncio
-async def test_callback_power_motor_calibrated(widget):
+async def test_callback_power_motor_calibrated(widget: TabDiagnostics) -> None:
     widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -84,7 +88,7 @@ async def test_callback_power_motor_calibrated(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_power_communication_calibrated(widget):
+async def test_callback_power_communication_calibrated(widget: TabDiagnostics) -> None:
     widget.model.utility_monitor.update_power_calibrated(
         PowerType.Communication, 0.3, 0.4
     )
@@ -97,7 +101,7 @@ async def test_callback_power_communication_calibrated(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_power_motor_raw(widget):
+async def test_callback_power_motor_raw(widget: TabDiagnostics) -> None:
     widget.model.utility_monitor.update_power_raw(PowerType.Motor, 0.5, 0.6)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -108,7 +112,7 @@ async def test_callback_power_motor_raw(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_power_communication_raw(widget):
+async def test_callback_power_communication_raw(widget: TabDiagnostics) -> None:
     widget.model.utility_monitor.update_power_raw(PowerType.Communication, 0.7, 0.8)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -119,7 +123,7 @@ async def test_callback_power_communication_raw(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_digital_status_input(widget):
+async def test_callback_digital_status_input(widget: TabDiagnostics) -> None:
     widget.model.utility_monitor.update_digital_status_input(3)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -130,13 +134,13 @@ async def test_callback_digital_status_input(widget):
     _assert_indicator_color(widget._digital_status_input[2], Qt.gray)
 
 
-def _assert_indicator_color(indicator, target_color):
+def _assert_indicator_color(indicator: QPushButton, target_color: QColor) -> None:
     palette = indicator.palette()
     assert palette.color(QPalette.Button) == target_color
 
 
 @pytest.mark.asyncio
-async def test_callback_digital_status_output(widget):
+async def test_callback_digital_status_output(widget: TabDiagnostics) -> None:
     widget.model.utility_monitor.update_digital_status_output(6)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -159,7 +163,7 @@ async def test_callback_digital_status_output(widget):
 
 
 @pytest.mark.asyncio
-async def test_callback_force_error_tangent(widget):
+async def test_callback_force_error_tangent(widget: TabDiagnostics) -> None:
     force_error_tangent = ForceErrorTangent()
     force_error_tangent.error_force = [1.2, 0.233, -1.334, 0, 31.34, -2.29]
     force_error_tangent.error_weight = 13.331

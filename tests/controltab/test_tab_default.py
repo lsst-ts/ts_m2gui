@@ -25,21 +25,22 @@ import pytest
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabDefault
 from PySide2.QtWidgets import QScrollArea, QWidget
+from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture
-def widget(qtbot):
+def widget(qtbot: QtBot) -> TabDefault:
     widget = TabDefault("Default", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
     return widget
 
 
-def test_init(widget):
+def test_init(widget: TabDefault) -> None:
     assert widget.windowTitle() == "Default"
 
 
-def test_set_widget_scrollable(widget):
+def test_set_widget_scrollable(widget: TabDefault) -> None:
     scroll_area = widget.set_widget_scrollable(QWidget())
     assert type(scroll_area) is QScrollArea
 
@@ -47,14 +48,14 @@ def test_set_widget_scrollable(widget):
     assert scroll_area_resizable.widgetResizable() is True
 
 
-def test_create_and_start_timer(widget):
+def test_create_and_start_timer(widget: TabDefault) -> None:
     timer = widget.create_and_start_timer(None)
 
     assert timer.interval() == widget.model.duration_refresh
     assert timer.isActive() is True
 
 
-def test_check_duration_and_restart_timer(widget):
+def test_check_duration_and_restart_timer(widget: TabDefault) -> None:
     timer = widget.create_and_start_timer(None)
 
     widget.model.duration_refresh = 1000
