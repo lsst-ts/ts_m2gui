@@ -25,8 +25,16 @@ import logging
 import types
 import typing
 
+import numpy as np
+from lsst.ts import salobj
 from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
+    LIMIT_FORCE_AXIAL_CLOSED_LOOP,
+    LIMIT_FORCE_AXIAL_OPEN_LOOP,
+    LIMIT_FORCE_TANGENT_CLOSED_LOOP,
+    LIMIT_FORCE_TANGENT_OPEN_LOOP,
+    MAX_LIMIT_FORCE_AXIAL_OPEN_LOOP,
+    MAX_LIMIT_FORCE_TANGENT_OPEN_LOOP,
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
     ActuatorDisplacementUnit,
@@ -37,7 +45,9 @@ from lsst.ts.m2com import (
     DigitalInput,
     DigitalOutput,
     LimitSwitchType,
+    MockErrorCode,
     PowerType,
+    check_limit_switches,
     get_config_dir,
 )
 
@@ -54,6 +64,7 @@ from . import (
     SignalPowerSystem,
     SignalScript,
     SignalStatus,
+    Status,
     TemperatureGroup,
     UtilityMonitor,
     get_num_actuator_ring,
@@ -144,7 +155,9 @@ class Model(object):
 
         self.system_status = self._set_system_status()
 
-        self.fault_manager = FaultManager(self.get_actuator_default_status(False))
+        self.fault_manager = FaultManager(
+            self.get_actuator_default_status(Status.Normal)
+        )
         self.utility_monitor = UtilityMonitor()
 
         self.controller = ControllerCell(
@@ -177,7 +190,8 @@ class Model(object):
             "isPowerCommunicationOn": False,
             "isPowerMotorOn": False,
             "isOpenLoopMaxLimitsEnabled": False,
-            "isAlarmWarningOn": False,
+            "isAlarmOn": False,
+            "isWarningOn": False,
             "isInterlockOn": False,
             "isCellTemperatureHigh": False,
         }
@@ -245,8 +259,8 @@ class Model(object):
         """Report the control status."""
         self.signal_control.is_control_updated.emit(True)
 
-    def add_error(self, error: int) -> None:
-        """Add the error.
+    def report_error(self, error: int) -> None:
+        """Report the error.
 
         Parameters
         ----------
@@ -261,8 +275,11 @@ class Model(object):
         """Check whenever the error is triggered, and update the related
         internal status."""
 
-        is_error_on = self.fault_manager.has_error()
-        self.update_system_status("isAlarmWarningOn", is_error_on)
+        is_error_on = self.controller.error_handler.exists_error()
+        self.update_system_status("isAlarmOn", is_error_on)
+
+        is_warning_on = self.controller.error_handler.exists_warning()
+        self.update_system_status("isWarningOn", is_warning_on)
 
     def clear_error(self, error: int) -> None:
         """Clear the error.
@@ -279,7 +296,7 @@ class Model(object):
     async def reset_errors(self) -> None:
         """Reset errors."""
 
-        await self.controller.clear_errors()
+        await self.controller.clear_errors(bypass_state_checking=True)
 
         self.fault_manager.reset_errors()
         self.fault_manager.reset_limit_switch_status(LimitSwitchType.Retract)
@@ -682,13 +699,7 @@ class Model(object):
 
             elif name == "errorCode":
                 error_code = message["errorCode"]
-                self.add_error(error_code)
-
-                # Note some error code might be just the warning. Therefore, we
-                # let the fault_manager to judge and fault the system when
-                # needed.
-                if self.fault_manager.has_error():
-                    await self.fault()
+                self.report_error(error_code)
 
                 self.log.warning(f"Receive the error code: {error_code}.")
 
@@ -769,12 +780,27 @@ class Model(object):
                 )
 
             elif name == "limitSwitchStatus":
-                self._report_triggered_limit_switch(
-                    LimitSwitchType.Retract, message["retract"]
-                )
-                self._report_triggered_limit_switch(
-                    LimitSwitchType.Extend, message["extend"]
-                )
+                if len(message["retract"]) != 0:
+                    self._report_triggered_limit_switch(
+                        LimitSwitchType.Retract,
+                        message["retract"],
+                        is_hardware_fault=True,
+                    )
+
+                    self.log.info(
+                        f"{LimitSwitchType.Retract!r} limit switches triggered: {message['retract']}."
+                    )
+
+                if len(message["extend"]) != 0:
+                    self._report_triggered_limit_switch(
+                        LimitSwitchType.Extend,
+                        message["extend"],
+                        is_hardware_fault=True,
+                    )
+
+                    self.log.info(
+                        f"{LimitSwitchType.Extend!r} limit switches triggered: {message['extend']}."
+                    )
 
             elif name == "powerSystemState":
                 self.signal_power_system.is_state_updated.emit(True)
@@ -809,11 +835,15 @@ class Model(object):
                 "summaryState",
                 "detailedState",
                 "temperatureOffset",
+                "summaryFaultsStatus",
             ):
                 pass
 
             else:
                 self.log.warning(f"Unspecified event message: {name}, ignoring...")
+
+        # Fault the system if needed
+        await self._check_and_fault_system()
 
     def _get_message_name(self, message: dict | None) -> str:
         """Get the name of message.
@@ -860,7 +890,10 @@ class Model(object):
             )
 
     def _report_triggered_limit_switch(
-        self, limit_switch_type: LimitSwitchType, limit_switches: list[int]
+        self,
+        limit_switch_type: LimitSwitchType,
+        limit_switches: list[int],
+        is_hardware_fault: bool = True,
     ) -> None:
         """Report the triggered limit switch.
 
@@ -870,18 +903,30 @@ class Model(object):
             Type of limit switch.
         limit_switches : `list`
             Triggered limit switches.
+        is_hardware_fault : `bool`, optional
+            Is the hardware fault or not. (the default is True)
         """
 
-        if len(limit_switches) != 0:
-            self.log.info(
-                f"{limit_switch_type!r} limit switches triggered: {limit_switches}."
-            )
-
+        limit_switch_status_current = (
+            self.fault_manager.limit_switch_status_retract
+            if limit_switch_type == LimitSwitchType.Retract
+            else self.fault_manager.limit_switch_status_extend
+        )
+        status_new = Status.Error if is_hardware_fault else Status.Alert
         try:
             for limit_switch in limit_switches:
+                # Check the current status
                 ring, number = map_actuator_id_to_alias(limit_switch)
+                name = ring.name + str(number)
+                status_current = limit_switch_status_current[name]
+
+                # Alert status can not overwrite the error status
+                if (status_current == Status.Error) and (status_new == Status.Alert):
+                    continue
+
+                # Update the new status
                 self.fault_manager.update_limit_switch_status(
-                    limit_switch_type, ring, number, True
+                    limit_switch_type, ring, number, status_new
                 )
 
         except ValueError:
@@ -898,6 +943,22 @@ class Model(object):
             Inner-loop control mode.
         """
         self.signal_ilc_status.address_mode.emit((address, mode))
+
+    async def _check_and_fault_system(self) -> None:
+        """Check the system condition and fault the system if needed."""
+
+        # Note some error code might be just the warning. Therefore, we
+        # let the error_handler to judge and fault the system when
+        # needed.
+        error_handler = self.controller.error_handler
+        if (
+            error_handler.exists_error()
+            or error_handler.has_warning(
+                MockErrorCode.LimitSwitchTriggeredOpenloop.value
+            )
+            or (self.controller.controller_state == salobj.State.FAULT)
+        ):
+            await self.fault()
 
     def _process_telemetry(self, message: dict | None = None) -> None:
         """Process the telemetry from the M2 controller.
@@ -954,6 +1015,8 @@ class Model(object):
 
                 self.utility_monitor.update_forces(forces)
 
+                self._check_force_with_limit(forces.f_cur)
+
             elif name == "tangentForce":
                 forces = self.utility_monitor.get_forces()
 
@@ -981,6 +1044,8 @@ class Model(object):
                     forces.f_error[idx - 1] = 0
 
                 self.utility_monitor.update_forces(forces)
+
+                self._check_force_with_limit(forces.f_cur)
 
             elif name == "temperature":
                 self.utility_monitor.update_temperature(
@@ -1088,6 +1153,57 @@ class Model(object):
 
             else:
                 self.log.warning(f"Unspecified telemetry message: {name}, ignoring...")
+
+    def _check_force_with_limit(
+        self, measured_force: list[float], buffer: float = 0.05
+    ) -> None:
+        """Check the measured force with the software limit. If it is out of
+        limit, alert the related limit switch status.
+
+        Parameters
+        ----------
+        measured_force : `list`
+            Measured force in Newton.
+        buffer : `float`, optional
+            Buffer of the force limit in ratio. (the default is 0.05)
+        """
+
+        limit_force_axial, limit_force_tangent = self.get_current_force_limits()
+        ratio = 1 - buffer
+        _, limit_switch_retract, limit_switch_extend = check_limit_switches(
+            np.array(measured_force),
+            limit_force_axial * ratio,
+            limit_force_tangent * ratio,
+        )
+
+        if len(limit_switch_retract) != 0:
+            self._report_triggered_limit_switch(
+                LimitSwitchType.Retract, limit_switch_retract, is_hardware_fault=False
+            )
+
+        if len(limit_switch_extend) != 0:
+            self._report_triggered_limit_switch(
+                LimitSwitchType.Extend, limit_switch_extend, is_hardware_fault=False
+            )
+
+    def get_current_force_limits(self) -> tuple[float, float]:
+        """Get the current force limits.
+
+        Returns
+        -------
+        `float`
+            Maximum axial force in Newton.
+        `float`
+            Maximum tangent force in Newton.
+        """
+
+        if self.is_closed_loop:
+            return LIMIT_FORCE_AXIAL_CLOSED_LOOP, LIMIT_FORCE_TANGENT_CLOSED_LOOP
+
+        if self.system_status["isOpenLoopMaxLimitsEnabled"] is True:
+            return MAX_LIMIT_FORCE_AXIAL_OPEN_LOOP, MAX_LIMIT_FORCE_TANGENT_OPEN_LOOP
+
+        return LIMIT_FORCE_AXIAL_OPEN_LOOP, LIMIT_FORCE_TANGENT_OPEN_LOOP
 
     def _process_lost_connection(self) -> None:
         """Process the lost of connection from the M2 controller."""

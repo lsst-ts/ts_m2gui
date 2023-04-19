@@ -35,23 +35,23 @@ class ActuatorForce:
     # The unit of force is Newton.
 
     # Force component in the calculation of gravity LUT.
-    f_gravity: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
-    f_delta: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_gravity: List[float] = field(default_factory=lambda: [0.0] * NUM_ACTUATOR)
+    f_delta: List[float] = field(default_factory=lambda: [0.0] * NUM_ACTUATOR)
 
     # Force component in the calculation of temperature LUT.
-    f_temperature: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_temperature: List[float] = field(default_factory=lambda: [0.0] * NUM_ACTUATOR)
 
     # Current force
-    f_cur: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_cur: List[float] = field(default_factory=lambda: [0.0] * NUM_ACTUATOR)
 
     # Force of the hard point correction
-    f_hc: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_hc: List[float] = field(default_factory=lambda: [0.0] * NUM_ACTUATOR)
 
     # Force error
-    f_error: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    f_error: List[float] = field(default_factory=lambda: [0.0] * NUM_ACTUATOR)
 
     # Step of motor. The data type should be integer.
     step: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
 
     # Actuator position in millimeter
-    position_in_mm: List[int] = field(default_factory=lambda: [0] * NUM_ACTUATOR)
+    position_in_mm: List[float] = field(default_factory=lambda: [0.0] * NUM_ACTUATOR)

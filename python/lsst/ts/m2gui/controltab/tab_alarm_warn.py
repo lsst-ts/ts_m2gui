@@ -21,10 +21,9 @@
 
 __all__ = ["TabAlarmWarn"]
 
-import csv
 from pathlib import Path
 
-from lsst.ts.m2com import LimitSwitchType
+from lsst.ts.m2com import LimitSwitchType, read_error_code_file
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
@@ -40,7 +39,7 @@ from PySide2.QtWidgets import (
 )
 from qasync import asyncSlot
 
-from ..enums import Ring
+from ..enums import Ring, Status
 from ..model import Model
 from ..signals import SignalError, SignalLimitSwitch
 from ..utils import create_label, create_table, run_command, set_button
@@ -124,12 +123,11 @@ class TabAlarmWarn(TabDefault):
 
         items = self._table_error.selectedItems()
 
-        error_code = str(items[0].text())
-
         try:
+            error_code = str(items[0].text())
             error_detail = self._error_list[error_code]
             self._text_error_cause.setPlainText(error_detail[4])
-        except KeyError:
+        except (KeyError, IndexError):
             pass
 
     def _create_text_error_cause(self) -> QPlainTextEdit:
@@ -181,31 +179,39 @@ class TabAlarmWarn(TabDefault):
 
         indicators = dict()
         for name in limit_switch_status.keys():
-            indicator = set_button(name, None, is_indicator=True, is_adjust_size=True)
+            indicator = set_button(
+                name,
+                None,
+                is_indicator=True,
+                is_adjust_size=True,
+                tool_tip="Green: Normal\nYellow: Software limit\nRed: Triggered",
+            )
 
-            self._update_indicator_color(indicator, False)
+            self._update_indicator_color(indicator, Status.Normal)
 
             indicators[name] = indicator
 
         return indicators
 
-    def _update_indicator_color(self, indicator: QPushButton, is_fault: bool) -> None:
+    def _update_indicator_color(self, indicator: QPushButton, status: Status) -> None:
         """Update the color of indicator.
 
         Parameters
         ----------
         indicator : `PySide2.QtWidgets.QPushButton`
             Indicator.
-        is_fault : `bool`
-            Is in fault or not.
+        status : enum `Status`
+            Status.
         """
 
         palette = indicator.palette()
 
-        if is_fault:
-            palette.setColor(QPalette.Button, Qt.red)
-        else:
+        if status == Status.Normal:
             palette.setColor(QPalette.Button, Qt.green)
+        elif status == Status.Alert:
+            palette.setColor(QPalette.Button, Qt.yellow)
+        else:
+            palette.setColor(QPalette.Button, Qt.red)
 
         indicator.setPalette(palette)
 
@@ -398,7 +404,7 @@ class TabAlarmWarn(TabDefault):
         type_name_status : `tuple`
             A tuple: (type, name, status). The data type of type is integer
             (enum `lsst.ts.m2com.LimitSwitchType`), the data type of name is
-            string, and the data type of status is bool.
+            string, and the data type of status is integer (enum `Status`).
         """
 
         limit_switch_type = LimitSwitchType(type_name_status[0])
@@ -408,8 +414,8 @@ class TabAlarmWarn(TabDefault):
             indicators = self._indicators_limit_switch_extend
 
         name = type_name_status[1]
-        is_fault = type_name_status[2]
-        self._update_indicator_color(indicators[name], is_fault)
+
+        self._update_indicator_color(indicators[name], Status(type_name_status[2]))
 
     def read_error_list_file(self, filepath: str | Path) -> None:
         """Read the tsv file of error list.
@@ -420,16 +426,14 @@ class TabAlarmWarn(TabDefault):
             File path.
         """
 
-        self._error_list = dict()
-        with open(filepath, "r") as file:
-            csv_reader = csv.reader(file, delimiter="\t")
+        # Randomly-chosen minimum error code by vendor
+        MINIMUM_ERROR_CODE = 6000
 
-            # Skip the header
-            next(csv_reader)
-
-            # Get the error details
-            for row in csv_reader:
-                self._error_list[row[0]] = row[1:]
+        # Read the file and pop out the dummy error code
+        self._error_list = read_error_code_file(filepath)
+        for error_code in list(self._error_list.keys()):
+            if int(error_code) < MINIMUM_ERROR_CODE:
+                self._error_list.pop(error_code)
 
         self._add_error_list_to_table()
         self._resize_table_error()

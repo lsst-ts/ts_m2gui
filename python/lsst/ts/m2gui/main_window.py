@@ -26,7 +26,7 @@ import pathlib
 import sys
 from datetime import datetime
 
-from lsst.ts.m2com import read_yaml_file
+from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.tcpip import LOCALHOST_IPV4
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QAction, QMainWindow, QToolBar, QVBoxLayout, QWidget
@@ -272,7 +272,7 @@ class MainWindow(QMainWindow):
     def _set_tab_alarm_warn(self) -> None:
         """Set the table of alarms and warnings."""
 
-        filepath = self._get_policy_dir() / "error_code_m2.tsv"
+        filepath = get_config_dir() / "error_code.tsv"
 
         tab_alarm_warn = self._control_tabs.get_tab("Alarms/Warnings")[1]
 

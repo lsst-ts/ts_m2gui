@@ -66,9 +66,8 @@ class SignalLimitSwitch(QtCore.QObject):
 
     # The type_name_status should be a tuple: (type, name, status). The data
     # type of "type" is integer (enum `lsst.ts.m2com.LimitSwitchType`), the
-    # data type of "name" is string, and the data type of "status" is bool. If
-    # the limit switch is triggered, put the "status" as True, otherwise,
-    # False.
+    # data type of "name" is string, and the data type of "status" is integer (
+    # enum `Status`).
     type_name_status = QtCore.Signal(object)
 
 
