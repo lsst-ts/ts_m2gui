@@ -47,6 +47,13 @@ pipeline {
             steps {
                 withEnv(["WORK_HOME=${env.WORKSPACE}"]) {
                     sh """
+                        git clone https://github.com/lsst-ts/ts_config_mttcs.git
+
+                        cd ${WORK_HOME}/ts_config_mttcs
+                        git checkout -t origin/${env.BRANCH} | true
+
+                        cd ${WORK_HOME}
+
                         git clone https://github.com/lsst-ts/ts_m2com.git
 
                         cd ${WORK_HOME}/ts_m2com
@@ -62,6 +69,9 @@ pipeline {
                 withEnv(["WORK_HOME=${env.WORKSPACE}"]) {
                     sh """
                         source ${env.SAL_SETUP_FILE}
+
+                        cd ${WORK_HOME}/ts_config_mttcs
+                        setup -k -r .
 
                         cd ${WORK_HOME}/ts_m2com
                         setup -k -r .
