@@ -6,6 +6,22 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.0:
+
+-------------
+0.4.0
+-------------
+
+* Update the limit switch status to support the new enum: **Status**.
+* Remove the **error_code_m2.tsv** and update the method to get the error code file.
+* Update the **Jenkinsfile** to use the default or related branch in **ts_config_mttcs**.
+* Fix the data type annotation of **ActuatorForce** class.
+* Update the ``TabAlarmWarn.read_error_list_file()`` to use the ``read_error_code_file()`` in **ts_m2com**.
+* Separate the **isAlarmWarningOn** overview status to **isAlarmOn** and **isWarningOn** statuses.
+* Replace the annotation of ``typing.Set`` with internal ``set``.
+* Rename ``Model.add_error()`` to ``Model.report_error()``.
+* Differentiate the limit switch is triggered by the software limit or hardware.
+
 .. _lsst.ts.m2gui-0.3.9:
 
 -------------
