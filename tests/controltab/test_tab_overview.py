@@ -126,19 +126,20 @@ async def test_callback_signal_status(qtbot: QtBot, widget: TabOverview) -> None
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_status_is_alarm_warning_on(
+async def test_callback_signal_status_is_alarm_on(
     qtbot: QtBot, widget_async: TabOverview
 ) -> None:
     # Default color
-    assert _get_color_is_alarm_warning_on(widget_async) == Qt.gray
+    assert _get_color_is_alarm_on(widget_async) == Qt.gray
 
     # There is the error
-    widget_async.model.add_error(3)
+    widget_async.model.controller.error_handler.add_new_error(3)
+    widget_async.model.report_error(3)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_alarm_warning_on(widget_async) == Qt.red
+    assert _get_color_is_alarm_on(widget_async) == Qt.red
 
     # The error is cleared
     await widget_async.model.reset_errors()
@@ -146,9 +147,39 @@ async def test_callback_signal_status_is_alarm_warning_on(
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_alarm_warning_on(widget_async) == Qt.gray
+    assert _get_color_is_alarm_on(widget_async) == Qt.gray
 
 
-def _get_color_is_alarm_warning_on(widget: TabOverview) -> QColor:
-    palette = widget._indicators_status["isAlarmWarningOn"].palette()
+def _get_color_is_alarm_on(widget: TabOverview) -> QColor:
+    palette = widget._indicators_status["isAlarmOn"].palette()
+    return palette.color(QPalette.Button)
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_status_is_warning_on(
+    qtbot: QtBot, widget_async: TabOverview
+) -> None:
+    # Default color
+    assert _get_color_is_warning_on(widget_async) == Qt.gray
+
+    # There is the warning
+    widget_async.model.controller.error_handler.add_new_warning(3)
+    widget_async.model.report_error(3)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert _get_color_is_warning_on(widget_async) == Qt.yellow
+
+    # The warning is cleared
+    await widget_async.model.reset_errors()
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert _get_color_is_warning_on(widget_async) == Qt.gray
+
+
+def _get_color_is_warning_on(widget: TabOverview) -> QColor:
+    palette = widget._indicators_status["isWarningOn"].palette()
     return palette.color(QPalette.Button)

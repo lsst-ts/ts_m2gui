@@ -21,13 +21,12 @@
 
 import asyncio
 import logging
-import pathlib
 from pathlib import Path
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2com import LimitSwitchType
-from lsst.ts.m2gui import Model, Ring
+from lsst.ts.m2com import LimitSwitchType, get_config_dir
+from lsst.ts.m2gui import Model, Ring, Status
 from lsst.ts.m2gui.controltab import TabAlarmWarn
 from PySide2.QtCore import QPoint, Qt
 from PySide2.QtGui import QColor, QPalette
@@ -38,9 +37,7 @@ SLEEP_TIME_LONG = 5
 
 
 def get_error_list_file() -> Path:
-    policy_dir = pathlib.Path(__file__).parents[0] / ".." / ".." / "policy"
-
-    return policy_dir / "error_code_m2.tsv"
+    return get_config_dir() / "error_code.tsv"
 
 
 @pytest.fixture
@@ -66,7 +63,7 @@ async def widget_async(qtbot: QtBot) -> TabAlarmWarn:
 
 
 def test_init(qtbot: QtBot, widget: TabAlarmWarn) -> None:
-    assert len(widget._error_list) == 39
+    assert len(widget._error_list) == 36
     assert len(widget._error_list["6051"]) == 6
 
     assert widget._text_error_cause.placeholderText() == "Possible Error Cause"
@@ -147,7 +144,7 @@ def _get_widget_item_center(widget: TabAlarmWarn, item_text: str) -> QPoint:
 
 @pytest.mark.asyncio
 async def test_callback_signal_error_new(qtbot: QtBot, widget: TabAlarmWarn) -> None:
-    widget.model.add_error(6051)
+    widget.model.report_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_SHORT)
@@ -155,7 +152,7 @@ async def test_callback_signal_error_new(qtbot: QtBot, widget: TabAlarmWarn) -> 
     color_6051 = _get_widget_item_color(widget, "6051")
     assert color_6051 == Qt.red
 
-    widget.model.add_error(6052)
+    widget.model.report_error(6052)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_SHORT)
@@ -173,7 +170,7 @@ def _get_widget_item_color(widget: TabAlarmWarn, item_text: str) -> QColor:
 async def test_callback_signal_error_cleared(
     qtbot: QtBot, widget: TabAlarmWarn
 ) -> None:
-    widget.model.add_error(6051)
+    widget.model.report_error(6051)
 
     widget.model.clear_error(6051)
 
@@ -196,14 +193,14 @@ async def test_callback_reset(qtbot: QtBot, widget_async: TabAlarmWarn) -> None:
     )
 
     # Highlight the error
-    widget_async.model.add_error(6051)
+    widget_async.model.report_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_SHORT)
 
     # Trigger the limit switch
     widget_async.model.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.C, 3, True
+        LimitSwitchType.Extend, Ring.C, 3, Status.Error
     )
 
     # Click the reset button
@@ -235,9 +232,29 @@ def test_set_error_item_color_error(qtbot: QtBot, widget: TabAlarmWarn) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_limit_switch(qtbot: QtBot, widget: TabAlarmWarn) -> None:
+async def test_callback_signal_limit_switch_alert(
+    qtbot: QtBot, widget: TabAlarmWarn
+) -> None:
     widget.model.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.C, 3, True
+        LimitSwitchType.Extend, Ring.B, 2, Status.Alert
+    )
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(SLEEP_TIME_SHORT)
+
+    indicator = widget._indicators_limit_switch_extend["B2"]
+    palette = indicator.palette()
+    color = palette.color(QPalette.Button)
+
+    assert color == Qt.yellow
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_limit_switch_error(
+    qtbot: QtBot, widget: TabAlarmWarn
+) -> None:
+    widget.model.fault_manager.update_limit_switch_status(
+        LimitSwitchType.Extend, Ring.C, 3, Status.Error
     )
 
     # Sleep so the event loop can access CPU to handle the signal

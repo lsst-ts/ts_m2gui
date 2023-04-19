@@ -26,6 +26,12 @@ import pytest
 import pytest_asyncio
 from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
+    LIMIT_FORCE_AXIAL_CLOSED_LOOP,
+    LIMIT_FORCE_AXIAL_OPEN_LOOP,
+    LIMIT_FORCE_TANGENT_CLOSED_LOOP,
+    LIMIT_FORCE_TANGENT_OPEN_LOOP,
+    MAX_LIMIT_FORCE_AXIAL_OPEN_LOOP,
+    MAX_LIMIT_FORCE_TANGENT_OPEN_LOOP,
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
     CommandActuator,
@@ -33,7 +39,7 @@ from lsst.ts.m2com import (
     LimitSwitchType,
     PowerType,
 )
-from lsst.ts.m2gui import LocalMode, Model, Ring
+from lsst.ts.m2gui import LocalMode, Model, Ring, Status
 from pytestqt.qtbot import QtBot
 
 TIMEOUT = 1000
@@ -53,22 +59,25 @@ async def model_async() -> Model:
 
 
 def test_init(model: Model) -> None:
-    assert len(model.system_status) == 9
+    assert len(model.system_status) == 10
 
 
-def test_add_error(qtbot: QtBot, model: Model) -> None:
+def test_report_error(qtbot: QtBot, model: Model) -> None:
     error = 3
+    model.controller.error_handler.add_new_error(error)
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        model.add_error(error)
+        model.report_error(error)
 
     assert model.fault_manager.errors == {error}
 
 
 def test_clear_error(qtbot: QtBot, model: Model) -> None:
     error = 3
-    model.add_error(error)
+    model.report_error(error)
 
-    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+    with qtbot.waitSignal(
+        model.fault_manager.signal_error.error_cleared, timeout=TIMEOUT
+    ):
         model.clear_error(error)
 
     assert model.fault_manager.errors == set()
@@ -78,12 +87,13 @@ def test_clear_error(qtbot: QtBot, model: Model) -> None:
 async def test_reset_errors(qtbot: QtBot, model_async: Model) -> None:
     assert model_async.controller.are_clients_connected() is True
 
-    model_async.add_error(3)
+    model_async.controller.error_handler.add_new_error(3)
+    model_async.report_error(3)
     model_async.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Retract, Ring.B, 2, True
+        LimitSwitchType.Retract, Ring.B, 2, Status.Error
     )
     model_async.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.C, 3, True
+        LimitSwitchType.Extend, Ring.C, 3, Status.Error
     )
 
     signals = [
@@ -95,8 +105,8 @@ async def test_reset_errors(qtbot: QtBot, model_async: Model) -> None:
         await model_async.reset_errors()
 
     assert model_async.fault_manager.errors == set()
-    assert model_async.fault_manager.limit_switch_status_retract["B2"] is False
-    assert model_async.fault_manager.limit_switch_status_extend["C3"] is False
+    assert model_async.fault_manager.limit_switch_status_retract["B2"] == Status.Normal
+    assert model_async.fault_manager.limit_switch_status_extend["C3"] == Status.Normal
 
 
 @pytest.mark.asyncio
@@ -258,7 +268,7 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
             message={"id": "m2AssemblyInPosition", "inPosition": True}
         )
 
-    with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
+    with qtbot.waitSignal(model.fault_manager.signal_error.error_new, timeout=TIMEOUT):
         await model._process_event(message={"id": "errorCode", "errorCode": 1})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
@@ -538,6 +548,44 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
                 "sum": 1,
             }
         )
+
+
+def test_check_force_with_limit(qtbot: QtBot, model: Model) -> None:
+    with qtbot.waitSignal(
+        model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
+    ):
+        model._check_force_with_limit([1000.0] * NUM_ACTUATOR)
+
+
+def test_get_current_force_limits(model: Model) -> None:
+    # Check the open-loop
+    (
+        limit_force_axial,
+        limit_force_tangent,
+    ) = model.get_current_force_limits()
+
+    assert limit_force_axial == LIMIT_FORCE_AXIAL_OPEN_LOOP
+    assert limit_force_tangent == LIMIT_FORCE_TANGENT_OPEN_LOOP
+
+    # Check the open-loop maximum
+    model.system_status["isOpenLoopMaxLimitsEnabled"] = True
+    (
+        limit_force_axial,
+        limit_force_tangent,
+    ) = model.get_current_force_limits()
+
+    assert limit_force_axial == MAX_LIMIT_FORCE_AXIAL_OPEN_LOOP
+    assert limit_force_tangent == MAX_LIMIT_FORCE_TANGENT_OPEN_LOOP
+
+    # Check the closed-loop
+    model.is_closed_loop = True
+    (
+        limit_force_axial,
+        limit_force_tangent,
+    ) = model.get_current_force_limits()
+
+    assert limit_force_axial == LIMIT_FORCE_AXIAL_CLOSED_LOOP
+    assert limit_force_tangent == LIMIT_FORCE_TANGENT_CLOSED_LOOP
 
 
 def test_process_lost_connection(model: Model) -> None:
