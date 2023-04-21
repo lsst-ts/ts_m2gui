@@ -51,7 +51,7 @@ from PySide2.QtWidgets import (
     QToolBar,
 )
 
-from . import Ring
+from .enums import Ring
 from .widget import QMessageBoxAsync
 
 

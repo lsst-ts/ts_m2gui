@@ -136,3 +136,7 @@ dmypy.json
 
 # Directory
 log/
+.pre-commit-config.yaml
+.flake8
+.isort.cfg
+.mypy.ini

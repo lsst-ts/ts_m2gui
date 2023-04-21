@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.1:
+
+-------------
+0.4.1
+-------------
+
+* Adapt the **.ts_pre_commit_config.yaml**.
+
 .. _lsst.ts.m2gui-0.4.0:
 
 -------------

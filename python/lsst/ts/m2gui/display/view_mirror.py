@@ -25,7 +25,7 @@ from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsView
 from qasync import asyncSlot
 
-from . import ItemActuator
+from .item_actuator import ItemActuator
 
 
 class ViewMirror(QGraphicsView):

@@ -23,7 +23,7 @@ __all__ = ["LogWindowHandler"]
 
 import logging
 
-from . import SignalMessage
+from .signals import SignalMessage
 
 
 class LogWindowHandler(logging.Handler):

@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from .figure_constant import *
 from .gauge import *
 from .item_actuator import *
 from .view_mirror import *
-from .figure_constant import *

@@ -25,7 +25,6 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout
 from qasync import asyncSlot
 
-from . import Model
 from .controltab import (
     TabActuatorControl,
     TabAlarmWarn,
@@ -39,6 +38,7 @@ from .controltab import (
     TabRigidBodyPos,
     TabUtilityView,
 )
+from .model import Model
 
 
 class ControlTabs(object):

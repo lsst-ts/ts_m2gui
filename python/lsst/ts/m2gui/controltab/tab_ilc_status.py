@@ -43,7 +43,7 @@ from ..utils import (
     create_label,
     set_button,
 )
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabIlcStatus(TabDefault):

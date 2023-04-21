@@ -26,7 +26,7 @@ import sys
 
 from PySide2.QtWidgets import QFileDialog
 
-from . import connect_signal_to_future
+from .tools import connect_signal_to_future
 
 
 class QFileDialogAsync(QFileDialog):

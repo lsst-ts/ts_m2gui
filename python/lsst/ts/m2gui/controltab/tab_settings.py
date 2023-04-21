@@ -26,7 +26,7 @@ from qasync import QApplication, asyncSlot
 
 from ..model import Model
 from ..utils import create_group_box, run_command, set_button
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabSettings(TabDefault):

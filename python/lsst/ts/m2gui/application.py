@@ -29,7 +29,7 @@ import sys
 import qasync
 from PySide2.QtCore import QCommandLineOption, QCommandLineParser
 
-from . import MainWindow
+from .main_window import MainWindow
 
 
 def run_application(argv: list) -> None:

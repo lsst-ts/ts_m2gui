@@ -43,7 +43,7 @@ from ..enums import Ring, Status
 from ..model import Model
 from ..signals import SignalError, SignalLimitSwitch
 from ..utils import create_label, create_table, run_command, set_button
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabAlarmWarn(TabDefault):

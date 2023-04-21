@@ -51,25 +51,26 @@ from lsst.ts.m2com import (
     get_config_dir,
 )
 
-from . import (
-    Config,
+from .config import Config
+from .enums import (
     DisplacementSensorDirection,
-    FaultManager,
-    ForceErrorTangent,
     LocalMode,
     Ring,
+    Status,
+    TemperatureGroup,
+)
+from .fault_manager import FaultManager
+from .force_error_tangent import ForceErrorTangent
+from .signals import (
     SignalConfig,
     SignalControl,
     SignalIlcStatus,
     SignalPowerSystem,
     SignalScript,
     SignalStatus,
-    Status,
-    TemperatureGroup,
-    UtilityMonitor,
-    get_num_actuator_ring,
-    map_actuator_id_to_alias,
 )
+from .utility_monitor import UtilityMonitor
+from .utils import get_num_actuator_ring, map_actuator_id_to_alias
 
 
 class Model(object):

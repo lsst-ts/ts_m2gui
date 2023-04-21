@@ -32,18 +32,14 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QAction, QMainWindow, QToolBar, QVBoxLayout, QWidget
 from qasync import QApplication, asyncSlot
 
-from . import (
-    ControlTabs,
-    LogWindowHandler,
-    Model,
-    QMessageBoxAsync,
-    SignalMessage,
-    get_button_action,
-    prompt_dialog_warning,
-    run_command,
-)
+from .control_tabs import ControlTabs
 from .controltab import TabSettings
 from .layout import LayoutControl, LayoutControlMode, LayoutLocalMode
+from .log_window_handler import LogWindowHandler
+from .model import Model
+from .signals import SignalMessage
+from .utils import get_button_action, prompt_dialog_warning, run_command
+from .widget import QMessageBoxAsync
 
 
 class MainWindow(QMainWindow):

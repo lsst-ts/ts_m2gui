@@ -34,7 +34,7 @@ from qasync import asyncSlot
 from ..model import Model
 from ..signals import SignalPosition
 from ..utils import create_group_box, create_label, get_tol, run_command, set_button
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabRigidBodyPos(TabDefault):

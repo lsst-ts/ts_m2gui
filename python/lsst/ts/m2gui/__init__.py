@@ -29,17 +29,17 @@ else:
     except ImportError:
         __version__ = "?"
 
-from .enums import *
-from .widget import *
-from .utils import *
-from .signals import *
-from .log_window_handler import *
-from .fault_manager import *
 from .actuator_force import *
-from .force_error_tangent import *
-from .utility_monitor import *
-from .config import *
-from .model import *
-from .control_tabs import *
-from .main_window import *
 from .application import *
+from .config import *
+from .control_tabs import *
+from .enums import *
+from .fault_manager import *
+from .force_error_tangent import *
+from .log_window_handler import *
+from .main_window import *
+from .model import *
+from .signals import *
+from .utility_monitor import *
+from .utils import *
+from .widget import *
