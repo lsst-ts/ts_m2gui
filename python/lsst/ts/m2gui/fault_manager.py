@@ -21,11 +21,9 @@
 
 __all__ = ["FaultManager"]
 
-import typing
-
 from lsst.ts.m2com import LimitSwitchType
 
-from . import Ring, SignalError, SignalLimitSwitch
+from . import Ring, SignalError, SignalLimitSwitch, Status
 
 
 class FaultManager(object):
@@ -58,7 +56,7 @@ class FaultManager(object):
         self.signal_error = SignalError()
         self.signal_limit_switch = SignalLimitSwitch()
 
-        self.errors: typing.Set[int] = set()
+        self.errors: set[int] = set()
 
         self.limit_switch_status_retract = limit_switch_status.copy()
         self.limit_switch_status_extend = limit_switch_status.copy()
@@ -129,10 +127,10 @@ class FaultManager(object):
             raise ValueError(f"Unsupported limit switch type: {limit_switch_type!r}.")
 
         for limit_switch, status in limit_switch_status.items():
-            if status is True:
-                limit_switch_status[limit_switch] = False
+            if status != Status.Normal:
+                limit_switch_status[limit_switch] = Status.Normal
                 self.signal_limit_switch.type_name_status.emit(
-                    (limit_switch_type, limit_switch, False)
+                    (limit_switch_type, limit_switch, Status.Normal)
                 )
 
     def update_limit_switch_status(
@@ -140,7 +138,7 @@ class FaultManager(object):
         limit_switch_type: LimitSwitchType,
         ring: Ring,
         number: int,
-        new_status: bool,
+        new_status: Status,
     ) -> None:
         """Update the limit switch status.
 
@@ -152,9 +150,8 @@ class FaultManager(object):
             Name of ring.
         number : `int`
             Number of actuator.
-        new_status : `bool`
-            New status of limit switch. If the limit switch is triggered, put
-            True, otherwise, False.
+        new_status : enum `Status`
+            New status of limit switch.
 
         Raises
         ------

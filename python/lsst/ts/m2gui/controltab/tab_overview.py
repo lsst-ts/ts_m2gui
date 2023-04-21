@@ -144,11 +144,15 @@ class TabOverview(TabDefault):
         """
 
         if indicator.text() in (
-            "isAlarmWarningOn",
+            "isAlarmOn",
             "isInterlockOn",
             "isCellTemperatureHigh",
         ):
             return Qt.red
+
+        elif indicator.text() == "isWarningOn":
+            return Qt.yellow
+
         else:
             return Qt.green
 

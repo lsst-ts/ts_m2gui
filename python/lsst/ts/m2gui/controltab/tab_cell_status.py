@@ -373,8 +373,8 @@ class TabCellStatus(TabDefault):
         """
 
         # Cell map
-        force_current_min = -1
-        force_current_max = 1
+        force_current_min = -1.0
+        force_current_max = 1.0
         for actuator, force_current in zip(
             self._view_mirror.actuators, self._forces.f_cur
         ):

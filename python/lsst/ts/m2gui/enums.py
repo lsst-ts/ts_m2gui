@@ -26,6 +26,7 @@ __all__ = [
     "DisplacementSensorDirection",
     "FigureActuatorData",
     "CellActuatorGroupData",
+    "Status",
 ]
 
 from enum import IntEnum, auto
@@ -81,3 +82,11 @@ class CellActuatorGroupData(IntEnum):
     All = 1
     Axial = auto()
     Tangent = auto()
+
+
+class Status(IntEnum):
+    """General status."""
+
+    Normal = 1
+    Alert = auto()
+    Error = auto()
