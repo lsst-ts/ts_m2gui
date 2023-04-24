@@ -27,7 +27,7 @@ from qasync import asyncSlot
 from ..enums import LocalMode
 from ..model import Model
 from ..utils import run_command, set_button
-from . import LayoutDefault
+from .layout_default import LayoutDefault
 
 
 class LayoutControlMode(LayoutDefault):

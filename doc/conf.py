@@ -11,20 +11,20 @@ import lsst.ts.m2gui
 from documenteer.conf.pipelinespkg import *
 
 project = "ts_m2gui"
-html_theme_options["logotext"] = project
+html_theme_options["logotext"] = project  # type: ignore # noqa
 html_title = project
 html_short_title = project
-doxylink = {}
+doxylink = {}  # type: ignore # noqa
 
-intersphinx_mapping["ts_m2com"] = ("https://ts-m2com.lsst.io", None)
+intersphinx_mapping["ts_m2com"] = ("https://ts-m2com.lsst.io", None)  # type: ignore # noqa
 
 # Support the sphinx extension of plantuml
-extensions.append("sphinxcontrib.plantuml")
+extensions.append("sphinxcontrib.plantuml")  # type: ignore # noqa
 
 # Put the path to plantuml.jar
 path_plantuml = (
     "/home/saluser/plantuml.jar"
     if getenv("PATH_PLANTUML") is None
     else getenv("PATH_PLANTUML")
-)
+)  # type: ignore # noqa
 plantuml = f"java -jar {path_plantuml}"

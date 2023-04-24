@@ -30,16 +30,11 @@ import numpy.typing
 from lsst.ts.m2com import DigitalInput, PowerType
 from PySide2.QtCore import Signal
 
-from . import (
-    ActuatorForce,
-    DisplacementSensorDirection,
-    ForceErrorTangent,
-    SignalDetailedForce,
-    SignalPosition,
-    SignalUtility,
-    TemperatureGroup,
-    get_tol,
-)
+from .actuator_force import ActuatorForce
+from .enums import DisplacementSensorDirection, TemperatureGroup
+from .force_error_tangent import ForceErrorTangent
+from .signals import SignalDetailedForce, SignalPosition, SignalUtility
+from .utils import get_tol
 
 
 class UtilityMonitor(object):

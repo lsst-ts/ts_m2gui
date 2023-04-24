@@ -35,7 +35,7 @@ from ..enums import CellActuatorGroupData, FigureActuatorData
 from ..model import Model
 from ..signals import SignalDetailedForce
 from ..utils import set_button
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabCellStatus(TabDefault):

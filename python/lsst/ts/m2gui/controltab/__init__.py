@@ -19,15 +19,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .tab_default import *
 from .tab_actuator_control import *
 from .tab_alarm_warn import *
 from .tab_cell_status import *
 from .tab_config_view import *
+from .tab_default import *
 from .tab_detailed_force import *
 from .tab_diagnostics import *
+from .tab_ilc_status import *
 from .tab_overview import *
 from .tab_rigid_body_pos import *
-from .tab_utility_view import *
 from .tab_settings import *
-from .tab_ilc_status import *
+from .tab_utility_view import *

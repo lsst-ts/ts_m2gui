@@ -38,7 +38,7 @@ from ..enums import DisplacementSensorDirection, TemperatureGroup
 from ..model import Model
 from ..signals import SignalPowerSystem, SignalUtility
 from ..utils import create_group_box, create_label, run_command, set_button
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabUtilityView(TabDefault):

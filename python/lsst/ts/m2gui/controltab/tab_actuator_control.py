@@ -53,7 +53,7 @@ from ..utils import (
     set_button,
 )
 from ..widget import QFileDialogAsync
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabActuatorControl(TabDefault):

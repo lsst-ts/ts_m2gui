@@ -39,7 +39,7 @@ from ..model import Model
 from ..signals import SignalDetailedForce, SignalUtility
 from ..utils import create_group_box, create_label, run_command, set_button
 from ..widget import QMessageBoxAsync
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabDiagnostics(TabDefault):

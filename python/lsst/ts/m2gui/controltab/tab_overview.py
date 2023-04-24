@@ -29,7 +29,7 @@ from qasync import asyncSlot
 from ..model import Model
 from ..signals import SignalControl, SignalMessage, SignalStatus
 from ..utils import create_label, set_button
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabOverview(TabDefault):

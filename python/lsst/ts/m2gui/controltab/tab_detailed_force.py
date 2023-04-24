@@ -38,7 +38,7 @@ from ..enums import Ring
 from ..model import Model
 from ..signals import SignalDetailedForce
 from ..utils import create_group_box, create_label, create_table, get_num_actuator_ring
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabDetailedForce(TabDefault):

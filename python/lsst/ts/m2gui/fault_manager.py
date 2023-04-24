@@ -23,7 +23,8 @@ __all__ = ["FaultManager"]
 
 from lsst.ts.m2com import LimitSwitchType
 
-from . import Ring, SignalError, SignalLimitSwitch, Status
+from .enums import Ring, Status
+from .signals import SignalError, SignalLimitSwitch
 
 
 class FaultManager(object):

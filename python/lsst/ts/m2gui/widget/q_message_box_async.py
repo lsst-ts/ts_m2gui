@@ -25,7 +25,7 @@ import asyncio
 
 from PySide2.QtWidgets import QMessageBox
 
-from . import connect_signal_to_future
+from .tools import connect_signal_to_future
 
 
 class QMessageBoxAsync(QMessageBox):

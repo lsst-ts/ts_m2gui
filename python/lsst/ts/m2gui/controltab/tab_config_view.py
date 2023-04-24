@@ -28,7 +28,7 @@ from ..config import Config
 from ..model import Model
 from ..signals import SignalConfig
 from ..utils import create_group_box, create_label
-from . import TabDefault
+from .tab_default import TabDefault
 
 
 class TabConfigView(TabDefault):

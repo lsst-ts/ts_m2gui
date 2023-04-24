@@ -25,7 +25,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtGui import QPen
 from PySide2.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem
 
-from . import Gauge
+from .gauge import Gauge
 
 
 class ItemActuator(QGraphicsEllipseItem):
