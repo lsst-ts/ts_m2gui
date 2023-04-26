@@ -38,6 +38,13 @@ See [Building single-package documentation locally](https://developer.lsst.io/st
 
 ## Run GUI in Docker Container
 
+You need to set the QT environment variables:
+
+```bash
+export QT_API="PySide2"
+export PYTEST_QT_API="PySide2"
+```
+
 ### CentOS 7
 
 Forward GUI by:
@@ -83,7 +90,6 @@ The environment variable **TS_CONFIG_MTTCS_DIR** specifies [ts_config_mttcs](htt
 You can run the unit tests by:
 
 ```bash
-export PYTEST_QT_API="PySide2"
 pytest tests/
 ```
 
