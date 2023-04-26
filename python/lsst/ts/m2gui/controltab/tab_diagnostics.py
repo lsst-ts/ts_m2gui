@@ -21,7 +21,7 @@
 
 __all__ = ["TabDiagnostics"]
 
-from lsst.ts.m2com import NUM_TANGENT_LINK
+from lsst.ts.m2com import NUM_TANGENT_LINK, DigitalOutputStatus
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
@@ -34,10 +34,17 @@ from PySide2.QtWidgets import (
 )
 from qasync import asyncSlot
 
+from ..enums import LocalMode
 from ..force_error_tangent import ForceErrorTangent
 from ..model import Model
 from ..signals import SignalDetailedForce, SignalUtility
-from ..utils import create_group_box, create_label, run_command, set_button
+from ..utils import (
+    create_group_box,
+    create_label,
+    prompt_dialog_warning,
+    run_command,
+    set_button,
+)
 from ..widget import QMessageBoxAsync
 from .tab_default import TabDefault
 
@@ -286,7 +293,17 @@ class TabDiagnostics(TabDefault):
         control = self._digital_status_control[idx]
         is_checked = control.isChecked()
 
-        is_successful = await run_command(self.model.set_bit_digital_status, idx)
+        allowed_mode = LocalMode.Diagnostic
+        if self.model.local_mode == allowed_mode:
+            is_successful = await run_command(
+                self.model.set_bit_digital_status, idx, DigitalOutputStatus.ToggleBit
+            )
+        else:
+            await prompt_dialog_warning(
+                "_callback_control_digital_status()",
+                f"Bit value of digital status can only be set in {allowed_mode!r}.",
+            )
+            is_successful = False
 
         if is_successful:
             self._update_control_text(control, is_checked)

@@ -64,11 +64,18 @@ class LayoutLocalMode(LayoutDefault):
             "Enable", self._callback_enable, tool_tip="Transition to enable state"
         )
 
+        # The mode transition is in the process or not
+        self._is_mode_transition_in_process = False
+
         super().__init__(model)
 
     @asyncSlot()
     async def _callback_signal_control(self, is_control_updated: bool) -> None:
-        if (not self.model.is_csc_commander) and (not self.model.is_closed_loop):
+        if (
+            (not self.model.is_csc_commander)
+            and (not self.model.is_closed_loop)
+            and (not self._is_mode_transition_in_process)
+        ):
             self._update_buttons()
         else:
             self._prohibit_transition()
@@ -149,6 +156,7 @@ class LayoutLocalMode(LayoutDefault):
         """
 
         # Disable all buttons first
+        self._is_mode_transition_in_process = True
         self._prohibit_transition()
 
         # Do the state transition
@@ -165,8 +173,8 @@ class LayoutLocalMode(LayoutDefault):
         elif local_mode == LocalMode.Enable:
             command = "enter_enable"
 
-        is_successful = await run_command(getattr(self.model, command))
+        await run_command(getattr(self.model, command))
 
-        # If fail, we need to make sure the buttons can work after that.
-        if not is_successful:
-            self._update_buttons()
+        # Reshow the buttons
+        self._is_mode_transition_in_process = False
+        self.model.report_control_status()
