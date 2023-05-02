@@ -44,6 +44,7 @@ from lsst.ts.m2com import (
     ControllerCell,
     DigitalInput,
     DigitalOutput,
+    DigitalOutputStatus,
     LimitSwitchType,
     MockErrorCode,
     PowerType,
@@ -481,28 +482,25 @@ class Model(object):
                 "Controller can only be rebooted at the standby state with local control."
             )
 
-    async def set_bit_digital_status(self, idx: int) -> None:
+    async def set_bit_digital_status(
+        self,
+        idx: int,
+        status: DigitalOutputStatus,
+    ) -> None:
         """Set the bit value of digital status.
 
         Parameters
         ----------
         idx : `int`
             Bit index that begins from 0, which should be >= 0.
-
-        Raises
-        ------
-        `RuntimeError`
-            Not in the diagnostic state.
+        status : enum `lsst.ts.m2com.DigitalOutputStatus`
+            Digital output status.
         """
 
-        if self.local_mode == LocalMode.Diagnostic:
-            await self.controller.write_command_to_server(
-                "switchDigitalOutput", message_details={"bit": 2**idx}
-            )
-        else:
-            raise RuntimeError(
-                "Bit value of digital status can only be set in the diagnostic state."
-            )
+        await self.controller.write_command_to_server(
+            "switchDigitalOutput",
+            message_details={"bit": 2**idx, "status": int(status)},
+        )
 
     async def command_script(
         self, command: CommandScript, script_name: str | None = None
@@ -1226,7 +1224,19 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Standby!r}."
             )
 
+        # Reset motor and communication power breakers bits and cRIO interlock
+        # bit. Based on the original developer in ts_mtm2, this is required to
+        # make the power system works correctly.
+        for idx in range(2, 5):
+            await self.set_bit_digital_status(idx, DigitalOutputStatus.BinaryHighLevel)
+
+        # I don't understand why I need to put the CLC mode to be Idle twice.
+        # This is translated from the ts_mtm2 and I need this to make the M2
+        # cRIO simulator to work.
+        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+
         await self.controller.load_configuration()
+        await self.controller.set_control_parameters()
 
         await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
         await self.controller.reset_force_offsets()
@@ -1235,8 +1245,6 @@ class Model(object):
         await self.controller.power(PowerType.Communication, True)
 
         self.local_mode = LocalMode.Diagnostic
-
-        self.report_control_status()
 
     async def enter_enable(self) -> None:
         """Transition from the Diagnostic mode to the Enable mode.
@@ -1260,8 +1268,6 @@ class Model(object):
 
         self.local_mode = LocalMode.Enable
 
-        self.report_control_status()
-
     async def exit_enable(self) -> None:
         """Transition from the Enable mode to the Diagnostic mode.
 
@@ -1280,8 +1286,6 @@ class Model(object):
         await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
 
         self.local_mode = LocalMode.Diagnostic
-
-        self.report_control_status()
 
     async def _basic_cleanup_and_power_off_motor(self) -> None:
         """Basic cleanup and power off the motor."""
@@ -1321,8 +1325,6 @@ class Model(object):
         await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
 
         self.local_mode = LocalMode.Standby
-
-        self.report_control_status()
 
     async def fault(self) -> None:
         """Fault the system and transition to the Diagnostic mode if the

@@ -199,12 +199,6 @@ async def test_reboot_controller_exception(model: Model) -> None:
 
 
 @pytest.mark.asyncio
-async def test_set_bit_digital_status_exception(model: Model) -> None:
-    with pytest.raises(RuntimeError):
-        await model.set_bit_digital_status(0)
-
-
-@pytest.mark.asyncio
 async def test_command_script_exception(model: Model) -> None:
     with pytest.raises(RuntimeError):
         await model.command_script(CommandScript.LoadScript)

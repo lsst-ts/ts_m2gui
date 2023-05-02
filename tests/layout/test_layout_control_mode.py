@@ -102,6 +102,10 @@ async def test_switch_force_balance_system(
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(15)
 
+    # Trigger the control signal to let the buttons change the status
+    widget_async.model.report_control_status()
+    await asyncio.sleep(1)
+
     assert widget_async.model.local_mode == LocalMode.Enable
 
     assert widget_async.model.is_closed_loop is False

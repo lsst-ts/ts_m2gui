@@ -6,6 +6,18 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.2:
+
+-------------
+0.4.2
+-------------
+
+* Support the bit status in ``Model.set_bit_digital_status()``.
+* Set the bit status and control parameters in ``Model.enter_diagnostic()``.
+* Do not report the control status under the state transitoin related commands (except the ``fault()``) in ``Model``.
+* Update the ``TabDiagnostics._callback_control_digital_status()`` to check the correct local mode to switch the buttons of digital outputs.
+* Update the ``LayoutLocalMode._callback_signal_control()`` that do not show the buttons when the system is doing the mode transition.
+
 .. _lsst.ts.m2gui-0.4.1:
 
 -------------
