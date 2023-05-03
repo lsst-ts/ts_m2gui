@@ -55,6 +55,9 @@ def model() -> Model:
 async def model_async() -> Model:
     async with Model(logging.getLogger(), is_simulation_mode=True) as model_sim:
         await model_sim.connect()
+
+        assert model_sim.fault_manager.has_error() is False
+
         yield model_sim
 
 
@@ -389,6 +392,21 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
         model._process_telemetry(
             message={
                 "id": "position",
+                "x": 1,
+                "y": 1,
+                "z": 1,
+                "xRot": 1,
+                "yRot": 1,
+                "zRot": 1,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_position.position_ims, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            message={
+                "id": "positionIMS",
                 "x": 1,
                 "y": 1,
                 "z": 1,
