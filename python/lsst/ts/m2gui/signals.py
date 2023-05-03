@@ -163,9 +163,15 @@ class SignalDetailedForce(QtCore.QObject):
 class SignalPosition(QtCore.QObject):
     """Position signal to send the rigid body position."""
 
-    # Rigid body position as a list: [x, y, z, rx, ry, rz]. The unit of x, y,
-    # and z is um. The unit of rx, ry, and ry is arcsec.
+    # Rigid body position as a list: [x, y, z, rx, ry, rz] based on the
+    # hardpoint displacement. The unit of x, y, and z is um. The unit of rx,
+    # ry, and ry is arcsec.
     position = QtCore.Signal(object)
+
+    # Rigid body position as a list: [x, y, z, rx, ry, rz] based on the
+    # independent measurement system (IMS). The unit of x, y, and z is um. The
+    # unit of rx, ry, and ry is arcsec.
+    position_ims = QtCore.Signal(object)
 
 
 class SignalScript(QtCore.QObject):

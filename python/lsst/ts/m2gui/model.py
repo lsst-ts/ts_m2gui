@@ -21,12 +21,12 @@
 
 __all__ = ["Model"]
 
+import asyncio
 import logging
 import types
 import typing
 
 import numpy as np
-from lsst.ts import salobj
 from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
     LIMIT_FORCE_AXIAL_CLOSED_LOOP,
@@ -194,7 +194,7 @@ class Model(object):
             "isOpenLoopMaxLimitsEnabled": False,
             "isAlarmOn": False,
             "isWarningOn": False,
-            "isInterlockOn": False,
+            "isInterlockEnabled": False,
             "isCellTemperatureHigh": False,
         }
 
@@ -647,8 +647,14 @@ class Model(object):
         self.controller.port_telemetry = port_telemetry
         self.controller.timeout_connection = timeout_connection
 
-    async def connect(self) -> None:
+    async def connect(self, time_process: float = 3.0) -> None:
         """Connect to the M2 controller.
+
+        Parameters
+        ----------
+        time_process : `float`, optional
+            Waiting time to let the application processes the received welcome
+            messages. (the default is 3.0)
 
         Raises
         ------
@@ -680,6 +686,13 @@ class Model(object):
             )
 
         await self.controller.connect_server()
+
+        # Wait some time to process the welcome messages
+        await asyncio.sleep(time_process)
+
+        # Clear all the existed error if any
+        if self.fault_manager.has_error():
+            await self.reset_errors()
 
     async def _process_event(self, message: dict | None = None) -> None:
         """Process the events from the M2 controller.
@@ -813,7 +826,7 @@ class Model(object):
                 self.update_system_status("isCrioConnected", message["isConnected"])
 
             elif name == "interlock":
-                self.update_system_status("isInterlockOn", message["state"])
+                self.update_system_status("isInterlockEnabled", message["state"])
 
             elif name == "cellTemperatureHiWarning":
                 self.update_system_status("isCellTemperatureHigh", message["hiWarning"])
@@ -950,12 +963,8 @@ class Model(object):
         # let the error_handler to judge and fault the system when
         # needed.
         error_handler = self.controller.error_handler
-        if (
-            error_handler.exists_error()
-            or error_handler.has_warning(
-                MockErrorCode.LimitSwitchTriggeredOpenloop.value
-            )
-            or (self.controller.controller_state == salobj.State.FAULT)
+        if error_handler.exists_error() or error_handler.has_warning(
+            MockErrorCode.LimitSwitchTriggeredOpenloop.value
         ):
             await self.fault()
 
@@ -983,6 +992,18 @@ class Model(object):
                     message["xRot"],
                     message["yRot"],
                     message["zRot"],
+                    is_ims=False,
+                )
+
+            elif name == "positionIMS":
+                self.utility_monitor.update_position(
+                    message["x"],
+                    message["y"],
+                    message["z"],
+                    message["xRot"],
+                    message["yRot"],
+                    message["zRot"],
+                    is_ims=True,
                 )
 
             elif name == "axialForce":
@@ -1023,13 +1044,17 @@ class Model(object):
                 forces.f_gravity[-NUM_TANGENT_LINK:] = message["lutGravity"]
                 forces.f_delta[-NUM_TANGENT_LINK:] = message["applied"]
                 forces.f_cur[-NUM_TANGENT_LINK:] = message["measured"]
-                forces.f_hc[-NUM_TANGENT_LINK:] = message["hardpointCorrection"]
+
+                # If the controller has the error, the hardpoint correction
+                # will not be calculated.
+                if len(message["hardpointCorrection"]) == NUM_TANGENT_LINK:
+                    forces.f_hc[-NUM_TANGENT_LINK:] = message["hardpointCorrection"]
 
                 forces.f_error[-NUM_TANGENT_LINK:] = [
                     (
                         message["lutGravity"][idx]
                         + message["applied"][idx]
-                        - message["hardpointCorrection"][idx]
+                        - forces.f_hc[-NUM_TANGENT_LINK + idx]
                         - message["measured"][idx]
                     )
                     for idx in range(NUM_TANGENT_LINK)
@@ -1146,7 +1171,6 @@ class Model(object):
                 "ilcData",
                 "netForcesTotal",
                 "netMomentsTotal",
-                "positionIMS",
             ):
                 pass
 

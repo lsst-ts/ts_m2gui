@@ -97,8 +97,11 @@ class TabRigidBodyPos(TabDefault):
             ),
         }
 
-        # Rigid body position
+        # Rigid body position based on the hardpoint displacement
         self._position = self._set_position()
+
+        # Rigid body position based on the independent measurement system (IMS)
+        self._position_ims = self._set_position()
 
         # Internal layout
         self.widget().setLayout(self._create_layout())
@@ -230,6 +233,7 @@ class TabRigidBodyPos(TabDefault):
 
         # First column
         layout_current_position = QVBoxLayout()
+        layout_current_position.addWidget(self._create_group_ims_position())
         layout_current_position.addWidget(self._create_group_current_position())
         layout_current_position.addWidget(self._create_group_home_position())
 
@@ -248,6 +252,34 @@ class TabRigidBodyPos(TabDefault):
         layout.addLayout(layout_move_absolute)
 
         return layout
+
+    def _create_group_ims_position(self) -> QGroupBox:
+        """Create the group of position based on the independent measurement
+        system (IMS).
+
+        Returns
+        -------
+        `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout_position = QFormLayout()
+        for axis in self.AXES:
+            if axis.startswith("r"):
+                layout_position.addRow(
+                    f"Rotation {axis} (arcsec):", self._position_ims[axis]
+                )
+            else:
+                layout_position.addRow(
+                    f"Position {axis} (um):", self._position_ims[axis]
+                )
+
+        layout = QVBoxLayout()
+        layout.addLayout(layout_position)
+
+        return create_group_box(
+            "Position Based on Independent Measurement System", layout
+        )
 
     def _create_group_current_position(self) -> QGroupBox:
         """Create the group of current position.
@@ -353,10 +385,12 @@ class TabRigidBodyPos(TabDefault):
         """
 
         signal_position.position.connect(self._callback_position)
+        signal_position.position_ims.connect(self._callback_position_ims)
 
     @asyncSlot()
     async def _callback_position(self, position: list) -> None:
-        """Callback of the position signal for the rigid body position.
+        """Callback of the position signal for the rigid body position based on
+        the hardpoint displacement.
 
         Parameters
         ----------
@@ -367,3 +401,18 @@ class TabRigidBodyPos(TabDefault):
 
         for idx, axis in enumerate(self.AXES):
             self._position[axis].setText(str(position[idx]))
+
+    @asyncSlot()
+    async def _callback_position_ims(self, position: list) -> None:
+        """Callback of the position signal for the rigid body position based on
+        the independent measurement system (IMS).
+
+        Parameters
+        ----------
+        position : `list`
+            Rigid body position as a list: [x, y, z, rx, ry, rz]. The unit of x
+            , y, and z is um. The unit of rx, ry, and ry is arcsec.
+        """
+
+        for idx, axis in enumerate(self.AXES):
+            self._position_ims[axis].setText(str(position[idx]))
