@@ -48,7 +48,7 @@ async def test_callback_time_out(widget: TabDetailedForce) -> None:
     assert widget._forces["f_hc"][3].text() == "1.23"
     assert widget._forces["f_cur"][5].text() == "0.20"
     assert widget._forces["f_error"][7].text() == "0.25"
-    assert widget._forces["position_in_mm"][10].text() == "123.00"
+    assert widget._forces["position_in_mm"][10].text() == "123.0000"
     assert widget._forces["step"][13].text() == "34"
 
 

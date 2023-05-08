@@ -60,6 +60,7 @@ def test_report_utility_status(qtbot: QtBot, utility_monitor: UtilityMonitor) ->
         utility_monitor.signal_detailed_force.forces,
         utility_monitor.signal_detailed_force.force_error_tangent,
         utility_monitor.signal_position.position,
+        utility_monitor.signal_position.position_ims,
     ]
     with qtbot.waitSignals(signals, timeout=TIMEOUT):
         utility_monitor.report_utility_status()
@@ -368,12 +369,6 @@ def test_update_forces(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
     assert id(utility_monitor.forces) == id(actuator_force)
     assert utility_monitor.forces.f_cur == actuator_force.f_cur
 
-    # There should be no change
-    actuator_force = utility_monitor.get_forces()
-    actuator_force.f_cur[1] = 100.001
-    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
-        utility_monitor.update_forces(actuator_force)
-
     # Current position is changed
     actuator_force = utility_monitor.get_forces()
     actuator_force.position_in_mm[1] = 100
@@ -423,11 +418,24 @@ def test_update_force_error_tangent(
 def test_update_position(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
     signal = utility_monitor.signal_position.position
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
-        utility_monitor.update_position(0.1, 0.23, 0.62, 3, 1.03, 1.06)
+        utility_monitor.update_position(0.1, 0.23, 0.62, 3, 1.03, 1.06, is_ims=False)
 
     assert utility_monitor.position == [0.1, 0.2, 0.6, 3, 1, 1.1]
 
     with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
-        utility_monitor.update_position(0.11, 0.23, 0.62, 3, 1.03, 1.06)
+        utility_monitor.update_position(0.11, 0.23, 0.62, 3, 1.03, 1.06, is_ims=False)
 
     assert utility_monitor.position[0] == 0.1
+
+
+def test_update_position_ims(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
+    signal = utility_monitor.signal_position.position_ims
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_position(0.1, 0.23, 0.62, 3, 1.03, 1.06, is_ims=True)
+
+    assert utility_monitor.position_ims == [0.1, 0.2, 0.6, 3, 1, 1.1]
+
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_position(0.11, 0.23, 0.62, 3, 1.03, 1.06, is_ims=True)
+
+    assert utility_monitor.position_ims[0] == 0.1

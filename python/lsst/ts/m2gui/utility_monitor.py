@@ -86,8 +86,13 @@ class UtilityMonitor(object):
     force_error_tangent : `ForceErrorTangent`
         Tangential force error to monitor the supporting force of mirror.
     position : `list`
-        Rigid body position: [x, y, z, rx, ry, rz]. The unit of x, y, and z is
-        um. The unit of rx, ry, and ry is arcsec.
+        Rigid body position: [x, y, z, rx, ry, rz] based on the hardpoint
+        displacement. The unit of x, y, and z is um. The unit of rx, ry, and
+        ry is arcsec.
+    position_ims : `list`
+        Rigid body position: [x, y, z, rx, ry, rz] based on the independent
+        measurement system (IMS). The unit of x, y, and z is um. The unit of
+        rx, ry, and ry is arcsec.
     """
 
     # Number of digits after the decimal
@@ -174,6 +179,7 @@ class UtilityMonitor(object):
         self.force_error_tangent = ForceErrorTangent()
 
         self.position = [0.0] * 6
+        self.position_ims = [0.0] * 6
 
     def _get_default_power(self) -> dict:
         """Get the default power data.
@@ -216,6 +222,7 @@ class UtilityMonitor(object):
         self._report_forces()
 
         self.signal_position.position.emit(self.position)
+        self.signal_position.position_ims.emit(self.position_ims)
 
     def _report_powers(self) -> None:
         """Report the powers."""
@@ -746,16 +753,8 @@ class UtilityMonitor(object):
         if id(actuator_force) == id(self.forces):
             raise ValueError("Input cannot be the same object of self.forces.")
 
-        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
-        if self._has_changed(
-            np.array(self.forces.f_cur), np.array(actuator_force.f_cur), tol
-        ) or self._has_changed(
-            np.array(self.forces.position_in_mm),
-            np.array(actuator_force.position_in_mm),
-            tol,
-        ):
-            self.forces = actuator_force
-            self.signal_detailed_force.forces.emit(self.forces)
+        self.forces = actuator_force
+        self.signal_detailed_force.forces.emit(self.forces)
 
     def update_force_error_tangent(
         self, force_error_tangent: ForceErrorTangent
@@ -794,7 +793,14 @@ class UtilityMonitor(object):
             )
 
     def update_position(
-        self, x: float, y: float, z: float, rx: float, ry: float, rz: float
+        self,
+        x: float,
+        y: float,
+        z: float,
+        rx: float,
+        ry: float,
+        rz: float,
+        is_ims: bool = False,
     ) -> None:
         """Update the position of rigid body.
 
@@ -812,19 +818,30 @@ class UtilityMonitor(object):
             Rotation y in arcsec.
         rz : `float`
             Rotation z in arcsec.
+        is_ims : `bool`, optional
+            Is based on the independent measurement system (IMS) or not. (the
+            default is False)
         """
+
+        # Decide the position and signal objects
+        position = self.position_ims if is_ims else self.position
+        signal = (
+            self.signal_position.position_ims
+            if is_ims
+            else self.signal_position.position
+        )
 
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
 
         is_changed = False
         components = [x, y, z, rx, ry, rz]
         for idx, component in enumerate(components):
-            if self._has_changed(self.position[idx], component, tol):
+            if self._has_changed(position[idx], component, tol):
                 is_changed = True
                 break
 
         if is_changed:
             for idx, component in enumerate(components):
-                self.position[idx] = round(component, self.NUM_DIGIT_AFTER_DECIMAL)
+                position[idx] = round(component, self.NUM_DIGIT_AFTER_DECIMAL)
 
-            self.signal_position.position.emit(self.position)
+            signal.emit(position)

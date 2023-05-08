@@ -6,6 +6,22 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.3:
+
+-------------
+0.4.3
+-------------
+
+* Rename the "isInterlockOn" with "isInterlockEnabled" to be consistent with the controller.
+The indicator's color should be green instead of red when the status is on.
+* Simplify the ``UtilityMonitor.update_forces()`` to remove the check of force change.
+* Update the ``Model.connect()`` to actively clear the error if any when the connection is constructed.
+* Update the ``UtilityMonitor.update_position()`` to publish the position by IMS.
+* Add the ``TabRigidBodyPos._create_group_ims_position()`` to show the position by IMS.
+* Change the digit in detailed force widget.
+* Update the condition to trigger the ``Model.fault()``.
+* Update the ``Model._process_telemetry()`` to deal with the condition that the hardpoint correction of tangent link might be empty.
+
 .. _lsst.ts.m2gui-0.4.2:
 
 -------------

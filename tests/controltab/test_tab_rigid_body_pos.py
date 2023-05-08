@@ -92,10 +92,21 @@ async def test_callback_clear_values_absolute(
 
 @pytest.mark.asyncio
 async def test_callback_position(widget: TabRigidBodyPos) -> None:
-    widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6)
+    widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6, is_ims=False)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
     for idx, axis in enumerate(widget.AXES):
         assert widget._position[axis].text() == str(idx + 1)
+
+
+@pytest.mark.asyncio
+async def test_callback_position_ims(widget: TabRigidBodyPos) -> None:
+    widget.model.utility_monitor.update_position(1, 2, 3, 4, 5, 6, is_ims=True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    for idx, axis in enumerate(widget.AXES):
+        assert widget._position_ims[axis].text() == str(idx + 1)

@@ -212,11 +212,11 @@ class TabDetailedForce(TabDefault):
         for key in vars(self._forces_latest).keys():
             field = getattr(self._forces_latest, key)
 
-            is_interger = key in ("encoder_count", "step")
-
             for idx in range(NUM_ACTUATOR):
-                if is_interger:
+                if key in ("encoder_count", "step"):
                     self._forces[key][idx].setText(str(field[idx]))
+                elif key == "position_in_mm":
+                    self._forces[key][idx].setText("%.4f" % field[idx])
                 else:
                     self._forces[key][idx].setText("%.2f" % field[idx])
 
