@@ -21,6 +21,7 @@
 
 __all__ = ["TabAlarmWarn"]
 
+from collections import OrderedDict
 from pathlib import Path
 
 from lsst.ts.m2com import LimitSwitchType, read_error_code_file
@@ -430,10 +431,13 @@ class TabAlarmWarn(TabDefault):
         MINIMUM_ERROR_CODE = 6000
 
         # Read the file and pop out the dummy error code
-        self._error_list = read_error_code_file(filepath)
-        for error_code in list(self._error_list.keys()):
+        error_list = read_error_code_file(filepath)
+        for error_code in list(error_list.keys()):
             if int(error_code) < MINIMUM_ERROR_CODE:
-                self._error_list.pop(error_code)
+                error_list.pop(error_code)
+
+        # Sort the error list
+        self._error_list = OrderedDict(sorted(error_list.items()))
 
         self._add_error_list_to_table()
         self._resize_table_error()

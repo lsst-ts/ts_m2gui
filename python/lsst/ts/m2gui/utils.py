@@ -158,7 +158,10 @@ def create_grid_layout_buttons(
 
 
 def create_label(
-    name: str = "", point_size: int | None = None, is_bold: bool = False
+    name: str = "",
+    tool_tip: str = "",
+    point_size: int | None = None,
+    is_bold: bool = False,
 ) -> QLabel:
     """Create the label.
 
@@ -166,6 +169,8 @@ def create_label(
     ----------
     name : `str`, optional
         Label name. (the default is "")
+    tool_tip : `str`, optional
+        Tool tip. (the default is "")
     point_size : `int` or None, optional
         Point size of label. The value should be greater than 0. Put None if
         use the system default. (the default is None)
@@ -178,6 +183,10 @@ def create_label(
         label.
     """
     label = QLabel(name)
+
+    # Set the tool tip
+    if tool_tip != "":
+        label.setToolTip(tool_tip)
 
     # Set the specific font
     font = label.font()

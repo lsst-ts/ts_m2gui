@@ -21,7 +21,13 @@
 
 __all__ = ["TabDiagnostics"]
 
-from lsst.ts.m2com import NUM_TANGENT_LINK, DigitalOutputStatus
+from lsst.ts.m2com import (
+    TANGENT_LINK_LOAD_BEARING_LINK,
+    TANGENT_LINK_NON_LOAD_BEARING_LINK,
+    TANGENT_LINK_THETA_Z_MOMENT,
+    TANGENT_LINK_TOTAL_WEIGHT_ERROR,
+    DigitalOutputStatus,
+)
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
@@ -65,6 +71,10 @@ class TabDiagnostics(TabDefault):
         Model class.
     """
 
+    # Colors used in the label's text
+    COLOR_BLACK = Qt.black.name.decode()
+    COLOR_RED = Qt.red.name.decode()
+
     def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
@@ -73,14 +83,30 @@ class TabDiagnostics(TabDefault):
         self._power_raw = self._create_labels_power()
 
         self._force_error_tangent = {
-            "a1": create_label(),
-            "a2": create_label(),
-            "a3": create_label(),
-            "a4": create_label(),
-            "a5": create_label(),
-            "a6": create_label(),
-            "total_weight": create_label(),
-            "tangent_sum": create_label(),
+            "a1": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_NON_LOAD_BEARING_LINK} N"
+            ),
+            "a2": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
+            ),
+            "a3": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
+            ),
+            "a4": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_NON_LOAD_BEARING_LINK} N"
+            ),
+            "a5": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
+            ),
+            "a6": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
+            ),
+            "total_weight": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_TOTAL_WEIGHT_ERROR} N"
+            ),
+            "tangent_sum": create_label(
+                tool_tip=f"Threshold is {TANGENT_LINK_THETA_Z_MOMENT} N"
+            ),
         }
 
         self._button_reboot = set_button(
@@ -767,14 +793,26 @@ class TabDiagnostics(TabDefault):
             mirror.
         """
 
-        for idx in range(0, NUM_TANGENT_LINK):
+        for idx, force_error_individual in enumerate(force_error_tangent.error_force):
+            threshold = (
+                TANGENT_LINK_NON_LOAD_BEARING_LINK  # A1, A4
+                if idx in (0, 3)
+                else TANGENT_LINK_LOAD_BEARING_LINK  # A2, A3, A5, A6
+            )
+
             self._force_error_tangent[f"a{idx+1}"].setText(
-                f"{force_error_tangent.error_force[idx]} N"
+                f"<font color='{self.COLOR_BLACK}'>{force_error_individual} N</font>"
+                if abs(force_error_individual) < threshold
+                else f"<font color='{self.COLOR_RED}'>{force_error_individual} N</font>"
             )
 
         self._force_error_tangent["total_weight"].setText(
-            f"{force_error_tangent.error_weight} N"
+            f"<font color='{self.COLOR_BLACK}'>{force_error_tangent.error_weight} N</font>"
+            if abs(force_error_tangent.error_weight) < TANGENT_LINK_TOTAL_WEIGHT_ERROR
+            else f"<font color='{self.COLOR_RED}'>{force_error_tangent.error_weight} N</font>"
         )
         self._force_error_tangent["tangent_sum"].setText(
-            f"{force_error_tangent.error_sum} N"
+            f"<font color='{self.COLOR_BLACK}'>{force_error_tangent.error_sum} N</font>"
+            if abs(force_error_tangent.error_sum) < TANGENT_LINK_THETA_Z_MOMENT
+            else f"<font color='{self.COLOR_RED}'>{force_error_tangent.error_sum} N</font>"
         )
