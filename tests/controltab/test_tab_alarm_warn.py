@@ -65,6 +65,7 @@ async def widget_async(qtbot: QtBot) -> TabAlarmWarn:
 def test_init(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     assert len(widget._error_list) == 36
     assert len(widget._error_list["6051"]) == 6
+    assert list(widget._error_list.keys())[-1] == "6088"
 
     assert widget._text_error_cause.placeholderText() == "Possible Error Cause"
     assert widget._text_error_cause.isReadOnly() is True

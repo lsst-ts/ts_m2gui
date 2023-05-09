@@ -52,6 +52,12 @@ async def widget_async(qtbot: QtBot) -> TabDiagnostics:
         yield widget_sim
 
 
+# Need to add this to make the above widget_async() to work on Jenkins.
+# I guess there is some bug in "pytest" and "pytest_asyncio" libraries.
+def test_init(widget_async: TabDiagnostics) -> None:
+    pass
+
+
 @pytest.mark.asyncio
 async def test_callback_control_digital_status(
     qtbot: QtBot, widget_async: TabDiagnostics
@@ -165,20 +171,36 @@ async def test_callback_digital_status_output(widget: TabDiagnostics) -> None:
 @pytest.mark.asyncio
 async def test_callback_force_error_tangent(widget: TabDiagnostics) -> None:
     force_error_tangent = ForceErrorTangent()
-    force_error_tangent.error_force = [1.2, 0.233, -1.334, 0, 31.34, -2.29]
+    force_error_tangent.error_force = [1.2, -2000.233, -1.334, 0, 31.34, -2.29]
     force_error_tangent.error_weight = 13.331
-    force_error_tangent.error_sum = 12.452
+    force_error_tangent.error_sum = -1200.452
     widget.model.utility_monitor.update_force_error_tangent(force_error_tangent)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget._force_error_tangent["a1"].text() == "1.2 N"
-    assert widget._force_error_tangent["a2"].text() == "0.2 N"
-    assert widget._force_error_tangent["a3"].text() == "-1.3 N"
-    assert widget._force_error_tangent["a4"].text() == "0 N"
-    assert widget._force_error_tangent["a5"].text() == "31.3 N"
-    assert widget._force_error_tangent["a6"].text() == "-2.3 N"
+    assert (
+        widget._force_error_tangent["a1"].text() == "<font color='black'>1.2 N</font>"
+    )
+    assert (
+        widget._force_error_tangent["a2"].text() == "<font color='red'>-2000.2 N</font>"
+    )
+    assert (
+        widget._force_error_tangent["a3"].text() == "<font color='black'>-1.3 N</font>"
+    )
+    assert widget._force_error_tangent["a4"].text() == "<font color='black'>0 N</font>"
+    assert (
+        widget._force_error_tangent["a5"].text() == "<font color='black'>31.3 N</font>"
+    )
+    assert (
+        widget._force_error_tangent["a6"].text() == "<font color='black'>-2.3 N</font>"
+    )
 
-    assert widget._force_error_tangent["total_weight"].text() == "13.3 N"
-    assert widget._force_error_tangent["tangent_sum"].text() == "12.5 N"
+    assert (
+        widget._force_error_tangent["total_weight"].text()
+        == "<font color='black'>13.3 N</font>"
+    )
+    assert (
+        widget._force_error_tangent["tangent_sum"].text()
+        == "<font color='red'>-1200.5 N</font>"
+    )
