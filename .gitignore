@@ -140,3 +140,6 @@ log/
 .flake8
 .isort.cfg
 .mypy.ini
+
+# Core files
+core.*

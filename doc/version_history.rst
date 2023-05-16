@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.4:
+
+-------------
+0.4.4
+-------------
+
+* Sort the error list in ``TabAlarmWarn`` class.
+* Update the ``TabDiagnostics._callback_force_error_tangent()`` to let the text's color is based on the threshold.
+
 .. _lsst.ts.m2gui-0.4.3:
 
 -------------
