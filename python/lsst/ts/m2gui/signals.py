@@ -54,6 +54,16 @@ class SignalPowerSystem(QtCore.QObject):
 class SignalError(QtCore.QObject):
     """Error signal to send the error code."""
 
+    # Summary faults status in the cell controller (data type: U64).
+    # Note the input data type needs to be object instead of int, which is 4
+    # bytes by default in QT. Otherwise, it will result in the overflow error.
+    summary_faults_status = QtCore.Signal(object)
+
+    # Enabled faults mask in the cell controller (data type: U64).
+    # Note the input data type needs to be object instead of int, which is 4
+    # bytes by default in QT. Otherwise, it will result in the overflow error.
+    enabled_faults_mask = QtCore.Signal(object)
+
     # New error codes
     error_new = QtCore.Signal(int)
 

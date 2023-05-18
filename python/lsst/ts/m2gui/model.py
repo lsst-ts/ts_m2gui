@@ -298,11 +298,11 @@ class Model(object):
     async def reset_errors(self) -> None:
         """Reset errors."""
 
-        await self.controller.clear_errors(bypass_state_checking=True)
-
         self.fault_manager.reset_errors()
         self.fault_manager.reset_limit_switch_status(LimitSwitchType.Retract)
         self.fault_manager.reset_limit_switch_status(LimitSwitchType.Extend)
+
+        await self.controller.clear_errors(bypass_state_checking=True)
 
         self._check_error_and_update_status()
 
@@ -842,12 +842,23 @@ class Model(object):
             elif name == "innerLoopControlMode":
                 self._report_ilc_status(message["address"], message["mode"])
 
+            elif name == "summaryFaultsStatus":
+                status = int(message["status"])
+                self.fault_manager.update_summary_faults_status(status)
+
+                self.log.info(f"Summary faults status: {hex(status)}.")
+
+            elif name == "enabledFaultsMask":
+                mask = int(message["mask"])
+                self.fault_manager.report_enabled_faults_mask(mask)
+
+                self.log.info(f"Enabled faults mask: {hex(mask)}.")
+
             # Ignore these messages because they are specific to CSC
             elif name in (
                 "summaryState",
                 "detailedState",
                 "temperatureOffset",
-                "summaryFaultsStatus",
             ):
                 pass
 

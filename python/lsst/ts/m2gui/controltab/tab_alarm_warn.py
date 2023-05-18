@@ -24,10 +24,17 @@ __all__ = ["TabAlarmWarn"]
 from collections import OrderedDict
 from pathlib import Path
 
-from lsst.ts.m2com import LimitSwitchType, read_error_code_file
+from lsst.ts.m2com import (
+    DEFAULT_ENABLED_FAULTS_MASK,
+    MINIMUM_ERROR_CODE,
+    LimitSwitchType,
+    read_error_code_file,
+)
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
+    QFormLayout,
+    QGroupBox,
     QHBoxLayout,
     QHeaderView,
     QPlainTextEdit,
@@ -40,10 +47,18 @@ from PySide2.QtWidgets import (
 )
 from qasync import asyncSlot
 
-from ..enums import Ring, Status
+from ..enums import LocalMode, Ring, Status
 from ..model import Model
 from ..signals import SignalError, SignalLimitSwitch
-from ..utils import create_label, create_table, run_command, set_button
+from ..utils import (
+    create_group_box,
+    create_label,
+    create_table,
+    prompt_dialog_warning,
+    run_command,
+    set_button,
+)
+from ..widget import QMessageBoxAsync
 from .tab_default import TabDefault
 
 
@@ -63,11 +78,43 @@ class TabAlarmWarn(TabDefault):
         Model class.
     """
 
+    # Colors used in the label's text
+    COLOR_RED = Qt.red.name.decode()
+
     def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
         # List of the errors
         self._error_list: dict = dict()
+
+        # Label of the summary faults status
+        self._label_summary_faults_status = create_label(
+            name=hex(0),
+            tool_tip=(
+                "Cell controller's summary faults status as a U64 integer.\n"
+                "Each bit means a specific error code restricted to the \n"
+                "enabled faults mask."
+            ),
+        )
+
+        # Label of the enabled faults mask
+        self._label_enabled_faults_mask = create_label(
+            name=hex(0),
+            tool_tip=(
+                "Mask to identify the faults. Each bit value means the \n"
+                "allowed error code. If this value is 0, all the errors \n"
+                "will be bypassed."
+            ),
+        )
+
+        # Label of the bypassed error code
+        self._label_error_code_bypass = create_label(
+            name="None",
+            tool_tip=(
+                "Bypassed error codes. If the value is not None,\n"
+                "the system might break."
+            ),
+        )
 
         # Table of the errors
         self._table_error = self._create_table_error()
@@ -83,11 +130,23 @@ class TabAlarmWarn(TabDefault):
             LimitSwitchType.Extend
         )
 
+        # Bypass the selected error codes
+        self._button_bypass_selected_errors = set_button(
+            "Bypass Selected Errors", self._callback_bypass_selected_errors
+        )
+
+        # Reset the enabled faults mask to default
+        self._button_reset_mask = set_button(
+            "Reset Enabled Faults Mask", self._callback_reset_mask
+        )
+
         # Reset all alarms and warnings
-        self._button_reset = None
+        self._button_reset = set_button("Reset All Items", self._callback_reset)
 
         # Enable the open-loop maximum limit
-        self._button_enable_open_loop_max_limit = None
+        self._button_enable_open_loop_max_limit = set_button(
+            "Enable Open-Loop Max Limits", self._callback_enable_open_loop_max_limit
+        )
 
         # Internal layout
         self.widget().setLayout(self._create_layout())
@@ -225,20 +284,56 @@ class TabAlarmWarn(TabDefault):
             Layout.
         """
 
-        self._button_reset = set_button("Reset All Items", self._callback_reset)
-        self._button_enable_open_loop_max_limit = set_button(
-            "Enable Open-Loop Max Limits", self._callback_enable_open_loop_max_limit
-        )
-
         layout = QVBoxLayout()
-        layout.addWidget(self._table_error)
-        layout.addWidget(self._text_error_cause)
-        layout.addWidget(create_label(name="Limit Switch Status", is_bold=True))
-        layout.addWidget(self._get_widget_limit_switch())
+        layout.addWidget(self._create_group_error_status())
+        layout.addWidget(self._create_group_limit_switch())
         layout.addWidget(self._button_reset)
         layout.addWidget(self._button_enable_open_loop_max_limit)
 
         return layout
+
+    def _create_group_error_status(self) -> QGroupBox:
+        """Create the group of error status.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout_faults_status = QFormLayout()
+        layout_faults_status.addRow(
+            "Summary Faults Status:", self._label_summary_faults_status
+        )
+        layout_faults_status.addRow(
+            "Enabled Faults Mask:", self._label_enabled_faults_mask
+        )
+        layout_faults_status.addRow(
+            "Bypassed Error Codes:", self._label_error_code_bypass
+        )
+
+        layout = QVBoxLayout()
+        layout.addLayout(layout_faults_status)
+        layout.addWidget(self._table_error)
+        layout.addWidget(self._text_error_cause)
+        layout.addWidget(self._button_bypass_selected_errors)
+        layout.addWidget(self._button_reset_mask)
+
+        return create_group_box("Error/Warning Information", layout)
+
+    def _create_group_limit_switch(self) -> QGroupBox:
+        """Create the group of limit switch.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QVBoxLayout()
+        layout.addWidget(self._get_widget_limit_switch())
+
+        return create_group_box("Limit Switch Status", layout)
 
     def _get_widget_limit_switch(self) -> QScrollArea:
         """Get the widget of limit switch.
@@ -304,6 +399,127 @@ class TabAlarmWarn(TabDefault):
         return layout
 
     @asyncSlot()
+    async def _callback_bypass_selected_errors(self) -> None:
+        """Callback of the bypass button to bypass the selected error codes."""
+
+        codes = self._get_selected_error_codes()
+        dialog = self._create_dialog_bypass(codes)
+
+        result = await dialog.show()
+        if result == QMessageBoxAsync.Ok:
+            is_diagnostic_mode = await self._is_diagnostic_mode()
+            if is_diagnostic_mode:
+                enabled_faults_mask = self._calc_enabled_faults_mask(
+                    codes, int(self._label_enabled_faults_mask.text(), base=16)
+                )
+                await run_command(
+                    self.model.controller.set_enabled_faults_mask, enabled_faults_mask
+                )
+
+    def _get_selected_error_codes(self) -> set:
+        """Get the selected error codes.
+
+        Returns
+        -------
+        `set`
+            Selected error codes.
+        """
+        items = self._table_error.selectedItems()
+
+        error_codes = set()
+        for item in items:
+            if item.column() == 0:
+                error_codes.add(int(item.text()))
+
+        return error_codes
+
+    def _create_dialog_bypass(self, codes: set) -> QMessageBoxAsync:
+        """Create a dialog to let user bypass the error codes.
+
+        Parameters
+        ----------
+        codes : `set`
+            Error codes to bypass.
+        """
+
+        dialog = QMessageBoxAsync()
+        dialog.setIcon(QMessageBoxAsync.Warning)
+        dialog.setWindowTitle("Bypass Selected Codes")
+
+        if len(codes) == 0:
+            dialog.setText("Please select the error codes to bypass related errors.")
+
+        elif self._label_error_code_bypass.text() != "None":
+            dialog.setText("Please reset the enabled faults mask first.")
+
+        else:
+            dialog.setText(
+                f"Are you sure to bypass the error codes: {codes}?\n"
+                "This action might break the system."
+            )
+            dialog.addButton(QMessageBoxAsync.Ok)
+
+        dialog.addButton(QMessageBoxAsync.Cancel)
+
+        # Block the user to interact with other running widgets
+        dialog.setModal(True)
+
+        return dialog
+
+    async def _is_diagnostic_mode(self) -> bool:
+        """Local mode is the diagnostic mode or not.
+
+        Returns
+        -------
+        `bool`
+            True if the local mode is diagnostic. Otherwise, False.
+        """
+        allowed_mode = LocalMode.Diagnostic
+        if self.model.local_mode == allowed_mode:
+            return True
+        else:
+            await prompt_dialog_warning(
+                "_is_diagnostic_mode()",
+                f"Enabled faults mask can only be updated in {allowed_mode!r}.",
+            )
+            return False
+
+    def _calc_enabled_faults_mask(self, codes: set, original_mask: int) -> int:
+        """Calculate the new enabled faults mask.
+
+        Parameters
+        ----------
+        codes : `set`
+            Error codes to bypass.
+        original_mask : `int`
+            Original enabled faults mask.
+
+        Returns
+        -------
+        `int`
+            New enabled faults mask.
+        """
+        bits = list()
+        for code in codes:
+            bits.append(self.model.controller.error_handler.get_bit_from_code(code))
+
+        self.model.log.debug(f"Bypass the error bits: {bits}.")
+
+        bit_sum = 0
+        for bit in bits:
+            bit_sum += 2**bit
+
+        return (original_mask | bit_sum) - bit_sum
+
+    @asyncSlot()
+    async def _callback_reset_mask(self) -> None:
+        """Callback of the reset-mask button to reset the enabled faults
+        mask."""
+        is_diagnostic_mode = await self._is_diagnostic_mode()
+        if is_diagnostic_mode:
+            await run_command(self.model.controller.reset_enabled_faults_mask)
+
+    @asyncSlot()
     async def _callback_reset(self) -> None:
         """Callback of the reset button to reset all alarms and warnings."""
 
@@ -326,8 +542,57 @@ class TabAlarmWarn(TabDefault):
             Signal of the error.
         """
 
+        signal_error.summary_faults_status.connect(
+            self._callback_signal_summary_faults_status
+        )
+        signal_error.enabled_faults_mask.connect(
+            self._callback_signal_enabled_faults_mask
+        )
         signal_error.error_new.connect(self._callback_signal_error_new)
         signal_error.error_cleared.connect(self._callback_signal_error_cleared)
+
+    @asyncSlot()
+    async def _callback_signal_summary_faults_status(self, status: int) -> None:
+        """Callback of the error signal for the summary faults status. It is a
+        U64 integer and each bit value means different error code.
+
+        Parameters
+        ----------
+        status : `int`
+            Summary faults status.
+        """
+        self._label_summary_faults_status.setText(hex(status))
+
+    @asyncSlot()
+    async def _callback_signal_enabled_faults_mask(self, mask: int) -> None:
+        """Callback of the error signal for the enabled faults mask. It is a
+        U64 integer and each bit value means the allowed error code.
+
+        Parameters
+        ----------
+        mask : `int`
+            Enabled faults mask.
+        """
+        # Show the received enabled faults mask
+        self._label_enabled_faults_mask.setText(hex(mask))
+
+        # Show the bypassed error codes
+        mask_diff = DEFAULT_ENABLED_FAULTS_MASK - mask
+
+        codes = list()
+        for idx, error_code in enumerate(
+            self.model.controller.error_handler.list_code_total
+        ):
+            if (mask_diff & (2**idx)) and (error_code >= MINIMUM_ERROR_CODE):
+                codes.append(error_code)
+
+        if len(codes) == 0:
+            self._label_error_code_bypass.setText("None")
+        else:
+            codes.sort()
+            self._label_error_code_bypass.setText(
+                f"<font color='{self.COLOR_RED}'>{codes}</font>"
+            )
 
     @asyncSlot()
     async def _callback_signal_error_new(self, error_code: int) -> None:
