@@ -42,6 +42,26 @@ def test_init(fault_manager: FaultManager) -> None:
     assert len(fault_manager.limit_switch_status_extend) == 78
 
 
+def test_update_summary_faults_status(
+    qtbot: QtBot, fault_manager: FaultManager
+) -> None:
+    status = 10
+
+    with qtbot.waitSignal(
+        fault_manager.signal_error.summary_faults_status, timeout=TIMEOUT
+    ):
+        fault_manager.update_summary_faults_status(status)
+
+    assert fault_manager.summary_faults_status == status
+
+
+def test_report_enabled_faults_mask(qtbot: QtBot, fault_manager: FaultManager) -> None:
+    with qtbot.waitSignal(
+        fault_manager.signal_error.enabled_faults_mask, timeout=TIMEOUT
+    ):
+        fault_manager.report_enabled_faults_mask(10)
+
+
 def test_add_error(qtbot: QtBot, fault_manager: FaultManager) -> None:
     error = 3
 
