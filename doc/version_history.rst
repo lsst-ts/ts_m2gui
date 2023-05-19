@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.5:
+
+-------------
+0.4.5
+-------------
+
+* Show the summary faults status and enabled faults mask.
+* Allow the user to set the enabled faults mask.
+
 .. _lsst.ts.m2gui-0.4.4:
 
 -------------

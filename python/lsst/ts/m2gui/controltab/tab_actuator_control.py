@@ -81,17 +81,17 @@ class TabActuatorControl(TabDefault):
         progress_bar = QProgressBar()
         progress_bar.setValue(0)
         self._info_script = {
-            "file": create_label(""),
+            "file": create_label(),
             "progress": progress_bar,
         }
 
         self._labels_force = {
-            "axial_min": create_label(""),
-            "axial_max": create_label(""),
-            "axial_total": create_label(""),
-            "tangent_min": create_label(""),
-            "tangent_max": create_label(""),
-            "tangent_total": create_label(""),
+            "axial_min": create_label(),
+            "axial_max": create_label(),
+            "axial_total": create_label(),
+            "tangent_min": create_label(),
+            "tangent_max": create_label(),
+            "tangent_total": create_label(),
         }
 
         self._buttons_script = {

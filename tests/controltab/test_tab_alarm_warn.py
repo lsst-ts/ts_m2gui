@@ -25,8 +25,8 @@ from pathlib import Path
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2com import LimitSwitchType, get_config_dir
-from lsst.ts.m2gui import Model, Ring, Status
+from lsst.ts.m2com import DEFAULT_ENABLED_FAULTS_MASK, LimitSwitchType, get_config_dir
+from lsst.ts.m2gui import LocalMode, Model, Ring, Status
 from lsst.ts.m2gui.controltab import TabAlarmWarn
 from PySide2.QtCore import QPoint, Qt
 from PySide2.QtGui import QColor, QPalette
@@ -141,6 +141,77 @@ def _get_widget_item_center(widget: TabAlarmWarn, item_text: str) -> QPoint:
     items = widget._table_error.findItems(item_text, Qt.MatchExactly)
     rect = widget._table_error.visualItemRect(items[0])
     return rect.center()
+
+
+def test_get_selected_error_codes(widget: TabAlarmWarn) -> None:
+    # No selected item
+    assert widget._get_selected_error_codes() == set()
+
+    # There are selected items
+    for row in range(2):
+        for column in range(2):
+            widget._table_error.item(row, column).setSelected(True)
+
+    assert widget._get_selected_error_codes() == {6051, 6052}
+
+
+@pytest.mark.asyncio
+async def test_is_diagnostic_mode(widget: TabAlarmWarn) -> None:
+    widget.model.local_mode = LocalMode.Diagnostic
+
+    is_diagnostic_mode = await widget._is_diagnostic_mode()
+
+    assert is_diagnostic_mode is True
+
+
+def test_calc_enabled_faults_mask(widget: TabAlarmWarn) -> None:
+    assert widget._calc_enabled_faults_mask({6051, 6055}, 8) == 0
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_summary_faults_status(
+    qtbot: QtBot, widget: TabAlarmWarn
+) -> None:
+    # Test the maximum value of U64
+    widget.model.fault_manager.update_summary_faults_status(18446744073709551615)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(SLEEP_TIME_SHORT)
+
+    assert widget._label_summary_faults_status.text() == "0xffffffffffffffff"
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_enabled_faults_mask_default(
+    qtbot: QtBot, widget: TabAlarmWarn
+) -> None:
+    # Test the maximum value of U64
+    widget.model.fault_manager.report_enabled_faults_mask(DEFAULT_ENABLED_FAULTS_MASK)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(SLEEP_TIME_SHORT)
+
+    assert widget._label_enabled_faults_mask.text() == hex(DEFAULT_ENABLED_FAULTS_MASK)
+    assert widget._label_error_code_bypass.text() == "None"
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_enabled_faults_mask_bypassed(
+    qtbot: QtBot, widget: TabAlarmWarn
+) -> None:
+    # Test the maximum value of U64
+    # bit 5: 6057, bit 6: 6056
+    mask = DEFAULT_ENABLED_FAULTS_MASK - 2**5 - 2**6
+    widget.model.fault_manager.report_enabled_faults_mask(mask)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(SLEEP_TIME_SHORT)
+
+    assert widget._label_enabled_faults_mask.text() == hex(mask)
+    assert (
+        widget._label_error_code_bypass.text()
+        == "<font color='red'>[6056, 6057]</font>"
+    )
 
 
 @pytest.mark.asyncio

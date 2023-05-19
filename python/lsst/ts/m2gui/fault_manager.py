@@ -41,6 +41,8 @@ class FaultManager(object):
         Signal to report the new or cleared errors.
     signal_limit_switch : `SignalLimitSwitch`
         Signal to report the updated status of limit switch.
+    summary_faults_status : `int`
+        Summary faults status in the cell controller.
     errors : `set [int]`
         Errors in the controller.
     limit_switch_status_retract : `dict`
@@ -57,10 +59,33 @@ class FaultManager(object):
         self.signal_error = SignalError()
         self.signal_limit_switch = SignalLimitSwitch()
 
+        self.summary_faults_status = 0
         self.errors: set[int] = set()
 
         self.limit_switch_status_retract = limit_switch_status.copy()
         self.limit_switch_status_extend = limit_switch_status.copy()
+
+    def update_summary_faults_status(self, status: int) -> None:
+        """Update the summary faults status.
+
+        Parameters
+        ----------
+        status : `int`
+            New status.
+        """
+        if status != self.summary_faults_status:
+            self.summary_faults_status = status
+            self.signal_error.summary_faults_status.emit(status)
+
+    def report_enabled_faults_mask(self, mask: int) -> None:
+        """Report the enabled faults mask.
+
+        Parameters
+        ----------
+        mask : `int`
+            Enabled faults mask.
+        """
+        self.signal_error.enabled_faults_mask.emit(mask)
 
     def add_error(self, error: int) -> None:
         """Add the error.
