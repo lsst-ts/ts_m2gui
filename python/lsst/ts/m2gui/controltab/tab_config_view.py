@@ -21,13 +21,26 @@
 
 __all__ = ["TabConfigView"]
 
-from PySide2.QtWidgets import QFormLayout, QGroupBox, QVBoxLayout
+from PySide2.QtWidgets import (
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QListWidget,
+    QVBoxLayout,
+)
 from qasync import asyncSlot
 
 from ..config import Config
+from ..enums import LocalMode
 from ..model import Model
 from ..signals import SignalConfig
-from ..utils import create_group_box, create_label
+from ..utils import (
+    create_group_box,
+    create_label,
+    prompt_dialog_warning,
+    run_command,
+    set_button,
+)
 from .tab_default import TabDefault
 
 
@@ -49,6 +62,14 @@ class TabConfigView(TabDefault):
 
     def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
+
+        # List of the configuration files
+        self._list_files = QListWidget()
+
+        # Button to set the configuration file
+        self._button_set_file = set_button(
+            "Set Configuration File", self._callback_set_configuration_file
+        )
 
         # Configuration parameters
         self._config_parameters = {
@@ -77,6 +98,40 @@ class TabConfigView(TabDefault):
 
         self._set_signal_config(self.model.signal_config)
 
+    @asyncSlot()
+    async def _callback_set_configuration_file(self) -> None:
+        """Callback to set the configuration file."""
+
+        file = self._get_selected_file()
+        function_name = "_callback_set_configuration_file()"
+        if file == "":
+            await prompt_dialog_warning(
+                function_name,
+                "Please select a configuration file.",
+            )
+            return
+
+        allowed_mode = LocalMode.Standby
+        if self.model.local_mode == allowed_mode:
+            await run_command(self.model.controller.set_configuration_file, file)
+        else:
+            await prompt_dialog_warning(
+                function_name,
+                f"Configuration file can only be set in {allowed_mode!r}.",
+            )
+
+    def _get_selected_file(self) -> str:
+        """Get the selected configuration file.
+
+        Returns
+        -------
+        `str`
+            Selected configuration file.
+        """
+
+        selected_file = self._list_files.selectedItems()
+        return selected_file[0].text() if (len(selected_file) != 0) else ""
+
     def _set_widget_and_layout(self) -> None:
         """Set the widget and layout."""
 
@@ -86,27 +141,51 @@ class TabConfigView(TabDefault):
         # Resize the dock to have a similar size of layout
         self.resize(widget.sizeHint())
 
-        self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
-
-    def _create_layout(self) -> QVBoxLayout:
+    def _create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide2.QtWidgets.QHBoxLayout`
             Layout.
         """
 
-        layout = QVBoxLayout()
-        layout.addWidget(self._create_group_file_version())
-        layout.addWidget(self._create_group_power_motor())
-        layout.addWidget(self._create_group_power_communication())
-        layout.addWidget(self._create_group_in_position_flag())
-        layout.addWidget(self._create_group_communication_timeout())
-        layout.addWidget(self._create_group_misc_inclinometer())
-        layout.addWidget(self._create_group_misc_temperature())
+        layout = QHBoxLayout()
+
+        # First column
+        layout_file = QVBoxLayout()
+        layout_file.addWidget(self._create_group_configuration_files())
+        layout_file.addWidget(self._create_group_file_version())
+
+        layout.addLayout(layout_file)
+
+        # Second column
+        layout_content = QVBoxLayout()
+        layout_content.addWidget(self._create_group_power_motor())
+        layout_content.addWidget(self._create_group_power_communication())
+        layout_content.addWidget(self._create_group_in_position_flag())
+        layout_content.addWidget(self._create_group_communication_timeout())
+        layout_content.addWidget(self._create_group_misc_inclinometer())
+        layout_content.addWidget(self._create_group_misc_temperature())
+
+        layout.addLayout(layout_content)
 
         return layout
+
+    def _create_group_configuration_files(self) -> QGroupBox:
+        """Create the group of configuration files.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QVBoxLayout()
+        layout.addWidget(self._list_files)
+        layout.addWidget(self._button_set_file)
+
+        return create_group_box("Configuration Files", layout)
 
     def _create_group_file_version(self) -> QGroupBox:
         """Create the group of files and version.
@@ -262,7 +341,22 @@ class TabConfigView(TabDefault):
             Signal of the configuration.
         """
 
+        signal_config.files.connect(self._callback_signal_config_files)
         signal_config.config.connect(self._callback_signal_config)
+
+    @asyncSlot()
+    async def _callback_signal_config_files(self, files: list[str]) -> None:
+        """Callback of the config signal for the configuration files.
+
+        Parameters
+        ----------
+        files : `list`
+            Configuration files.
+        """
+
+        self._list_files.clear()
+        for file in files:
+            self._list_files.addItem(file)
 
     @asyncSlot()
     async def _callback_signal_config(self, config: Config) -> None:

@@ -98,6 +98,9 @@ class SignalStatus(QtCore.QObject):
 class SignalConfig(QtCore.QObject):
     """Configuration signal to send the configuration."""
 
+    # List of configuration files: ["file_1", "file_2", ...].
+    files = QtCore.Signal(object)
+
     # Instance of `Config` class.
     config = QtCore.Signal(object)
 
