@@ -37,6 +37,34 @@ def widget(qtbot: QtBot) -> TabConfigView:
 
 
 @pytest.mark.asyncio
+async def test_get_selected_file(qtbot: QtBot, widget: TabConfigView) -> None:
+    widget.model.signal_config.files.emit(["a", "b", "c"])
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    # No selection
+    assert widget._get_selected_file() == ""
+
+    # Select an item
+    widget._list_files.setCurrentRow(1)
+    assert widget._get_selected_file() == "b"
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_config_files(
+    qtbot: QtBot, widget: TabConfigView
+) -> None:
+    files = ["a", "b", "c"]
+    widget.model.signal_config.files.emit(files)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget._list_files.count() == len(files)
+
+
+@pytest.mark.asyncio
 async def test_callback_signal_config(qtbot: QtBot, widget: TabConfigView) -> None:
     widget.model.report_config(
         file_configuration="a",

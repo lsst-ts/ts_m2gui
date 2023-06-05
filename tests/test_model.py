@@ -387,6 +387,11 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
     ):
         await model._process_event(message={"id": "enabledFaultsMask", "mask": 10})
 
+    with qtbot.waitSignal(model.signal_config.files, timeout=TIMEOUT):
+        await model._process_event(
+            message={"id": "configurationFiles", "files": ["a", "b"]}
+        )
+
 
 def test_get_message_name(model: Model) -> None:
     assert model._get_message_name("") == ""

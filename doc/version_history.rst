@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.6:
+
+-------------
+0.4.6
+-------------
+
+* Subscribe the event of available configuration files from the controller.
+* Allow the user to select the configuration file to set in the controller.
+
 .. _lsst.ts.m2gui-0.4.5:
 
 -------------

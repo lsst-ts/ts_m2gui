@@ -854,6 +854,12 @@ class Model(object):
 
                 self.log.info(f"Enabled faults mask: {hex(mask)}.")
 
+            elif name == "configurationFiles":
+                files = message["files"]
+                self.signal_config.files.emit(files)
+
+                self.log.info(f"Available configuration files: {files}.")
+
             # Ignore these messages because they are specific to CSC
             elif name in (
                 "summaryState",
