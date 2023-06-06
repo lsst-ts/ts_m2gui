@@ -165,8 +165,11 @@ class SignalDetailedForce(QtCore.QObject):
     # the axial actuators and the last three are the tangential actuators.
     hard_points = QtCore.Signal(object)
 
-    # Instance of the `ActuatorForce` class.
-    forces = QtCore.Signal(object)
+    # Instance of the `ActuatorForceAxial` class.
+    forces_axial = QtCore.Signal(object)
+
+    # Instance of the `ActuatorForceTangent` class.
+    forces_tangent = QtCore.Signal(object)
 
     # Tangential force error to monitor the supporting force of tangential
     # link. Instance of `ForceErrorTangent` class.

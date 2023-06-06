@@ -29,7 +29,8 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
-from ..actuator_force import ActuatorForce
+from ..actuator_force_axial import ActuatorForceAxial
+from ..actuator_force_tangent import ActuatorForceTangent
 from ..display import FigureConstant, Gauge, ViewMirror
 from ..enums import CellActuatorGroupData, FigureActuatorData
 from ..model import Model
@@ -68,7 +69,9 @@ class TabCellStatus(TabDefault):
         # Visible actuator IDs on the cell map
         self._visible_actuator_ids = self.get_visible_actuator_ids()
 
-        self._forces = ActuatorForce()
+        self._forces_axial = ActuatorForceAxial()
+        self._forces_tangent = ActuatorForceTangent()
+
         self._figures = self._create_figures()
         self._gauge = Gauge(-1, 1)
 
@@ -326,11 +329,14 @@ class TabCellStatus(TabDefault):
         actuator_data = FigureActuatorData(selected_index + 1)
 
         if actuator_data == FigureActuatorData.ForceMeasured:
-            return self._forces.f_cur, False
+            return self._forces_axial.f_cur + self._forces_tangent.f_cur, False
         elif actuator_data == FigureActuatorData.ForceError:
-            return self._forces.f_error, False
+            return self._forces_axial.f_error + self._forces_tangent.f_error, False
         elif actuator_data == FigureActuatorData.Displacement:
-            return self._forces.position_in_mm, True
+            return (
+                self._forces_axial.position_in_mm + self._forces_tangent.position_in_mm,
+                True,
+            )
 
         return list(), False
 
@@ -373,11 +379,11 @@ class TabCellStatus(TabDefault):
         """
 
         # Cell map
+        forces_current = self._forces_axial.f_cur + self._forces_tangent.f_cur
+
         force_current_min = -1.0
         force_current_max = 1.0
-        for actuator, force_current in zip(
-            self._view_mirror.actuators, self._forces.f_cur
-        ):
+        for actuator, force_current in zip(self._view_mirror.actuators, forces_current):
             if actuator.acutator_id in self._visible_actuator_ids:
                 actuator.update_magnitude(
                     force_current, self._gauge.min, self._gauge.max
@@ -397,12 +403,11 @@ class TabCellStatus(TabDefault):
             self._gauge.set_magnitude_range(force_current_min, force_current_max)
 
         # Figures
-        num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
         self._figures["realtime"].append_data(
-            np.mean(np.abs(self._forces.f_error[0:num_axial])), idx=0
+            np.mean(np.abs(self._forces_axial.f_error)), idx=0
         )
         self._figures["realtime"].append_data(
-            np.mean(np.abs(self._forces.f_error[-NUM_TANGENT_LINK:])), idx=1
+            np.mean(np.abs(self._forces_tangent.f_error)), idx=1
         )
 
         data_selected, is_displacement = self._get_data_selected()
@@ -510,16 +515,29 @@ class TabCellStatus(TabDefault):
         signal_detailed_force : `SignalDetailedForce`
             Signal of the detailed force.
         """
-        signal_detailed_force.forces.connect(self._callback_forces)
+        signal_detailed_force.forces_axial.connect(self._callback_forces_axial)
+        signal_detailed_force.forces_tangent.connect(self._callback_forces_tangent)
 
     @asyncSlot()
-    async def _callback_forces(self, forces: ActuatorForce) -> None:
-        """Callback of the forces, which contain the look-up table (LUT)
+    async def _callback_forces_axial(self, forces: ActuatorForceAxial) -> None:
+        """Callback of the axial forces, which contain the look-up table (LUT)
         details.
 
         Parameters
         ----------
-        forces : `ActuatorForce`
-            Detailed actuator forces.
+        forces : `ActuatorForceAxial`
+            Detailed axial actuator forces.
         """
-        self._forces = forces
+        self._forces_axial = forces
+
+    @asyncSlot()
+    async def _callback_forces_tangent(self, forces: ActuatorForceTangent) -> None:
+        """Callback of the tangent forces, which contain the look-up table
+        (LUT) details.
+
+        Parameters
+        ----------
+        forces : `ActuatorForceTangent`
+            Detailed tangent actuator forces.
+        """
+        self._forces_tangent = forces
