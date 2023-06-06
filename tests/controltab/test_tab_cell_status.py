@@ -27,7 +27,8 @@ from pathlib import Path
 import pytest
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
 from lsst.ts.m2gui import (
-    ActuatorForce,
+    ActuatorForceAxial,
+    ActuatorForceTangent,
     CellActuatorGroupData,
     FigureActuatorData,
     Model,
@@ -122,7 +123,7 @@ def test_get_visible_actuator_ids(widget: TabCellStatus) -> None:
 
 def test_get_data_selected(widget: TabCellStatus) -> None:
     # Update the internal holded force data
-    widget._forces.f_cur[0] = 1
+    widget._forces_axial.f_cur[0] = 1
 
     data_selected, is_displacement = widget._get_data_selected()
     assert data_selected[0] == 1
@@ -132,11 +133,11 @@ def test_get_data_selected(widget: TabCellStatus) -> None:
 @pytest.mark.asyncio
 async def test_callback_selection_changed(widget: TabCellStatus) -> None:
     # Update the internal holded actuator data
-    widget._forces.position_in_mm[0] = 3000
-    widget._forces.position_in_mm[-1] = -3000
+    widget._forces_axial.position_in_mm[0] = 3000
+    widget._forces_tangent.position_in_mm[-1] = -3000
 
-    widget._forces.f_error[0] = 2
-    widget._forces.f_error[-1] = -2
+    widget._forces_axial.f_error[0] = 2
+    widget._forces_tangent.f_error[-1] = -2
 
     # Displacement
 
@@ -188,12 +189,12 @@ async def test_callback_time_out(widget: TabCellStatus) -> None:
             if item.label_id.toPlainText() == "2":
                 item.setSelected(True)
 
-    widget._forces.f_cur[1] = 100
-    widget._forces.f_error[1] = 72
-    widget._forces.f_error[77] = -12
+    widget._forces_axial.f_cur[1] = 100
+    widget._forces_axial.f_error[1] = 72
+    widget._forces_tangent.f_error[-1] = -12
     await widget._callback_time_out()
 
-    assert widget._forces.f_cur[1] == 100
+    assert widget._forces_axial.f_cur[1] == 100
     assert widget._view_mirror.actuators[1].magnitude == 100
 
     figure_realtime = widget._figures["realtime"]
@@ -209,13 +210,26 @@ async def test_callback_time_out(widget: TabCellStatus) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_forces(widget: TabCellStatus) -> None:
-    actuator_force = ActuatorForce()
+async def test_callback_forces_axial(widget: TabCellStatus) -> None:
+    actuator_force = ActuatorForceAxial()
     actuator_force.f_cur[1] = 100
 
-    widget.model.utility_monitor.update_forces(actuator_force)
+    widget.model.utility_monitor.update_forces_axial(actuator_force)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert id(widget._forces) == id(actuator_force)
+    assert id(widget._forces_axial) == id(actuator_force)
+
+
+@pytest.mark.asyncio
+async def test_callback_forces_tangent(widget: TabCellStatus) -> None:
+    actuator_force = ActuatorForceTangent()
+    actuator_force.f_cur[1] = 100
+
+    widget.model.utility_monitor.update_forces_tangent(actuator_force)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert id(widget._forces_tangent) == id(actuator_force)

@@ -431,9 +431,10 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
+    model.utility_monitor.hard_points["axial"] = [6, 16, 26]
     num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
     with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
+        model.utility_monitor.signal_detailed_force.forces_axial, timeout=TIMEOUT
     ):
         model._process_telemetry(
             message={
@@ -446,8 +447,9 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
+    model.utility_monitor.hard_points["tangent"] = [74, 76, 78]
     with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
+        model.utility_monitor.signal_detailed_force.forces_tangent, timeout=TIMEOUT
     ):
         model._process_telemetry(
             message={
@@ -496,25 +498,23 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
-    ):
-        model._process_telemetry(
-            message={
-                "id": "axialEncoderPositions",
-                "position": [10000] * num_axial,
-            }
-        )
+    model._process_telemetry(
+        message={
+            "id": "axialEncoderPositions",
+            "position": [10000] * num_axial,
+        }
+    )
+    assert model.utility_monitor.forces_axial.position_in_mm == [10] * num_axial
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.forces, timeout=TIMEOUT
-    ):
-        model._process_telemetry(
-            message={
-                "id": "tangentEncoderPositions",
-                "position": [10000] * NUM_TANGENT_LINK,
-            }
-        )
+    model._process_telemetry(
+        message={
+            "id": "tangentEncoderPositions",
+            "position": [10000] * NUM_TANGENT_LINK,
+        }
+    )
+    assert (
+        model.utility_monitor.forces_tangent.position_in_mm == [10] * NUM_TANGENT_LINK
+    )
 
     with qtbot.waitSignal(
         model.utility_monitor.signal_utility.displacements, timeout=TIMEOUT
@@ -578,10 +578,14 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
 
 
 def test_check_force_with_limit(qtbot: QtBot, model: Model) -> None:
+    model.utility_monitor.forces_axial.f_cur = [1000.0] * (
+        NUM_ACTUATOR - NUM_TANGENT_LINK
+    )
+
     with qtbot.waitSignal(
         model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
     ):
-        model._check_force_with_limit([1000.0] * NUM_ACTUATOR)
+        model._check_force_with_limit()
 
 
 def test_get_current_force_limits(model: Model) -> None:
