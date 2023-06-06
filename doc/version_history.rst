@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.4.7:
+
+-------------
+0.4.7
+-------------
+
+* Add the classes of ``ActuatorForceAxial`` and ``ActuatorForceTangent`` to replace the ``ActuatorForce`` class to minimize the duplication.
+
 .. _lsst.ts.m2gui-0.4.6:
 
 -------------

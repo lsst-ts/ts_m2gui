@@ -48,7 +48,8 @@ m2gui
 * **Config** is a data class that has the configuration details in the M2 cell control system.
 * **FaultManager** records the system error.
 * **UtilityMonitor** monitors the utility status.
-* **ActuatorForce** is a data class that has the force details contain the look-up table (LUT) information, force balance system, etc.
+* **ActuatorForceAxial** is a data class that has the axial force details contain the look-up table (LUT) information, force balance system, etc.
+* **ActuatorForceTangent** is a data class that has the tangent force details contain the look-up table (LUT) information, force balance system, etc.
 * **ForceErrorTangent** is a data class that is used to monitor the supporting force of mirror according to the tangential link force error.
 * **ControlTabs** has the control tables.
 * **LogWindowHandler** handles the log window.

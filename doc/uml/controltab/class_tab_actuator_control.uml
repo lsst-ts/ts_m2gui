@@ -3,7 +3,8 @@ package "m2gui" #DDDDDD {
   Model *-- UtilityMonitor
   Model *-- SignalScript : emit()
   UtilityMonitor *-- SignalDetailedForce : emit()
-  UtilityMonitor ..> ActuatorForce
+  UtilityMonitor *-- ActuatorForceAxial
+  UtilityMonitor *-- ActuatorForceTangent
 }
 
 package "widget" #DDDDDD {
@@ -15,6 +16,7 @@ TabDefault <|-- TabActuatorControl
 
 TabActuatorControl --> SignalScript : connect()
 TabActuatorControl --> SignalDetailedForce : connect()
-TabActuatorControl ..> ActuatorForce
+TabActuatorControl ..> ActuatorForceAxial
+TabActuatorControl ..> ActuatorForceTangent
 TabActuatorControl ..> QFileDialogAsync
 @enduml

@@ -2,12 +2,14 @@
 package "m2gui" #DDDDDD {
   Model *-- UtilityMonitor
   UtilityMonitor *-- SignalDetailedForce : emit()
-  UtilityMonitor ..> ActuatorForce
+  UtilityMonitor *-- ActuatorForceAxial
+  UtilityMonitor *-- ActuatorForceTangent
 }
 
 TabDefault *-- Model
 TabDefault <|-- TabDetailedForce
 
 TabDetailedForce --> SignalDetailedForce : connect()
-TabDetailedForce ..> ActuatorForce
+TabDetailedForce *-- ActuatorForceAxial
+TabDetailedForce *-- ActuatorForceTangent
 @enduml

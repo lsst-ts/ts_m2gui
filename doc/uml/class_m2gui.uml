@@ -40,7 +40,8 @@ UtilityMonitor *-- SignalUtility : emit()
 UtilityMonitor *-- SignalDetailedForce : emit()
 UtilityMonitor *-- SignalPosition : emit()
 
-UtilityMonitor *-- ActuatorForce
+UtilityMonitor *-- ActuatorForceAxial
+UtilityMonitor *-- ActuatorForceTangent
 UtilityMonitor *-- ForceErrorTangent
 
 LayoutDefault *-- Model

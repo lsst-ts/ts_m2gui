@@ -2,7 +2,8 @@
 package "m2gui" #DDDDDD {
   Model *-- UtilityMonitor
   UtilityMonitor *-- SignalDetailedForce : emit()
-  UtilityMonitor ..> ActuatorForce
+  UtilityMonitor *-- ActuatorForceAxial
+  UtilityMonitor *-- ActuatorForceTangent
 }
 
 package "display" #DDDDDD {
@@ -20,5 +21,6 @@ TabCellStatus ..> Gauge
 TabCellStatus ..> ItemActuator
 
 TabCellStatus --> SignalDetailedForce : connect()
-TabCellStatus *-- ActuatorForce
+TabCellStatus *-- ActuatorForceAxial
+TabCellStatus *-- ActuatorForceTangent
 @enduml
