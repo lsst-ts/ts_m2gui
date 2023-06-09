@@ -25,7 +25,7 @@ import logging
 import pytest
 import pytest_asyncio
 from lsst.ts.m2com import ActuatorDisplacementUnit
-from lsst.ts.m2gui import ActuatorForce, LocalMode, Model
+from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, LocalMode, Model
 from lsst.ts.m2gui.controltab import TabActuatorControl
 from PySide2.QtCore import Qt
 from pytestqt.qtbot import QtBot
@@ -232,14 +232,12 @@ async def test_callback_progress(widget: TabActuatorControl) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_forces(widget: TabActuatorControl) -> None:
-    actuator_force = ActuatorForce()
+async def test_callback_forces_axial(widget: TabActuatorControl) -> None:
+    actuator_force = ActuatorForceAxial()
     actuator_force.f_cur[0] = -1
     actuator_force.f_cur[71] = 2
-    actuator_force.f_cur[72] = 3
-    actuator_force.f_cur[77] = -5
 
-    widget.model.utility_monitor.update_forces(actuator_force)
+    widget.model.utility_monitor.update_forces_axial(actuator_force)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -247,6 +245,18 @@ async def test_callback_forces(widget: TabActuatorControl) -> None:
     assert widget._labels_force["axial_min"].text() == "-1.00"
     assert widget._labels_force["axial_max"].text() == "2.00"
     assert widget._labels_force["axial_total"].text() == "1.00"
+
+
+@pytest.mark.asyncio
+async def test_callback_forces_tangent(widget: TabActuatorControl) -> None:
+    actuator_force = ActuatorForceTangent()
+    actuator_force.f_cur[0] = 3
+    actuator_force.f_cur[5] = -5
+
+    widget.model.utility_monitor.update_forces_tangent(actuator_force)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
 
     assert widget._labels_force["tangent_min"].text() == "-5.00"
     assert widget._labels_force["tangent_max"].text() == "3.00"

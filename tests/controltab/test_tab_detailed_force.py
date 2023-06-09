@@ -23,7 +23,7 @@ import asyncio
 import logging
 
 import pytest
-from lsst.ts.m2gui import ActuatorForce, Model
+from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, Model
 from lsst.ts.m2gui.controltab import TabDetailedForce
 from pytestqt.qtbot import QtBot
 
@@ -38,11 +38,12 @@ def widget(qtbot: QtBot) -> TabDetailedForce:
 
 @pytest.mark.asyncio
 async def test_callback_time_out(widget: TabDetailedForce) -> None:
-    widget._forces_latest.f_hc[3] = 1.234
-    widget._forces_latest.f_cur[5] = 0.2
-    widget._forces_latest.f_error[7] = 0.249
-    widget._forces_latest.position_in_mm[10] = 123
-    widget._forces_latest.step[13] = 34
+    # Check the axial actuators
+    widget._forces_latest_axial.f_hc[3] = 1.234
+    widget._forces_latest_axial.f_cur[5] = 0.2
+    widget._forces_latest_axial.f_error[7] = 0.249
+    widget._forces_latest_axial.position_in_mm[10] = 123
+    widget._forces_latest_axial.step[13] = 34
     await widget._callback_time_out()
 
     assert widget._forces["f_hc"][3].text() == "1.23"
@@ -50,6 +51,20 @@ async def test_callback_time_out(widget: TabDetailedForce) -> None:
     assert widget._forces["f_error"][7].text() == "0.25"
     assert widget._forces["position_in_mm"][10].text() == "123.0000"
     assert widget._forces["step"][13].text() == "34"
+
+    # Check the tangent links
+    widget._forces_latest_tangent.f_hc[0] = 1.234
+    widget._forces_latest_tangent.f_cur[1] = 0.2
+    widget._forces_latest_tangent.f_error[2] = 0.249
+    widget._forces_latest_tangent.position_in_mm[3] = 123
+    widget._forces_latest_tangent.step[4] = 34
+    await widget._callback_time_out()
+
+    assert widget._forces["f_hc"][72].text() == "1.23"
+    assert widget._forces["f_cur"][73].text() == "0.20"
+    assert widget._forces["f_error"][74].text() == "0.25"
+    assert widget._forces["position_in_mm"][75].text() == "123.0000"
+    assert widget._forces["step"][76].text() == "34"
 
 
 @pytest.mark.asyncio
@@ -66,12 +81,24 @@ async def test_callback_hard_points(widget: TabDetailedForce) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_forces(widget: TabDetailedForce) -> None:
-    forces = ActuatorForce()
+async def test_callback_forces_axial(widget: TabDetailedForce) -> None:
+    forces = ActuatorForceAxial()
     forces.f_cur[5] = 0.2
-    widget.model.utility_monitor.update_forces(forces)
+    widget.model.utility_monitor.update_forces_axial(forces)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert id(widget._forces_latest) == id(forces)
+    assert id(widget._forces_latest_axial) == id(forces)
+
+
+@pytest.mark.asyncio
+async def test_callback_forces_tangent(widget: TabDetailedForce) -> None:
+    forces = ActuatorForceTangent()
+    forces.f_cur[3] = 0.2
+    widget.model.utility_monitor.update_forces_tangent(forces)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert id(widget._forces_latest_tangent) == id(forces)

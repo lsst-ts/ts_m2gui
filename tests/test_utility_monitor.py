@@ -37,9 +37,14 @@ def utility_monitor() -> UtilityMonitor:
     return UtilityMonitor()
 
 
-def test_get_forces(utility_monitor: UtilityMonitor) -> None:
-    forces = utility_monitor.get_forces()
-    assert id(forces) != id(utility_monitor.forces)
+def test_get_forces_axial(utility_monitor: UtilityMonitor) -> None:
+    forces = utility_monitor.get_forces_axial()
+    assert id(forces) != id(utility_monitor.forces_axial)
+
+
+def test_get_forces_tangent(utility_monitor: UtilityMonitor) -> None:
+    forces = utility_monitor.get_forces_tangent()
+    assert id(forces) != id(utility_monitor.forces_tangent)
 
 
 def test_report_utility_status(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
@@ -57,7 +62,8 @@ def test_report_utility_status(qtbot: QtBot, utility_monitor: UtilityMonitor) ->
         utility_monitor.signal_utility.digital_status_input,
         utility_monitor.signal_utility.digital_status_output,
         utility_monitor.signal_detailed_force.hard_points,
-        utility_monitor.signal_detailed_force.forces,
+        utility_monitor.signal_detailed_force.forces_axial,
+        utility_monitor.signal_detailed_force.forces_tangent,
         utility_monitor.signal_detailed_force.force_error_tangent,
         utility_monitor.signal_position.position,
         utility_monitor.signal_position.position_ims,
@@ -352,32 +358,62 @@ def test_update_hard_points_exception(utility_monitor: UtilityMonitor) -> None:
         utility_monitor.update_hard_points([1], [2])
 
 
-def test_update_forces_exception(utility_monitor: UtilityMonitor) -> None:
+def test_update_forces_exception_axial(utility_monitor: UtilityMonitor) -> None:
     with pytest.raises(ValueError):
-        utility_monitor.update_forces(utility_monitor.forces)
+        utility_monitor.update_forces_axial(utility_monitor.forces_axial)
 
 
-def test_update_forces(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
+def test_update_forces_exception_tangent(utility_monitor: UtilityMonitor) -> None:
+    with pytest.raises(ValueError):
+        utility_monitor.update_forces_tangent(utility_monitor.forces_tangent)
+
+
+def test_update_forces_axial(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
     # Current force is changed
-    actuator_force = utility_monitor.get_forces()
+    actuator_force = utility_monitor.get_forces_axial()
     actuator_force.f_cur[1] = 100
 
-    signal = utility_monitor.signal_detailed_force.forces
+    signal = utility_monitor.signal_detailed_force.forces_axial
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
-        utility_monitor.update_forces(actuator_force)
+        utility_monitor.update_forces_axial(actuator_force)
 
-    assert id(utility_monitor.forces) == id(actuator_force)
-    assert utility_monitor.forces.f_cur == actuator_force.f_cur
+    assert id(utility_monitor.forces_axial) == id(actuator_force)
+    assert utility_monitor.forces_axial.f_cur == actuator_force.f_cur
 
     # Current position is changed
-    actuator_force = utility_monitor.get_forces()
+    actuator_force = utility_monitor.get_forces_axial()
     actuator_force.position_in_mm[1] = 100
 
-    signal = utility_monitor.signal_detailed_force.forces
+    signal = utility_monitor.signal_detailed_force.forces_axial
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
-        utility_monitor.update_forces(actuator_force)
+        utility_monitor.update_forces_axial(actuator_force)
 
-    assert utility_monitor.forces.position_in_mm == actuator_force.position_in_mm
+    assert utility_monitor.forces_axial.position_in_mm == actuator_force.position_in_mm
+
+
+def test_update_forces_tangent(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
+    # Current force is changed
+    actuator_force = utility_monitor.get_forces_tangent()
+    actuator_force.f_cur[1] = 100
+
+    signal = utility_monitor.signal_detailed_force.forces_tangent
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_forces_tangent(actuator_force)
+
+    assert id(utility_monitor.forces_tangent) == id(actuator_force)
+    assert utility_monitor.forces_tangent.f_cur == actuator_force.f_cur
+
+    # Current position is changed
+    actuator_force = utility_monitor.get_forces_tangent()
+    actuator_force.position_in_mm[1] = 100
+
+    signal = utility_monitor.signal_detailed_force.forces_tangent
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_forces_tangent(actuator_force)
+
+    assert (
+        utility_monitor.forces_tangent.position_in_mm == actuator_force.position_in_mm
+    )
 
 
 def test_update_force_error_tangent(

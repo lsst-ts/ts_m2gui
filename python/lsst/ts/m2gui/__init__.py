@@ -29,7 +29,8 @@ else:
     except ImportError:
         __version__ = "?"
 
-from .actuator_force import *
+from .actuator_force_axial import *
+from .actuator_force_tangent import *
 from .application import *
 from .config import *
 from .control_tabs import *

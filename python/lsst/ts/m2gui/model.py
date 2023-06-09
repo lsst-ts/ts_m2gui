@@ -1024,21 +1024,25 @@ class Model(object):
                 )
 
             elif name == "axialForce":
-                forces = self.utility_monitor.get_forces()
+                forces_axial = self.utility_monitor.get_forces_axial()
 
-                forces.f_gravity[:num_axial] = message["lutGravity"]
-                forces.f_temperature[:num_axial] = message["lutTemperature"]
-                forces.f_delta[:num_axial] = message["applied"]
-                forces.f_cur[:num_axial] = message["measured"]
-                forces.f_hc[:num_axial] = message["hardpointCorrection"]
+                forces_axial.f_gravity = message["lutGravity"]
+                forces_axial.f_temperature = message["lutTemperature"]
+                forces_axial.f_delta = message["applied"]
+                forces_axial.f_cur = message["measured"]
 
-                forces.f_error[:num_axial] = [
+                # If the controller has the error, the hardpoint correction
+                # will not be calculated.
+                if len(message["hardpointCorrection"]) == num_axial:
+                    forces_axial.f_hc = message["hardpointCorrection"]
+
+                forces_axial.f_error = [
                     (
-                        message["lutGravity"][idx]
-                        + message["lutTemperature"][idx]
-                        + message["applied"][idx]
-                        - message["hardpointCorrection"][idx]
-                        - message["measured"][idx]
+                        forces_axial.f_gravity[idx]
+                        + forces_axial.f_temperature[idx]
+                        + forces_axial.f_delta[idx]
+                        + forces_axial.f_hc[idx]
+                        - forces_axial.f_cur[idx]
                     )
                     for idx in range(num_axial)
                 ]
@@ -1048,31 +1052,31 @@ class Model(object):
                 # figure out why it was designed in this way in a latter time.
                 for idx in self.utility_monitor.hard_points["axial"]:
                     # Index begins from 0 in list
-                    forces.f_error[idx - 1] = 0
+                    forces_axial.f_error[idx - 1] = 0
 
-                self.utility_monitor.update_forces(forces)
+                self.utility_monitor.update_forces_axial(forces_axial)
 
-                self._check_force_with_limit(forces.f_cur)
+                self._check_force_with_limit()
 
             elif name == "tangentForce":
-                forces = self.utility_monitor.get_forces()
+                forces_tangent = self.utility_monitor.get_forces_tangent()
 
                 # There is no temperature LUT correction
-                forces.f_gravity[-NUM_TANGENT_LINK:] = message["lutGravity"]
-                forces.f_delta[-NUM_TANGENT_LINK:] = message["applied"]
-                forces.f_cur[-NUM_TANGENT_LINK:] = message["measured"]
+                forces_tangent.f_gravity = message["lutGravity"]
+                forces_tangent.f_delta = message["applied"]
+                forces_tangent.f_cur = message["measured"]
 
                 # If the controller has the error, the hardpoint correction
                 # will not be calculated.
                 if len(message["hardpointCorrection"]) == NUM_TANGENT_LINK:
-                    forces.f_hc[-NUM_TANGENT_LINK:] = message["hardpointCorrection"]
+                    forces_tangent.f_hc = message["hardpointCorrection"]
 
-                forces.f_error[-NUM_TANGENT_LINK:] = [
+                forces_tangent.f_error = [
                     (
-                        message["lutGravity"][idx]
-                        + message["applied"][idx]
-                        - forces.f_hc[-NUM_TANGENT_LINK + idx]
-                        - message["measured"][idx]
+                        forces_tangent.f_gravity[idx]
+                        + forces_tangent.f_delta[idx]
+                        + forces_tangent.f_hc[idx]
+                        - forces_tangent.f_cur[idx]
                     )
                     for idx in range(NUM_TANGENT_LINK)
                 ]
@@ -1082,11 +1086,11 @@ class Model(object):
                 # figure out why it was designed in this way in a latter time.
                 for idx in self.utility_monitor.hard_points["tangent"]:
                     # Index begins from 0 in list
-                    forces.f_error[idx - 1] = 0
+                    forces_tangent.f_error[idx - 1 - num_axial] = 0
 
-                self.utility_monitor.update_forces(forces)
+                self.utility_monitor.update_forces_tangent(forces_tangent)
 
-                self._check_force_with_limit(forces.f_cur)
+                self._check_force_with_limit()
 
             elif name == "temperature":
                 self.utility_monitor.update_temperature(
@@ -1122,30 +1126,24 @@ class Model(object):
             # We base on the change of position to send the "signal" to
             # update the GUI.
             elif name == "axialActuatorSteps":
-                self.utility_monitor.forces.step[:num_axial] = message["steps"]
+                self.utility_monitor.forces_axial.step = message["steps"]
 
             elif name == "tangentActuatorSteps":
-                self.utility_monitor.forces.step[-NUM_TANGENT_LINK:] = message["steps"]
+                self.utility_monitor.forces_tangent.step = message["steps"]
 
             elif name == "axialEncoderPositions":
-                forces = self.utility_monitor.get_forces()
-
                 # The received unit is um instead of mm.
                 position = message["position"]
-                forces.position_in_mm[:num_axial] = [value * 1e-3 for value in position]
-
-                self.utility_monitor.update_forces(forces)
-
-            elif name == "tangentEncoderPositions":
-                forces = self.utility_monitor.get_forces()
-
-                # The received unit is um instead of mm.
-                position = message["position"]
-                forces.position_in_mm[-NUM_TANGENT_LINK:] = [
+                self.utility_monitor.forces_axial.position_in_mm = [
                     value * 1e-3 for value in position
                 ]
 
-                self.utility_monitor.update_forces(forces)
+            elif name == "tangentEncoderPositions":
+                # The received unit is um instead of mm.
+                position = message["position"]
+                self.utility_monitor.forces_tangent.position_in_mm = [
+                    value * 1e-3 for value in position
+                ]
 
             elif name == "displacementSensors":
                 self.utility_monitor.update_displacements(
@@ -1194,24 +1192,25 @@ class Model(object):
             else:
                 self.log.warning(f"Unspecified telemetry message: {name}, ignoring...")
 
-    def _check_force_with_limit(
-        self, measured_force: list[float], buffer: float = 0.05
-    ) -> None:
+    def _check_force_with_limit(self, buffer: float = 0.05) -> None:
         """Check the measured force with the software limit. If it is out of
         limit, alert the related limit switch status.
 
         Parameters
         ----------
-        measured_force : `list`
-            Measured force in Newton.
         buffer : `float`, optional
             Buffer of the force limit in ratio. (the default is 0.05)
         """
 
+        measured_force = np.append(
+            self.utility_monitor.forces_axial.f_cur,
+            self.utility_monitor.forces_tangent.f_cur,
+        )
+
         limit_force_axial, limit_force_tangent = self.get_current_force_limits()
         ratio = 1 - buffer
         _, limit_switch_retract, limit_switch_extend = check_limit_switches(
-            np.array(measured_force),
+            measured_force,
             limit_force_axial * ratio,
             limit_force_tangent * ratio,
         )

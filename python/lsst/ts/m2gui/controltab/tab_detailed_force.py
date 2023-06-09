@@ -21,7 +21,7 @@
 
 __all__ = ["TabDetailedForce"]
 
-from lsst.ts.m2com import NUM_ACTUATOR
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QAbstractItemView,
@@ -33,7 +33,8 @@ from PySide2.QtWidgets import (
 )
 from qasync import asyncSlot
 
-from ..actuator_force import ActuatorForce
+from ..actuator_force_axial import ActuatorForceAxial
+from ..actuator_force_tangent import ActuatorForceTangent
 from ..enums import Ring
 from ..model import Model
 from ..signals import SignalDetailedForce
@@ -75,7 +76,8 @@ class TabDetailedForce(TabDefault):
         self._forces = self._create_items_force()
 
         # Latest received actuator forces
-        self._forces_latest = ActuatorForce()
+        self._forces_latest_axial = ActuatorForceAxial()
+        self._forces_latest_tangent = ActuatorForceTangent()
 
         # List of the force details
         self._list_force_details = list(self._forces.keys())
@@ -118,7 +120,7 @@ class TabDetailedForce(TabDefault):
         items_force = dict()
         items_force["id"] = actuator_id
 
-        for name in vars(self.model.utility_monitor.forces).keys():
+        for name in vars(self.model.utility_monitor.forces_axial).keys():
             items_force[name] = list()
             for idx in range(NUM_ACTUATOR):
                 items_force[name].append(QTableWidgetItem())
@@ -209,18 +211,44 @@ class TabDetailedForce(TabDefault):
         """Callback timeout function to update the force table."""
 
         # Update the force items on tables
-        for key in vars(self._forces_latest).keys():
-            field = getattr(self._forces_latest, key)
-
-            for idx in range(NUM_ACTUATOR):
-                if key in ("encoder_count", "step"):
-                    self._forces[key][idx].setText(str(field[idx]))
-                elif key == "position_in_mm":
-                    self._forces[key][idx].setText("%.4f" % field[idx])
-                else:
-                    self._forces[key][idx].setText("%.2f" % field[idx])
+        num_axial_actuator = NUM_ACTUATOR - NUM_TANGENT_LINK
+        self._update_forces(self._forces_latest_axial, num_axial_actuator)
+        self._update_forces(self._forces_latest_tangent, NUM_TANGENT_LINK)
 
         self.check_duration_and_restart_timer(self._timer)
+
+    def _update_forces(
+        self,
+        forces_latest: ActuatorForceAxial | ActuatorForceTangent,
+        num_actuator: int,
+    ) -> None:
+        """Update the forces.
+
+        Parameters
+        ----------
+        forces_latest : `ActuatorForceAxial` or `ActuatorForceTangent`
+            Latest data of the axial or tangent actuator forces.
+        num_actuator : `int`
+            Number of the actuators.
+        """
+
+        # Check the "forces" is the axial actuator or not
+        num_axial_actuator = NUM_ACTUATOR - NUM_TANGENT_LINK
+        is_axial_actuator = num_actuator == num_axial_actuator
+
+        for key in vars(forces_latest).keys():
+            field = getattr(forces_latest, key)
+
+            for idx in range(num_actuator):
+                # Need to add the index's offset for tangent links
+                idx_updated = idx if is_axial_actuator else (num_axial_actuator + idx)
+
+                if key in ("encoder_count", "step"):
+                    self._forces[key][idx_updated].setText(str(field[idx]))
+                elif key == "position_in_mm":
+                    self._forces[key][idx_updated].setText("%.4f" % field[idx])
+                else:
+                    self._forces[key][idx_updated].setText("%.2f" % field[idx])
 
     def _set_widget_and_layout(self) -> None:
         """Set the widget and layout."""
@@ -280,7 +308,9 @@ class TabDetailedForce(TabDefault):
         """
 
         signal_detailed_force.hard_points.connect(self._callback_hard_points)
-        signal_detailed_force.forces.connect(self._callback_forces)
+
+        signal_detailed_force.forces_axial.connect(self._callback_forces_axial)
+        signal_detailed_force.forces_tangent.connect(self._callback_forces_tangent)
 
     @asyncSlot()
     async def _callback_hard_points(self, hard_points: list[int]) -> None:
@@ -298,13 +328,25 @@ class TabDetailedForce(TabDefault):
         self._hard_points["tangent"].setText(f"{hard_points[3:]}")
 
     @asyncSlot()
-    async def _callback_forces(self, forces: ActuatorForce) -> None:
-        """Callback of the forces, which contain the look-up table (LUT)
+    async def _callback_forces_axial(self, forces: ActuatorForceAxial) -> None:
+        """Callback of the axial forces, which contain the look-up table (LUT)
         details.
 
         Parameters
         ----------
-        forces : `ActuatorForce`
-            Detailed actuator forces.
+        forces : `ActuatorForceAxial`
+            Detailed axial actuator forces.
         """
-        self._forces_latest = forces
+        self._forces_latest_axial = forces
+
+    @asyncSlot()
+    async def _callback_forces_tangent(self, forces: ActuatorForceTangent) -> None:
+        """Callback of the tangent forces, which contain the look-up table
+        (LUT) details.
+
+        Parameters
+        ----------
+        forces : `ActuatorForceTangent`
+            Detailed tangent actuator forces.
+        """
+        self._forces_latest_tangent = forces

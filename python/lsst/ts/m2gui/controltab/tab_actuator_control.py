@@ -24,12 +24,7 @@ __all__ = ["TabActuatorControl"]
 from pathlib import Path
 
 import numpy as np
-from lsst.ts.m2com import (
-    NUM_TANGENT_LINK,
-    ActuatorDisplacementUnit,
-    CommandActuator,
-    CommandScript,
-)
+from lsst.ts.m2com import ActuatorDisplacementUnit, CommandActuator, CommandScript
 from PySide2.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
@@ -41,7 +36,8 @@ from PySide2.QtWidgets import (
 )
 from qasync import asyncSlot
 
-from ..actuator_force import ActuatorForce
+from ..actuator_force_axial import ActuatorForceAxial
+from ..actuator_force_tangent import ActuatorForceTangent
 from ..enums import Ring
 from ..model import Model
 from ..signals import SignalDetailedForce, SignalScript
@@ -529,7 +525,7 @@ class TabActuatorControl(TabDefault):
     def _set_signal_detailed_force(
         self, signal_detailed_force: SignalDetailedForce
     ) -> None:
-        """Set the detailed force signal with callback function. This signal
+        """Set the detailed force signal with callback functions. This signal
         provides the calculated and measured force details contains the look-up
         table (LUT).
 
@@ -538,28 +534,41 @@ class TabActuatorControl(TabDefault):
         signal_detailed_force : `SignalDetailedForce`
             Signal of the detailed force.
         """
-        signal_detailed_force.forces.connect(self._callback_forces)
+        signal_detailed_force.forces_axial.connect(self._callback_forces_axial)
+        signal_detailed_force.forces_tangent.connect(self._callback_forces_tangent)
 
     @asyncSlot()
-    async def _callback_forces(self, forces: ActuatorForce) -> None:
-        """Callback of the forces, which contain the look-up table (LUT)
+    async def _callback_forces_axial(self, forces: ActuatorForceAxial) -> None:
+        """Callback of the axial forces, which contain the look-up table (LUT)
         details.
 
         Parameters
         ----------
-        forces : `ActuatorForce`
-            Detailed actuator forces.
+        forces : `ActuatorForceAxial`
+            Detailed axial actuator forces.
         """
 
-        force_measured = np.array(forces.f_cur)
-        force_axial = force_measured[:-NUM_TANGENT_LINK]
-        force_tangent = force_measured[-NUM_TANGENT_LINK:]
+        force_axial = np.array(forces.f_cur)
 
         value_format = "%.2f"
         self._labels_force["axial_min"].setText(value_format % force_axial.min())
         self._labels_force["axial_max"].setText(value_format % force_axial.max())
         self._labels_force["axial_total"].setText(value_format % force_axial.sum())
 
+    @asyncSlot()
+    async def _callback_forces_tangent(self, forces: ActuatorForceTangent) -> None:
+        """Callback of the tangent forces, which contain the look-up table
+        (LUT) details.
+
+        Parameters
+        ----------
+        forces : `ActuatorForceTangent`
+            Detailed tangent actuator forces.
+        """
+
+        force_tangent = np.array(forces.f_cur)
+
+        value_format = "%.2f"
         self._labels_force["tangent_min"].setText(value_format % force_tangent.min())
         self._labels_force["tangent_max"].setText(value_format % force_tangent.max())
         self._labels_force["tangent_total"].setText(value_format % force_tangent.sum())

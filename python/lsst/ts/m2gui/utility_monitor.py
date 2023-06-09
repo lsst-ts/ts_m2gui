@@ -30,7 +30,8 @@ import numpy.typing
 from lsst.ts.m2com import DigitalInput, PowerType
 from PySide2.QtCore import Signal
 
-from .actuator_force import ActuatorForce
+from .actuator_force_axial import ActuatorForceAxial
+from .actuator_force_tangent import ActuatorForceTangent
 from .enums import DisplacementSensorDirection, TemperatureGroup
 from .force_error_tangent import ForceErrorTangent
 from .signals import SignalDetailedForce, SignalPosition, SignalUtility
@@ -81,8 +82,10 @@ class UtilityMonitor(object):
         status. 1 means OK (or triggered). Otherwise 0.
     hard_points : `dict`
         Hard points of the axial and tangential actuators.
-    forces : `ActuatorForce`
-        Detailed actuator forces.
+    forces_axial : `ActuatorForceAxial`
+        Detailed axial actuator forces.
+    forces_tangent : `ActuatorForceTangent`
+        Detailed tangent actuator forces.
     force_error_tangent : `ForceErrorTangent`
         Tangential force error to monitor the supporting force of mirror.
     position : `list`
@@ -175,7 +178,9 @@ class UtilityMonitor(object):
 
         self.hard_points = {"axial": [0, 0, 0], "tangent": [0, 0, 0]}
 
-        self.forces = ActuatorForce()
+        self.forces_axial = ActuatorForceAxial()
+        self.forces_tangent = ActuatorForceTangent()
+
         self.force_error_tangent = ForceErrorTangent()
 
         self.position = [0.0] * 6
@@ -193,15 +198,25 @@ class UtilityMonitor(object):
 
         return {"voltage": 0, "current": 0}
 
-    def get_forces(self) -> ActuatorForce:
-        """Get the forces.
+    def get_forces_axial(self) -> ActuatorForceAxial:
+        """Get the axial forces.
 
         Returns
         -------
-        `ActuatorForce`
-            Detailed actuator forces as a new copy of internal data.
+        `ActuatorForceAxial`
+            Detailed axial actuator forces as a new copy of internal data.
         """
-        return deepcopy(self.forces)
+        return deepcopy(self.forces_axial)
+
+    def get_forces_tangent(self) -> ActuatorForceTangent:
+        """Get the tangent forces.
+
+        Returns
+        -------
+        `ActuatorForceTangent`
+            Detailed tangent actuator forces as a new copy of internal data.
+        """
+        return deepcopy(self.forces_tangent)
 
     def report_utility_status(self) -> None:
         """Report the utility status."""
@@ -272,7 +287,8 @@ class UtilityMonitor(object):
         self.signal_detailed_force.hard_points.emit(
             self.hard_points["axial"] + self.hard_points["tangent"]
         )
-        self.signal_detailed_force.forces.emit(self.forces)
+        self.signal_detailed_force.forces_axial.emit(self.forces_axial)
+        self.signal_detailed_force.forces_tangent.emit(self.forces_tangent)
         self.signal_detailed_force.force_error_tangent.emit(self.force_error_tangent)
 
     def get_temperature_sensors(self, temperature_group: TemperatureGroup) -> list[str]:
@@ -736,25 +752,45 @@ class UtilityMonitor(object):
             self.hard_points["axial"] + self.hard_points["tangent"]
         )
 
-    def update_forces(self, actuator_force: ActuatorForce) -> None:
-        """Update the forces.
+    def update_forces_axial(self, actuator_force: ActuatorForceAxial) -> None:
+        """Update the axial actuator forces.
 
         Parameters
         ----------
-        actuator_force : `ActuatorForce`
-            Actuator force.
+        actuator_force : `ActuatorForceAxial`
+            Axial actuator force.
 
         Raises
         ------
         `ValueError`
-            When the input is the same object of self.forces.
+            When the input is the same object of self.forces_axial.
         """
 
-        if id(actuator_force) == id(self.forces):
-            raise ValueError("Input cannot be the same object of self.forces.")
+        if id(actuator_force) == id(self.forces_axial):
+            raise ValueError("Input cannot be the same object of self.forces_axial.")
 
-        self.forces = actuator_force
-        self.signal_detailed_force.forces.emit(self.forces)
+        self.forces_axial = actuator_force
+        self.signal_detailed_force.forces_axial.emit(self.forces_axial)
+
+    def update_forces_tangent(self, actuator_force: ActuatorForceTangent) -> None:
+        """Update the tangent actuator forces.
+
+        Parameters
+        ----------
+        actuator_force : `ActuatorForceTangent`
+            Tangent actuator force.
+
+        Raises
+        ------
+        `ValueError`
+            When the input is the same object of self.forces_tangent.
+        """
+
+        if id(actuator_force) == id(self.forces_tangent):
+            raise ValueError("Input cannot be the same object of self.forces_tangent.")
+
+        self.forces_tangent = actuator_force
+        self.signal_detailed_force.forces_tangent.emit(self.forces_tangent)
 
     def update_force_error_tangent(
         self, force_error_tangent: ForceErrorTangent
