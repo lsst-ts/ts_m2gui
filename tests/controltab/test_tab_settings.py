@@ -46,6 +46,11 @@ def test_init(widget: TabSettings) -> None:
     assert (
         widget._settings["timeout_connection"].value() == controller.timeout_connection
     )
+
+    assert widget._settings["use_external_elevation_angle"].isChecked() is False
+    assert widget._settings["enable_angle_comparison"].isChecked() is False
+    assert widget._settings["max_angle_difference"].value() == 2.0
+
     assert widget._settings["log_level"].value() == widget.model.log.level
     assert widget._settings["refresh_frequency"].value() == int(
         1000 / widget.model.duration_refresh
@@ -84,6 +89,23 @@ def test_init(widget: TabSettings) -> None:
 
 
 @pytest.mark.asyncio
+async def test_callback_use_external_elevation_angle(widget: TabSettings) -> None:
+    # Use the external elevation angle
+    await widget._callback_use_external_elevation_angle(int(Qt.CheckState.Checked))
+
+    assert widget._settings["enable_angle_comparison"].isChecked() is True
+    assert widget._settings["enable_angle_comparison"].isEnabled() is False
+
+    assert widget._button_overwrite_external_elevation_angle.isEnabled() is True
+
+    # Use the internal elevation angle
+    await widget._callback_use_external_elevation_angle(int(Qt.CheckState.Unchecked))
+
+    assert widget._settings["enable_angle_comparison"].isEnabled() is True
+    assert widget._button_overwrite_external_elevation_angle.isEnabled() is False
+
+
+@pytest.mark.asyncio
 async def test_callback_apply_host(qtbot: QtBot, widget: TabSettings) -> None:
     widget._settings["host"].setText("newHost")
     widget._settings["port_command"].setValue(1)
@@ -118,3 +140,14 @@ async def test_callback_apply_general(qtbot: QtBot, widget: TabSettings) -> None
 
     app = QApplication.instance()
     assert app.font().pointSize() == 12
+
+
+@pytest.mark.asyncio
+async def test_callback_signal_config_temperature_offset(widget: TabSettings) -> None:
+    offset = 10.1
+    widget.model.signal_config.temperature_offset.emit(offset)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget._settings["lut_temperature_ref"].value() == offset
