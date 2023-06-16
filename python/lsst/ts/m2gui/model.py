@@ -426,17 +426,7 @@ class Model(object):
         """
 
         if self.is_enabled_and_closed_loop_control():
-            await self.controller.write_command_to_server(
-                "positionMirror",
-                message_details={
-                    "x": x,
-                    "y": y,
-                    "z": z,
-                    "xRot": rx,
-                    "yRot": ry,
-                    "zRot": rz,
-                },
-            )
+            await self.controller.position_mirror(x, y, z, rx, ry, rz)
         else:
             raise RuntimeError("Mirror can be positioned only in closed-loop control.")
 
@@ -566,7 +556,7 @@ class Model(object):
             Not in the enabled state with open-loop control.
         """
 
-        if actuators == []:
+        if (actuators is not None) and (len(actuators) == 0):
             raise RuntimeError("No actuator is selected.")
 
         if unit == ActuatorDisplacementUnit.Step:
@@ -591,6 +581,48 @@ class Model(object):
         else:
             raise RuntimeError(
                 "Failed to command the actuator. Only allow in Enabled state and open-loop control."
+            )
+
+    async def apply_actuator_force(self, actuators: list[int], force: float) -> None:
+        """Apply the actuator force.
+
+        Parameters
+        ----------
+        actuators : `list`
+            Selected actuators to do the movement. If the empty list [] is
+            passed, the function will raise the RuntimeError.
+        force : `float`
+            Force to apply in Newton.
+
+        Raises
+        ------
+        `RuntimeError`
+            No actuator is selected.
+        `RuntimeError`
+            Not in the enabled state with closed-loop control.
+        """
+
+        if len(actuators) == 0:
+            raise RuntimeError("No actuator is selected.")
+
+        if self.is_enabled_and_closed_loop_control():
+            # Prepare the applied forces
+            num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
+            force_axial = [0.0] * num_axial
+            force_tangent = [0.0] * NUM_TANGENT_LINK
+
+            for actuator in actuators:
+                if actuator < num_axial:
+                    force_axial[actuator] = force
+                else:
+                    force_tangent[actuator - num_axial] = force
+
+            # Apply the forces
+            await self.controller.apply_forces(force_axial, force_tangent)
+
+        else:
+            raise RuntimeError(
+                "Failed to command the actuator. Only allow in Enabled state and closed-loop control."
             )
 
     async def reset_breakers(self, power_type: PowerType) -> None:
@@ -860,11 +892,19 @@ class Model(object):
 
                 self.log.info(f"Available configuration files: {files}.")
 
+            elif name == "temperatureOffset":
+                offset_ring = message["ring"]
+
+                # Need to fix this event in ts_xml in the future. The offset
+                # is a constant instead of an array.
+                self.signal_config.temperature_offset.emit(float(offset_ring[0]))
+
+                self.log.info(f"Ring temperature offset: {offset_ring}.")
+
             # Ignore these messages because they are specific to CSC
             elif name in (
                 "summaryState",
                 "detailedState",
-                "temperatureOffset",
             ):
                 pass
 

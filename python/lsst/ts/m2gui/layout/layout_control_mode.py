@@ -109,8 +109,4 @@ class LayoutControlMode(LayoutDefault):
             True if turn on the force balance system, which means the system is
             going to do the closed-loop control. Otherwise, False.
         """
-        await run_command(
-            self.model.controller.write_command_to_server,
-            "switchForceBalanceSystem",
-            message_details={"status": status},
-        )
+        await run_command(self.model.controller.switch_force_balance_system, status)
