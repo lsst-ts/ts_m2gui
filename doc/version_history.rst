@@ -6,10 +6,10 @@
 Version History
 ##################
 
-.. _lsst.ts.m2gui-0.4.8:
+.. _lsst.ts.m2gui-0.5.0:
 
 -------------
-0.4.8
+0.5.0
 -------------
 
 * Use the migrated functions in **Controller** class in **ts_m2com**.
