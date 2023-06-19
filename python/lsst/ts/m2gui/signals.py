@@ -104,6 +104,10 @@ class SignalConfig(QtCore.QObject):
     # Instance of `Config` class.
     config = QtCore.Signal(object)
 
+    # Temperature offset used in the look-up table calculation.
+    # The unit is degree C.
+    temperature_offset = QtCore.Signal(float)
+
 
 class SignalUtility(QtCore.QObject):
     """Utility signal to send the utility status."""

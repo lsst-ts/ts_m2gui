@@ -34,6 +34,9 @@ from lsst.ts.m2com import (
     MAX_LIMIT_FORCE_TANGENT_OPEN_LOOP,
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
+    NUM_TEMPERATURE_EXHAUST,
+    NUM_TEMPERATURE_INTAKE,
+    NUM_TEMPERATURE_RING,
     CommandActuator,
     CommandScript,
     LimitSwitchType,
@@ -218,6 +221,28 @@ async def test_command_actuator_exception(model: Model) -> None:
 
 
 @pytest.mark.asyncio
+async def test_apply_actuator_force_exception(model: Model) -> None:
+    with pytest.raises(RuntimeError):
+        await model.apply_actuator_force([], 0.0)
+
+    model.local_mode = LocalMode.Enable
+    with pytest.raises(RuntimeError):
+        await model.apply_actuator_force([1], 0.0)
+
+
+@pytest.mark.asyncio
+async def test_apply_actuator_force(model_async: Model) -> None:
+    model_async.local_mode = LocalMode.Enable
+    model_async.is_closed_loop = True
+    force = 10.0
+    await model_async.apply_actuator_force([1, 77], force)
+
+    control_closed_loop = model_async.controller.mock_server.model.control_closed_loop
+    assert control_closed_loop.axial_forces["applied"][1] == force
+    assert control_closed_loop.tangent_forces["applied"][-1] == force
+
+
+@pytest.mark.asyncio
 async def test_reset_breakers(qtbot: QtBot, model_async: Model) -> None:
     # Power on the motor and communication first
     controller = model_async.controller
@@ -390,6 +415,16 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(model.signal_config.files, timeout=TIMEOUT):
         await model._process_event(
             message={"id": "configurationFiles", "files": ["a", "b"]}
+        )
+
+    with qtbot.waitSignal(model.signal_config.temperature_offset, timeout=TIMEOUT):
+        await model._process_event(
+            message={
+                "id": "temperatureOffset",
+                "ring": [21.0] * NUM_TEMPERATURE_RING,
+                "intake": [0.0] * NUM_TEMPERATURE_INTAKE,
+                "exhaust": [0.0] * NUM_TEMPERATURE_EXHAUST,
+            }
         )
 
 
@@ -630,7 +665,7 @@ def test_process_lost_connection(model: Model) -> None:
 
 
 @pytest.mark.asyncio
-async def test_state_transition_normal(qtbot: QtBot, model_async: Model) -> None:
+async def test_state_transition_normal(model_async: Model) -> None:
     await model_async.enter_diagnostic()
     assert model_async.local_mode == LocalMode.Diagnostic
 
@@ -645,7 +680,7 @@ async def test_state_transition_normal(qtbot: QtBot, model_async: Model) -> None
 
 
 @pytest.mark.asyncio
-async def test_fault(qtbot: QtBot, model_async: Model) -> None:
+async def test_fault(model_async: Model) -> None:
     await model_async.enter_diagnostic()
     await model_async.enter_enable()
 

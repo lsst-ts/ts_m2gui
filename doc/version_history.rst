@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.5.0:
+
+-------------
+0.5.0
+-------------
+
+* Use the migrated functions in **Controller** class in **ts_m2com**.
+* Add the control parameters and look-up table (LUT) parameters in the tab of settings.
+* Subscribe the event: **temperatureOffset**.
+
 .. _lsst.ts.m2gui-0.4.7:
 
 -------------

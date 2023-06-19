@@ -1,8 +1,10 @@
 @startuml
 package "m2gui" #DDDDDD {
-  class Model
+  Model *-- SignalConfig : emit()
 }
 
 TabDefault *-- Model
 TabDefault <|-- TabSettings
+
+TabSettings --> SignalConfig : connect()
 @enduml

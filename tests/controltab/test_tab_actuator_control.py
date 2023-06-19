@@ -182,9 +182,7 @@ async def test_callback_actuator_start(
     await _transition_to_enable_state(widget_async)
 
     controller = widget_async.model.controller
-    await controller.write_command_to_server(
-        "switchForceBalanceSystem", message_details={"status": False}
-    )
+    await controller.switch_force_balance_system(False)
 
     # Select the actuators
     selected_actuators = [0, 1, 3, 7, 76, 77]
@@ -218,6 +216,19 @@ async def test_callback_actuator_start(
 
     # Sleep sometime to let the movement to be done
     await asyncio.sleep(10)
+
+
+@pytest.mark.asyncio
+async def test_callback_clear_force(
+    qtbot: QtBot, widget_async: TabActuatorControl
+) -> None:
+    # Set the force
+    widget_async._applied_force.setValue(10)
+
+    # Clear the force
+    await widget_async._callback_clear_force()
+
+    assert widget_async._applied_force.value() == 0.0
 
 
 @pytest.mark.asyncio

@@ -71,6 +71,8 @@ class TabActuatorControl(TabDefault):
     MAX_DISPLACEMENT_MM = 200
     MAX_DISPLACEMENT_STEP = 10**7
 
+    MAX_FORCE_N = 500
+
     def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
 
@@ -127,7 +129,7 @@ class TabActuatorControl(TabDefault):
             "clear_all": set_button("Clear All", self._callback_clear_all),
         }
 
-        self._buttons_actuator = {
+        self._buttons_actuator_open_loop = {
             "start": set_button("Start", self._callback_actuator_start),
             "stop": set_button(
                 "Stop", self._callback_actuator_command, CommandActuator.Stop
@@ -138,6 +140,13 @@ class TabActuatorControl(TabDefault):
             "resume": set_button(
                 "Resume", self._callback_actuator_command, CommandActuator.Resume
             ),
+        }
+
+        self._applied_force = self._create_applied_force()
+
+        self._buttons_actuator_closed_loop = {
+            "apply_force": set_button("Apply Force", self._callback_apply_force),
+            "clear_force": set_button("Clear Force", self._callback_clear_force),
         }
 
         self._set_widget_and_layout()
@@ -305,7 +314,7 @@ class TabActuatorControl(TabDefault):
     @asyncSlot()
     async def _callback_actuator_start(
         self,
-    ) -> tuple[list, float | int, ActuatorDisplacementUnit]:
+    ) -> tuple[list[int], float | int, ActuatorDisplacementUnit]:
         """Callback of the start button in actuator control. The cell
         controller will start to move the actuators.
 
@@ -319,11 +328,7 @@ class TabActuatorControl(TabDefault):
             Displacement unit.
         """
 
-        actuators = list()
-        for idx, actuator_selection in enumerate(self._buttons_actuator_selection):
-            if actuator_selection.isChecked():
-                actuators.append(idx)
-
+        actuators = self._get_selected_actuators()
         target_displacement = self._target_displacement.value()
 
         # Index begins from 0 instead of 1 in QComboBox
@@ -341,6 +346,22 @@ class TabActuatorControl(TabDefault):
 
         return actuators, target_displacement, displacement_unit
 
+    def _get_selected_actuators(self) -> list[int]:
+        """Get the selected actuators.
+
+        Returns
+        -------
+        actuators : `list`
+            Selected actuators.
+        """
+
+        actuators = list()
+        for idx, actuator_selection in enumerate(self._buttons_actuator_selection):
+            if actuator_selection.isChecked():
+                actuators.append(idx)
+
+        return actuators
+
     @asyncSlot()
     async def _callback_actuator_command(self, command: CommandActuator) -> None:
         """Callback of the actuator buttons in actuator control. The cell
@@ -352,6 +373,39 @@ class TabActuatorControl(TabDefault):
             Actuator command.
         """
         await run_command(self.model.command_actuator, command)
+
+    def _create_applied_force(self) -> QDoubleSpinBox:
+        """Create the applied force.
+
+        Returns
+        -------
+        applied_force : `PySide2.QtWidgets.QDoubleSpinBox`
+            Applied force.
+        """
+
+        applied_force = QDoubleSpinBox()
+        applied_force.setRange(-self.MAX_FORCE_N, self.MAX_FORCE_N)
+        applied_force.setSuffix(" N")
+
+        return applied_force
+
+    @asyncSlot()
+    async def _callback_apply_force(self) -> None:
+        """Callback of the apply-force button in actuator control. This will
+        apply the actuator forces to controller."""
+
+        actuators = self._get_selected_actuators()
+        force = self._applied_force.value()
+        await run_command(self.model.apply_actuator_force, actuators, force)
+
+    @asyncSlot()
+    async def _callback_clear_force(self) -> None:
+        """Callback of the clear-force button in actuator control. This will
+        clear the applied forces in controller."""
+
+        self._applied_force.setValue(0)
+
+        await run_command(self.model.controller.reset_force_offsets)
 
     def _set_widget_and_layout(self) -> None:
         """Set the widget and layout."""
@@ -389,7 +443,12 @@ class TabActuatorControl(TabDefault):
         # Second column
         layout_actuator_control = QVBoxLayout()
         layout_actuator_control.addWidget(self._create_group_actuator_selector())
-        layout_actuator_control.addWidget(self._create_group_actuator_control())
+        layout_actuator_control.addWidget(
+            self._create_group_actuator_control_open_loop()
+        )
+        layout_actuator_control.addWidget(
+            self._create_group_actuator_control_closed_loop()
+        )
 
         layout.addLayout(layout_actuator_control)
 
@@ -477,10 +536,11 @@ class TabActuatorControl(TabDefault):
 
         return create_group_box("Actuator Selector", layout)
 
-    def _create_group_actuator_control(self) -> QGroupBox:
+    def _create_group_actuator_control_open_loop(self) -> QGroupBox:
         """Create the group of actuator control for single or multiple
-        actuators. This is different from the script control, which focus on a
-        continuous motion. This actuator control is just a one-time movement.
+        actuators for the open-loop control. This is different from the script
+        control, which focus on a continuous motion. This actuator control is
+        just a one-time movement.
 
         Returns
         -------
@@ -496,10 +556,34 @@ class TabActuatorControl(TabDefault):
 
         layout.addLayout(layout_displacement)
 
-        for button in self._buttons_actuator.values():
+        for button in self._buttons_actuator_open_loop.values():
             layout.addWidget(button)
 
-        return create_group_box("Actuator Control", layout)
+        return create_group_box("Actuator Control (Open-Loop)", layout)
+
+    def _create_group_actuator_control_closed_loop(self) -> QGroupBox:
+        """Create the group of actuator control for single or multiple
+        actuators for the closed-loop control. This is different from the
+        script control, which focus on a continuous motion. This actuator
+        control is just a one-time movement.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QVBoxLayout()
+
+        layout_force = QFormLayout()
+        layout_force.addRow("Force", self._applied_force)
+
+        layout.addLayout(layout_force)
+
+        for button in self._buttons_actuator_closed_loop.values():
+            layout.addWidget(button)
+
+        return create_group_box("Actuator Control (Closed-Loop)", layout)
 
     def _set_signal_script(self, signal_script: SignalScript) -> None:
         """Set the script signal with callback function.
