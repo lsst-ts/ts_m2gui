@@ -155,6 +155,8 @@ m2gui.controltab
 * **TabUtilityView** shows the utility status.
 * **TabSettings** shows the settings of GUI.
 * **TabIlcStatus** shows the inner-loop controller (ILC) status.
+* **TabNetForceMoment** shows the net force and moment of total actuators and force balance system status.
+* **TabRealtimeNetForceMoment** shows the realtime data of net force and moment of total actuators and force balance system status.
 
 The class diagrams for each table child class are listed below to give you the idea of class relationship.
 
@@ -241,10 +243,18 @@ m2gui.controltab.TabSettings
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_ilc_status:
 
 m2gui.controltab.TabIlcStatus
-----------------------------
+-----------------------------
 
 .. uml:: ../uml/controltab/class_tab_ilc_status.uml
     :caption: Class diagram of TabIlcStatus class
+
+.. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_net_force_moment:
+
+m2gui.controltab.TabNetForceMoment
+----------------------------------
+
+.. uml:: ../uml/controltab/class_tab_net_force_moment.uml
+    :caption: Class diagram of TabNetForceMoment class
 
 .. _API:
 
