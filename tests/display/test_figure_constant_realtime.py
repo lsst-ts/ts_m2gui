@@ -50,17 +50,28 @@ def test_update_data_exception(widget: FigureConstant) -> None:
 
 
 def test_append_data(widget: FigureConstant) -> None:
+    # Check the update of y-axis
     widget.append_data(-20, idx=0)
 
     assert widget.get_series(0).count() == 1
     assert widget.axis_y.min() == -21
     assert widget.axis_y.max() == 1
 
+    assert widget._counter_realtime == 1
+
     widget.append_data(20, idx=1)
 
     assert widget.get_series(1).count() == 1
     assert widget.axis_y.min() == -21
     assert widget.axis_y.max() == 21
+
+    # Check the y-axis will be adjusted
+    for counter in range(25):
+        widget.append_data(24, idx=0)
+
+    assert widget._counter_realtime == 7
+    assert widget.axis_y.min() == 19
+    assert widget.axis_y.max() == 25
 
 
 def test_append_point(widget: FigureConstant) -> None:
