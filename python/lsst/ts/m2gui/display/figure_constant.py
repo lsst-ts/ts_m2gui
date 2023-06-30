@@ -97,6 +97,10 @@ class FigureConstant(QtCharts.QChartView):
         self._num_points = num_points
         self._is_realtime = is_realtime
 
+        # Counter of the realtime data
+        self._counter_realtime = 0
+        self._max_counter_realtime = num_points * num_lines
+
         self._set_chart(title_figure)
 
         self._set_default_series(range_x_min, range_x_max, num_lines, legends)
@@ -290,12 +294,17 @@ class FigureConstant(QtCharts.QChartView):
                 self._value_y_min - self.OFFSET_Y, self._value_y_max + self.OFFSET_Y
             )
 
-    def adjust_range_axis_y(self) -> None:
+    def adjust_range_axis_y(self, threshold: float | int = 1) -> None:
         """Adjust the range of y-axis.
 
         This is different from the self._update_range_axis_y(). Sometimes, it
         may be required to go through all the points to adjust the range of
         y-axis.
+
+        Parameters
+        ----------
+        threshold : `float` or `int`, optional
+            Threshold to decide the update of range. (the default is 1)
         """
 
         num_series = len(self.chart().series())
@@ -308,7 +317,7 @@ class FigureConstant(QtCharts.QChartView):
 
         self._value_y_min = min(values)
         self._value_y_max = max(values)
-        self._update_range_axis_y(threshold=1)
+        self._update_range_axis_y(threshold=threshold)
 
     def _get_range_points(self, idx: int) -> tuple[float, float]:
         """Get the range of points in a specific series.
@@ -369,6 +378,14 @@ class FigureConstant(QtCharts.QChartView):
         self._value_y_max = max(self._value_y_max, value)
         self._value_y_min = min(self._value_y_min, value)
         self._update_range_axis_y()
+
+        # Update the counter
+        self._counter_realtime += 1
+        if self._counter_realtime >= self._max_counter_realtime:
+            self._counter_realtime = 0
+
+            # Adjust the range of y-axis if needed
+            self.adjust_range_axis_y(threshold=5)
 
     def _append_point(self, points: list[QPointF], value: float) -> None:
         """Append the point.

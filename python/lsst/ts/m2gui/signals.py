@@ -32,6 +32,7 @@ __all__ = [
     "SignalPosition",
     "SignalScript",
     "SignalIlcStatus",
+    "SignalNetForceMoment",
 ]
 
 from PySide2 import QtCore
@@ -208,3 +209,21 @@ class SignalIlcStatus(QtCore.QObject):
     # integer and the data type of mode is interger
     # (enum `lsst.ts.m2com.InnerLoopControlMode`).
     address_mode = QtCore.Signal(object)
+
+
+class SignalNetForceMoment(QtCore.QObject):
+    """Net force/moment signal to send the net force and moment of total
+    actuators, and force balance status."""
+
+    # Total actuator net force in Newton as [fx, fy, fz] for x, y, and z
+    # dimensions.
+    net_force_total = QtCore.Signal(object)
+
+    # Total actuator net moment in Newton * meter as [mx, my, mz] for x, y, and
+    # z dimensions.
+    net_moment_total = QtCore.Signal(object)
+
+    # Force balance status as [fx, fy, fz, mx, my, mz] based on the hardpoint
+    # corrections for x, y, and z dimensions.
+    # The units of force and moment are Newton and Newton * meter.
+    force_balance = QtCore.Signal(object)

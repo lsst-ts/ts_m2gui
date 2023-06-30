@@ -34,6 +34,7 @@ from .controltab import (
     TabDetailedForce,
     TabDiagnostics,
     TabIlcStatus,
+    TabNetForceMoment,
     TabOverview,
     TabRigidBodyPos,
     TabUtilityView,
@@ -86,6 +87,7 @@ class ControlTabs(object):
             TabDiagnostics("Diagnostics", model),
             TabAlarmWarn("Alarms/Warnings", model),
             TabIlcStatus("ILC Status", model),
+            TabNetForceMoment("Net Force/Moment", model),
         ]
 
         for tab in self._tabs:
