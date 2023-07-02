@@ -41,10 +41,11 @@ def test_init(widget: TabDefault) -> None:
 
 
 def test_set_widget_scrollable(widget: TabDefault) -> None:
-    scroll_area = widget.set_widget_scrollable(QWidget())
+    scroll_area = widget.set_widget_scrollable(QWidget(), False)
     assert type(scroll_area) is QScrollArea
+    assert scroll_area.widgetResizable() is False
 
-    scroll_area_resizable = widget.set_widget_scrollable(QWidget(), is_resizable=True)
+    scroll_area_resizable = widget.set_widget_scrollable(QWidget(), True)
     assert scroll_area_resizable.widgetResizable() is True
 
 

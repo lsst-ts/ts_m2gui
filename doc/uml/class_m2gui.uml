@@ -44,6 +44,8 @@ UtilityMonitor *-- ActuatorForceAxial
 UtilityMonitor *-- ActuatorForceTangent
 UtilityMonitor *-- ForceErrorTangent
 
+UtilityMonitor *-- SignalNetForceMoment : emit()
+
 LayoutDefault *-- Model
 LayoutDefault --> SignalControl : connect()
 

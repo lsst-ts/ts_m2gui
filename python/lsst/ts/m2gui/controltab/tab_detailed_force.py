@@ -93,7 +93,7 @@ class TabDetailedForce(TabDefault):
         # Timer to update the forces on table
         self._timer = self.create_and_start_timer(self._callback_time_out)
 
-        self._set_widget_and_layout()
+        self.set_widget_and_layout(is_scrollable=True)
 
         self._set_signal_detailed_force(
             self.model.utility_monitor.signal_detailed_force
@@ -250,15 +250,7 @@ class TabDetailedForce(TabDefault):
                 else:
                     self._forces[key][idx_updated].setText("%.2f" % field[idx])
 
-    def _set_widget_and_layout(self) -> None:
-        """Set the widget and layout."""
-
-        widget = self.widget()
-        widget.setLayout(self._create_layout())
-
-        self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
-
-    def _create_layout(self) -> QVBoxLayout:
+    def create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns

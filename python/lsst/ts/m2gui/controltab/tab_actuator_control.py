@@ -149,7 +149,7 @@ class TabActuatorControl(TabDefault):
             "clear_force": set_button("Clear Force", self._callback_clear_force),
         }
 
-        self._set_widget_and_layout()
+        self.set_widget_and_layout(is_scrollable=True)
 
         self._set_signal_script(self.model.signal_script)
         self._set_signal_detailed_force(
@@ -407,18 +407,7 @@ class TabActuatorControl(TabDefault):
 
         await run_command(self.model.controller.reset_force_offsets)
 
-    def _set_widget_and_layout(self) -> None:
-        """Set the widget and layout."""
-
-        widget = self.widget()
-        widget.setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(widget.sizeHint())
-
-        self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
-
-    def _create_layout(self) -> QHBoxLayout:
+    def create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns

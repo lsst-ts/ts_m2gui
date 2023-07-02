@@ -10,4 +10,6 @@ TabDefault <|-- TabRigidBodyPos
 TabDefault <|-- TabUtilityView
 TabDefault <|-- TabSettings
 TabDefault <|-- TabIlcStatus
+TabDefault <|-- TabNetForceMoment
+TabDefault <|-- TabRealtimeNetForceMoment
 @enduml

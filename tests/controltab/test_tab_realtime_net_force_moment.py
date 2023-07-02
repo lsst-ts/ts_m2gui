@@ -19,17 +19,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from .tab_actuator_control import *
-from .tab_alarm_warn import *
-from .tab_cell_status import *
-from .tab_config_view import *
-from .tab_default import *
-from .tab_detailed_force import *
-from .tab_diagnostics import *
-from .tab_ilc_status import *
-from .tab_net_force_moment import *
-from .tab_overview import *
-from .tab_realtime_net_force_moment import *
-from .tab_rigid_body_pos import *
-from .tab_settings import *
-from .tab_utility_view import *
+import logging
+
+import pytest
+from lsst.ts.m2gui import Model
+from lsst.ts.m2gui.controltab import TabRealtimeNetForceMoment
+from pytestqt.qtbot import QtBot
+
+
+@pytest.fixture
+def widget(qtbot: QtBot) -> TabRealtimeNetForceMoment:
+    widget = TabRealtimeNetForceMoment("Realtime Data", Model(logging.getLogger()))
+    qtbot.addWidget(widget)
+
+    return widget
+
+
+@pytest.mark.asyncio
+async def test_callback_time_out(widget: TabRealtimeNetForceMoment) -> None:
+    for idx in range(len(widget.net_force_moment)):
+        widget.net_force_moment[idx] = (idx + 1) * 0.1
+
+    await widget._callback_time_out()
+
+    for idx, figure in enumerate(widget._figures.values()):
+        assert figure.get_points(0)[-1].y() == (idx + 1) * 0.1

@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.5.1:
+
+-------------
+0.5.1
+-------------
+
+* Add the **tab_net_force_moment.py** and **tab_realtime_net_force_moment.py**.
+* Add the new signal: **SignalNetForceMoment**.
+* Update the ``FigureConstant.append_data()`` to regularly check the y-axis needs to be adjusted or not.
+
 .. _lsst.ts.m2gui-0.5.0:
 
 -------------

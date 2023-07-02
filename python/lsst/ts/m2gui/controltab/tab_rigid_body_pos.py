@@ -103,8 +103,7 @@ class TabRigidBodyPos(TabDefault):
         # Rigid body position based on the independent measurement system (IMS)
         self._position_ims = self._set_position()
 
-        # Internal layout
-        self.widget().setLayout(self._create_layout())
+        self.set_widget_and_layout()
 
         self._set_signal_position(self.model.utility_monitor.signal_position)
 
@@ -220,7 +219,7 @@ class TabRigidBodyPos(TabDefault):
 
         return position
 
-    def _create_layout(self) -> QHBoxLayout:
+    def create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns

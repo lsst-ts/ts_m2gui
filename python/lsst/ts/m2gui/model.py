@@ -1220,13 +1220,23 @@ class Model(object):
                 force_error.error_sum = message["sum"]
                 self.utility_monitor.update_force_error_tangent(force_error)
 
-            # Ignore these messages because they are specific to CSC
-            elif name in (
-                "forceBalance",
-                "ilcData",
-                "netForcesTotal",
-                "netMomentsTotal",
-            ):
+            elif name == "netForcesTotal":
+                self.utility_monitor.update_net_force_moment_total(
+                    [message[axis] for axis in ("fx", "fy", "fz")], is_force=True
+                )
+
+            elif name == "netMomentsTotal":
+                self.utility_monitor.update_net_force_moment_total(
+                    [message[axis] for axis in ("mx", "my", "mz")], is_force=False
+                )
+
+            elif name == "forceBalance":
+                self.utility_monitor.update_force_balance(
+                    [message[axis] for axis in ("fx", "fy", "fz", "mx", "my", "mz")]
+                )
+
+            # Ignore this message because it is specific to CSC
+            elif name in ("ilcData"):
                 pass
 
             else:

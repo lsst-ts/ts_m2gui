@@ -148,11 +148,7 @@ class TabAlarmWarn(TabDefault):
             "Enable Open-Loop Max Limits", self._callback_enable_open_loop_max_limit
         )
 
-        # Internal layout
-        self.widget().setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(self.widget().sizeHint())
+        self.set_widget_and_layout()
 
         # Set the callbacks of signals
         self._set_signal_error(self.model.fault_manager.signal_error)
@@ -275,7 +271,7 @@ class TabAlarmWarn(TabDefault):
 
         indicator.setPalette(palette)
 
-    def _create_layout(self) -> QVBoxLayout:
+    def create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
@@ -359,7 +355,7 @@ class TabAlarmWarn(TabDefault):
                 )
             )
 
-        return self.set_widget_scrollable(widget)
+        return self.set_widget_scrollable(widget, False)
 
     def _get_layout_limit_switch_specific_ring(
         self, limit_switch_type: LimitSwitchType, ring: Ring

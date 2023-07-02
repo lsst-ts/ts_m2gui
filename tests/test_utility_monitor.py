@@ -67,6 +67,9 @@ def test_report_utility_status(qtbot: QtBot, utility_monitor: UtilityMonitor) ->
         utility_monitor.signal_detailed_force.force_error_tangent,
         utility_monitor.signal_position.position,
         utility_monitor.signal_position.position_ims,
+        utility_monitor.signal_net_force_moment.net_force_total,
+        utility_monitor.signal_net_force_moment.net_moment_total,
+        utility_monitor.signal_net_force_moment.force_balance,
     ]
     with qtbot.waitSignals(signals, timeout=TIMEOUT):
         utility_monitor.report_utility_status()
@@ -475,3 +478,52 @@ def test_update_position_ims(qtbot: QtBot, utility_monitor: UtilityMonitor) -> N
         utility_monitor.update_position(0.11, 0.23, 0.62, 3, 1.03, 1.06, is_ims=True)
 
     assert utility_monitor.position_ims[0] == 0.1
+
+
+def test_update_net_force_moment_total(
+    qtbot: QtBot, utility_monitor: UtilityMonitor
+) -> None:
+    # Force
+    signal = utility_monitor.signal_net_force_moment.net_force_total
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_net_force_moment_total(
+            [0.11, -0.22, -0.33], is_force=True
+        )
+
+    assert utility_monitor.net_force_total == [0.1, -0.2, -0.3]
+
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_net_force_moment_total(
+            [0.111, -0.22, -0.33], is_force=True
+        )
+
+    assert utility_monitor.net_force_total == [0.1, -0.2, -0.3]
+
+    # Moment
+    signal = utility_monitor.signal_net_force_moment.net_moment_total
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_net_force_moment_total(
+            [0.11, -0.22, -0.33], is_force=False
+        )
+
+    assert utility_monitor.net_moment_total == [0.1, -0.2, -0.3]
+
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_net_force_moment_total(
+            [0.111, -0.22, -0.33], is_force=False
+        )
+
+    assert utility_monitor.net_moment_total == [0.1, -0.2, -0.3]
+
+
+def test_update_force_balance(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
+    signal = utility_monitor.signal_net_force_moment.force_balance
+    with qtbot.waitSignal(signal, timeout=TIMEOUT):
+        utility_monitor.update_force_balance([0.11, -0.22, -0.33, 0.44, 0.55, -0.66])
+
+    assert utility_monitor.force_balance == [0.1, -0.2, -0.3, 0.4, 0.6, -0.7]
+
+    with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
+        utility_monitor.update_force_balance([0.111, -0.22, -0.33, 0.44, 0.55, -0.66])
+
+    assert utility_monitor.force_balance == [0.1, -0.2, -0.3, 0.4, 0.6, -0.7]

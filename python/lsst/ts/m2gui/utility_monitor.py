@@ -34,7 +34,12 @@ from .actuator_force_axial import ActuatorForceAxial
 from .actuator_force_tangent import ActuatorForceTangent
 from .enums import DisplacementSensorDirection, TemperatureGroup
 from .force_error_tangent import ForceErrorTangent
-from .signals import SignalDetailedForce, SignalPosition, SignalUtility
+from .signals import (
+    SignalDetailedForce,
+    SignalNetForceMoment,
+    SignalPosition,
+    SignalUtility,
+)
 from .utils import get_tol
 
 
@@ -49,6 +54,8 @@ class UtilityMonitor(object):
         Signal to report the detailed force.
     signal_position : `SignalPosition`
         Signal to report the rigid body position.
+    signal_net_force_moment : `SignalNetForceMoment`
+        Signal to send the net force, moment, and force balance status.
     power_motor_calibrated : `dict`
         Calibrated motor power. The unit of voltage is volt and the unit of
         current is ampere.
@@ -96,6 +103,13 @@ class UtilityMonitor(object):
         Rigid body position: [x, y, z, rx, ry, rz] based on the independent
         measurement system (IMS). The unit of x, y, and z is um. The unit of
         rx, ry, and ry is arcsec.
+    net_force_total : `list`
+        Total actuator net force in Newton: [fx, fy, fz].
+    net_moment_total : `list`
+        Total actuator net moment in Newton * meter: [mx, my, mz].
+    force_balance : `list`
+        Force balance status: [fx, fy, fz, mx, my, mz]. The units of force and
+        moment are Newton and Newton * meter.
     """
 
     # Number of digits after the decimal
@@ -111,6 +125,7 @@ class UtilityMonitor(object):
         self.signal_utility = SignalUtility()
         self.signal_detailed_force = SignalDetailedForce()
         self.signal_position = SignalPosition()
+        self.signal_net_force_moment = SignalNetForceMoment()
 
         self.power_motor_calibrated = self._get_default_power()
         self.power_communication_calibrated = self._get_default_power()
@@ -186,6 +201,11 @@ class UtilityMonitor(object):
         self.position = [0.0] * 6
         self.position_ims = [0.0] * 6
 
+        self.net_force_total = [0.0] * 3
+        self.net_moment_total = [0.0] * 3
+
+        self.force_balance = [0.0] * 6
+
     def _get_default_power(self) -> dict:
         """Get the default power data.
 
@@ -239,6 +259,8 @@ class UtilityMonitor(object):
         self.signal_position.position.emit(self.position)
         self.signal_position.position_ims.emit(self.position_ims)
 
+        self._report_net_force_moment_force_balance()
+
     def _report_powers(self) -> None:
         """Report the powers."""
 
@@ -290,6 +312,14 @@ class UtilityMonitor(object):
         self.signal_detailed_force.forces_axial.emit(self.forces_axial)
         self.signal_detailed_force.forces_tangent.emit(self.forces_tangent)
         self.signal_detailed_force.force_error_tangent.emit(self.force_error_tangent)
+
+    def _report_net_force_moment_force_balance(self) -> None:
+        """Report the total net force, moment, and force balance status."""
+
+        self.signal_net_force_moment.net_force_total.emit(self.net_force_total)
+        self.signal_net_force_moment.net_moment_total.emit(self.net_moment_total)
+
+        self.signal_net_force_moment.force_balance.emit(self.force_balance)
 
     def get_temperature_sensors(self, temperature_group: TemperatureGroup) -> list[str]:
         """Get the temperature sensors in a specific group.
@@ -881,3 +911,53 @@ class UtilityMonitor(object):
                 position[idx] = round(component, self.NUM_DIGIT_AFTER_DECIMAL)
 
             signal.emit(position)
+
+    def update_net_force_moment_total(
+        self,
+        value_new: list[float],
+        is_force: bool = True,
+    ) -> None:
+        """Update the total net force or moment.
+
+        Parameters
+        ----------
+        value_new : `list`
+            New (x, y, z) component values. Unit is Newton or Newton * meter
+            based on 'is_force'.
+        is_force : `bool`, optional
+            Is the force data or not. If not, the moment data is applied. (the
+            default is True)
+        """
+
+        # Decide the value to compare and the related signal
+        value_old = self.net_force_total if is_force else self.net_moment_total
+
+        signal = (
+            self.signal_net_force_moment.net_force_total
+            if is_force
+            else self.signal_net_force_moment.net_moment_total
+        )
+
+        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
+        if self._has_changed(np.array(value_old), np.array(value_new), tol):
+            for idx, value in enumerate(value_new):
+                value_old[idx] = round(value, self.NUM_DIGIT_AFTER_DECIMAL)
+
+            signal.emit(value_old)
+
+    def update_force_balance(self, value_new: list[float]) -> None:
+        """Update the force balance status.
+
+        Parameters
+        ----------
+        value_new : `list`
+            New (fx, fy, fz, mx, my, mz) component values. Unit is Newton or
+            Newton * meter that depends on the component is force or moment.
+        """
+
+        tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
+        if self._has_changed(np.array(self.force_balance), np.array(value_new), tol):
+            for idx, value in enumerate(value_new):
+                self.force_balance[idx] = round(value, self.NUM_DIGIT_AFTER_DECIMAL)
+
+            self.signal_net_force_moment.force_balance.emit(self.force_balance)

@@ -611,6 +611,45 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_net_force_moment.net_force_total, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            message={
+                "id": "netForcesTotal",
+                "fx": 1.1,
+                "fy": 1.2,
+                "fz": 1.3,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_net_force_moment.net_moment_total, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            message={
+                "id": "netMomentsTotal",
+                "mx": 1.1,
+                "my": 1.2,
+                "mz": 1.3,
+            }
+        )
+
+    with qtbot.waitSignal(
+        model.utility_monitor.signal_net_force_moment.force_balance, timeout=TIMEOUT
+    ):
+        model._process_telemetry(
+            message={
+                "id": "forceBalance",
+                "fx": 1.1,
+                "fy": 1.2,
+                "fz": 1.3,
+                "mx": 1.4,
+                "my": 1.5,
+                "mz": 1.6,
+            }
+        )
+
 
 def test_check_force_with_limit(qtbot: QtBot, model: Model) -> None:
     model.utility_monitor.forces_axial.f_cur = [1000.0] * (

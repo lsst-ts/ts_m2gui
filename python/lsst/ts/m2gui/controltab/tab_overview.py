@@ -66,8 +66,7 @@ class TabOverview(TabDefault):
         # Clear the log message on window
         self._button_clear = None
 
-        # Internal layout
-        self.widget().setLayout(self._create_layout())
+        self.set_widget_and_layout()
 
         self._update_control_status()
 
@@ -170,7 +169,7 @@ class TabOverview(TabDefault):
 
         return window_log
 
-    def _create_layout(self) -> QVBoxLayout:
+    def create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns

@@ -68,11 +68,7 @@ class TabIlcStatus(TabDefault):
         # Indicators of the ILCs
         self._indicators_ilc = self._create_indicators_ilc(NUM_INNER_LOOP_CONTROLLER)
 
-        # Internal layout
-        self.widget().setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(self.widget().sizeHint())
+        self.set_widget_and_layout()
 
         # Set the callback of signal
         self._set_signal_ilc_status(self.model.signal_ilc_status)
@@ -152,7 +148,7 @@ class TabIlcStatus(TabDefault):
         else:
             return Qt.gray
 
-    def _create_layout(self) -> QVBoxLayout:
+    def create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns
