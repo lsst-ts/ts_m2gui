@@ -914,28 +914,22 @@ class UtilityMonitor(object):
 
     def update_net_force_moment_total(
         self,
-        component_x: float,
-        component_y: float,
-        component_z: float,
+        value_new: list[float],
         is_force: bool = True,
     ) -> None:
         """Update the total net force or moment.
 
         Parameters
         ----------
-        component_x : `float`
-            X component. Unit is Newton or Newton * meter based on 'is_force'.
-        component_y : `float`
-            Y component. Unit is Newton or Newton * meter based on 'is_force'.
-        component_z : `float`
-            Z component. Unit is Newton or Newton * meter based on 'is_force'.
+        value_new : `list`
+            New (x, y, z) component values. Unit is Newton or Newton * meter
+            based on 'is_force'.
         is_force : `bool`, optional
             Is the force data or not. If not, the moment data is applied. (the
             default is True)
         """
 
         # Decide the value to compare and the related signal
-        value_new = [component_x, component_y, component_z]
         value_old = self.net_force_total if is_force else self.net_moment_total
 
         signal = (
@@ -951,27 +945,15 @@ class UtilityMonitor(object):
 
             signal.emit(value_old)
 
-    def update_force_balance(
-        self, fx: float, fy: float, fz: float, mx: float, my: float, mz: float
-    ) -> None:
+    def update_force_balance(self, value_new: list[float]) -> None:
         """Update the force balance status.
 
         Parameters
         ----------
-        fx : `float`
-            Force in x dimension in Newton.
-        fy : `float`
-            Force in y dimension in Newton.
-        fz : `float`
-            Force in z dimension in Newton.
-        mx : `float`
-            Moment in x dimension in Newton * meter.
-        my : `float`
-            Moment in y dimension in Newton * meter.
-        mz : `float`
-            Moment in z dimension in Newton * meter.
+        value_new : `list`
+            New (fx, fy, fz, mx, my, mz) component values. Unit is Newton or
+            Newton * meter that depends on the component is force or moment.
         """
-        value_new = [fx, fy, fz, mx, my, mz]
 
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
         if self._has_changed(np.array(self.force_balance), np.array(value_new), tol):

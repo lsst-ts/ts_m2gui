@@ -80,7 +80,7 @@ class TabRealtimeNetForceMoment(TabDefault):
         figures = dict()
         axes = ["fx", "fy", "fz", "mx", "my", "mz"]
         for axis in axes:
-            label_y = "Force (N)" if axis.startswith("f") else "Moment (N * m)"
+            label_y = "Force (N)" if axis.startswith("f") else "Moment (N m)"
             figures[axis] = FigureConstant(
                 1,
                 num_realtime,
@@ -135,9 +135,7 @@ class TabRealtimeNetForceMoment(TabDefault):
             figure = self._figures[axis]
             figure.setMinimumWidth(self.MIN_WIDTH)
 
-            row = 0 if (index < max_column) else 1
-            column = index if (index < max_column) else (index - max_column)
-
+            row, column = divmod(index, max_column)
             layout.addWidget(figure, row, column)
 
         return layout

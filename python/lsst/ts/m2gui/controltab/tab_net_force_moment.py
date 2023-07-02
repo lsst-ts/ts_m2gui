@@ -218,7 +218,7 @@ class TabNetForceMoment(TabDefault):
         for idx, axis in enumerate(axes):
             net_force_moment[idx + 3] = net_moment_total[idx]
 
-            self._net_force_moment_total[axis].setText(f"{net_moment_total[idx]} N * m")
+            self._net_force_moment_total[axis].setText(f"{net_moment_total[idx]} N m")
 
     def _callback_signal_force_balance(self, force_balance: list[float]) -> None:
         """Callback of the net force/moment signal for the new force balance
@@ -237,5 +237,5 @@ class TabNetForceMoment(TabDefault):
         for idx, axis in enumerate(self._force_balance.keys()):
             net_force_moment[idx] = force_balance[idx]
 
-            unit = "N" if (idx < 3) else "N * m"
+            unit = "N" if (idx < 3) else "N m"
             self._force_balance[axis].setText(f"{force_balance[idx]} {unit}")

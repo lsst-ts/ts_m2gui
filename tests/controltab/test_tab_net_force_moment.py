@@ -94,9 +94,9 @@ async def test_callback_signal_net_moment_total(widget: TabNetForceMoment) -> No
         3.6,
     ]
 
-    assert widget._net_force_moment_total["mx"].text() == "1.1 N * m"
-    assert widget._net_force_moment_total["my"].text() == "-2.2 N * m"
-    assert widget._net_force_moment_total["mz"].text() == "3.6 N * m"
+    assert widget._net_force_moment_total["mx"].text() == "1.1 N m"
+    assert widget._net_force_moment_total["my"].text() == "-2.2 N m"
+    assert widget._net_force_moment_total["mz"].text() == "3.6 N m"
 
 
 @pytest.mark.asyncio
@@ -120,6 +120,6 @@ async def test_callback_signal_force_balance(widget: TabNetForceMoment) -> None:
     assert widget._force_balance["fx"].text() == "1.1 N"
     assert widget._force_balance["fy"].text() == "-2.2 N"
     assert widget._force_balance["fz"].text() == "3.6 N"
-    assert widget._force_balance["mx"].text() == "4.4 N * m"
-    assert widget._force_balance["my"].text() == "-5.4 N * m"
-    assert widget._force_balance["mz"].text() == "-6.8 N * m"
+    assert widget._force_balance["mx"].text() == "4.4 N m"
+    assert widget._force_balance["my"].text() == "-5.4 N m"
+    assert widget._force_balance["mz"].text() == "-6.8 N m"

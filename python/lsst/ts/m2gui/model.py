@@ -1222,22 +1222,17 @@ class Model(object):
 
             elif name == "netForcesTotal":
                 self.utility_monitor.update_net_force_moment_total(
-                    message["fx"], message["fy"], message["fz"], is_force=True
+                    [message[axis] for axis in ("fx", "fy", "fz")], is_force=True
                 )
 
             elif name == "netMomentsTotal":
                 self.utility_monitor.update_net_force_moment_total(
-                    message["mx"], message["my"], message["mz"], is_force=False
+                    [message[axis] for axis in ("mx", "my", "mz")], is_force=False
                 )
 
             elif name == "forceBalance":
                 self.utility_monitor.update_force_balance(
-                    message["fx"],
-                    message["fy"],
-                    message["fz"],
-                    message["mx"],
-                    message["my"],
-                    message["mz"],
+                    [message[axis] for axis in ("fx", "fy", "fz", "mx", "my", "mz")]
                 )
 
             # Ignore this message because it is specific to CSC
