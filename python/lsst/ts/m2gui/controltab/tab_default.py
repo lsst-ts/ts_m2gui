@@ -25,7 +25,14 @@ import types
 import typing
 
 from PySide2.QtCore import QTimer
-from PySide2.QtWidgets import QComboBox, QDockWidget, QFormLayout, QScrollArea, QWidget
+from PySide2.QtWidgets import (
+    QComboBox,
+    QDockWidget,
+    QFormLayout,
+    QLayout,
+    QScrollArea,
+    QWidget,
+)
 
 from ..enums import Ring
 from ..model import Model
@@ -61,17 +68,48 @@ class TabDefault(QDockWidget):
         # features bring more troubles than the benifits.
         self.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
-    def set_widget_scrollable(
-        self, widget: QWidget, is_resizable: bool = False
-    ) -> QScrollArea:
+    def set_widget_and_layout(self, is_scrollable: bool = False) -> None:
+        """Set the widget and layout.
+
+        Parameters
+        ----------
+        is_scrollable : `bool`, optional
+            Is is_scrollable or not. (the default is False)
+        """
+
+        widget = self.widget()
+        widget.setLayout(self.create_layout())
+
+        # Resize the dock to have a similar size of layout
+        self.resize(widget.sizeHint())
+
+        if is_scrollable:
+            self.setWidget(self.set_widget_scrollable(widget, True))
+
+    def create_layout(self) -> QLayout:
+        """Create the layout.
+
+        Returns
+        -------
+        layout : `PySide2.QtWidgets.QLayout`
+            Layout.
+
+        Raises
+        ------
+        `NotImplementedError`
+            If the child class does not implement this function.
+        """
+        raise NotImplementedError("Child class should implemented this.")
+
+    def set_widget_scrollable(self, widget: QWidget, is_resizable: bool) -> QScrollArea:
         """Set the widget to be scrollable.
 
         Parameters
         ----------
         widget : `PySide2.QtWidgets.QWidget`
             Widget.
-        is_resizable : `bool`, optional
-            Is resizable or not. (the default is False)
+        is_resizable : `bool`
+            Is resizable or not.
 
         Returns
         -------

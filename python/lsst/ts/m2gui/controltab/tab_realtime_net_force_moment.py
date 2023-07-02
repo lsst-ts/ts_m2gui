@@ -61,7 +61,7 @@ class TabRealtimeNetForceMoment(TabDefault):
         # Timer to update the realtime figures
         self._timer = self.create_and_start_timer(self._callback_time_out)
 
-        self._set_widget_and_layout()
+        self.set_widget_and_layout()
 
     def _create_figures(self, num_realtime: int = 200) -> dict:
         """Create the figures to show the net force and moment.
@@ -107,16 +107,7 @@ class TabRealtimeNetForceMoment(TabDefault):
 
         self.check_duration_and_restart_timer(self._timer)
 
-    def _set_widget_and_layout(self) -> None:
-        """Set the widget and layout."""
-
-        widget = self.widget()
-        widget.setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(widget.sizeHint())
-
-    def _create_layout(self) -> QGridLayout:
+    def create_layout(self) -> QGridLayout:
         """Create the layout.
 
         Returns

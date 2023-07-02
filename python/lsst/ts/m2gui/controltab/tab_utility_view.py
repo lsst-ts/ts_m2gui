@@ -95,7 +95,7 @@ class TabUtilityView(TabDefault):
             self.model.utility_monitor.displacements
         )
 
-        self._set_widget_and_layout()
+        self.set_widget_and_layout(is_scrollable=True)
 
         self._update_power_system_status()
 
@@ -185,18 +185,7 @@ class TabUtilityView(TabDefault):
 
         return labels_sensor_data
 
-    def _set_widget_and_layout(self) -> None:
-        """Set the widget and layout."""
-
-        widget = self.widget()
-        widget.setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(widget.sizeHint())
-
-        self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
-
-    def _create_layout(self) -> QHBoxLayout:
+    def create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns

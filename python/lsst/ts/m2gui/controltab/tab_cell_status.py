@@ -81,11 +81,7 @@ class TabCellStatus(TabDefault):
         # Timer to update cell status forces (and displays)
         self._timer = self.create_and_start_timer(self._callback_time_out)
 
-        # Internal layout
-        self.widget().setLayout(self._create_layout())
-
-        # Resize the dock to match the layout size
-        self.resize(self.widget().sizeHint())
+        self.set_widget_and_layout()
 
         self._set_signal_detailed_force(
             self.model.utility_monitor.signal_detailed_force
@@ -426,7 +422,7 @@ class TabCellStatus(TabDefault):
                     f"force: {round(selected_actuator.magnitude, 2)} N"
                 )
 
-    def _create_layout(self) -> QHBoxLayout:
+    def create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns

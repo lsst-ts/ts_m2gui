@@ -87,22 +87,13 @@ class TabNetForceMoment(TabDefault):
             self._tab_realtime_force_balance.show,
         )
 
-        self._set_widget_and_layout()
+        self.set_widget_and_layout()
 
         self._set_signal_net_force_moment(
             self.model.utility_monitor.signal_net_force_moment
         )
 
-    def _set_widget_and_layout(self) -> None:
-        """Set the widget and layout."""
-
-        widget = self.widget()
-        widget.setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(widget.sizeHint())
-
-    def _create_layout(self) -> QVBoxLayout:
+    def create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns

@@ -94,7 +94,7 @@ class TabConfigView(TabDefault):
             "misc_range_temperature": create_label(),
         }
 
-        self._set_widget_and_layout()
+        self.set_widget_and_layout()
 
         self._set_signal_config(self.model.signal_config)
 
@@ -132,16 +132,7 @@ class TabConfigView(TabDefault):
         selected_file = self._list_files.selectedItems()
         return selected_file[0].text() if (len(selected_file) != 0) else ""
 
-    def _set_widget_and_layout(self) -> None:
-        """Set the widget and layout."""
-
-        widget = self.widget()
-        widget.setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(widget.sizeHint())
-
-    def _create_layout(self) -> QHBoxLayout:
+    def create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns

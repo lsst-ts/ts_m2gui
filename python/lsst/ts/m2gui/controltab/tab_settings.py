@@ -129,8 +129,7 @@ class TabSettings(TabDefault):
             "Apply General Settings", self._callback_apply_general
         )
 
-        # Internal layout
-        self.widget().setLayout(self._create_layout())
+        self.set_widget_and_layout()
 
         self._set_signal_config(self.model.signal_config)
 
@@ -369,7 +368,7 @@ class TabSettings(TabDefault):
         font.setPointSize(self._settings["point_size"].value())
         app.setFont(font)
 
-    def _create_layout(self) -> QVBoxLayout:
+    def create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
         Returns

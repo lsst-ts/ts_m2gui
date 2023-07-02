@@ -62,7 +62,7 @@ async def test_callback_button_realtime_force_balance(
 @pytest.mark.asyncio
 async def test_callback_signal_net_force_total(widget: TabNetForceMoment) -> None:
     widget.model.utility_monitor.update_net_force_moment_total(
-        1.11, -2.22, 3.56, is_force=True
+        [1.11, -2.22, 3.56], is_force=True
     )
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -82,7 +82,7 @@ async def test_callback_signal_net_force_total(widget: TabNetForceMoment) -> Non
 @pytest.mark.asyncio
 async def test_callback_signal_net_moment_total(widget: TabNetForceMoment) -> None:
     widget.model.utility_monitor.update_net_force_moment_total(
-        1.11, -2.22, 3.56, is_force=False
+        [1.11, -2.22, 3.56], is_force=False
     )
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -102,7 +102,7 @@ async def test_callback_signal_net_moment_total(widget: TabNetForceMoment) -> No
 @pytest.mark.asyncio
 async def test_callback_signal_force_balance(widget: TabNetForceMoment) -> None:
     widget.model.utility_monitor.update_force_balance(
-        1.11, -2.22, 3.56, 4.41, -5.41, -6.78
+        [1.11, -2.22, 3.56, 4.41, -5.41, -6.78]
     )
 
     # Sleep so the event loop can access CPU to handle the signal

@@ -124,7 +124,7 @@ class TabDiagnostics(TabDefault):
             len(self._get_list_digital_status_output())
         )
 
-        self._set_widget_and_layout()
+        self.set_widget_and_layout(is_scrollable=True)
 
         self._set_signal_utility(self.model.utility_monitor.signal_utility)
         self._set_signal_detailed_force(
@@ -352,18 +352,7 @@ class TabDiagnostics(TabDefault):
         else:
             control.setText("OFF")
 
-    def _set_widget_and_layout(self) -> None:
-        """Set the widget and layout."""
-
-        widget = self.widget()
-        widget.setLayout(self._create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(widget.sizeHint())
-
-        self.setWidget(self.set_widget_scrollable(widget, is_resizable=True))
-
-    def _create_layout(self) -> QHBoxLayout:
+    def create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns
