@@ -322,7 +322,9 @@ class TabDiagnostics(TabDefault):
         allowed_mode = LocalMode.Diagnostic
         if self.model.local_mode == allowed_mode:
             is_successful = await run_command(
-                self.model.set_bit_digital_status, idx, DigitalOutputStatus.ToggleBit
+                self.model.controller.set_bit_digital_status,
+                idx,
+                DigitalOutputStatus.ToggleBit,
             )
         else:
             await prompt_dialog_warning(

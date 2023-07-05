@@ -527,7 +527,7 @@ class TabAlarmWarn(TabDefault):
     async def _callback_enable_open_loop_max_limit(self) -> None:
         """Callback of the enable button to enable the maximum limit of
         open-loop control."""
-        await run_command(self.model.enable_open_loop_max_limit, True)
+        await run_command(self.model.controller.enable_open_loop_max_limit, True)
 
     def _set_signal_error(self, signal_error: SignalError) -> None:
         """Set the error signal with callback functions.
