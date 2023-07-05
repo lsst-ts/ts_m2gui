@@ -37,6 +37,7 @@ from lsst.ts.m2com import (
     NUM_TEMPERATURE_EXHAUST,
     NUM_TEMPERATURE_INTAKE,
     NUM_TEMPERATURE_RING,
+    ClosedLoopControlMode,
     CommandActuator,
     CommandScript,
     LimitSwitchType,
@@ -118,16 +119,24 @@ async def test_reset_errors(qtbot: QtBot, model_async: Model) -> None:
 @pytest.mark.asyncio
 async def test_enable_open_loop_max_limit(model_async: Model) -> None:
     # Should fail for the closed-loop control
-    model_async.is_closed_loop = True
+    controller = model_async.controller
+    mock_model = controller.mock_server.model
+
+    mock_model.control_open_loop.is_running = False
+    mock_model.control_closed_loop.is_running = True
+    controller.closed_loop_control_mode = ClosedLoopControlMode.ClosedLoop
+
     with pytest.raises(RuntimeError):
-        await model_async.enable_open_loop_max_limit(True)
+        await model_async.controller.enable_open_loop_max_limit(True)
 
     assert model_async.system_status["isOpenLoopMaxLimitsEnabled"] is False
 
     # Should succeed for the open-loop control
-    model_async.is_closed_loop = False
+    mock_model.control_open_loop.is_running = True
+    mock_model.control_closed_loop.is_running = False
+    controller.closed_loop_control_mode = ClosedLoopControlMode.OpenLoop
 
-    await model_async.enable_open_loop_max_limit(True)
+    await model_async.controller.enable_open_loop_max_limit(True)
 
     await asyncio.sleep(1)
 

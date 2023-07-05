@@ -306,29 +306,6 @@ class Model(object):
 
         self._check_error_and_update_status()
 
-    async def enable_open_loop_max_limit(self, status: bool) -> None:
-        """Enable the maximum limit in open-loop control.
-
-        Parameters
-        ----------
-        status : `bool`
-            Enable the maximum limit or not.
-
-        Raises
-        ------
-        `RuntimeError`
-            Not in the open-loop control.
-        """
-
-        if not self.is_closed_loop:
-            await self.controller.write_command_to_server(
-                "enableOpenLoopMaxLimit", message_details={"status": status}
-            )
-        else:
-            raise RuntimeError(
-                "Failed to enable the maximum limit. Only allow in open-loop control."
-            )
-
     def update_system_status(self, status_name: str, new_status: bool) -> None:
         """Update the system status.
 
@@ -395,10 +372,6 @@ class Model(object):
         """
         self.signal_script.progress.emit(int(progress))
 
-    async def save_position(self) -> None:
-        """Save the rigid body position."""
-        await self.controller.write_command_to_server("saveMirrorPosition")
-
     async def go_to_position(
         self, x: float, y: float, z: float, rx: float, ry: float, rz: float
     ) -> None:
@@ -452,10 +425,6 @@ class Model(object):
         """
         return self.local_mode == LocalMode.Enable and self.is_closed_loop
 
-    async def set_home(self) -> None:
-        """Set the home position."""
-        await self.controller.write_command_to_server("setMirrorHome")
-
     async def reboot_controller(self) -> None:
         """Reboot the cell controller.
 
@@ -466,31 +435,11 @@ class Model(object):
         """
 
         if self.local_mode == LocalMode.Standby and not self.is_csc_commander:
-            await self.controller.write_command_to_server("rebootController")
+            await self.controller.reboot_controller()
         else:
             raise RuntimeError(
                 "Controller can only be rebooted at the standby state with local control."
             )
-
-    async def set_bit_digital_status(
-        self,
-        idx: int,
-        status: DigitalOutputStatus,
-    ) -> None:
-        """Set the bit value of digital status.
-
-        Parameters
-        ----------
-        idx : `int`
-            Bit index that begins from 0, which should be >= 0.
-        status : enum `lsst.ts.m2com.DigitalOutputStatus`
-            Digital output status.
-        """
-
-        await self.controller.write_command_to_server(
-            "switchDigitalOutput",
-            message_details={"bit": 2**idx, "status": int(status)},
-        )
 
     async def command_script(
         self, command: CommandScript, script_name: str | None = None
@@ -511,15 +460,7 @@ class Model(object):
         """
 
         if self.local_mode == LocalMode.Enable:
-            message_details = {"scriptCommand": command}
-            if script_name is not None:
-                message_details["scriptName"] = script_name
-
-            await self.controller.write_command_to_server(
-                "runScript",
-                message_details=message_details,
-            )
-
+            await self.controller.command_script(command, script_name=script_name)
         else:
             raise RuntimeError(
                 "Failed to run the script command. Only allowed in Enabled state."
@@ -551,33 +492,16 @@ class Model(object):
         Raises
         ------
         `RuntimeError`
-            No actuator is selected.
-        `RuntimeError`
             Not in the enabled state with open-loop control.
         """
 
-        if (actuators is not None) and (len(actuators) == 0):
-            raise RuntimeError("No actuator is selected.")
-
-        if unit == ActuatorDisplacementUnit.Step:
-            target_displacement = int(target_displacement)
-
         if self.is_enabled_and_open_loop_control():
-            message_details = {"actuatorCommand": command}
-            if actuators is not None:
-                message_details.update(
-                    {
-                        "actuators": actuators,
-                        "displacement": target_displacement,
-                        "unit": unit,
-                    }
-                )
-
-            await self.controller.write_command_to_server(
-                "moveActuators",
-                message_details=message_details,
+            await self.controller.command_actuator(
+                command,
+                actuators=actuators,
+                target_displacement=target_displacement,
+                unit=unit,
             )
-
         else:
             raise RuntimeError(
                 "Failed to command the actuator. Only allow in Enabled state and open-loop control."
@@ -636,9 +560,7 @@ class Model(object):
 
         self.utility_monitor.reset_breakers(power_type)
 
-        await self.controller.write_command_to_server(
-            "resetBreakers", message_details={"powerType": power_type}
-        )
+        await self.controller.reset_breakers(power_type)
 
     def update_connection_information(
         self,
@@ -1318,7 +1240,9 @@ class Model(object):
         # bit. Based on the original developer in ts_mtm2, this is required to
         # make the power system works correctly.
         for idx in range(2, 5):
-            await self.set_bit_digital_status(idx, DigitalOutputStatus.BinaryHighLevel)
+            await self.controller.set_bit_digital_status(
+                idx, DigitalOutputStatus.BinaryHighLevel
+            )
 
         # I don't understand why I need to put the CLC mode to be Idle twice.
         # This is translated from the ts_mtm2 and I need this to make the M2
