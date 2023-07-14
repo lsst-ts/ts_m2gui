@@ -37,6 +37,7 @@ from lsst.ts.m2com import (
     MAX_LIMIT_FORCE_TANGENT_OPEN_LOOP,
     NUM_ACTUATOR,
     NUM_TANGENT_LINK,
+    OUTLIER_INCLINOMETER_RAW,
     ActuatorDisplacementUnit,
     ClosedLoopControlMode,
     CommandActuator,
@@ -129,6 +130,10 @@ class Model(object):
         Controller to do the TCP/IP communication with the servers of M2 cell.
     duration_refresh : `int`
         Duration to refresh the data in milliseconds.
+    ilc_retry_times : `int`
+        Retry times to transition the inner-loop controller (ILC) state.
+    ilc_timeout : `float`
+        Timeout in second for the transition of ILC state.
     """
 
     def __init__(
@@ -175,6 +180,9 @@ class Model(object):
         self._is_simulation_mode = is_simulation_mode
 
         self.duration_refresh = 100
+
+        self.ilc_retry_times = 3
+        self.ilc_timeout = 20.0
 
     def _set_system_status(self) -> dict[str, bool]:
         """Set the default system status.
@@ -442,7 +450,10 @@ class Model(object):
             )
 
     async def command_script(
-        self, command: CommandScript, script_name: str | None = None
+        self,
+        command: CommandScript,
+        script_name: str | None = None,
+        bypass_state_checking: bool = False,
     ) -> None:
         """Run the script command.
 
@@ -452,12 +463,18 @@ class Model(object):
             Script command.
         script_name : `str` or None, optional
             Name of the script. (the default is None)
+        bypass_state_checking : `bool`, optional
+            Bypass the state checking or not. (the default is False)
 
         Raises
         ------
         `RuntimeError`
             Not in the enabled state.
         """
+
+        if bypass_state_checking:
+            await self.controller.command_script(command, script_name=script_name)
+            return
 
         if self.local_mode == LocalMode.Enable:
             await self.controller.command_script(command, script_name=script_name)
@@ -800,7 +817,7 @@ class Model(object):
                 status = int(message["status"])
                 self.fault_manager.update_summary_faults_status(status)
 
-                self.log.info(f"Summary faults status: {hex(status)}.")
+                self.log.debug(f"Summary faults status: {hex(status)}.")
 
             elif name == "enabledFaultsMask":
                 mask = int(message["mask"])
@@ -1074,8 +1091,16 @@ class Model(object):
                 )
 
             elif name == "zenithAngle":
+                # Filter the outlier from ILC
+                inclinometer_raw = message["inclinometerRaw"]
+                if int(inclinometer_raw) >= OUTLIER_INCLINOMETER_RAW:
+                    self.log.debug(
+                        f"Outlier of raw inclinometer: {inclinometer_raw} degree. Filering ..."
+                    )
+                    return
+
                 self.utility_monitor.update_inclinometer_angle(
-                    message["inclinometerRaw"],
+                    inclinometer_raw,
                     new_angle_processed=message["inclinometerProcessed"],
                 )
 
@@ -1157,9 +1182,8 @@ class Model(object):
                     [message[axis] for axis in ("fx", "fy", "fz", "mx", "my", "mz")]
                 )
 
-            # Ignore this message because it is specific to CSC
-            elif name in ("ilcData"):
-                pass
+            elif name == "ilcData":
+                self.log.debug(f"Receive ILC status: {message['status']}.")
 
             else:
                 self.log.warning(f"Unspecified telemetry message: {name}, ignoring...")
@@ -1239,6 +1263,9 @@ class Model(object):
         # Reset motor and communication power breakers bits and cRIO interlock
         # bit. Based on the original developer in ts_mtm2, this is required to
         # make the power system works correctly.
+
+        # TODO: Check with electrical engineer that I need to reset the cRIO
+        # interlock or not in a latter time.
         for idx in range(2, 5):
             await self.controller.set_bit_digital_status(
                 idx, DigitalOutputStatus.BinaryHighLevel
@@ -1256,8 +1283,6 @@ class Model(object):
         await self.controller.reset_force_offsets()
         await self.controller.reset_actuator_steps()
 
-        await self.controller.power(PowerType.Communication, True)
-
         self.local_mode = LocalMode.Diagnostic
 
     async def enter_enable(self) -> None:
@@ -1274,10 +1299,21 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
             )
 
+        await self.controller.power(PowerType.Communication, True)
         await self.controller.power(PowerType.Motor, True)
-        await self.controller.set_ilc_to_enabled()
+
+        if not self.controller.are_ilc_modes_enabled():
+            try:
+                await self.controller.set_ilc_to_enabled(
+                    retry_times=self.ilc_retry_times, timeout=self.ilc_timeout
+                )
+
+            except RuntimeError:
+                await self._basic_cleanup_and_power_off_motor()
+                raise
+
         await self.controller.set_closed_loop_control_mode(
-            ClosedLoopControlMode.OpenLoop
+            ClosedLoopControlMode.OpenLoop, timeout=30.0
         )
 
         self.local_mode = LocalMode.Enable
@@ -1297,7 +1333,6 @@ class Model(object):
             )
 
         await self._basic_cleanup_and_power_off_motor()
-        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
 
         self.local_mode = LocalMode.Diagnostic
 
@@ -1305,13 +1340,13 @@ class Model(object):
         """Basic cleanup and power off the motor."""
 
         try:
-            await self.command_script(CommandScript.Stop)
-            await self.command_script(CommandScript.Clear)
+            await self.command_script(CommandScript.Stop, bypass_state_checking=True)
+            await self.command_script(CommandScript.Clear, bypass_state_checking=True)
 
             await self.controller.reset_force_offsets()
             await self.controller.reset_actuator_steps()
             await self.controller.set_closed_loop_control_mode(
-                ClosedLoopControlMode.TelemetryOnly
+                ClosedLoopControlMode.TelemetryOnly, timeout=30.0
             )
 
             await self.controller.power(PowerType.Motor, False)
@@ -1336,7 +1371,13 @@ class Model(object):
             )
 
         await self.controller.power(PowerType.Communication, False)
-        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+        await self.controller.set_closed_loop_control_mode(
+            ClosedLoopControlMode.Idle, timeout=20.0
+        )
+
+        self.controller.set_ilc_modes_to_unknown()
+        for address, status in enumerate(self.controller.ilc_modes):
+            self._report_ilc_status(address, int(status))
 
         self.local_mode = LocalMode.Standby
 

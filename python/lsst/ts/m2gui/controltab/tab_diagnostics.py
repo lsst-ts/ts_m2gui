@@ -255,7 +255,7 @@ class TabDiagnostics(TabDefault):
             "J3-W14-2 Communication Power Breaker OK",
             "Spare Input 29",
             "Spare Input 30",
-            "Interlock Power Replay On",
+            "Interlock Power Relay On",
         ]
 
     def _get_list_digital_status_output(self) -> list:

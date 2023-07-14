@@ -734,7 +734,7 @@ class UtilityMonitor(object):
 
         value_update = value
         for item in DigitalInput:
-            if ("PowerBreaker" in item.name) or ("PowerReplay" in item.name):
+            if ("PowerBreaker" in item.name) or ("PowerRelay" in item.name):
                 value_update = value_update ^ item.value
 
         return value_update
