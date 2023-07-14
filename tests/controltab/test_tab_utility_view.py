@@ -68,8 +68,9 @@ def test_init(widget: TabUtilityView) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_reset_breakers(widget_async: TabUtilityView) -> None:
-    # Transition to Diagnostic state to turn on the communication power
+    # Transition to Enabled state to turn on the communication power
     await widget_async.model.enter_diagnostic()
+    await widget_async.model.enter_enable()
 
     name = "J3-W14-2"
     widget_async.model.utility_monitor.update_breaker(name, True)
