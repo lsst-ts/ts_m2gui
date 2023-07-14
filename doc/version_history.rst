@@ -6,6 +6,20 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.1:
+
+-------------
+0.6.1
+-------------
+
+* Handle the error in ``Model.enter_enable()`` when failed to enable all the ILCs.
+* Allow to bypass the state check of ``Model.command_script()``.
+* Turn on the communication power at ``Model.enter_enable()`` instead of ``Model.enter_diagnostic()``.
+* Finetune the behavior and timeout for functions relate to the state transition.
+* Fix the typo in **TabDiagnostics** and **UtilityMonitor** classes.
+* User can set the retry times and timeout of the ILC state transition.
+* Filter the outlier of raw inclinometer value.
+
 .. _lsst.ts.m2gui-0.6.0:
 
 -------------
