@@ -110,9 +110,7 @@ def _assert_prohibit_transition(widget: MockWidget) -> None:
 @pytest.mark.asyncio
 async def test_set_local_mode(qtbot: QtBot, widget_async: MockWidget) -> None:
     controller = widget_async.model.controller
-    await controller.write_command_to_server(
-        "switchCommandSource", message_details={"isRemote": False}
-    )
+    await controller.switch_command_source(False)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -147,7 +145,7 @@ async def test_set_local_mode(qtbot: QtBot, widget_async: MockWidget) -> None:
     assert widget_async.layout_local_mode._button_diagnostic.isEnabled() is True
     assert widget_async.layout_local_mode._button_enable.isEnabled() is False
 
-    await widget_async.model.enable_open_loop_max_limit(True)
+    await widget_async.model.controller.enable_open_loop_max_limit(True)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(5)

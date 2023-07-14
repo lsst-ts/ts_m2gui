@@ -108,8 +108,4 @@ class LayoutControl(LayoutDefault):
         is_commander : `bool`
             CSC is the commander or not.
         """
-        await run_command(
-            self.model.controller.write_command_to_server,
-            "switchCommandSource",
-            message_details={"isRemote": is_commander},
-        )
+        await run_command(self.model.controller.switch_command_source, is_commander)

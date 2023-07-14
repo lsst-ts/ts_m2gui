@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.0:
+
+-------------
+0.6.0
+-------------
+
+* Migrate the functions to **ts_m2com**
+
 .. _lsst.ts.m2gui-0.5.1:
 
 -------------

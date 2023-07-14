@@ -112,7 +112,7 @@ async def test_switch_force_balance_system(
     assert widget_async.layout_control_mode._button_open_loop.isEnabled() is False
     assert widget_async.layout_control_mode._button_closed_loop.isEnabled() is True
 
-    await widget_async.model.enable_open_loop_max_limit(True)
+    await widget_async.model.controller.enable_open_loop_max_limit(True)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
