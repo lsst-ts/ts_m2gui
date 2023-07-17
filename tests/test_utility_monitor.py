@@ -314,13 +314,13 @@ def test_update_digital_status_input(
 def test_process_digital_status_input(utility_monitor: UtilityMonitor) -> None:
     value = (
         DigitalInput.J1_W9_1_MotorPowerBreaker.value
-        + DigitalInput.InterlockPowerReplay.value
+        + DigitalInput.InterlockPowerRelay.value
     )
 
     value_update = utility_monitor._process_digital_status_input(value)
 
     assert value_update & DigitalInput.J1_W9_1_MotorPowerBreaker.value == 0
-    assert value_update & DigitalInput.InterlockPowerReplay.value == 0
+    assert value_update & DigitalInput.InterlockPowerRelay.value == 0
 
     assert (
         value_update & DigitalInput.J2_W10_3_MotorPowerBreaker.value

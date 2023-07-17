@@ -32,6 +32,7 @@ from PySide2.QtWidgets import (
     QDoubleSpinBox,
     QFormLayout,
     QGroupBox,
+    QHBoxLayout,
     QLineEdit,
     QSpinBox,
     QVBoxLayout,
@@ -125,6 +126,15 @@ class TabSettings(TabDefault):
             self._settings["use_external_elevation_angle"].isChecked()
         )
 
+        self._button_apply_ilc = set_button(
+            "Apply ILC Settings",
+            self._callback_apply_ilc,
+            tool_tip=(
+                "Apply the inner-loop controller (ILC) settings used in the\n"
+                "state transtion."
+            ),
+        )
+
         self._button_apply_general = set_button(
             "Apply General Settings", self._callback_apply_general
         )
@@ -152,6 +162,8 @@ class TabSettings(TabDefault):
             "max_angle_difference": QSpinBox(),
             "lut_temperature_ref": QDoubleSpinBox(),
             "external_elevation_angle": QDoubleSpinBox(),
+            "ilc_retry_times": QSpinBox(),
+            "ilc_timeout": QDoubleSpinBox(),
             "log_level": QSpinBox(),
             "refresh_frequency": QSpinBox(),
             "point_size": QSpinBox(),
@@ -200,6 +212,15 @@ class TabSettings(TabDefault):
         )
         settings["external_elevation_angle"].setSuffix(" degree")
 
+        settings["ilc_retry_times"].setToolTip(
+            "Retry times to transtion the ILC to Enabled state."
+        )
+
+        settings["ilc_timeout"].setSuffix(" sec")
+        settings["ilc_timeout"].setToolTip(
+            "Timeout to transtion the ILC to Enabled state."
+        )
+
         settings["log_level"].setRange(self.LOG_LEVEL_MINIMUM, self.LOG_LEVEL_MAXIMUM)
         settings["log_level"].setToolTip(
             "CRITICAL (50), ERROR (40), WARNING (30), INFO (20), DEBUG (10)"
@@ -234,6 +255,9 @@ class TabSettings(TabDefault):
         settings["max_angle_difference"].setValue(
             controller.control_parameters["max_angle_difference"]
         )
+
+        settings["ilc_retry_times"].setValue(self.model.ilc_retry_times)
+        settings["ilc_timeout"].setValue(self.model.ilc_timeout)
 
         settings["log_level"].setValue(self.model.log.level)
 
@@ -351,8 +375,16 @@ class TabSettings(TabDefault):
         await run_command(self.model.controller.set_external_elevation_angle, angle)
 
     @asyncSlot()
+    async def _callback_apply_ilc(self) -> None:
+        """Callback of the apply-ilc-settings button. This will apply the
+        new inner-loop controller (ILC) settings to model."""
+
+        self.model.ilc_retry_times = int(self._settings["ilc_retry_times"].value())
+        self.model.ilc_timeout = self._settings["ilc_timeout"].value()
+
+    @asyncSlot()
     async def _callback_apply_general(self) -> None:
-        """Callback of the apply-general-setting button. This will apply the
+        """Callback of the apply-general-settings button. This will apply the
         new general settings to model."""
 
         self.model.log.setLevel(self._settings["log_level"].value())
@@ -368,21 +400,31 @@ class TabSettings(TabDefault):
         font.setPointSize(self._settings["point_size"].value())
         app.setFont(font)
 
-    def create_layout(self) -> QVBoxLayout:
+    def create_layout(self) -> QHBoxLayout:
         """Create the layout.
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide2.QtWidgets.QHBoxLayout`
             Layout.
         """
 
-        layout = QVBoxLayout()
+        layout = QHBoxLayout()
 
-        layout.addWidget(self._create_group_tcpip())
-        layout.addWidget(self._create_group_control_parameters())
-        layout.addWidget(self._create_group_lut_parameters())
-        layout.addWidget(self._create_group_application())
+        # First column
+        layout_column_1 = QVBoxLayout()
+        layout_column_1.addWidget(self._create_group_tcpip())
+        layout_column_1.addWidget(self._create_group_control_parameters())
+        layout_column_1.addWidget(self._create_group_lut_parameters())
+
+        layout.addLayout(layout_column_1)
+
+        # Second column
+        layout_column_2 = QVBoxLayout()
+        layout_column_2.addWidget(self._create_group_ilc_parameters())
+        layout_column_2.addWidget(self._create_group_application())
+
+        layout.addLayout(layout_column_2)
 
         return layout
 
@@ -455,6 +497,26 @@ class TabSettings(TabDefault):
         layout.addWidget(self._button_overwrite_external_elevation_angle)
 
         return create_group_box("Look-Up Table Parameters", layout)
+
+    def _create_group_ilc_parameters(self) -> QGroupBox:
+        """Create the group of inner-loop controller (ILC) parameters.
+
+        Returns
+        -------
+        `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QVBoxLayout()
+
+        layout_ilc = QFormLayout()
+        layout_ilc.addRow("Retry times:", self._settings["ilc_retry_times"])
+        layout_ilc.addRow("Timeout:", self._settings["ilc_timeout"])
+
+        layout.addLayout(layout_ilc)
+        layout.addWidget(self._button_apply_ilc)
+
+        return create_group_box("Inner-Loop Controller Parameters", layout)
 
     def _create_group_application(self) -> QGroupBox:
         """Create the group of application.

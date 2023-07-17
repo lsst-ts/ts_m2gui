@@ -51,6 +51,9 @@ def test_init(widget: TabSettings) -> None:
     assert widget._settings["enable_angle_comparison"].isChecked() is False
     assert widget._settings["max_angle_difference"].value() == 2.0
 
+    assert widget._settings["ilc_retry_times"].value() == widget.model.ilc_retry_times
+    assert widget._settings["ilc_timeout"].value() == widget.model.ilc_timeout
+
     assert widget._settings["log_level"].value() == widget.model.log.level
     assert widget._settings["refresh_frequency"].value() == int(
         1000 / widget.model.duration_refresh
@@ -122,6 +125,20 @@ async def test_callback_apply_host(qtbot: QtBot, widget: TabSettings) -> None:
     assert controller.port_command == 1
     assert controller.port_telemetry == 2
     assert controller.timeout_connection == 3
+
+
+@pytest.mark.asyncio
+async def test_callback_apply_ilc(qtbot: QtBot, widget: TabSettings) -> None:
+    widget._settings["ilc_retry_times"].setValue(10)
+    widget._settings["ilc_timeout"].setValue(30.15)
+
+    qtbot.mouseClick(widget._button_apply_ilc, Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget.model.ilc_retry_times == 10
+    assert widget.model.ilc_timeout == 30.15
 
 
 @pytest.mark.asyncio

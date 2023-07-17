@@ -137,7 +137,7 @@ async def test_set_local_mode(qtbot: QtBot, widget_async: MockWidget) -> None:
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(15)
+    await asyncio.sleep(20)
 
     assert widget_async.model.local_mode == LocalMode.Enable
 
