@@ -33,11 +33,17 @@ __all__ = [
     "prompt_dialog_warning",
     "run_command",
     "get_button_action",
+    "read_ilc_status_from_log",
+    "sum_ilc_lost_comm",
 ]
 
+import ast
+import re
 from functools import partial
+from pathlib import Path
 
-from lsst.ts.m2com import is_coroutine
+import numpy as np
+from lsst.ts.m2com import NUM_ACTUATOR, is_coroutine
 from PySide2 import QtWidgets
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
@@ -437,3 +443,58 @@ def get_button_action(tool_bar: QToolBar, name: str) -> QAction:
             return tool_bar.widgetForAction(action)
 
     return None
+
+
+def read_ilc_status_from_log(
+    filepath: Path | str, keyword: str = "ILC status"
+) -> list[list[int]]:
+    """Read the inner-loop controller (ILC) status from the log file.
+
+    Parameters
+    ----------
+    filepath : `Path` or `str`
+        Log file path.
+    keyword : `str`, optional
+        Keyword in the log file. (the default is "ILC status")
+
+    Returns
+    -------
+    ilc_status : `list`
+        ILC status.
+    """
+
+    ilc_status = list()
+    with open(filepath, "r") as file:
+        for line in file:
+            if keyword in line:
+                result = re.match(r".+(\[.+\])", line)
+
+                if result is not None:
+                    ilc_status.append(ast.literal_eval(result.group(1)))
+
+    return ilc_status
+
+
+def sum_ilc_lost_comm(ilc_status: list[list[int]]) -> list[int]:
+    """Summarize the lost communication of inner-loop controller (ILC).
+
+    Parameters
+    ----------
+    ilc_status : `list`
+        ILC status.
+
+    Returns
+    -------
+    `list`
+        Summarized lost communication.
+    """
+
+    ilc_lost_communication = np.zeros(NUM_ACTUATOR, dtype=int)
+
+    ilc_data = np.array(ilc_status)
+    for data in ilc_data:
+        lost_value = (data == 0).astype(int)
+        if np.sum(lost_value) != NUM_ACTUATOR:
+            ilc_lost_communication = ilc_lost_communication + lost_value
+
+    return ilc_lost_communication.tolist()
