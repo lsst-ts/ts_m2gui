@@ -27,6 +27,7 @@ from .tab_default import *
 from .tab_detailed_force import *
 from .tab_diagnostics import *
 from .tab_ilc_status import *
+from .tab_limit_switch_status import *
 from .tab_net_force_moment import *
 from .tab_overview import *
 from .tab_realtime_net_force_moment import *

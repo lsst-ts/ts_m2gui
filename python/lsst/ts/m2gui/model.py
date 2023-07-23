@@ -29,6 +29,7 @@ import typing
 import numpy as np
 from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
+    DEFAULT_ENABLED_FAULTS_MASK,
     LIMIT_FORCE_AXIAL_CLOSED_LOOP,
     LIMIT_FORCE_AXIAL_OPEN_LOOP,
     LIMIT_FORCE_TANGENT_CLOSED_LOOP,
@@ -202,7 +203,7 @@ class Model(object):
             "isOpenLoopMaxLimitsEnabled": False,
             "isAlarmOn": False,
             "isWarningOn": False,
-            "isInterlockEnabled": False,
+            "isInterlockEngaged": False,
             "isCellTemperatureHigh": False,
         }
 
@@ -797,7 +798,7 @@ class Model(object):
                 self.update_system_status("isCrioConnected", message["isConnected"])
 
             elif name == "interlock":
-                self.update_system_status("isInterlockEnabled", message["state"])
+                self.update_system_status("isInterlockEngaged", message["state"])
 
             elif name == "cellTemperatureHiWarning":
                 self.update_system_status("isCellTemperatureHigh", message["hiWarning"])
@@ -1260,6 +1261,8 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Standby!r}."
             )
 
+        await self._bypass_monitor_ilc_read_error()
+
         # Reset motor and communication power breakers bits and cRIO interlock
         # bit. Based on the original developer in ts_mtm2, this is required to
         # make the power system works correctly.
@@ -1284,6 +1287,24 @@ class Model(object):
         await self.controller.reset_actuator_steps()
 
         self.local_mode = LocalMode.Diagnostic
+
+    async def _bypass_monitor_ilc_read_error(self) -> None:
+        """Bypass the error codes related to the monitoring inner-loop
+        controller (ILC) read error before the fix.
+
+        TODO: Remove this after the ILC is fixed.
+        """
+
+        codes = {1000, 1001, 6052}
+        (
+            enabled_faults_mask,
+            bits,
+        ) = self.controller.error_handler.calc_enabled_faults_mask(
+            codes, DEFAULT_ENABLED_FAULTS_MASK
+        )
+        self.log.info(f"Bypass the error codes: {codes}. Bits: {bits}.")
+
+        await self.controller.set_enabled_faults_mask(enabled_faults_mask)
 
     async def enter_enable(self) -> None:
         """Transition from the Diagnostic mode to the Enable mode.
