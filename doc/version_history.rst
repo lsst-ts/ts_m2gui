@@ -6,6 +6,18 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.2:
+
+-------------
+0.6.2
+-------------
+
+* Bypass the ILC reading error codes temporarily before upgrading the ILC firmware.
+* Update the layout of **TabAlarmWarn**.
+* Add the functions to analyze the lost ILC communication in log file.
+* Add the **TabLimitSwitchStatus** class.
+* Rename the indicator: **isInterlockEnabled** to be **isInterlockEngaged**.
+
 .. _lsst.ts.m2gui-0.6.1:
 
 -------------
