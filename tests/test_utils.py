@@ -20,14 +20,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
+import tempfile
+from pathlib import Path
 
 import pytest
+from lsst.ts.m2com import NUM_ACTUATOR
 from lsst.ts.m2gui import (
     Ring,
     get_num_actuator_ring,
     get_tol,
     map_actuator_id_to_alias,
+    read_ilc_status_from_log,
     run_command,
+    sum_ilc_lost_comm,
 )
 from pytestqt.qtbot import QtBot
 
@@ -82,3 +87,36 @@ async def test_run_command(qtbot: QtBot) -> None:
 
     assert await run_command(command_coroutine, False) is True
     assert await run_command(command_coroutine, True, is_prompted=False) is False
+
+
+def test_read_ilc_status_from_log() -> None:
+    ilc_status_message = [16] * NUM_ACTUATOR
+    log_message = (
+        f"This is a test log file.\n"
+        f"2023-07-18, DEBUG, Receive ILC status: {ilc_status_message}.\n"
+        f"2023-07-19, DEBUG, Receive ILC status: {ilc_status_message}."
+    )
+
+    file = tempfile.NamedTemporaryFile()
+    file.seek(0)
+    file.write(log_message.encode())
+    file.flush()
+
+    filepath = Path(file.name)
+    ilc_status = read_ilc_status_from_log(filepath)
+
+    assert ilc_status == [ilc_status_message, ilc_status_message]
+
+
+def test_sum_ilc_lost_comm() -> None:
+    # Prepare the ILC status
+    ilc_status_1 = [0] * NUM_ACTUATOR
+    ilc_status_2 = [0] + [1] * (NUM_ACTUATOR - 1)
+    ilc_status_3 = [0, 0] + [1] * (NUM_ACTUATOR - 2)
+
+    ilc_status = [ilc_status_1, ilc_status_2, ilc_status_3]
+
+    # Summarize the lost communication
+    lost_comm = sum_ilc_lost_comm(ilc_status)
+
+    assert lost_comm == [2, 1] + [0] * (NUM_ACTUATOR - 2)
