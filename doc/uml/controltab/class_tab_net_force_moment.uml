@@ -10,6 +10,7 @@ package "display" #DDDDDD {
 
 TabDefault *-- Model
 TabDefault <|-- TabNetForceMoment
+TabDefault <|-- TabRealtimeNetForceMoment
 
 TabNetForceMoment "1" *-- "2" TabRealtimeNetForceMoment
 TabNetForceMoment --> SignalNetForceMoment : connect()

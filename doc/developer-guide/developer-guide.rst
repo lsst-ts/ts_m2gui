@@ -157,6 +157,7 @@ m2gui.controltab
 * **TabIlcStatus** shows the inner-loop controller (ILC) status.
 * **TabNetForceMoment** shows the net force and moment of total actuators and force balance system status.
 * **TabRealtimeNetForceMoment** shows the realtime data of net force and moment of total actuators and force balance system status.
+* **TabLimitSwitchStatus** shows the limit switch status.
 
 The class diagrams for each table child class are listed below to give you the idea of class relationship.
 
