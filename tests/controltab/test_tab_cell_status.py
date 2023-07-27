@@ -21,11 +21,10 @@
 
 import asyncio
 import logging
-import pathlib
 from pathlib import Path
 
 import pytest
-from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, get_config_dir
 from lsst.ts.m2gui import (
     ActuatorForceAxial,
     ActuatorForceTangent,
@@ -42,9 +41,7 @@ TIMEOUT = 1000
 
 
 def get_cell_geometry_file() -> Path:
-    policy_dir = pathlib.Path(__file__).parents[0] / ".." / ".." / "policy"
-
-    return policy_dir / "cell_geometry.yaml"
+    return get_config_dir() / "harrisLUT" / "cell_geom.yaml"
 
 
 @pytest.fixture

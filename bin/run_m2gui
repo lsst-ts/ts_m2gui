@@ -18,8 +18,6 @@
 # GNU General Public License for more details.
 #
 
-import sys
-
 from lsst.ts.m2gui import run_application
 
-run_application(sys.argv)
+run_application()

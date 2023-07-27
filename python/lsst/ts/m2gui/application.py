@@ -32,21 +32,15 @@ from PySide2.QtCore import QCommandLineOption, QCommandLineParser
 from .main_window import MainWindow
 
 
-def run_application(argv: list) -> None:
-    """Run the application.
-
-    Parameters
-    ----------
-    argv : `list`
-        Arguments from the command line.
-    """
+def run_application() -> None:
+    """Run the application."""
 
     if "QT_API" not in os.environ:
         os.environ.setdefault("QT_API", "PySide2")
         print("qasync: QT_API not set, defaulting to PySide2.")
 
     try:
-        qasync.run(main(argv))
+        qasync.run(main(sys.argv))
     except asyncio.exceptions.CancelledError:
         sys.exit(0)
 
