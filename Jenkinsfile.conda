@@ -1,0 +1,2 @@
+@Library('JenkinsShared')_
+CondaPipeline(["ts_config_mttcs"], "ts-m2gui", "lsst.ts.m2gui", "noarch")
