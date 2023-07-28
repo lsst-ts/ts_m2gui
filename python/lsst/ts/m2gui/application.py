@@ -39,10 +39,25 @@ def run_application() -> None:
         os.environ.setdefault("QT_API", "PySide2")
         print("qasync: QT_API not set, defaulting to PySide2.")
 
-    try:
-        qasync.run(main(sys.argv))
-    except asyncio.exceptions.CancelledError:
-        sys.exit(0)
+    # Workaround the Python 3.11 issue in 'qasync' module based on:
+    # https://github.com/CabbageDevelopment/qasync/issues/68
+    if (sys.version_info.major == 3) and (sys.version_info.minor >= 11):
+        with qasync._set_event_loop_policy(qasync.DefaultQEventLoopPolicy()):
+            runner = asyncio.runners.Runner()
+
+            try:
+                runner.run(main(sys.argv))
+
+            except asyncio.exceptions.CancelledError:
+                sys.exit(0)
+
+            finally:
+                runner.close()
+    else:
+        try:
+            qasync.run(main(sys.argv))
+        except asyncio.exceptions.CancelledError:
+            sys.exit(0)
 
 
 async def main(argv: list) -> bool:

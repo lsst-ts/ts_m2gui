@@ -16,6 +16,7 @@ Version History
 * Move the policy files to **ts_config_mttcs**.
 * Remove the ``log/`` directory and output the log file to ``/rubin/mtm2/log`` if possible.
 * Remove the argument of ``run_application()``.
+* Workaround the Python 3.11 issue in **qasync** module.
 
 .. _lsst.ts.m2gui-0.6.2:
 
