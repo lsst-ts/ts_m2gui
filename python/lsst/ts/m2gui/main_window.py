@@ -188,8 +188,15 @@ class MainWindow(QMainWindow):
 
         return log
 
-    def _get_log_file_name(self) -> pathlib.Path:
+    def _get_log_file_name(
+        self, default_log_dir: str = "/rubin/mtm2/log"
+    ) -> pathlib.Path:
         """Get the log file name.
+
+        Parameters
+        ----------
+        default_log_dir : `str`, optional
+            Default log directory. (the default is "/rubin/mtm2/log")
 
         Returns
         -------
@@ -197,10 +204,19 @@ class MainWindow(QMainWindow):
             Log file name.
         """
 
+        log_dir = pathlib.Path(default_log_dir)
+        if not log_dir.is_dir():
+            print(
+                (
+                    f"Default log directory: {default_log_dir} does not exist. "
+                    "Use the home directory instead."
+                )
+            )
+            log_dir = pathlib.Path.home()
+
         name = "log_%s.txt" % datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
-        return (
-            pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "log" / name
-        )
+
+        return log_dir / name
 
     def _set_model(self, is_simulation_mode: bool, is_crio_simulator: bool) -> Model:
         """Set the model.
@@ -227,7 +243,7 @@ class MainWindow(QMainWindow):
             raise ValueError("No simulation mode and cRIO simulator at the same time.")
 
         # Read the yaml file
-        filepath = self._get_policy_dir() / "default.yaml"
+        filepath = get_config_dir() / "default_gui.yaml"
         default_settings = read_yaml_file(filepath)
 
         if is_simulation_mode:
@@ -277,21 +293,10 @@ class MainWindow(QMainWindow):
 
         tab_alarm_warn.read_error_list_file(filepath)
 
-    def _get_policy_dir(self) -> pathlib.Path:
-        """Get the policy directory.
-
-        Returns
-        -------
-        `pathlib.Path`
-            Policy directory.
-        """
-
-        return pathlib.Path(__file__).parents[0] / ".." / ".." / ".." / ".." / "policy"
-
     def _set_tab_cell_status(self) -> None:
         """Set the table of cell status."""
 
-        filepath = self._get_policy_dir() / "cell_geometry.yaml"
+        filepath = get_config_dir() / "harrisLUT" / "cell_geom.yaml"
 
         tab_cell_status = self._control_tabs.get_tab("Cell Status")[1]
 
@@ -303,7 +308,7 @@ class MainWindow(QMainWindow):
     def _set_tab_ilc_status(self) -> None:
         """Set the table of inner-loop controller (ILC) status."""
 
-        filepath = self._get_policy_dir() / "ilc_details.yaml"
+        filepath = get_config_dir() / "ilc_details.yaml"
 
         tab_ilc_status = self._control_tabs.get_tab("ILC Status")[1]
 

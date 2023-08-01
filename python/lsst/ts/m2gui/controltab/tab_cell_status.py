@@ -473,21 +473,21 @@ class TabCellStatus(TabDefault):
 
         # Set the mirror radius to calculate the magnification of actuator
         # on the mirror's view
-        radius = cell_geometry["radius"]
+        radius = cell_geometry["radiusActTangent"]
         self._view_mirror.mirror_radius = radius
 
         aliases = list(self.model.get_actuator_default_status(False))
 
         # Axial actuators
         idx_alias = 0
-        for id_axial, location in enumerate(cell_geometry["location_axial"]):
+        for id_axial, location in enumerate(cell_geometry["locAct_axial"]):
             self._view_mirror.add_item_actuator(
                 id_axial + 1, aliases[idx_alias], location[0], location[1]
             )
             idx_alias += 1
 
         # Tangential actuators
-        degree_tangent = cell_geometry["degree_tangent"]
+        degree_tangent = cell_geometry["locAct_tangent"]
 
         list_id_tangent = range(NUM_ACTUATOR - NUM_TANGENT_LINK + 1, NUM_ACTUATOR + 1)
 

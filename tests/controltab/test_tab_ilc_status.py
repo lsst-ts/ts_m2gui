@@ -21,11 +21,14 @@
 
 import asyncio
 import logging
-import pathlib
 from pathlib import Path
 
 import pytest
-from lsst.ts.m2com import NUM_INNER_LOOP_CONTROLLER, InnerLoopControlMode
+from lsst.ts.m2com import (
+    NUM_INNER_LOOP_CONTROLLER,
+    InnerLoopControlMode,
+    get_config_dir,
+)
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabIlcStatus
 from PySide2.QtCore import Qt
@@ -34,9 +37,7 @@ from pytestqt.qtbot import QtBot
 
 
 def get_ilc_details_file() -> Path:
-    policy_dir = pathlib.Path(__file__).parents[0] / ".." / ".." / "policy"
-
-    return policy_dir / "ilc_details.yaml"
+    return get_config_dir() / "ilc_details.yaml"
 
 
 @pytest.fixture
