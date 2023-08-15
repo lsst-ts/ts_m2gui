@@ -27,7 +27,8 @@ from copy import deepcopy
 
 import numpy as np
 import numpy.typing
-from lsst.ts.m2com import DigitalInput, PowerType
+from lsst.ts.idl.enums import MTM2
+from lsst.ts.m2com import DigitalInput
 from PySide2.QtCore import Signal
 
 from .actuator_force_axial import ActuatorForceAxial
@@ -367,13 +368,13 @@ class UtilityMonitor(object):
         return sensors
 
     def update_power_calibrated(
-        self, power_type: PowerType, new_voltage: float, new_current: float
+        self, power_type: MTM2.PowerType, new_voltage: float, new_current: float
     ) -> None:
         """Update the calibrated power data.
 
         Parameters
         ----------
-        power_type : enum `lsst.ts.m2com.PowerType`
+        power_type : enum `MTM2.PowerType`
             Power type.
         new_voltage : `float`
             New voltage value in volt.
@@ -386,10 +387,10 @@ class UtilityMonitor(object):
             Not supported power type.
         """
 
-        if power_type == PowerType.Motor:
+        if power_type == MTM2.PowerType.Motor:
             power = self.power_motor_calibrated
             signal_name = "power_motor_calibrated"
-        elif power_type == PowerType.Communication:
+        elif power_type == MTM2.PowerType.Communication:
             power = self.power_communication_calibrated
             signal_name = "power_communication_calibrated"
         else:
@@ -454,13 +455,13 @@ class UtilityMonitor(object):
         return np.max(np.abs(value_old - value_new)) >= tol
 
     def update_power_raw(
-        self, power_type: PowerType, new_voltage: float, new_current: float
+        self, power_type: MTM2.PowerType, new_voltage: float, new_current: float
     ) -> None:
         """Update the raw power data.
 
         Parameters
         ----------
-        power_type : enum `lsst.ts.m2com.PowerType`
+        power_type : enum `MTM2.PowerType`
             Power type.
         new_voltage : `float`
             New voltage value in volt.
@@ -473,10 +474,10 @@ class UtilityMonitor(object):
             Not supported power type.
         """
 
-        if power_type == PowerType.Motor:
+        if power_type == MTM2.PowerType.Motor:
             power = self.power_motor_raw
             signal_name = "power_motor_raw"
-        elif power_type == PowerType.Communication:
+        elif power_type == MTM2.PowerType.Communication:
             power = self.power_communication_raw
             signal_name = "power_communication_raw"
         else:
@@ -543,12 +544,12 @@ class UtilityMonitor(object):
             self.breakers[name] = new_status
             self.signal_utility.breaker_status.emit((name, new_status))
 
-    def reset_breakers(self, power_type: PowerType) -> None:
+    def reset_breakers(self, power_type: MTM2.PowerType) -> None:
         """Reset the breakers.
 
         Parameters
         ----------
-        power_type : enum `lsst.ts.m2com.PowerType`
+        power_type : enum `MTM2.PowerType`
             Power type.
         """
 
@@ -556,12 +557,12 @@ class UtilityMonitor(object):
         for breaker in breakers:
             self.update_breaker(breaker, False)
 
-    def get_breakers(self, power_type: PowerType) -> list[str]:
+    def get_breakers(self, power_type: MTM2.PowerType) -> list[str]:
         """Get the breakers of the specific power type.
 
         Parameters
         ----------
-        power_type : enum `lsst.ts.m2com.PowerType`
+        power_type : enum `MTM2.PowerType`
             Power type.
 
         Returns
@@ -570,7 +571,7 @@ class UtilityMonitor(object):
             List of the breakers.
         """
 
-        if power_type == PowerType.Motor:
+        if power_type == MTM2.PowerType.Motor:
             breaker_range = range(9, 12)
         else:
             breaker_range = range(12, 15)

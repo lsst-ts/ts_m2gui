@@ -20,7 +20,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-from lsst.ts.m2com import DigitalInput, PowerType
+from lsst.ts.idl.enums import MTM2
+from lsst.ts.m2com import DigitalInput
 from lsst.ts.m2gui import (
     DisplacementSensorDirection,
     ForceErrorTangent,
@@ -81,14 +82,14 @@ def test_update_power_calibrated(qtbot: QtBot, utility_monitor: UtilityMonitor) 
     # There is the update
     signal_motor = utility_monitor.signal_utility.power_motor_calibrated
     with qtbot.waitSignal(signal_motor, timeout=TIMEOUT):
-        utility_monitor.update_power_calibrated(PowerType.Motor, 0.11, 0.27)
+        utility_monitor.update_power_calibrated(MTM2.PowerType.Motor, 0.11, 0.27)
 
     assert utility_monitor.power_motor_calibrated["voltage"] == 0.1
     assert utility_monitor.power_motor_calibrated["current"] == 0.3
 
     # There should be no update
     with qtbot.assertNotEmitted(signal_motor, wait=TIMEOUT):
-        utility_monitor.update_power_calibrated(PowerType.Motor, 0.12, 0.28)
+        utility_monitor.update_power_calibrated(MTM2.PowerType.Motor, 0.12, 0.28)
 
     assert utility_monitor.power_motor_calibrated["voltage"] == 0.1
     assert utility_monitor.power_motor_calibrated["current"] == 0.3
@@ -98,7 +99,9 @@ def test_update_power_calibrated(qtbot: QtBot, utility_monitor: UtilityMonitor) 
     # There is the update
     signal_communication = utility_monitor.signal_utility.power_communication_calibrated
     with qtbot.waitSignal(signal_communication, timeout=TIMEOUT):
-        utility_monitor.update_power_calibrated(PowerType.Communication, 0.21, 0.37)
+        utility_monitor.update_power_calibrated(
+            MTM2.PowerType.Communication, 0.21, 0.37
+        )
 
     assert utility_monitor.power_communication_calibrated["voltage"] == 0.2
     assert utility_monitor.power_communication_calibrated["current"] == 0.4
@@ -110,7 +113,7 @@ def test_update_power_raw(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None
     # There is the update
     signal_motor = utility_monitor.signal_utility.power_motor_raw
     with qtbot.waitSignal(signal_motor, timeout=TIMEOUT):
-        utility_monitor.update_power_raw(PowerType.Motor, 0.11, 0.27)
+        utility_monitor.update_power_raw(MTM2.PowerType.Motor, 0.11, 0.27)
 
     assert utility_monitor.power_motor_raw["voltage"] == 0.1
     assert utility_monitor.power_motor_raw["current"] == 0.3
@@ -120,7 +123,7 @@ def test_update_power_raw(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None
     # There is the update
     signal_communication = utility_monitor.signal_utility.power_communication_raw
     with qtbot.waitSignal(signal_communication, timeout=TIMEOUT):
-        utility_monitor.update_power_raw(PowerType.Communication, 0.21, 0.37)
+        utility_monitor.update_power_raw(MTM2.PowerType.Communication, 0.21, 0.37)
 
     assert utility_monitor.power_communication_raw["voltage"] == 0.2
     assert utility_monitor.power_communication_raw["current"] == 0.4
@@ -224,21 +227,21 @@ def test_reset_breakers(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:
     # There should be no signal
     signal = utility_monitor.signal_utility.breaker_status
     with qtbot.assertNotEmitted(signal, wait=TIMEOUT):
-        utility_monitor.reset_breakers(PowerType.Motor)
+        utility_monitor.reset_breakers(MTM2.PowerType.Motor)
 
     # There is the signal
     name = "J1-W9-1"
     utility_monitor.update_breaker(name, True)
 
     with qtbot.waitSignal(signal, timeout=TIMEOUT):
-        utility_monitor.reset_breakers(PowerType.Motor)
+        utility_monitor.reset_breakers(MTM2.PowerType.Motor)
 
     assert utility_monitor.breakers[name] is False
 
 
 def test_get_breakers(utility_monitor: UtilityMonitor) -> None:
-    assert len(utility_monitor.get_breakers(PowerType.Motor)) == 9
-    assert len(utility_monitor.get_breakers(PowerType.Communication)) == 6
+    assert len(utility_monitor.get_breakers(MTM2.PowerType.Motor)) == 9
+    assert len(utility_monitor.get_breakers(MTM2.PowerType.Communication)) == 6
 
 
 def test_update_temperature(qtbot: QtBot, utility_monitor: UtilityMonitor) -> None:

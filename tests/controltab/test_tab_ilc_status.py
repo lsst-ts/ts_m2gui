@@ -24,11 +24,8 @@ import logging
 from pathlib import Path
 
 import pytest
-from lsst.ts.m2com import (
-    NUM_INNER_LOOP_CONTROLLER,
-    InnerLoopControlMode,
-    get_config_dir,
-)
+from lsst.ts.idl.enums import MTM2
+from lsst.ts.m2com import NUM_INNER_LOOP_CONTROLLER, get_config_dir
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabIlcStatus
 from PySide2.QtCore import Qt
@@ -53,16 +50,16 @@ def test_init(widget: TabIlcStatus) -> None:
 
 
 def test_get_indicator_color(widget: TabIlcStatus) -> None:
-    assert widget._get_indicator_color(InnerLoopControlMode.Standby) == Qt.cyan
-    assert widget._get_indicator_color(InnerLoopControlMode.Disabled) == Qt.blue
-    assert widget._get_indicator_color(InnerLoopControlMode.Enabled) == Qt.green
-    assert widget._get_indicator_color(InnerLoopControlMode.Fault) == Qt.red
-    assert widget._get_indicator_color(InnerLoopControlMode.Unknown) == Qt.gray
+    assert widget._get_indicator_color(MTM2.InnerLoopControlMode.Standby) == Qt.cyan
+    assert widget._get_indicator_color(MTM2.InnerLoopControlMode.Disabled) == Qt.blue
+    assert widget._get_indicator_color(MTM2.InnerLoopControlMode.Enabled) == Qt.green
+    assert widget._get_indicator_color(MTM2.InnerLoopControlMode.Fault) == Qt.red
+    assert widget._get_indicator_color(MTM2.InnerLoopControlMode.Unknown) == Qt.gray
 
 
 @pytest.mark.asyncio
 async def test_callback_signal_ilc_status(qtbot: QtBot, widget: TabIlcStatus) -> None:
-    mode = InnerLoopControlMode.Disabled
+    mode = MTM2.InnerLoopControlMode.Disabled
     widget.model._report_ilc_status(1, mode.value)
 
     # Sleep so the event loop can access CPU to handle the signal

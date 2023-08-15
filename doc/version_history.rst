@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.4:
+
+-------------
+0.6.4
+-------------
+
+* Use the enums in **ts_idl**.
+
 .. _lsst.ts.m2gui-0.6.3:
 
 -------------

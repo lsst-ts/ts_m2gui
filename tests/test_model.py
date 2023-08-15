@@ -37,11 +37,9 @@ from lsst.ts.m2com import (
     NUM_TEMPERATURE_EXHAUST,
     NUM_TEMPERATURE_INTAKE,
     NUM_TEMPERATURE_RING,
-    ClosedLoopControlMode,
     CommandActuator,
     CommandScript,
     LimitSwitchType,
-    PowerType,
 )
 from lsst.ts.m2gui import LocalMode, Model, Ring, Status
 from pytestqt.qtbot import QtBot
@@ -124,7 +122,7 @@ async def test_enable_open_loop_max_limit(model_async: Model) -> None:
 
     mock_model.control_open_loop.is_running = False
     mock_model.control_closed_loop.is_running = True
-    controller.closed_loop_control_mode = ClosedLoopControlMode.ClosedLoop
+    controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.ClosedLoop
 
     with pytest.raises(RuntimeError):
         await model_async.controller.enable_open_loop_max_limit(True)
@@ -134,7 +132,7 @@ async def test_enable_open_loop_max_limit(model_async: Model) -> None:
     # Should succeed for the open-loop control
     mock_model.control_open_loop.is_running = True
     mock_model.control_closed_loop.is_running = False
-    controller.closed_loop_control_mode = ClosedLoopControlMode.OpenLoop
+    controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.OpenLoop
 
     await model_async.controller.enable_open_loop_max_limit(True)
 
@@ -255,15 +253,15 @@ async def test_apply_actuator_force(model_async: Model) -> None:
 async def test_reset_breakers(qtbot: QtBot, model_async: Model) -> None:
     # Power on the motor and communication first
     controller = model_async.controller
-    await controller.power(PowerType.Communication, True)
-    await controller.power(PowerType.Motor, True)
+    await controller.power(MTM2.PowerType.Communication, True)
+    await controller.power(MTM2.PowerType.Motor, True)
 
     model_async.utility_monitor.update_breaker("J1-W9-1", True)
 
     with qtbot.waitSignal(
         model_async.utility_monitor.signal_utility.breaker_status, timeout=TIMEOUT_LONG
     ):
-        await model_async.reset_breakers(PowerType.Motor)
+        await model_async.reset_breakers(MTM2.PowerType.Motor)
 
 
 def test_update_connection_information(model: Model) -> None:
