@@ -23,11 +23,11 @@ __all__ = ["TabIlcStatus"]
 
 from pathlib import Path
 
+from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_INNER_LOOP_CONTROLLER,
     NUM_TANGENT_LINK,
-    InnerLoopControlMode,
     read_yaml_file,
 )
 from PySide2.QtCore import Qt
@@ -95,14 +95,14 @@ class TabIlcStatus(TabDefault):
                 str(specific_id), None, is_indicator=True, is_adjust_size=True
             )
 
-            self._update_indicator_color(indicator, InnerLoopControlMode.Unknown)
+            self._update_indicator_color(indicator, MTM2.InnerLoopControlMode.Unknown)
 
             indicators.append(indicator)
 
         return indicators
 
     def _update_indicator_color(
-        self, indicator: QPushButton, mode: InnerLoopControlMode
+        self, indicator: QPushButton, mode: MTM2.InnerLoopControlMode
     ) -> None:
         """Update the color of indicator.
 
@@ -110,7 +110,7 @@ class TabIlcStatus(TabDefault):
         ----------
         indicator : `PySide2.QtWidgets.QPushButton`
             Indicator.
-        mode : enum `lsst.ts.m2com.InnerLoopControlMode`
+        mode : enum `MTM2.InnerLoopControlMode`
             Mode of inner-loop controller (ILC).
         """
 
@@ -119,12 +119,12 @@ class TabIlcStatus(TabDefault):
 
         indicator.setPalette(palette)
 
-    def _get_indicator_color(self, mode: InnerLoopControlMode) -> QColor:
+    def _get_indicator_color(self, mode: MTM2.InnerLoopControlMode) -> QColor:
         """Get the indicator color based on the mode.
 
         Parameters
         ----------
-        mode : enum `lsst.ts.m2com.InnerLoopControlMode`
+        mode : enum `MTM2.InnerLoopControlMode`
             Mode of inner-loop controller (ILC).
 
         Returns
@@ -133,16 +133,16 @@ class TabIlcStatus(TabDefault):
             Indicator color.
         """
 
-        if mode == InnerLoopControlMode.Standby:
+        if mode == MTM2.InnerLoopControlMode.Standby:
             return Qt.cyan
 
-        elif mode == InnerLoopControlMode.Disabled:
+        elif mode == MTM2.InnerLoopControlMode.Disabled:
             return Qt.blue
 
-        elif mode == InnerLoopControlMode.Enabled:
+        elif mode == MTM2.InnerLoopControlMode.Enabled:
             return Qt.green
 
-        elif mode == InnerLoopControlMode.Fault:
+        elif mode == MTM2.InnerLoopControlMode.Fault:
             return Qt.red
 
         else:
@@ -201,11 +201,11 @@ class TabIlcStatus(TabDefault):
 
         # Get the colors for each state
         states = [
-            InnerLoopControlMode.Standby,
-            InnerLoopControlMode.Disabled,
-            InnerLoopControlMode.Enabled,
-            InnerLoopControlMode.Fault,
-            InnerLoopControlMode.Unknown,
+            MTM2.InnerLoopControlMode.Standby,
+            MTM2.InnerLoopControlMode.Disabled,
+            MTM2.InnerLoopControlMode.Enabled,
+            MTM2.InnerLoopControlMode.Fault,
+            MTM2.InnerLoopControlMode.Unknown,
         ]
 
         colors = list()
@@ -268,11 +268,11 @@ class TabIlcStatus(TabDefault):
         address_mode : `tuple`
             A tuple: (address, mode). The data type of address is integer
             and the data type of mode is integer
-            (enum `lsst.ts.m2com.InnerLoopControlMode`).
+            (enum `MTM2.InnerLoopControlMode`).
         """
 
         address = address_mode[0]
-        mode = InnerLoopControlMode(address_mode[1])
+        mode = MTM2.InnerLoopControlMode(address_mode[1])
         self._update_indicator_color(self._indicators_ilc[address], mode)
 
     def read_ilc_details_file(self, filepath: str | Path) -> None:

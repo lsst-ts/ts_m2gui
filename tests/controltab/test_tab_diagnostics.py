@@ -24,7 +24,7 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2com import PowerType
+from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2gui import ForceErrorTangent, Model
 from lsst.ts.m2gui.controltab import TabDiagnostics
 from PySide2.QtCore import Qt
@@ -84,7 +84,7 @@ async def test_callback_control_digital_status(
 
 @pytest.mark.asyncio
 async def test_callback_power_motor_calibrated(widget: TabDiagnostics) -> None:
-    widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
+    widget.model.utility_monitor.update_power_calibrated(MTM2.PowerType.Motor, 0.1, 0.2)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -96,7 +96,7 @@ async def test_callback_power_motor_calibrated(widget: TabDiagnostics) -> None:
 @pytest.mark.asyncio
 async def test_callback_power_communication_calibrated(widget: TabDiagnostics) -> None:
     widget.model.utility_monitor.update_power_calibrated(
-        PowerType.Communication, 0.3, 0.4
+        MTM2.PowerType.Communication, 0.3, 0.4
     )
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -108,7 +108,7 @@ async def test_callback_power_communication_calibrated(widget: TabDiagnostics) -
 
 @pytest.mark.asyncio
 async def test_callback_power_motor_raw(widget: TabDiagnostics) -> None:
-    widget.model.utility_monitor.update_power_raw(PowerType.Motor, 0.5, 0.6)
+    widget.model.utility_monitor.update_power_raw(MTM2.PowerType.Motor, 0.5, 0.6)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -119,7 +119,9 @@ async def test_callback_power_motor_raw(widget: TabDiagnostics) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_power_communication_raw(widget: TabDiagnostics) -> None:
-    widget.model.utility_monitor.update_power_raw(PowerType.Communication, 0.7, 0.8)
+    widget.model.utility_monitor.update_power_raw(
+        MTM2.PowerType.Communication, 0.7, 0.8
+    )
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)

@@ -21,7 +21,7 @@
 
 __all__ = ["TabUtilityView"]
 
-from lsst.ts.m2com import PowerType
+from lsst.ts.idl.enums import MTM2
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
@@ -79,12 +79,12 @@ class TabUtilityView(TabDefault):
         self._button_reset_breakers_motor = set_button(
             "Reset Breakers (Motor)",
             self._callback_reset_breakers,
-            PowerType.Motor,
+            MTM2.PowerType.Motor,
         )
         self._button_reset_breakers_communication = set_button(
             "Reset Breakers (Communication)",
             self._callback_reset_breakers,
-            PowerType.Communication,
+            MTM2.PowerType.Communication,
         )
 
         self._temperatures = self._create_labels_sensor_data(
@@ -141,7 +141,7 @@ class TabUtilityView(TabDefault):
         indicator.setPalette(palette)
 
     @asyncSlot()
-    async def _callback_reset_breakers(self, power_type: PowerType) -> None:
+    async def _callback_reset_breakers(self, power_type: MTM2.PowerType) -> None:
         """Callback of the reset-breakers button. This will reset all triggered
         breakers.
 
@@ -150,13 +150,13 @@ class TabUtilityView(TabDefault):
 
         Parameters
         ----------
-        power_type : enum `lsst.ts.m2com.PowerType`
+        power_type : enum `MTM2.PowerType`
             Power type.
         """
 
         button = (
             self._button_reset_breakers_motor
-            if power_type == PowerType.Motor
+            if power_type == MTM2.PowerType.Motor
             else self._button_reset_breakers_communication
         )
         button.setEnabled(False)
@@ -206,9 +206,11 @@ class TabUtilityView(TabDefault):
 
         # Second column
         layout_breaker = QVBoxLayout()
-        layout_breaker.addWidget(self._create_group_breakers(PowerType.Motor))
+        layout_breaker.addWidget(self._create_group_breakers(MTM2.PowerType.Motor))
         layout_breaker.addWidget(self._button_reset_breakers_motor)
-        layout_breaker.addWidget(self._create_group_breakers(PowerType.Communication))
+        layout_breaker.addWidget(
+            self._create_group_breakers(MTM2.PowerType.Communication)
+        )
         layout_breaker.addWidget(self._button_reset_breakers_communication)
 
         layout.addLayout(layout_breaker)
@@ -306,12 +308,12 @@ class TabUtilityView(TabDefault):
 
         return create_group_box("Elevation Angle", layout)
 
-    def _create_group_breakers(self, power_type: PowerType) -> QGroupBox:
+    def _create_group_breakers(self, power_type: MTM2.PowerType) -> QGroupBox:
         """Create the group of breakers.
 
         Parameters
         ----------
-        power_type : enum `lsst.ts.m2com.PowerType`
+        power_type : enum `MTM2.PowerType`
             Power type.
 
         Returns

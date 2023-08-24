@@ -24,7 +24,7 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2com import PowerType
+from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2gui import DisplacementSensorDirection, Model, TemperatureGroup
 from lsst.ts.m2gui.controltab import TabUtilityView
 from PySide2.QtCore import Qt
@@ -75,7 +75,7 @@ async def test_callback_reset_breakers(widget_async: TabUtilityView) -> None:
     name = "J3-W14-2"
     widget_async.model.utility_monitor.update_breaker(name, True)
 
-    await widget_async._callback_reset_breakers(PowerType.Communication)
+    await widget_async._callback_reset_breakers(MTM2.PowerType.Communication)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(8)
@@ -87,7 +87,7 @@ async def test_callback_reset_breakers(widget_async: TabUtilityView) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_power_motor(qtbot: QtBot, widget: TabUtilityView) -> None:
-    widget.model.utility_monitor.update_power_calibrated(PowerType.Motor, 0.1, 0.2)
+    widget.model.utility_monitor.update_power_calibrated(MTM2.PowerType.Motor, 0.1, 0.2)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -101,7 +101,7 @@ async def test_callback_power_communication(
     qtbot: QtBot, widget: TabUtilityView
 ) -> None:
     widget.model.utility_monitor.update_power_calibrated(
-        PowerType.Communication, 0.1, 0.2
+        MTM2.PowerType.Communication, 0.1, 0.2
     )
 
     # Sleep so the event loop can access CPU to handle the signal

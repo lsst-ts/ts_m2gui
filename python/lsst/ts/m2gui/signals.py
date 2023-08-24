@@ -207,7 +207,7 @@ class SignalIlcStatus(QtCore.QObject):
 
     # Address and mode as a tuple: (address, mode). The data type of address is
     # integer and the data type of mode is interger
-    # (enum `lsst.ts.m2com.InnerLoopControlMode`).
+    # (enum `MTM2.InnerLoopControlMode` in ts_idl).
     address_mode = QtCore.Signal(object)
 
 

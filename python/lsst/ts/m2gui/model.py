@@ -40,7 +40,6 @@ from lsst.ts.m2com import (
     NUM_TANGENT_LINK,
     OUTLIER_INCLINOMETER_RAW,
     ActuatorDisplacementUnit,
-    ClosedLoopControlMode,
     CommandActuator,
     CommandScript,
     ControllerCell,
@@ -49,7 +48,6 @@ from lsst.ts.m2com import (
     DigitalOutputStatus,
     LimitSwitchType,
     MockErrorCode,
-    PowerType,
     check_limit_switches,
     get_config_dir,
 )
@@ -567,12 +565,12 @@ class Model(object):
                 "Failed to command the actuator. Only allow in Enabled state and closed-loop control."
             )
 
-    async def reset_breakers(self, power_type: PowerType) -> None:
+    async def reset_breakers(self, power_type: MTM2.PowerType) -> None:
         """Reset the breakers.
 
         Parameters
         ----------
-        power_type : enum `lsst.ts.m2com.PowerType`
+        power_type : enum `MTM2.PowerType`
             Power type.
         """
 
@@ -1143,20 +1141,24 @@ class Model(object):
 
             elif name == "powerStatus":
                 self.utility_monitor.update_power_calibrated(
-                    PowerType.Motor, message["motorVoltage"], message["motorCurrent"]
+                    MTM2.PowerType.Motor,
+                    message["motorVoltage"],
+                    message["motorCurrent"],
                 )
                 self.utility_monitor.update_power_calibrated(
-                    PowerType.Communication,
+                    MTM2.PowerType.Communication,
                     message["commVoltage"],
                     message["commCurrent"],
                 )
 
             elif name == "powerStatusRaw":
                 self.utility_monitor.update_power_raw(
-                    PowerType.Motor, message["motorVoltage"], message["motorCurrent"]
+                    MTM2.PowerType.Motor,
+                    message["motorVoltage"],
+                    message["motorCurrent"],
                 )
                 self.utility_monitor.update_power_raw(
-                    PowerType.Communication,
+                    MTM2.PowerType.Communication,
                     message["commVoltage"],
                     message["commCurrent"],
                 )
@@ -1277,12 +1279,16 @@ class Model(object):
         # I don't understand why I need to put the CLC mode to be Idle twice.
         # This is translated from the ts_mtm2 and I need this to make the M2
         # cRIO simulator to work.
-        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+        await self.controller.set_closed_loop_control_mode(
+            MTM2.ClosedLoopControlMode.Idle
+        )
 
         await self.controller.load_configuration()
         await self.controller.set_control_parameters()
 
-        await self.controller.set_closed_loop_control_mode(ClosedLoopControlMode.Idle)
+        await self.controller.set_closed_loop_control_mode(
+            MTM2.ClosedLoopControlMode.Idle
+        )
         await self.controller.reset_force_offsets()
         await self.controller.reset_actuator_steps()
 
@@ -1320,8 +1326,8 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
             )
 
-        await self.controller.power(PowerType.Communication, True)
-        await self.controller.power(PowerType.Motor, True)
+        await self.controller.power(MTM2.PowerType.Communication, True)
+        await self.controller.power(MTM2.PowerType.Motor, True)
 
         if not self.controller.are_ilc_modes_enabled():
             try:
@@ -1334,7 +1340,7 @@ class Model(object):
                 raise
 
         await self.controller.set_closed_loop_control_mode(
-            ClosedLoopControlMode.OpenLoop, timeout=30.0
+            MTM2.ClosedLoopControlMode.OpenLoop, timeout=30.0
         )
 
         self.local_mode = LocalMode.Enable
@@ -1367,10 +1373,10 @@ class Model(object):
             await self.controller.reset_force_offsets()
             await self.controller.reset_actuator_steps()
             await self.controller.set_closed_loop_control_mode(
-                ClosedLoopControlMode.TelemetryOnly, timeout=30.0
+                MTM2.ClosedLoopControlMode.TelemetryOnly, timeout=30.0
             )
 
-            await self.controller.power(PowerType.Motor, False)
+            await self.controller.power(MTM2.PowerType.Motor, False)
 
         except Exception:
             self.log.exception(
@@ -1391,9 +1397,9 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
             )
 
-        await self.controller.power(PowerType.Communication, False)
+        await self.controller.power(MTM2.PowerType.Communication, False)
         await self.controller.set_closed_loop_control_mode(
-            ClosedLoopControlMode.Idle, timeout=20.0
+            MTM2.ClosedLoopControlMode.Idle, timeout=20.0
         )
 
         self.controller.set_ilc_modes_to_unknown()
