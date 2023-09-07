@@ -43,7 +43,7 @@ class FaultManager(object):
         Signal to report the updated status of limit switch.
     summary_faults_status : `int`
         Summary faults status in the cell controller.
-    errors : `set [int]`
+    errors : `set` [`int`]
         Errors in the controller.
     limit_switch_status_retract : `dict`
         Retract limit switch status. The key is the name of limit switch. The

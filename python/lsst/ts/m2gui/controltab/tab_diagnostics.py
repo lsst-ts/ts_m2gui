@@ -179,7 +179,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        indicators_status : `list [PySide2.QtWidgets.QPushButton]`
+        indicators_status : `list` [`PySide2.QtWidgets.QPushButton`]
             Indicators of the digital status.
         """
 
@@ -287,7 +287,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        controls : `list [PySide2.QtWidgets.QPushButton]`
+        controls : `list` [`PySide2.QtWidgets.QPushButton`]
             List of the controls of digital status.
         """
 
@@ -722,7 +722,7 @@ class TabDiagnostics(TabDefault):
 
         Parameters
         ----------
-        indicators : `list [PySide2.QtWidgets.QPushButton]`
+        indicators : `list` [`PySide2.QtWidgets.QPushButton`]
             Indicators of the digital status.
         digital_status : `int`
             Digital status. Each bit means different status. 1 means OK or

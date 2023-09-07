@@ -49,7 +49,7 @@ class FigureConstant(QtCharts.QChartView):
         Title of the y axis.
     title_figure : `str`
         Title of the figure.
-    legends : `list [str]`
+    legends : `list` [`str`]
         Legends. The number of elements should be the same as num_lines,
         otherwise, there will be the IndexError. Put [] if you do not want to
         show the legends.
@@ -161,7 +161,7 @@ class FigureConstant(QtCharts.QChartView):
             Maximum of the range of x-axis.
         num_lines : `int`
             Number of the lines.
-        text_legends : `list [str]`
+        text_legends : `list` [`str`]
             Text of the legends. The number of elements should be the same as
             num_lines, otherwise, there will be the IndexError. Put [] if you
             do not want to show the legend.
@@ -199,7 +199,7 @@ class FigureConstant(QtCharts.QChartView):
 
         Returns
         -------
-        `list [PySide2.QtCore.QPointF]`
+        `list` [`PySide2.QtCore.QPointF`]
             Points.
         """
         return self.get_series(idx).points()
@@ -392,7 +392,7 @@ class FigureConstant(QtCharts.QChartView):
 
         Parameters
         ----------
-        points : `list [PySide2.QtCore.QPointF]`
+        points : `list` [`PySide2.QtCore.QPointF`]
             Points.
         value : `float`
             New coming data.

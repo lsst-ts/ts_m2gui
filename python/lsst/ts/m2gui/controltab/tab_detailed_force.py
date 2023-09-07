@@ -105,7 +105,7 @@ class TabDetailedForce(TabDefault):
         Returns
         -------
         items_force : `dict`
-            Items of the force. The value is the `list` of
+            Items of the force. The value is the list of
             `PySide2.QtWidgets.QTableWidgetItem`.
         """
 

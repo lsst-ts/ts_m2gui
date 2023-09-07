@@ -332,7 +332,7 @@ class UtilityMonitor(object):
 
         Returns
         -------
-        `list [str]`
+        `list` [`str`]
             List of the sensors.
         """
 
@@ -355,7 +355,7 @@ class UtilityMonitor(object):
 
         Returns
         -------
-        `list [str]`
+        `list` [`str`]
             List of the sensors.
         """
 
@@ -567,7 +567,7 @@ class UtilityMonitor(object):
 
         Returns
         -------
-        `list [str]`
+        `list` [`str`]
             List of the breakers.
         """
 
@@ -602,7 +602,7 @@ class UtilityMonitor(object):
         ----------
         temperature_group : enum `TemperatureGroup`
             Temperature group.
-        new_temperatures : `list [float]`
+        new_temperatures : `list` [`float`]
             New temperatures in degree. The order should begin from sensor 1 to
             sensor n defined in the specific temperature group.
         """
@@ -630,9 +630,9 @@ class UtilityMonitor(object):
 
         Parameters
         ----------
-        sensors : `list [str]`
+        sensors : `list` [`str`]
             List of the sensor names.
-        new_values : `list [float]`
+        new_values : `list` [`float`]
             List of the new values. The size should be the same as the
             "sensors".
         num_digit_after_decimal : `int`
@@ -687,7 +687,7 @@ class UtilityMonitor(object):
         ----------
         direction : enum `DisplacementSensorDirection`
             Direction of the displacement sensors.
-        new_displacements : `list [float]`
+        new_displacements : `list` [`float`]
             New displacements in millimeter. The order should begin from sensor
             1 to sensor n defined in the specific direction.
         """
