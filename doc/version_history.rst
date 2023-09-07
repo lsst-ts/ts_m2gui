@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.5:
+
+-------------
+0.6.5
+-------------
+
+* Improve the user manual and add the section of error handing.
+* Fix the format of code.
+
 .. _lsst.ts.m2gui-0.6.4:
 
 -------------
@@ -121,8 +130,7 @@ Version History
 0.4.3
 -------------
 
-* Rename the "isInterlockOn" with "isInterlockEnabled" to be consistent with the controller.
-The indicator's color should be green instead of red when the status is on.
+* Rename the "isInterlockOn" with "isInterlockEnabled" to be consistent with the controller. The indicator's color should be green instead of red when the status is on.
 * Simplify the ``UtilityMonitor.update_forces()`` to remove the check of force change.
 * Update the ``Model.connect()`` to actively clear the error if any when the connection is constructed.
 * Update the ``UtilityMonitor.update_position()`` to publish the position by IMS.
@@ -282,9 +290,7 @@ The indicator's color should be green instead of red when the status is on.
 -------------
 
 * Support the specific command, event, and telemetry for the EUI only.
-* Add the option to disable the logging file for the file permission issue of CentOS host with the docker container.
-In addition, the latest developer docker image has the problem to use the PySide2 with CentOS host as root user.
-Report the bug in DM-36459.
+* Add the option to disable the logging file for the file permission issue of CentOS host with the docker container. In addition, the latest developer docker image has the problem to use the PySide2 with CentOS host as root user. Report the bug in DM-36459.
 
 .. _lsst.ts.m2gui-0.2.2:
 
