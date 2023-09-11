@@ -339,13 +339,13 @@ class Model(object):
             )
 
     def report_config(self, **kwargs: dict[str, typing.Any]) -> Config:
-        """Report the configuration defined in `Config` class.
+        """Report the configuration defined in Config class.
 
         Parameters
         ----------
         **kwargs : `dict`
             Configuration key-value pairs. The available keys are defined in
-            `Config` class.
+            Config class.
 
         Returns
         -------
@@ -495,7 +495,7 @@ class Model(object):
         ----------
         command : enum `lsst.ts.m2com.CommandActuator`
             Actuator command.
-        actuators : `list [int]` or None, optional
+        actuators : `list` [`int]` or None, optional
             Selected actuators to do the movement. If the empty list [] is
             passed, the function will raise the RuntimeError. (the default is
             None)
@@ -857,7 +857,7 @@ class Model(object):
 
         Parameters
         ----------
-        message : `dict` or `None`
+        message : `dict` or None
             Message.
 
         Returns

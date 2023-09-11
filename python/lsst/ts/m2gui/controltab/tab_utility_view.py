@@ -337,7 +337,7 @@ class TabUtilityView(TabDefault):
 
         Parameters
         ----------
-        temperature_groups : `list [TemperatureGroup]`
+        temperature_groups : `list` [`TemperatureGroup`]
             List of the temperature groups.
         group_title : `str`
             Group title.

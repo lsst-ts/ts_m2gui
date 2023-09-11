@@ -33,7 +33,7 @@ class ViewMirror(QGraphicsView):
 
     Attributes
     ----------
-    actuators : `list [ItemActuator]`
+    actuators : `list` [`ItemActuator`]
         Items of the actuator.
     mirror_radius : `float` or `int`
         Radius of the mirror in meter.

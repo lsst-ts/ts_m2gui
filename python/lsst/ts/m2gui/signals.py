@@ -76,9 +76,9 @@ class SignalLimitSwitch(QtCore.QObject):
     """Status signal to send the event of limit switch status."""
 
     # The type_name_status should be a tuple: (type, name, status). The data
-    # type of "type" is integer (enum `lsst.ts.m2com.LimitSwitchType`), the
+    # type of "type" is integer (enum lsst.ts.m2com.LimitSwitchType), the
     # data type of "name" is string, and the data type of "status" is integer (
-    # enum `Status`).
+    # enum Status).
     type_name_status = QtCore.Signal(object)
 
 
@@ -102,7 +102,7 @@ class SignalConfig(QtCore.QObject):
     # List of configuration files: ["file_1", "file_2", ...].
     files = QtCore.Signal(object)
 
-    # Instance of `Config` class.
+    # Instance of Config class.
     config = QtCore.Signal(object)
 
     # Temperature offset used in the look-up table calculation.
@@ -141,14 +141,14 @@ class SignalUtility(QtCore.QObject):
 
     # The temperatures should be a tuple:
     # (temperature_group, [temperture_1, temperture_2, ...]). The data type of
-    # "temperature_group" is the enum: `TemperatureGroup`. The data type of the
+    # "temperature_group" is the enum: TemperatureGroup. The data type of the
     # temperature in "[temperture_1, temperture_2, ...]" is float. The unit is
     # degree C. This list should have all the temperatures in the group.
     temperatures = QtCore.Signal(object)
 
     # The displacements should be a tuple:
     # (sensor_direction, [displacement_1, displacement_2, ...]). The data type
-    # of "sensor_direction" is the enum: `DisplacementSensorDirection`. The
+    # of "sensor_direction" is the enum: DisplacementSensorDirection. The
     # data type of displacement in "[displacement_1, displacement_2, ...]" is
     # float. The unit is mm. This list should have all the displacements in the
     # direction.
@@ -170,14 +170,14 @@ class SignalDetailedForce(QtCore.QObject):
     # the axial actuators and the last three are the tangential actuators.
     hard_points = QtCore.Signal(object)
 
-    # Instance of the `ActuatorForceAxial` class.
+    # Instance of the ActuatorForceAxial class.
     forces_axial = QtCore.Signal(object)
 
-    # Instance of the `ActuatorForceTangent` class.
+    # Instance of the ActuatorForceTangent class.
     forces_tangent = QtCore.Signal(object)
 
     # Tangential force error to monitor the supporting force of tangential
-    # link. Instance of `ForceErrorTangent` class.
+    # link. Instance of ForceErrorTangent class.
     force_error_tangent = QtCore.Signal(object)
 
 
@@ -207,7 +207,7 @@ class SignalIlcStatus(QtCore.QObject):
 
     # Address and mode as a tuple: (address, mode). The data type of address is
     # integer and the data type of mode is interger
-    # (enum `MTM2.InnerLoopControlMode` in ts_idl).
+    # (enum MTM2.InnerLoopControlMode in ts_idl).
     address_mode = QtCore.Signal(object)
 
 

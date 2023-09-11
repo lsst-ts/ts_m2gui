@@ -30,7 +30,7 @@ The badges above navigate to the GitHub repository for the GUI code and Jira iss
 Configuring the M2 GUI
 ======================
 
-The M2 GUI configuration is `here <https://github.com/lsst-ts/ts_m2gui/blob/develop/policy/default.yaml>`_.
+The M2 GUI configuration is `here <https://github.com/lsst-ts/ts_config_mttcs/blob/develop/MTM2/v2/default_gui.yaml>`_.
 The yaml file is used and read when the application runs.
 You can also use the setting table in GUI to update the values.
 See the :ref:`user guide <User_Documentation>` for the details.
@@ -44,6 +44,17 @@ Observatory operators and other interested parties should consult the user guide
 
 .. toctree::
     user-guide/user-guide
+    :maxdepth: 1
+
+.. _Error_Handling:
+
+Error Handling
+==============
+
+The possible error of M2 and the related handling to recover the system are recorded here.
+
+.. toctree::
+    error-handling/error-handling
     :maxdepth: 1
 
 .. _Development_Documentation:
