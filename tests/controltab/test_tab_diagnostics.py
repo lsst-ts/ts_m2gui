@@ -24,9 +24,9 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2gui import ForceErrorTangent, Model
 from lsst.ts.m2gui.controltab import TabDiagnostics
+from lsst.ts.xml.enums import MTM2
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette
 from PySide2.QtWidgets import QPushButton

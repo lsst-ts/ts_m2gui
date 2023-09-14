@@ -27,8 +27,8 @@ from copy import deepcopy
 
 import numpy as np
 import numpy.typing
-from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import DigitalInput
+from lsst.ts.xml.enums import MTM2
 from PySide2.QtCore import Signal
 
 from .actuator_force_axial import ActuatorForceAxial

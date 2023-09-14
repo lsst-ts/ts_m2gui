@@ -23,13 +23,13 @@ __all__ = ["TabIlcStatus"]
 
 from pathlib import Path
 
-from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_INNER_LOOP_CONTROLLER,
     NUM_TANGENT_LINK,
     read_yaml_file,
 )
+from lsst.ts.xml.enums import MTM2
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette
 from PySide2.QtWidgets import QGroupBox, QLabel, QPushButton, QVBoxLayout

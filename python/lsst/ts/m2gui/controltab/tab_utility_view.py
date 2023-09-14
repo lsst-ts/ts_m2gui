@@ -21,7 +21,7 @@
 
 __all__ = ["TabUtilityView"]
 
-from lsst.ts.idl.enums import MTM2
+from lsst.ts.xml.enums import MTM2
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from PySide2.QtWidgets import (
