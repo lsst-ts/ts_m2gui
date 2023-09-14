@@ -5,7 +5,7 @@
 ## Platform
 
 - CentOS 7
-- python: 3.10.5
+- python: 3.11.5
 
 ## Needed Package
 

@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.6:
+
+-------------
+0.6.6
+-------------
+
+* Remove the legacy code.
+* Use the enums in **ts_xml** instead of **ts_idl**.
+
 .. _lsst.ts.m2gui-0.6.5:
 
 -------------
