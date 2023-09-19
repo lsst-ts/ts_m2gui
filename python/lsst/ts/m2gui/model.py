@@ -27,7 +27,6 @@ import types
 import typing
 
 import numpy as np
-from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2com import (
     DEFAULT_ENABLED_FAULTS_MASK,
     LIMIT_FORCE_AXIAL_CLOSED_LOOP,
@@ -51,6 +50,7 @@ from lsst.ts.m2com import (
     check_limit_switches,
     get_config_dir,
 )
+from lsst.ts.xml.enums import MTM2
 
 from .config import Config
 from .enums import (
@@ -309,7 +309,7 @@ class Model(object):
         self.fault_manager.reset_limit_switch_status(LimitSwitchType.Retract)
         self.fault_manager.reset_limit_switch_status(LimitSwitchType.Extend)
 
-        await self.controller.clear_errors(bypass_state_checking=True)
+        await self.controller.clear_errors()
 
         self._check_error_and_update_status()
 

@@ -64,7 +64,7 @@ def test_set_model(widget: MainWindow) -> None:
     assert model_local_host.controller.host == "127.0.0.1"
 
     model_crio_simulator = widget._set_model(False, True)
-    assert model_crio_simulator.controller.host == "m2-crio-simulator.ls.lsst.org"
+    assert model_crio_simulator.controller.host == "m2-crio-controller02.cp.lsst.org"
 
     with pytest.raises(ValueError):
         widget._set_model(True, True)

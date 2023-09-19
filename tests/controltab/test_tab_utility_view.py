@@ -24,9 +24,9 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts.idl.enums import MTM2
 from lsst.ts.m2gui import DisplacementSensorDirection, Model, TemperatureGroup
 from lsst.ts.m2gui.controltab import TabUtilityView
+from lsst.ts.xml.enums import MTM2
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPalette
 from pytestqt.qtbot import QtBot
