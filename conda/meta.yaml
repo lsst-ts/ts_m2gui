@@ -16,9 +16,9 @@ build:
   entry_points:
     - run_m2gui = lsst.ts.m2gui.application:run_application
 
-# The 'pytest' always aborts itself on MacOS or Jenkins. Maybe the coexistence
-# of PySide2 and PySide5 has the problem when running the tests. Comment this
-# test section at this moment.
+# The 'pytest' aborts itself on Jenkins. The container of Jenkins conda builder
+# does not have the QT related libraries. Comment this test section until the
+# DM-41091 is done.
 
 # test:
 #   requires:
@@ -28,10 +28,12 @@ build:
 #     - {{ cdt('libxdamage') }}  # [linux]
 #     - {{ cdt('libxxf86vm') }}  # [linux]
 #     - {{ cdt('libxext') }}     # [linux]
+#     - {{ cdt('xorg-x11-server-Xvfb')}}  # [linux]
 #     - ts-conda-build =0.3
 #     - ts-xml
 #     - ts-idl {{ idl_version }}
 #     - pytest-qt
+#     - pytest-xvfb
 #     - ts-tcpip
 #     - ts-m2com
 #   source_files:
@@ -41,6 +43,7 @@ build:
 #     - setup.cfg
 #     - pyproject.toml
 #   commands:
+#     - export TS_CONFIG_MTTCS_DIR=/opt/lsst/tssw/ts_config_mttcs
 #     - pytest
 
 requirements:

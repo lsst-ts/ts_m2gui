@@ -143,3 +143,5 @@ log/
 
 # Core files
 core.*
+.clang-format
+.ruff.toml
