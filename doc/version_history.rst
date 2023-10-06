@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.7:
+
+-------------
+0.6.7
+-------------
+
+* Fix the ``test`` section of ``meta.yaml``.
+* Update the ``.ts_pre_commit_config.yaml``.
+
 .. _lsst.ts.m2gui-0.6.6:
 
 -------------

@@ -20,28 +20,31 @@ build:
 # of PySide2 and PySide5 has the problem when running the tests. Comment this
 # test section at this moment.
 
-# test:
-#   requires:
-#     - {{ cdt('mesa-libgl-devel') }}  # [linux]
-#     - {{ cdt('mesa-dri-drivers') }}  # [linux]
-#     - {{ cdt('libselinux') }}  # [linux]
-#     - {{ cdt('libxdamage') }}  # [linux]
-#     - {{ cdt('libxxf86vm') }}  # [linux]
-#     - {{ cdt('libxext') }}     # [linux]
-#     - ts-conda-build =0.3
-#     - ts-xml
-#     - ts-idl {{ idl_version }}
-#     - pytest-qt
-#     - ts-tcpip
-#     - ts-m2com
-#   source_files:
-#     - python
-#     - bin
-#     - tests
-#     - setup.cfg
-#     - pyproject.toml
-#   commands:
-#     - pytest
+test:
+  requires:
+    - {{ cdt('mesa-libgl-devel') }}  # [linux]
+    - {{ cdt('mesa-dri-drivers') }}  # [linux]
+    - {{ cdt('libselinux') }}  # [linux]
+    - {{ cdt('libxdamage') }}  # [linux]
+    - {{ cdt('libxxf86vm') }}  # [linux]
+    - {{ cdt('libxext') }}     # [linux]
+    - {{ cdt('xorg-x11-server-Xvfb')}}  # [linux]
+    - ts-conda-build =0.3
+    - ts-xml
+    - ts-idl {{ idl_version }}
+    - pytest-qt
+    - pytest-xvfb
+    - ts-tcpip
+    - ts-m2com
+  source_files:
+    - python
+    - bin
+    - tests
+    - setup.cfg
+    - pyproject.toml
+  commands:
+    - export TS_CONFIG_MTTCS_DIR=/opt/lsst/tssw/ts_config_mttcs
+    - pytest
 
 requirements:
   host:

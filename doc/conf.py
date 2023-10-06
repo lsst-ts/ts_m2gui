@@ -7,8 +7,8 @@ https://developer.lsst.io/stack/building-single-package-docs.html
 
 from os import getenv
 
-import lsst.ts.m2gui
-from documenteer.conf.pipelinespkg import *
+import lsst.ts.m2gui  # type: ignore # noqa
+from documenteer.conf.pipelinespkg import *  # type: ignore # noqa
 
 project = "ts_m2gui"
 html_theme_options["logotext"] = project  # type: ignore # noqa
