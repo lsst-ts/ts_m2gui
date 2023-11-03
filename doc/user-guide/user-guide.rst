@@ -5,8 +5,13 @@ User Guide
 ################
 
 This graphical user interface (GUI) is a Qt-based application to control the actuators, observe sensor telemetry, show the configurable parameter settings of the M2 cell control system, reset faults, and diagnose issues observed during the operation.
-This GUI is supposed to be used by the hardware engineers or operators to have a more detailed control of hardware compared with the automatic or remote mode: `ts_m2 <https://ts-m2.lsst.io/>`_.
+This GUI is supposed to be used by the hardware engineers or operators to have a more detailed control of hardware compared with the automatic or remote mode (a.k.a. commandable SAL component, CSC): `ts_m2 <https://ts-m2.lsst.io/>`_.
 Functionality of the GUI will be discussed in detail to provide the reader a comprehensive source for understanding the operation of GUI.
+
+It is noted that before the `DM_37422 <https://jira.lsstcorp.org/browse/DM-37422>`_ is fixed, you can only have the GUI or CSC connects to the M2 cell control system in a single time.
+Otherwise, you would get the TCP/IP connection error.
+In addition, there might be the inconsistency of internal data if you had used the deprecated M2 LabVIEW GUI to control the M2 already.
+To fix the issue of internal error, the easierst way is to restart the cell control system (see :ref:`lsst.ts.m2gui-error_restart_control_system`).
 
 .. _Operation:
 
@@ -86,12 +91,27 @@ Local Mode
 You can control the M2 directly from the local mode (click the **Local** button after the connection with the controller is on).
 If the system is under the remote control originally, this action will take over the control, and the M2 cell controller listens to the command from GUI only.
 
+Before the state transition, you need to connect to the M2 cell first.
+Then, you should check the **Enabled Faults Mask** value should not be 0.
+See the :ref:`lsst.ts.m2gui-user_alarm_warn` for the details.
+If it is 0, you will need to restart the application (see :ref:`lsst.ts.m2gui-error_restart_control_system`) to reset the internal data.
+
 You can transition the system into the **Diagonostic** state to check the system status without energizing the actuators.
-If everything looks good, you can transition the system into the **Enabled** state to command the M2 hardware with the open-loop or closed-loop control.
+By default, the **Diagonostic** state does not have the powers of communication and motor.
+It would be good that you can check the interlock first before transitioning to the **Enabled** state.
 
 Based on the circuit configuration, the interlock might be released after the motor power is on or the motor power could not be turned on because the interlock signal is still there.
 You can use the **Diagnostics** table to toggle the motor/communication power to check the circuit of interlock at that time if you could not enable the system successfully.
 See the :ref:`lsst.ts.m2gui-user_diagnostics` for more details.
+
+If everything looks good, you can transition the system into the **Enabled** state to command the M2 hardware with the open-loop or closed-loop control (do not forget to turn off the motor and communication power first if this will be the first time to transition to the **Enabled** state).
+If the interlock is on, you would not be able to transition to the **Enabled** state.
+Sometimes, you may need the global interlock system (GIS) to reset the interlock signal of M2.
+This can be done by pushing the **RESET** blue button of the **M2 ACTUATOR** tab on the GIS cabinet at the level 2.
+
+It is recommanded to check the ILC status as well while transitioning to the **Enabled** state (see :ref:`lsst.ts.m2gui-user_ilc_status`).
+If there are only a few ILCs could not be enabled, you could try to increase the retry times in :ref:`lsst.ts.m2gui-user_settings`.
+But if there are many, you may need to restart the application (see :ref:`lsst.ts.m2gui-error_restart_control_system`) or power-cycle the entire system.
 
 If the system is under the closed-loop control, the LUT correction and force balance system are applied to compensate the affection from the temperature fluctuation and gravity.
 
@@ -362,6 +382,7 @@ Do not do this unless you know what you are doing.
 You can click the **Reset Enabled Faults Mask** button to remove all the bypassed error codes.
 
 The **Reset All Items** button resets all faults and if the fault condition has been removed, the fault will clear and the red highlighted row(s) will be removed.
+You can always try to reset all errors to remove the out-of-date signals.
 
 In some cases, you may want to use the button of **Enable Open-Loop Max Limits** to allow an increased force range to move some specific actuators back to safer positions.
 This can only be done under the open-loop control, and it will be reset back a smaller force range after the system transitions to the closed-loop control.

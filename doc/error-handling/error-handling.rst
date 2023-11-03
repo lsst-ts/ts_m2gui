@@ -111,6 +111,7 @@ Troubleshooting
 ================
 
 When the error happens, you can check the **Troubleshooting Next Steps** in the following table to fix the issue (based on **T14900-0124**).
+Sometimes, the alarms/warnings on GUI might be out-of-date, and you can try to reset them first (see :ref:`lsst.ts.m2gui-user_alarm_warn`) before the further action.
 
 .. list-table:: Troubleshooting
    :widths: 10 40 70 120
@@ -139,7 +140,7 @@ When the error happens, you can check the **Troubleshooting Next Steps** in the 
    * - 6055
      - Excessive force detected
      - Measured force exceeded programmable threshold.
-     - Reference the `constant.py <https://github.com/lsst-ts/ts_m2com/blob/develop/python/lsst/ts/m2com/constant.py>`_ to determine the force limits for the state when the excessive force was detected. Look at the :ref:`lsst.ts.m2gui-user_actuator_control` or :ref:`lsst.ts.m2gui-user_detailed_force` to determine the actuator(s) which violated the force limits. In **Local** mode, drive the actuator(s) away from the force limit. If the excessive force was originally detected in open-loop, click the **Enable Open-Loop Max Limits** button to provide force relief to unload the actuators. If for some reason it is determined that the load cell has been compromised and needs to be replaced, reference **T14900-3024** Axial Actuator Replacemement.
+     - Reference the `constant.py <https://github.com/lsst-ts/ts_m2com/blob/develop/python/lsst/ts/m2com/constant.py>`_ to determine the force limits for the state when the excessive force was detected. Look at the :ref:`lsst.ts.m2gui-user_actuator_control` or :ref:`lsst.ts.m2gui-user_detailed_force` to determine the actuator(s) which violated the force limits. In **Local** mode, drive the actuator(s) away from the force limit. If the excessive force was originally detected in open-loop, click the **Enable Open-Loop Max Limits** button to provide force relief to unload the actuators. If for some reason it is determined that the load cell has been compromised and needs to be replaced, reference **T14900-3024** Axial Actuator Replacemement. If this error is triggered from the rigid body movement, see the :ref:`lsst.ts.m2gui-recover_system_from_rigid_body_movement`.
    * - 6056
      - Actuator limit switch triggered [closed-loop]
      - An actuator responded with a closed limit switch in any direction.
@@ -251,7 +252,7 @@ When the error happens, you can check the **Troubleshooting Next Steps** in the 
    * - 6088
      - Tangent load cell fault
      - Tangent load cell calculations violate any of the monitoring conditions.
-     - Possible causes: tangent actuator ILC, tangent actuator load cell, tangent actuator ILC wiring, bad inclination signal. If it is determined that a tangent actuator is to be replaced, reference **T14900-3025** Tangent Actuator Replacement. If an ILC needs to be replaced, reference **T14900-1002** ILC Programming Document. Check the :ref:`lsst.ts.m2gui-error_code_6051_6088` as well.
+     - Possible causes: tangent actuator ILC, tangent actuator load cell, tangent actuator ILC wiring, bad inclination signal. If it is determined that a tangent actuator is to be replaced, reference **T14900-3025** Tangent Actuator Replacement. If an ILC needs to be replaced, reference **T14900-1002** ILC Programming Document. Check the :ref:`lsst.ts.m2gui-error_code_6051_6088` as well. If this error is triggered from the rigid body movement, see the :ref:`lsst.ts.m2gui-recover_system_from_rigid_body_movement`.
 
 .. _lsst.ts.m2gui-error_special_cases:
 
@@ -320,3 +321,24 @@ If the error was **Excessive Comm Current (code 6066)**, this means the telemetr
 If one actuator was failing, it would imply the overcurrent would be seen on only one cable.
 Therefore, if you test one cable (or zone) at one time, you should be able to identify which group of actuators might have the power issue.
 But if the error kept the same for all 3 zones, it would imply a failure in every one of 3 zones, which was highly unlikely to be the case, and you might need to check something else that might result in these errors.
+
+.. _lsst.ts.m2gui-recover_system_from_rigid_body_movement:
+
+Recover the System from the Rigid Body Movement
+-----------------------------------------------
+
+The available range of rigid body momement is restricted to the assembly and it would induce the error codes: 6055 and 6088 if the movement is big.
+Actually, in the normal telescope survey, the M2 should stay at the origin with the minimum stress.
+However, in some cases, we would need to adjust the mirror's position and this might trigger the error to transition the system to leave the closed-loop control to protect the mirror.
+
+If the error code is 6055, you can check the :ref:`lsst.ts.m2gui-user_detailed_force` to see which actuator has the force higher than the threshold of closed-loop control.
+Usually, the axial actuator is related to the z-direction and the tangent link is related to the x- and y-direction.
+Once the actuator is identified, you can move it in steps to have the force lower than the threshold of closed-loop control, and then, put the system into the closed-loop control to recover the system.
+It is noted that the single actuator movement will increase the stress of the system.
+Therefore, the actuator's force should not differ from the threshold too much before transitioning to the closed-loop control.
+Otherwise, the system might be damaged from the high stress (see the :ref:`lsst.ts.m2gui-user_diagnostics` for the 4 fault conditions of tangent load cell).
+
+If the error code is 6088, it might be easier to bypass this error code first, and move the system back to the origin directly to minimize the moment in the movement.
+See :ref:`lsst.ts.m2gui-user_alarm_warn` for the details.
+But the action to bypass the error code might break the system totally.
+Therefore, it would be better to check with the maintainers first before bypassing the error code.
