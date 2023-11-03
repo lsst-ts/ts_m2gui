@@ -336,7 +336,7 @@ Usually, the axial actuator is related to the z-direction and the tangent link i
 Once the actuator is identified, you can move it in steps to have the force lower than the threshold of closed-loop control, and then, put the system into the closed-loop control to recover the system.
 It is noted that the single actuator movement will increase the stress of the system.
 Therefore, the actuator's force should not differ from the threshold too much before transitioning to the closed-loop control.
-Otherwise, the system might be damaged from the high stress.
+Otherwise, the system might be damaged from the high stress (see the :ref:`lsst.ts.m2gui-user_diagnostics` for the 4 fault conditions of tangent load cell).
 
 If the error code is 6088, it might be easier to bypass this error code first, and move the system back to the origin directly to minimize the moment in the movement.
 See :ref:`lsst.ts.m2gui-user_alarm_warn` for the details.

@@ -107,6 +107,7 @@ See the :ref:`lsst.ts.m2gui-user_diagnostics` for more details.
 If everything looks good, you can transition the system into the **Enabled** state to command the M2 hardware with the open-loop or closed-loop control (do not forget to turn off the motor and communication power first if this will be the first time to transition to the **Enabled** state).
 If the interlock is on, you would not be able to transition to the **Enabled** state.
 Sometimes, you may need the global interlock system (GIS) to reset the interlock signal of M2.
+This can be done by pushing the **RESET** blue button of the **M2 ACTUATOR** tab on the GIS cabinet at the level 2.
 
 It is recommanded to check the ILC status as well while transitioning to the **Enabled** state (see :ref:`lsst.ts.m2gui-user_ilc_status`).
 If there are only a few ILCs could not be enabled, you could try to increase the retry times in :ref:`lsst.ts.m2gui-user_settings`.
