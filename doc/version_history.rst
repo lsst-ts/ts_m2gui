@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.8:
+
+-------------
+0.6.8
+-------------
+
+* Improve the documents.
+
 .. _lsst.ts.m2gui-0.6.7:
 
 -------------
