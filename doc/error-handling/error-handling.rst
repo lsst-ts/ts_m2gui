@@ -384,4 +384,6 @@ To reset the M2 interlock signal, if the M2 is on the TMA, you might need to pus
 
   Reset the M2 GIS.
 
+After having pressed the **RESET** button, wait 2 minutes before restoring the system with the M2 Python GUI.
+
 Otherwise, if the M2 is on the level 3, usually, press and release the e-stop button would be enough.
