@@ -124,11 +124,11 @@ Sometimes, the alarms/warnings on GUI might be out-of-date, and you can try to r
    * - 6051
      - Actuator inner-loop controller (ILC) read error
      - ILC responded with an exception code, did not respond at all (timeout), did not receive command, or reported fault status.
-     - Most likely an ILC that is not responsive/failed. Look at the telemetry data to see which ILC address does not show a correct broadcast counter that increments by 16 every time step. That will narrow down the ILC to troubleshoot. If an ILC needs to be replaced, reference **T14900-1002** ILC Programming Document to reprogram and configure the software properly. Check the :ref:`lsst.ts.m2gui-error_code_6051_6088` as well.
+     - Most likely an ILC that is not responsive/failed. Look at the telemetry data to see which ILC address does not show a correct broadcast counter that increments by 16 every time step. That will narrow down the ILC to troubleshoot. If an ILC needs to be replaced, reference **T14900-1002** ILC Programming Document to reprogram and configure the software properly. Check the :ref:`lsst.ts.m2gui-error_code_6051_6088` and :ref:`lsst.ts.m2gui-error_code_6051_6052` as well.
    * - 6052
      - Monitoring ILC read error
      - ILC responded with an exception code or did not respond at all (timeout).
-     - The current firmware of the sensor ILCs generate this warning 4.5% of all samples. Updating to new firmware on the sensor ILCs should remedy this warning. For reference, updating firmware on the ILCs is described in **T14900-1002** ILC Programming Document.
+     - The current firmware of the sensor ILCs generate this warning 4.5% of all samples. Updating to new firmware on the sensor ILCs should remedy this warning. For reference, updating firmware on the ILCs is described in **T14900-1002** ILC Programming Document. Check the :ref:`lsst.ts.m2gui-error_code_6051_6052` as well.
    * - 6053
      - cRIO communication error
      - Loss of communication between the cRIO and M2 controller.
@@ -287,8 +287,8 @@ Code 6051 and 6088
 
 These two error codes might not be real and you could try the followings first:
 
-1. Restart the control system.
-2. Power-cycle the whole M2 system.
+1. Restart the control system (see :ref:`lsst.ts.m2gui-error_restart_control_system`).
+2. Power-cycle the whole M2 system (see :ref:`lsst.ts.m2gui-error_power_cycle`).
 
 In addition, they might happen when you have the inconsistent elevation angle and look-up table (LUT) calculation.
 For example, if the following actions are executed:
@@ -300,6 +300,17 @@ For example, if the following actions are executed:
 Most likely, when you try to transition to the **Enabled** state or closed-loop control, you will get the error codes of 6051 or 6088 immediately.
 When this happens, you just need to move the M2 back to the original elevation angle (20 degree in this example), and you should be able to enable the system again.
 If you forget the original elevation angle, you may need to check the engineering facility database (EFD), try-and-error, or calculate the possible elevation angle based on the measured forces at that moment.
+
+.. _lsst.ts.m2gui-error_code_6051_6052:
+
+Code 6051 and 6052
+-------------------
+
+These two error codes might not be real and you could try the followings first:
+
+1. Power-cycle the M2 system by following :ref:`lsst.ts.m2gui-error_power_cycle`.
+2. Make sure the control system is running by following :ref:`lsst.ts.m2gui-error_restart_control_system` and :ref:`lsst.ts.m2gui-error_log_file`.
+3. Release the interlock signal by following :ref:`lsst.ts.m2gui-error_reset_m2_interlock_signal`.
 
 .. _lsst.ts.m2gui-error_code_6065_6066:
 
@@ -325,7 +336,7 @@ But if the error kept the same for all 3 zones, it would imply a failure in ever
 .. _lsst.ts.m2gui-recover_system_from_rigid_body_movement:
 
 Recover the System from the Rigid Body Movement
------------------------------------------------
+===============================================
 
 The available range of rigid body momement is restricted to the assembly and it would induce the error codes: 6055 and 6088 if the movement is big.
 Actually, in the normal telescope survey, the M2 should stay at the origin with the minimum stress.
@@ -342,3 +353,35 @@ If the error code is 6088, it might be easier to bypass this error code first, a
 See :ref:`lsst.ts.m2gui-user_alarm_warn` for the details.
 But the action to bypass the error code might break the system totally.
 Therefore, it would be better to check with the maintainers first before bypassing the error code.
+
+.. _lsst.ts.m2gui-error_power_cycle:
+
+Power-Cycle
+===========
+
+If the M2 is on the TMA, you might need to use the internet interface of general power distribution unit (PDU) to power-cycle it.
+Before the power-cycle, you should check with the hardware or system engineers first.
+The internet interface of PDU is `tea_pdu <https://tea-pdu01.cp.lsst.org/>`_ and the related credential is in `1Passoword MainTel Vault <https://lsstit.1password.com/signin>`_.
+You can only reach this interface when you are under the control network, and the VPN can not reach it directly.
+You can power off followed by powering on the M2 cabinet (wait >30 seconds in between) in the following widget:
+
+.. figure:: ../screenshot/pdu_m2.png
+  :width: 550
+
+  Power-cycle the M2 on the general PDU.
+
+Otherwise, if the M2 is on the level 3, it should be straigt-forward to unplug and replug the power cable (wait >30 seconds in between).
+
+.. _lsst.ts.m2gui-error_reset_m2_interlock_signal:
+
+Reset the M2 Interlock Signal
+=============================
+
+To reset the M2 interlock signal, if the M2 is on the TMA, you might need to push the **RESET** blue button of the **M2 ACTUATOR** tab on the global interlock system (GIS) cabinet at the level 2 as the following:
+
+.. figure:: ../screenshot/gis_reset.jpg
+  :width: 250
+
+  Reset the M2 GIS.
+
+Otherwise, if the M2 is on the level 3, usually, press and release the e-stop button would be enough.

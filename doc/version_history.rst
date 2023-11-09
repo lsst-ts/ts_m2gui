@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.9:
+
+-------------
+0.6.9
+-------------
+
+* Improve the documents to power cycle the system and release the interlock.
+
 .. _lsst.ts.m2gui-0.6.8:
 
 -------------
