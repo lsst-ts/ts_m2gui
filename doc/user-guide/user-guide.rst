@@ -6,6 +6,7 @@ User Guide
 
 This graphical user interface (GUI) is a Qt-based application to control the actuators, observe sensor telemetry, show the configurable parameter settings of the M2 cell control system, reset faults, and diagnose issues observed during the operation.
 This GUI is supposed to be used by the hardware engineers or operators to have a more detailed control of hardware compared with the automatic or remote mode (a.k.a. commandable SAL component, CSC): `ts_m2 <https://ts-m2.lsst.io/>`_.
+If the GUI can not put the system into the closed-loop control, the M2 CSC will not be able to as well because they are using the same interface to the control system.
 Functionality of the GUI will be discussed in detail to provide the reader a comprehensive source for understanding the operation of GUI.
 
 It is noted that before the `DM_37422 <https://jira.lsstcorp.org/browse/DM-37422>`_ is fixed, you can only have the GUI or CSC connects to the M2 cell control system in a single time.
@@ -107,7 +108,7 @@ See the :ref:`lsst.ts.m2gui-user_diagnostics` for more details.
 If everything looks good, you can transition the system into the **Enabled** state to command the M2 hardware with the open-loop or closed-loop control (do not forget to turn off the motor and communication power first if this will be the first time to transition to the **Enabled** state).
 If the interlock is on, you would not be able to transition to the **Enabled** state.
 Sometimes, you may need the global interlock system (GIS) to reset the interlock signal of M2.
-This can be done by pushing the **RESET** blue button of the **M2 ACTUATOR** tab on the GIS cabinet at the level 2.
+See :ref:`lsst.ts.m2gui-error_reset_m2_interlock_signal`.
 
 It is recommanded to check the ILC status as well while transitioning to the **Enabled** state (see :ref:`lsst.ts.m2gui-user_ilc_status`).
 If there are only a few ILCs could not be enabled, you could try to increase the retry times in :ref:`lsst.ts.m2gui-user_settings`.
