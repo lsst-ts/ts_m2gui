@@ -124,7 +124,7 @@ async def test_switch_force_balance_system(
     )
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
 
     assert widget_async.model.is_closed_loop is True
     assert widget_async.layout_control_mode._button_open_loop.isEnabled() is True
