@@ -124,7 +124,7 @@ Sometimes, the alarms/warnings on GUI might be out-of-date, and you can try to r
    * - 6051
      - Actuator inner-loop controller (ILC) read error
      - ILC responded with an exception code, did not respond at all (timeout), did not receive command, or reported fault status.
-     - Most likely an ILC that is not responsive/failed. Look at the telemetry data to see which ILC address does not show a correct broadcast counter that increments by 16 every time step. That will narrow down the ILC to troubleshoot. If an ILC needs to be replaced, reference **T14900-1002** ILC Programming Document to reprogram and configure the software properly. Check the :ref:`lsst.ts.m2gui-error_code_6051_6088` and :ref:`lsst.ts.m2gui-error_code_6051_6052` as well.
+     - Usually, this can be fixed by :ref:`lsst.ts.m2gui-error_code_6051_6088` or :ref:`lsst.ts.m2gui-error_code_6051_6052`. Otherwise, most likely an ILC that is not responsive/failed. Look at the telemetry data to see which ILC address does not show a correct broadcast counter that increments by 16 every time step. That will narrow down the ILC to troubleshoot. If an ILC needs to be replaced, reference **T14900-1002** ILC Programming Document to reprogram and configure the software properly.
    * - 6052
      - Monitoring ILC read error
      - ILC responded with an exception code or did not respond at all (timeout).
@@ -371,6 +371,9 @@ You can power off followed by powering on the M2 cabinet (wait >30 seconds in be
   Power-cycle the M2 on the general PDU.
 
 Otherwise, if the M2 is on the level 3, it should be straigt-forward to unplug and replug the power cable (wait >30 seconds in between).
+
+After rebooting the M2, you need to wait for 5 minutes or more before the connection request.
+If you do not want to wait long, you can follow the :ref:`lsst.ts.m2gui-error_restart_control_system` to make sure the control system is running and waiting for the TCP/IP connection.
 
 .. _lsst.ts.m2gui-error_reset_m2_interlock_signal:
 
