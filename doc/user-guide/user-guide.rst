@@ -31,6 +31,7 @@ By default, there will be a log file created under the ``/rubin/mtm2/log`` or ``
 You can assign the `logging level <https://docs.python.org/3/library/logging.html#logging-levels>`_ from the command line or use the GUI (see :ref:`lsst.ts.m2gui-user_settings`).
 
 The operation of GUI is explained below.
+For each action (or click the button), you need to wait for some time to let the GUI finish the related command with the control system in the timeout period.
 
 .. _lsst.ts.m2gui-user_main_panel:
 
@@ -75,7 +76,7 @@ You can do the following things:
 
 #. Parameters to set and get the inner-loop controller (ILC) state. Sometimes, you may need to tune these if the internet traffic is jamed.
 
-#. General settings of application. You can use the different `logging level <https://docs.python.org/3/library/logging.html#logging-levels>`_ to support the debugging if needed. The log file will be in the ``/rubin/mtm2/log`` directory. If it does not exist in file system, the log file will be in the ``$HOME`` directory.
+#. General settings of application. You can use the different `logging level <https://docs.python.org/3/library/logging.html#logging-levels>`_ to support the debugging if needed. The log file will be in the ``/rubin/mtm2/log`` directory. If it does not exist in file system, the log file will be in the ``$HOME`` directory. If the logging level is **DEBUG**, you will see the statistical telemetry rate (should be ~20 messages/sec at **Disabled** state and ~100 messages/sec at **Enabled** state), received event and command acknowledgement/status, ILC data (only meaningful if the ILC is in the Enabled state), and more.
 
 After the modification of settings, you can click the related **Apply** button to use the new values.
 
@@ -109,6 +110,14 @@ If everything looks good, you can transition the system into the **Enabled** sta
 If the interlock is on, you would not be able to transition to the **Enabled** state.
 Sometimes, you may need the global interlock system (GIS) to reset the interlock signal of M2.
 See :ref:`lsst.ts.m2gui-error_reset_m2_interlock_signal`.
+
+If you see a prompt window as the following to say the closed-loop control mode can not be **OpenLoop** in the timeout, there should be something wrong now in the system.
+You can see the :ref:`lsst.ts.m2gui-user_overview`, :ref:`lsst.ts.m2gui-user_diagnostics`, :ref:`lsst.ts.m2gui-user_alarm_warn`, and others to see the possible reason to fix the issue.
+
+.. figure:: ../screenshot/enable_failed.png
+  :width: 350
+
+  Enable failed
 
 It is recommanded to check the ILC status as well while transitioning to the **Enabled** state (see :ref:`lsst.ts.m2gui-user_ilc_status`).
 If there are only a few ILCs could not be enabled, you could try to increase the retry times in :ref:`lsst.ts.m2gui-user_settings`.
