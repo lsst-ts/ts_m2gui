@@ -349,10 +349,20 @@ It is noted that the single actuator movement will increase the stress of the sy
 Therefore, the actuator's force should not differ from the threshold too much before transitioning to the closed-loop control.
 Otherwise, the system might be damaged from the high stress (see the :ref:`lsst.ts.m2gui-user_diagnostics` for the 4 fault conditions of tangent load cell).
 
-If the error code is 6088, it might be easier to bypass this error code first, and move the system back to the origin directly to minimize the moment in the movement.
-See :ref:`lsst.ts.m2gui-user_alarm_warn` for the details.
-But the action to bypass the error code might break the system totally.
-Therefore, it would be better to check with the maintainers first before bypassing the error code.
+If the error code is 6088, it might be easier to bypass this error code and move the related tangent link to decrease the tangent force error.
+First, you need restart the application to clear the internal history (see :ref:`lsst.ts.m2gui-error_restart_control_system`).
+Second, bypass the error codes at :ref:`lsst.ts.m2gui-user_alarm_warn`.
+Move the tangent link under the open-loop control to let the tangent force error to be less than the thresholds.
+Then, transition to the closed-loop control if possible.
+Finally, reset the enabled faults mask to the default value to protect the system.
+
+But sometimes, it might be difficult to calculate the needed actuator movement.
+Therefore, you could change the following threshold of tangent force error in ``/u/config/parameter.json`` in controller: **tangentLink_totalWeightError**, **tangentLink_loadBearingLink**, **tangentLink_thetaZmoment**, or **tangentLink_nonLoadBearingLink** (to log in the controller, see :ref:`lsst.ts.m2gui-error_restart_control_system`).
+Restart the control system to read the updated configuration file, and transition the system to the closed-loop control to minimize the stress.
+Finally, change the thresholds to the original ones and restart the applicaiton to use the default values.
+
+But the action to bypass the error code or change the thresholds might break the system totally.
+Therefore, it would be better to check with the maintainers first before the above actions.
 
 .. _lsst.ts.m2gui-error_power_cycle:
 
