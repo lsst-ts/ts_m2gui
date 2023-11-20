@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.6.10:
+
+-------------
+0.6.10
+-------------
+
+* Improve the document of error handling.
+
 .. _lsst.ts.m2gui-0.6.9:
 
 -------------
