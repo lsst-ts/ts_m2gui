@@ -47,7 +47,7 @@ def widget(qtbot: QtBot) -> MockWidget:
 
 
 def test_init(qtbot: QtBot, widget: MockWidget) -> None:
-    assert widget.layout_control_tabs._list_widget.count() == 11
+    assert widget.layout_control_tabs._list_widget.count() == 12
 
 
 def test_get_tab(qtbot: QtBot, widget: MockWidget) -> None:
@@ -99,6 +99,7 @@ async def test_show(qtbot: QtBot, widget: MockWidget) -> None:
         "Alarms/Warnings",
         "ILC Status",
         "Net Force/Moment",
+        "Hardpoints",
     ]
 
     for name in names:
