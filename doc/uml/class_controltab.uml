@@ -13,4 +13,5 @@ TabDefault <|-- TabIlcStatus
 TabDefault <|-- TabNetForceMoment
 TabDefault <|-- TabRealtimeNetForceMoment
 TabDefault <|-- TabLimitSwitchStatus
+TabDefault <|-- TabHardpointSelection
 @enduml

@@ -52,7 +52,7 @@ LayoutDefault --> SignalControl : connect()
 LogWindowHandler *-- SignalMessage : emit()
 
 ControlTabs ..> Model
-ControlTabs "1" *-- "9" TabDefault
+ControlTabs "1" *-- "12" TabDefault
 
 TabDefault *-- Model
 @enduml

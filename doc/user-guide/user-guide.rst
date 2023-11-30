@@ -469,3 +469,28 @@ Net Force/Moment in Real-Time
 This table shows the net force and moment in real-time.
 The first row is the forces in x, y, and z directions.
 The second row is the moments in x, y, and z directions.
+
+For the TMA azimuth movement, you should expect to see the moments are smooth with intermittent peaks to reflect the acceleration/deceleration of TMA.
+For the TMA elevation movement, you should see the change of force-y,z and moment-x to reflect the supportors of M2 (peaks reflect the TMA's acceleration/deceleration as well).
+When the TMA is on the zenith/horizon, the supportors of M2 are the axial/tangent actuators.
+If the TMA is on the horizon, the M2 has the maximum moment-x to be around ~1250-1300 N.
+This means if you see the moment-x has the value higher than this in any case, something should be wrong.
+If you see any unexpected behaviors of moments, something should be wrong as well.
+
+.. _lsst.ts.m2gui-user_hardpoint_selection:
+
+Hardpoint Selection
+-------------------
+
+.. figure:: ../screenshot/hardpoint_selection.png
+  :width: 550
+
+  Select the hardpoints.
+
+You can use this table to select the hardpoints in the **Diagnostic** state.
+If there is any actuator is in fault, it should be assigned to be the hardpoint to support the survey until the day crew can have a further investigation.
+There are some geometry requirements for the hardpoints, and you can use the **Suggest Hardpoints** button to get the suggestion.
+At least one axial and one tangent actuators should be selected before doing the suggestion.
+Use the **Apply Hardpoints** button to apply the new hardpoints.
+Once it succeeds, you should see the related update in :ref:`lsst.ts.m2gui-user_detailed_force`.
+You can use the **Reset Default** button to get the default hardpoints as well.

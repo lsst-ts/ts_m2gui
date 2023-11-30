@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.0:
+
+-------------
+0.7.0
+-------------
+
+* Add the **tab_hardpoint_selection.py**.
+
 .. _lsst.ts.m2gui-0.6.10:
 
 -------------

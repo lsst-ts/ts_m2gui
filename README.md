@@ -4,8 +4,8 @@
 
 ## Platform
 
-- CentOS 7
-- python: 3.11.5
+- AlmaLinux 8.9
+- python: 3.11.6
 
 ## Needed Package
 
@@ -15,10 +15,10 @@
 - qt5-qtbase-devel (install by `yum`)
 - xorg-x11-server-Xvfb (optional, install by `yum`)
 - qasync (install by `conda -c conda-forge`)
-- [black](https://github.com/psf/black) (23.1.0, optional)
-- [flake8](https://github.com/PyCQA/flake8) (4.0.1, optional)
-- [isort](https://github.com/PyCQA/isort) (5.12.0, optional)
-- [mypy](https://github.com/python/mypy) (1.0.0, optional)
+- [black](https://github.com/psf/black) (optional)
+- [flake8](https://github.com/PyCQA/flake8) (optional)
+- [isort](https://github.com/PyCQA/isort) (optional)
+- [mypy](https://github.com/python/mypy) (optional)
 - [documenteer](https://github.com/lsst-sqre/documenteer) (optional)
 - pytest (optional, install by `conda`)
 - pytest-flake8 (optional, install by `conda -c conda-forge`)
@@ -45,7 +45,7 @@ export QT_API="PySide2"
 export PYTEST_QT_API="PySide2"
 ```
 
-### CentOS 7
+### AlmaLinux
 
 Forward GUI by:
 

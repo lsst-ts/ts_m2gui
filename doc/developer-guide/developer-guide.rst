@@ -158,6 +158,7 @@ m2gui.controltab
 * **TabNetForceMoment** shows the net force and moment of total actuators and force balance system status.
 * **TabRealtimeNetForceMoment** shows the realtime data of net force and moment of total actuators and force balance system status.
 * **TabLimitSwitchStatus** shows the limit switch status.
+* **TabHardpointSelection** can select the hardpoints.
 
 The class diagrams for each table child class are listed below to give you the idea of class relationship.
 
@@ -256,6 +257,14 @@ m2gui.controltab.TabNetForceMoment
 
 .. uml:: ../uml/controltab/class_tab_net_force_moment.uml
     :caption: Class diagram of TabNetForceMoment class
+
+.. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_hardpoint_selection:
+
+m2gui.controltab.TabHardpointSelection
+--------------------------------------
+
+.. uml:: ../uml/controltab/class_tab_hardpoint_selection.uml
+    :caption: Class diagram of TabHardpointSelection class
 
 .. _API:
 
