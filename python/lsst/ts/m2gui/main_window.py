@@ -269,6 +269,7 @@ class MainWindow(QMainWindow):
         self._set_tab_alarm_warn()
         self._set_tab_cell_status()
         self._set_tab_ilc_status()
+        self._set_tab_hardpoint_selection()
 
     def _set_tab_overview(self) -> None:
         """Set the table of overview."""
@@ -316,6 +317,18 @@ class MainWindow(QMainWindow):
         assert tab_ilc_status is not None
 
         tab_ilc_status.read_ilc_details_file(filepath)
+
+    def _set_tab_hardpoint_selection(self) -> None:
+        """Set the table of hardpoint selection."""
+
+        filepath = get_config_dir() / "harrisLUT" / "cell_geom.yaml"
+
+        tab_hardpoint_selection = self._control_tabs.get_tab("Hardpoints")[1]
+
+        # Workaround of the mypy checking
+        assert tab_hardpoint_selection is not None
+
+        tab_hardpoint_selection.read_cell_geometry_file(filepath)
 
     def _create_layout(self) -> QVBoxLayout:
         """Create the layout.

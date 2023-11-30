@@ -461,11 +461,6 @@ class TabCellStatus(TabDefault):
         ----------
         filepath : `str` or `pathlib.PosixPath`
             Filepath that contains the cell information.
-
-        Raises
-        ------
-        `IOError`
-            Cannot open the file.
         """
 
         # Read the yaml file
