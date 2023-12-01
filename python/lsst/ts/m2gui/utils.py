@@ -511,7 +511,7 @@ def get_checked_buttons(buttons: list[QPushButton]) -> list[int]:
 
     Returns
     -------
-    checked_buttons : `list`
+    `list`
         Indexes of the checked buttons.
     """
 
