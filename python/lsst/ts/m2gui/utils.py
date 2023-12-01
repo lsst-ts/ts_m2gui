@@ -35,6 +35,7 @@ __all__ = [
     "get_button_action",
     "read_ilc_status_from_log",
     "sum_ilc_lost_comm",
+    "get_checked_buttons",
 ]
 
 import ast
@@ -498,3 +499,20 @@ def sum_ilc_lost_comm(ilc_status: list[list[int]]) -> list[int]:
             ilc_lost_communication = ilc_lost_communication + lost_value
 
     return ilc_lost_communication.tolist()
+
+
+def get_checked_buttons(buttons: list[QPushButton]) -> list[int]:
+    """Get the checked buttons.
+
+    Parameters
+    ----------
+    buttons : `list`
+        Buttons.
+
+    Returns
+    -------
+    `list`
+        Indexes of the checked buttons.
+    """
+
+    return [idx for idx, button in enumerate(buttons) if button.isChecked()]

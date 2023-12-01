@@ -26,6 +26,7 @@ from .tab_config_view import *
 from .tab_default import *
 from .tab_detailed_force import *
 from .tab_diagnostics import *
+from .tab_hardpoint_selection import *
 from .tab_ilc_status import *
 from .tab_limit_switch_status import *
 from .tab_net_force_moment import *

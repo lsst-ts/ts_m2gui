@@ -469,3 +469,35 @@ Net Force/Moment in Real-Time
 This table shows the net force and moment in real-time.
 The first row is the forces in x, y, and z directions.
 The second row is the moments in x, y, and z directions.
+
+When the TMA moves in azimuth, expect to see smooth and almost constant mirror moments, interrupted by peaks caused by the TMA acceleration/deceleration.
+For the movement in elevation, y and z mirror forces shall change with cos/sin of the TMA elevation - maximum z force magnitude observed at the zenith, maximum y force magnitude at the horizon.
+
+The x moment shall reflect the supportors of mirror.
+If the TMA is at the zenith, the mirror is supported by axial actuators.
+When the TMA is at the horizon, tangent actuators are supporting the mirror mass (counteracting mirror gravity force).
+At the horizon, there is x moment caused by the mirror's tendency to flip.
+The maximum value of that moment shall be around 1250-1300 N*m.
+If the x-moment value is higher than the expected maximum, something is wrong with the mirror or its control system.
+Also, any unexpected moment change should be investigated.
+
+.. _lsst.ts.m2gui-user_hardpoint_selection:
+
+Hardpoint Selection
+-------------------
+
+.. figure:: ../screenshot/hardpoint_selection.png
+  :width: 550
+
+  Select the hardpoints.
+
+You can use this user interface to select the hardpoints actuators.
+The actuators can be selected only in the **Diagnostic** state.
+Faulted actuators can be selected as hardpoints and work as hardpoints, so the night survey can continue until the day crew can inspect and service them.
+Once you have marked a few actuators as hardpoints, you can click on the **Suggest Hardpoints** button to select the remaining hardpoints.
+This makes sure geometric requirements for hardpoint selection are met.
+
+At least one axial and one tangent actuator should be selected before clicking the **Suggest Hardpoints** button.
+Use the **Apply Selection** button to apply the hardpoints selection.
+Once the command succeeds, you should see the related update in :ref:`lsst.ts.m2gui-user_detailed_force`.
+The **Reset Default** button clears your selection and loads the default set.

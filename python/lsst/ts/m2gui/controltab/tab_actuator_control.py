@@ -45,6 +45,7 @@ from ..utils import (
     create_grid_layout_buttons,
     create_group_box,
     create_label,
+    get_checked_buttons,
     run_command,
     set_button,
 )
@@ -328,7 +329,7 @@ class TabActuatorControl(TabDefault):
             Displacement unit.
         """
 
-        actuators = self._get_selected_actuators()
+        actuators = get_checked_buttons(self._buttons_actuator_selection)
         target_displacement = self._target_displacement.value()
 
         # Index begins from 0 instead of 1 in QComboBox
@@ -345,22 +346,6 @@ class TabActuatorControl(TabDefault):
         )
 
         return actuators, target_displacement, displacement_unit
-
-    def _get_selected_actuators(self) -> list[int]:
-        """Get the selected actuators.
-
-        Returns
-        -------
-        actuators : `list`
-            Selected actuators.
-        """
-
-        actuators = list()
-        for idx, actuator_selection in enumerate(self._buttons_actuator_selection):
-            if actuator_selection.isChecked():
-                actuators.append(idx)
-
-        return actuators
 
     @asyncSlot()
     async def _callback_actuator_command(self, command: CommandActuator) -> None:
@@ -394,7 +379,7 @@ class TabActuatorControl(TabDefault):
         """Callback of the apply-force button in actuator control. This will
         apply the actuator forces to controller."""
 
-        actuators = self._get_selected_actuators()
+        actuators = get_checked_buttons(self._buttons_actuator_selection)
         force = self._applied_force.value()
         await run_command(self.model.apply_actuator_force, actuators, force)
 
