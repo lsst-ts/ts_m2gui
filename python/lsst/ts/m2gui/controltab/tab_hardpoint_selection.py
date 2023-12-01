@@ -80,7 +80,7 @@ class TabHardpointSelection(TabDefault):
                 tool_tip="Reset the default hardpoints",
             ),
             "apply": set_button(
-                "Apply Hardpoints",
+                "Apply Selection",
                 self._callback_apply_hardpoints,
                 tool_tip="Apply the selected hardpoints",
             ),
@@ -157,7 +157,7 @@ class TabHardpointSelection(TabDefault):
         # Only support in the simulation mode at this moment.
         # TODO: Remove this after the M2 cell LabVIEW code supports this.
         if not self.model._is_simulation_mode:
-            raise RuntimeError("Only support in the simulation mode.")
+            raise RuntimeError("Only supported in the simulation mode.")
 
         # Set the hardpoints
         await self.model.controller.set_hardpoint_list(hardpoints)
@@ -170,14 +170,14 @@ class TabHardpointSelection(TabDefault):
         await run_command(self._suggest_hardpoints)
 
     def _suggest_hardpoints(self) -> None:
-        """Suggest the hardpoints.
+        """Suggest the hardpoints. Requires at least one axial and one
+        tangential hardpoints are already selected.
 
         Raises
         ------
         `ValueError`
-            When there is no selected axial hardpoint.
-        `ValueError`
-            When there is no selected tangent hardpoint.
+            When there aren't at least one axial and one tangential actuators
+            already selected.
         """
 
         # Check the axial hardpoint

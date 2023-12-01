@@ -470,12 +470,16 @@ This table shows the net force and moment in real-time.
 The first row is the forces in x, y, and z directions.
 The second row is the moments in x, y, and z directions.
 
-For the TMA azimuth movement, you should expect to see the moments are smooth with intermittent peaks to reflect the acceleration/deceleration of TMA.
-For the TMA elevation movement, you should see the change of force-y,z and moment-x to reflect the supportors of M2 (peaks reflect the TMA's acceleration/deceleration as well).
-When the TMA is on the zenith/horizon, the supportors of M2 are the axial/tangent actuators.
-If the TMA is on the horizon, the M2 has the maximum moment-x to be around ~1250-1300 N.
-This means if you see the moment-x has the value higher than this in any case, something should be wrong.
-If you see any unexpected behaviors of moments, something should be wrong as well.
+When the TMA moves in azimuth, expect to see smooth and almost constant mirror moments, interrupted by peaks caused by the TMA acceleration/deceleration.
+For the movement in elevation, y and z mirror forces shall change with cos/sin of the TMA elevation - maximum z force magnitude observed at the zenith, maximum y force magnitude at the horizon.
+
+The x moment shall reflect the supportors of mirror.
+If the TMA is at the zenith, the mirror is supported by axial actuators.
+When the TMA is at the horizon, tangent actuators are supporting the mirror mass (counteracting mirror gravity force).
+At the horizon, there is x moment caused by the mirror's tendency to flip.
+The maximum value of that moment shall be around 1250-1300 N*m.
+If the x-moment value is higher than the expected maximum, something is wrong with the mirror or its control system.
+Also, any unexpected moment change should be investigated.
 
 .. _lsst.ts.m2gui-user_hardpoint_selection:
 
@@ -487,10 +491,13 @@ Hardpoint Selection
 
   Select the hardpoints.
 
-You can use this table to select the hardpoints in the **Diagnostic** state.
-If there is any actuator is in fault, it should be assigned to be the hardpoint to support the survey until the day crew can have a further investigation.
-There are some geometry requirements for the hardpoints, and you can use the **Suggest Hardpoints** button to get the suggestion.
-At least one axial and one tangent actuators should be selected before doing the suggestion.
-Use the **Apply Hardpoints** button to apply the new hardpoints.
-Once it succeeds, you should see the related update in :ref:`lsst.ts.m2gui-user_detailed_force`.
-You can use the **Reset Default** button to get the default hardpoints as well.
+You can use this user interface to select the hardpoints actuators.
+The actuators can be selected only in the **Diagnostic** state.
+Faulted actuators can be selected as hardpoints and work as hardpoints, so the night survey can continue until the day crew can inspect and service them.
+Once you have marked a few actuators as hardpoints, you can click on the **Suggest Hardpoints** button to select the remaining hardpoints.
+This makes sure geometric requirements for hardpoint selection are met.
+
+At least one axial and one tangent actuator should be selected before clicking the **Suggest Hardpoints** button.
+Use the **Apply Selection** button to apply the hardpoints selection.
+Once the command succeeds, you should see the related update in :ref:`lsst.ts.m2gui-user_detailed_force`.
+The **Reset Default** button clears your selection and loads the default set.

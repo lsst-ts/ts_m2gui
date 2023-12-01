@@ -515,9 +515,4 @@ def get_checked_buttons(buttons: list[QPushButton]) -> list[int]:
         Indexes of the checked buttons.
     """
 
-    checked_buttons = list()
-    for idx, button in enumerate(buttons):
-        if button.isChecked():
-            checked_buttons.append(idx)
-
-    return checked_buttons
+    return [idx for idx, button in enumerate(buttons) if button.isChecked()]
