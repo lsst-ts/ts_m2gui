@@ -94,6 +94,9 @@ You can control the M2 directly from the local mode (click the **Local** button 
 If the system is under the remote control originally, this action will take over the control, and the M2 cell controller listens to the command from GUI only.
 
 Before the state transition, you need to connect to the M2 cell first.
+If you lost the connection after you connected to the M2 cell, most likely, you lost the internet or someone power-cycled the M2 system but you did not notice that.
+To confirm the latter, you can try to log in the M2 cRIO (see :ref:`lsst.ts.m2gui-error_restart_control_system`) and check there is any new log file created or not (see :ref:`lsst.ts.m2gui-error_log_file`).
+
 Then, you should check the **Enabled Faults Mask** value should not be 0.
 See the :ref:`lsst.ts.m2gui-user_alarm_warn` for the details.
 If it is 0, you will need to restart the application (see :ref:`lsst.ts.m2gui-error_restart_control_system`) to reset the internal data.
@@ -110,6 +113,14 @@ If everything looks good, you can transition the system into the **Enabled** sta
 If the interlock is on, you would not be able to transition to the **Enabled** state.
 Sometimes, you may need the global interlock system (GIS) to reset the interlock signal of M2.
 See :ref:`lsst.ts.m2gui-error_reset_m2_interlock_signal`.
+If the GIS signal exists, you would not be able to power on the motor and you might have the following prompt window:
+
+.. figure:: ../screenshot/gis_block_motor_power.png
+  :width: 350
+
+  GIS blocks the motor power
+
+You can see :ref:`lsst.ts.m2gui-user_diagnostics` to know how to check the interlock signal manually.
 
 If you see a prompt window as the following to say the closed-loop control mode can not be **OpenLoop** in the timeout, there should be something wrong now in the system.
 You can see the :ref:`lsst.ts.m2gui-user_overview`, :ref:`lsst.ts.m2gui-user_diagnostics`, :ref:`lsst.ts.m2gui-user_alarm_warn`, and others to see the possible reason to fix the issue.
@@ -358,7 +369,9 @@ The groups of tangent weight error, tangent error, and tangent force error are u
 When the mouse is closed to the field in groups (for example, **Total Weight Error**), the threshold of each field will be shown.
 If any value is equal or higher than the threshold, the system will shutdown the motor power and transition to the **Diagnostic** state to protect the mirror.
 
-It is noted that only when the D2 (digital output) and D31 (digital input) indicators are green, the interlock is disengaged.
+It is noted that only when the D2 ("interlock enable" in digital output) and D31 ("interlock power relay on" in digital input) indicators are green when the digital output controls D0 (motor power) and D1 (communication power) are on, the interlock is disengaged.
+This implies that you could manually toggle on/off the D0 and D1 to check the interlock signal exists or not.
+If you do so, you always need to turn on the communication power first followed by the motor power, and turn off the motor power first followed by the communication power.
 
 The diagnostics table also contains a button to reboot the cell controller.
 
