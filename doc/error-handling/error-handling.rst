@@ -293,13 +293,6 @@ First check that two error codes might not be real and you could try the followi
 1. Restart the control system (see :ref:`lsst.ts.m2gui-error_restart_control_system`).
 2. Power-cycle the whole M2 system (see :ref:`lsst.ts.m2gui-error_power_cycle`).
 
-In addition, they might happen when you have the inconsistent elevation angle and look-up table (LUT) calculation.
-For example, if the following actions are executed:
-
-1. Put the system into the closed-loop control at 20 degree elevation angle.
-2. Turn off the force balance system by transition to the open-loop control, **Standby/Diagnostic** state, shutdown the system, or something similar.
-3. Move the M2 to another elevation angle such as 30 degree by the cart or telescope mount assembly (TMA).
-
 More likely, when you try to transition to the **Enabled** state or closed-loop control, you will get the error codes of 6051 or 6088 immediately.
 When this happens, you just need to move the M2/TMA back to the original elevation angle (when it was last in closed-loop), and you should be able to enable the system again.
 If you forget the original elevation angle, you may need to check the engineering facility database (EFD), try-and-error, or calculate the possible elevation angle based on the measured forces at that moment.
