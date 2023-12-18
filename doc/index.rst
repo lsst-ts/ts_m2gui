@@ -46,10 +46,10 @@ Observatory operators and other interested parties should consult the user guide
     user-guide/user-guide
     :maxdepth: 1
 
-.. _Error_Handling:
+.. _Error_Handling_Documentation:
 
-Error Handling
-==============
+Error Handling Documentation
+============================
 
 The possible error of M2 and the related handling to recover the system are recorded here.
 
