@@ -112,6 +112,7 @@ Troubleshooting
 
 When the error happens, you can check the **Troubleshooting Next Steps** in the following table to fix the issue (based on **T14900-0124**).
 Sometimes, the alarms/warnings on GUI might be out-of-date, and you can try to reset them first (see :ref:`lsst.ts.m2gui-user_alarm_warn`) before the further action.
+If you do not see the telemetry while connecting to the controller, you can try to restart the application (see the :ref:`lsst.ts.m2gui-error_restart_control_system`).
 
 .. list-table:: Troubleshooting
    :widths: 10 40 70 120

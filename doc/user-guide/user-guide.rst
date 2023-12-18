@@ -14,6 +14,12 @@ Otherwise, you would get the TCP/IP connection error.
 In addition, there might be the inconsistency of internal data if you had used the deprecated M2 LabVIEW GUI to control the M2 already.
 To fix the issue of internal error, the easierst way is to restart the cell control system (see :ref:`lsst.ts.m2gui-error_restart_control_system`).
 
+.. note::
+  This GUI is to replace the original LabVIEW GUI: `ts_mtm2 <https://github.com/lsst-ts/ts_mtm2>`_, and the related executable is ``runM2Cntlr``.
+  If the LabVIEW GUI was used to run the system with the opened- or closed-loop control, you may need to restart the control system (see the :ref:`lsst.ts.m2gui-error_restart_control_system`) before using the Python GUI or CSC to control the system.
+  This GUI will end the support once the `DM_37422 <https://jira.lsstcorp.org/browse/DM-37422>`_ is fixed.
+  At this moment, it only plays the role to show the system status when the CSC is controlling the system when needed as the debug purpose.
+
 .. _Operation:
 
 Operation
