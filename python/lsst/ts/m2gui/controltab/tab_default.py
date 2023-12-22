@@ -212,4 +212,4 @@ class TabDefault(QDockWidget):
     ) -> None:
         """This is an overridden function to support the asynchronous context
         manager."""
-        await self.model.controller.close_tasks()
+        await self.model.controller.close_controller_and_mock_server()

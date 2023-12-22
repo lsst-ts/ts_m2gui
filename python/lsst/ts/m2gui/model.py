@@ -89,9 +89,6 @@ class Model(object):
         Telemetry port to connect. (the default is 50011)
     timeout_connection : `float`, optional
         Connection timeout in second. (the default is 10.0)
-    timeout_in_second : `float`, optional
-        Time limit for reading data from the TCP/IP interface (sec). (the
-        default is 0.05)
     is_simulation_mode: `bool`, optional
         True if running in simulation mode. (the default is False)
 
@@ -142,7 +139,6 @@ class Model(object):
         port_command: int = 50010,
         port_telemetry: int = 50011,
         timeout_connection: float = 10.0,
-        timeout_in_second: float = 0.05,
         is_simulation_mode: bool = False,
     ) -> None:
         self.log = log
@@ -168,12 +164,16 @@ class Model(object):
 
         self.controller = ControllerCell(
             log=self.log,
-            timeout_in_second=timeout_in_second,
             is_csc=False,
             host=host,
             port_command=port_command,
             port_telemetry=port_telemetry,
             timeout_connection=timeout_connection,
+        )
+        self.controller.set_callback_process_event(self._process_event)
+        self.controller.set_callback_process_telemetry(self._process_telemetry)
+        self.controller.set_callback_process_lost_connection(
+            self._process_lost_connection
         )
 
         self._is_simulation_mode = is_simulation_mode
@@ -641,20 +641,6 @@ class Model(object):
         if self._is_simulation_mode:
             await self.controller.run_mock_server(get_config_dir(), "harrisLUT")
 
-        # Run the event and telemetry loops
-        if self.controller.run_loops is False:
-            self.controller.run_loops = True
-
-            self.log.debug(
-                "Starting event, telemetry and connection monitor loop tasks."
-            )
-
-            self.controller.start_task_event_loop(self._process_event)
-            self.controller.start_task_telemetry_loop(self._process_telemetry)
-            self.controller.start_task_connection_monitor_loop(
-                self._process_lost_connection
-            )
-
         await self.controller.connect_server()
 
         # Wait some time to process the welcome messages
@@ -963,7 +949,7 @@ class Model(object):
         ):
             await self.fault()
 
-    def _process_telemetry(self, message: dict | None = None) -> None:
+    async def _process_telemetry(self, message: dict | None = None) -> None:
         """Process the telemetry from the M2 controller.
 
         Parameters
@@ -1243,7 +1229,7 @@ class Model(object):
 
         return LIMIT_FORCE_AXIAL_OPEN_LOOP, LIMIT_FORCE_TANGENT_OPEN_LOOP
 
-    def _process_lost_connection(self) -> None:
+    async def _process_lost_connection(self) -> None:
         """Process the lost of connection from the M2 controller."""
 
         self.update_system_status("isCrioConnected", False)
@@ -1427,9 +1413,9 @@ class Model(object):
         else:
             self.log.info("No connection with the M2 controller.")
 
-        await self.controller.close_tasks()
+        await self.controller.close_controller_and_mock_server()
 
-        self._process_lost_connection()
+        await self._process_lost_connection()
 
     async def __aenter__(self) -> object:
         """This is an overridden function to support the asynchronous context
@@ -1444,4 +1430,4 @@ class Model(object):
     ) -> None:
         """This is an overridden function to support the asynchronous context
         manager."""
-        await self.controller.close_tasks()
+        await self.controller.close_controller_and_mock_server()

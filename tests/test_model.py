@@ -442,11 +442,12 @@ def test_get_message_name(model: Model) -> None:
     assert model._get_message_name({"id": "test"}) == "test"
 
 
-def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
+@pytest.mark.asyncio
+async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_position.position, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "position",
                 "x": 1,
@@ -461,7 +462,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_position.position_ims, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "positionIMS",
                 "x": 1,
@@ -478,7 +479,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_detailed_force.forces_axial, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "axialForce",
                 "lutGravity": [1] * num_axial,
@@ -493,7 +494,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_detailed_force.forces_tangent, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "tangentForce",
                 "lutGravity": [1] * NUM_TANGENT_LINK,
@@ -506,7 +507,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_utility.temperatures, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "temperature",
                 "intake": [1] * 2,
@@ -522,7 +523,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
         ],
         timeout=TIMEOUT,
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "zenithAngle",
                 "inclinometerRaw": 1,
@@ -533,14 +534,14 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_utility.inclinometer_tma, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "inclinometerAngleTma",
                 "inclinometer": 1,
             }
         )
 
-    model._process_telemetry(
+    await model._process_telemetry(
         message={
             "id": "axialEncoderPositions",
             "position": [10000] * num_axial,
@@ -548,7 +549,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     )
     assert model.utility_monitor.forces_axial.position_in_mm == [10] * num_axial
 
-    model._process_telemetry(
+    await model._process_telemetry(
         message={
             "id": "tangentEncoderPositions",
             "position": [10000] * NUM_TANGENT_LINK,
@@ -562,7 +563,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
         model.utility_monitor.signal_utility.displacements, timeout=TIMEOUT
     ):
         num_sensor = 6
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "displacementSensors",
                 "thetaZ": [1] * num_sensor,
@@ -578,7 +579,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
         timeout=TIMEOUT,
     ):
         num_sensor = 6
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "powerStatus",
                 "motorVoltage": 1,
@@ -596,7 +597,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
         timeout=TIMEOUT,
     ):
         num_sensor = 6
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "powerStatusRaw",
                 "motorVoltage": 1,
@@ -609,7 +610,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_detailed_force.force_error_tangent, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "forceErrorTangent",
                 "force": [1] * NUM_TANGENT_LINK,
@@ -621,7 +622,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_net_force_moment.net_force_total, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "netForcesTotal",
                 "fx": 1.1,
@@ -633,7 +634,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_net_force_moment.net_moment_total, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "netMomentsTotal",
                 "mx": 1.1,
@@ -645,7 +646,7 @@ def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(
         model.utility_monitor.signal_net_force_moment.force_balance, timeout=TIMEOUT
     ):
-        model._process_telemetry(
+        await model._process_telemetry(
             message={
                 "id": "forceBalance",
                 "fx": 1.1,
@@ -700,11 +701,12 @@ def test_get_current_force_limits(model: Model) -> None:
     assert limit_force_tangent == LIMIT_FORCE_TANGENT_CLOSED_LOOP
 
 
-def test_process_lost_connection(model: Model) -> None:
+@pytest.mark.asyncio
+async def test_process_lost_connection(model: Model) -> None:
     model.system_status["isCrioConnected"] = True
     model.system_status["isTelemetryActive"] = True
 
-    model._process_lost_connection()
+    await model._process_lost_connection()
 
     assert model.system_status["isCrioConnected"] is False
     assert model.system_status["isTelemetryActive"] is False

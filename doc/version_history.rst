@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.1:
+
+-------------
+0.7.1
+-------------
+
+* Adapt the update in **ts_m2com**.
+
 .. _lsst.ts.m2gui-0.7.0:
 
 -------------
