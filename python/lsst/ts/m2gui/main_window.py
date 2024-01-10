@@ -400,8 +400,7 @@ class MainWindow(QMainWindow):
                 # Closes the running asynchronous tasks before quitting the
                 # application. This makes sure the asynchronous tasks aren't
                 # running without a connection.
-                if self.model.controller.run_loops:
-                    await self.model.controller.close_tasks()
+                await self.model.controller.close_controller_and_mock_server()
 
                 QApplication.instance().quit()
 
