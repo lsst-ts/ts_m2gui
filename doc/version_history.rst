@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.2:
+
+-------------
+0.7.2
+-------------
+
+* Add the ``recover-system-night.rst``.
+
 .. _lsst.ts.m2gui-0.7.1:
 
 -------------

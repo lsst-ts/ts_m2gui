@@ -57,6 +57,10 @@ The possible error of M2 and the related handling to recover the system are reco
     error-handling/error-handling
     :maxdepth: 1
 
+.. toctree::
+    error-handling/recover-system-night
+    :maxdepth: 1
+
 .. _Development_Documentation:
 
 Development Documentation
