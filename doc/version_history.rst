@@ -13,6 +13,7 @@ Version History
 -------------
 
 * Add the ``recover-system-night.rst``.
+* Improve the document.
 
 .. _lsst.ts.m2gui-0.7.1:
 
