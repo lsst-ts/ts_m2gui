@@ -26,6 +26,6 @@ To recover the sytem, do the followings:
 
 4. Use the M2 Python graphical user interface (GUI) to put the system into the closed-loop control. See :ref:`lsst.ts.m2gui-user_local_mode` for the details. You might need to click the button of **Reset All Items** multiple times if there is the error in this process (see :ref:`lsst.ts.m2gui-user_alarm_warn`). If the system can not transition to the closed-loop control after some trying, you will need the help from maintainers.
 
-5. Transition the system back to the **Stanby** state and exit the GUI.
+5. Transition the system back to the open-loop control, **Diagnostic** state, and the **Standby** state in the final. Disconnect from the cell controller and exit the GUI.
 
-6. Use the M2 CSC to transition the system to the **Enabled** state. See the related log message if needed. Sometimes, you may need to set the logging level to be **DEBUG** in this process (see the `logging levels <https://docs.python.org/3/library/logging.html#logging-levels>`_).
+6. Use the M2 CSC to transition the system to the **Enabled** state. If you use the **LOVE**, you may need to wait a little bit when transitioning the **Disabled** state to the **Enabled** state. See the related log message if needed. Sometimes, you may need to set the logging level to be **DEBUG** in this process (see the `logging levels <https://docs.python.org/3/library/logging.html#logging-levels>`_).
