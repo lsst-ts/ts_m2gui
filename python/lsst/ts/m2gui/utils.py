@@ -347,6 +347,61 @@ def map_actuator_id_to_alias(actuator_id: int) -> tuple[Ring, int]:
     raise ValueError(f"Unknown actuator ID ({actuator_id}) encountered.")
 
 
+async def __prompt_dialog(
+    title: str, description: str, icon: int, is_prompted: bool = True
+) -> None:
+    """Shows a warning dialog.
+
+    The user must react to this dialog. The rest of the GUI is blocked until
+    the dialog is dismissed.
+
+    Parameters
+    ----------
+    title : `str`
+        Title of the dialog.
+    description : `str`
+        Description message to be shown in the dialog.
+    icon : `int`
+        QMessageBox icon id (Warning, Critical ,.) to be shown with the
+        message.
+    is_prompted : `bool`, optional
+        When False, dialog will not be executed. That is used for tests, which
+        shall not be the case when used in the real GUI. (the default is True)
+    """
+
+    dialog = QMessageBoxAsync()
+    dialog.setIcon(icon)
+    dialog.setWindowTitle(title)
+    dialog.setText(description)
+
+    # Block the user to interact with other running widgets
+    dialog.setModal(True)
+
+    if is_prompted:
+        await dialog.show()
+
+
+async def prompt_dialog_critical(
+    title: str, description: str, is_prompted: bool = True
+) -> None:
+    """Shows a critical/error dialog.
+
+    The user must react to this dialog. The rest of the GUI is blocked until
+    the dialog is dismissed.
+
+    Parameters
+    ----------
+    title : `str`
+        Title of the dialog.
+    description : `str`
+        Description message to be shown in the dialog.
+    is_prompted : `bool`, optional
+        When False, dialog will not be executed. That is used for tests, which
+        shall not be the case when used in the real GUI. (the default is True)
+    """
+    await __prompt_dialog(title, description, QMessageBoxAsync.Critical, is_prompted)
+
+
 async def prompt_dialog_warning(
     title: str, description: str, is_prompted: bool = True
 ) -> None:
@@ -365,17 +420,7 @@ async def prompt_dialog_warning(
         When False, dialog will not be executed. That is used for tests, which
         shall not be the case when used in the real GUI. (the default is True)
     """
-
-    dialog = QMessageBoxAsync()
-    dialog.setIcon(QMessageBoxAsync.Warning)
-    dialog.setWindowTitle(title)
-    dialog.setText(description)
-
-    # Block the user to interact with other running widgets
-    dialog.setModal(True)
-
-    if is_prompted:
-        await dialog.show()
+    await __prompt_dialog(title, description, QMessageBoxAsync.Warning, is_prompted)
 
 
 async def run_command(

@@ -11,6 +11,10 @@ license = { text = "GPL" }
 classifiers = [ "Programming Language :: Python :: 3" ]
 urls = {documentation = "https://jira.lsstcorp.org/secure/Dashboard.jspa", repository = "https://github.com/lsst-ts/ts_m2gui" }
 dynamic = [ "version" ]
+dependencies = [
+    "pyside2",
+    "ts_m2com",
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "setuptools_scm.get_version" }
