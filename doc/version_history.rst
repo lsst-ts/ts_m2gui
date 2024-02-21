@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.3:
+
+-------------
+0.7.3
+-------------
+
+* Update the ``TabDiagnostics._get_list_digital_status_output()``.
+
 .. _lsst.ts.m2gui-0.7.2:
 
 -------------

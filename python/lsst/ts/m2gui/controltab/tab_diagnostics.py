@@ -272,7 +272,7 @@ class TabDiagnostics(TabDefault):
             "Interlock Enable",
             "Reset Motor Breakers",
             "Reset Communication Breakers",
-            "Spare Output 5",
+            "Closed-Loop Control",
             "Spare Output 6",
             "Spare Output 7",
         ]
