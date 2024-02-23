@@ -13,7 +13,11 @@ urls = {documentation = "https://jira.lsstcorp.org/secure/Dashboard.jspa", repos
 dynamic = [ "version" ]
 dependencies = [
     "pyside2",
+    "pyyaml",
+    "qasync",
     "ts_m2com",
+    "ts_xml",
+    "ts_tcpip",
 ]
 
 [tool.setuptools.dynamic]

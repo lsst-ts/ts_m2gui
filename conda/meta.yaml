@@ -26,8 +26,6 @@ test:
     - {{ cdt('libxext') }}     # [linux]
     - {{ cdt('xorg-x11-server-Xvfb')}}  # [linux]
     - ts-conda-build =0.3
-    - ts-xml
-    - ts-idl {{ idl_version }}
     - pytest-qt
     - pytest-xvfb
     - ts-tcpip
@@ -64,8 +62,6 @@ requirements:
     - python {{ python }}
     - setuptools
     - setuptools_scm
-    - ts-xml
-    - ts-idl {{ idl_version }}
     - pandas
     - pyside2
     - qasync

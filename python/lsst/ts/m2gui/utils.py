@@ -30,6 +30,7 @@ __all__ = [
     "get_tol",
     "get_num_actuator_ring",
     "map_actuator_id_to_alias",
+    "prompt_dialog_critical",
     "prompt_dialog_warning",
     "run_command",
     "get_button_action",
@@ -362,7 +363,7 @@ async def __prompt_dialog(
     description : `str`
         Description message to be shown in the dialog.
     icon : `int`
-        QMessageBox icon id (Warning, Critical ,.) to be shown with the
+        QMessageBox icon id (Warning, Critical, etc.) to be shown with the
         message.
     is_prompted : `bool`, optional
         When False, dialog will not be executed. That is used for tests, which
@@ -384,7 +385,7 @@ async def __prompt_dialog(
 async def prompt_dialog_critical(
     title: str, description: str, is_prompted: bool = True
 ) -> None:
-    """Shows a critical/error dialog.
+    """Shows a critical dialog.
 
     The user must react to this dialog. The rest of the GUI is blocked until
     the dialog is dismissed.

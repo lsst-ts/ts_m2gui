@@ -473,9 +473,9 @@ class MainWindow(QMainWindow):
             try:
                 await run_command(self.model.connect)
             except Exception as ex:
-                prompt_dialog_critical(
+                await prompt_dialog_critical(
                     "_callback_connect",
-                    f"Cannot connect to LabView remote - {ex}",
+                    f"Cannot connect to LabVIEW remote - {ex}",
                 )
 
         action_connect.setEnabled(True)
