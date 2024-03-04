@@ -38,7 +38,12 @@ from .layout import LayoutControl, LayoutControlMode, LayoutLocalMode
 from .log_window_handler import LogWindowHandler
 from .model import Model
 from .signals import SignalMessage
-from .utils import get_button_action, prompt_dialog_warning, run_command
+from .utils import (
+    get_button_action,
+    prompt_dialog_critical,
+    prompt_dialog_warning,
+    run_command,
+)
 from .widget import QMessageBoxAsync
 
 
@@ -465,7 +470,13 @@ class MainWindow(QMainWindow):
                 "_callback_connect()", "The M2 cRIO controller is already connected."
             )
         else:
-            await run_command(self.model.connect)
+            try:
+                await run_command(self.model.connect)
+            except Exception as ex:
+                await prompt_dialog_critical(
+                    "_callback_connect",
+                    f"Cannot connect to LabVIEW remote - {ex}",
+                )
 
         action_connect.setEnabled(True)
 

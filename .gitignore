@@ -145,3 +145,4 @@ log/
 core.*
 .clang-format
 .ruff.toml
+towncrier.toml

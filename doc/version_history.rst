@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.4:
+
+-------------
+0.7.4
+-------------
+
+* Properly report connection timeout error.
+
 .. _lsst.ts.m2gui-0.7.3:
 
 -------------
