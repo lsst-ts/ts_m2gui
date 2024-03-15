@@ -1,10 +1,14 @@
-@startuml
-package "m2gui" #DDDDDD {
-  Model *-- UtilityMonitor
-  UtilityMonitor *-- SignalNetForceMoment : emit()
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalNetForceMoment
 }
 
-package "display" #DDDDDD {
+Model *-- UtilityMonitor
+UtilityMonitor *-- SignalNetForceMoment : emit()
+
+namespace display {
   class FigureConstant
 }
 
@@ -16,4 +20,3 @@ TabNetForceMoment "1" *-- "2" TabRealtimeNetForceMoment
 TabNetForceMoment --> SignalNetForceMoment : connect()
 
 TabRealtimeNetForceMoment "1" *-- "6" FigureConstant
-@enduml

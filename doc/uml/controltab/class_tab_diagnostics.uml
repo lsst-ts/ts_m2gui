@@ -1,11 +1,16 @@
-@startuml
-package "m2gui" #DDDDDD {
-  Model *-- UtilityMonitor
-  UtilityMonitor *-- SignalUtility : emit()
-  UtilityMonitor *-- SignalDetailedForce : emit()
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalUtility
+  class SignalDetailedForce
 }
 
-package "widget" #DDDDDD {
+Model *-- UtilityMonitor
+UtilityMonitor *-- SignalUtility : emit()
+UtilityMonitor *-- SignalDetailedForce : emit()
+
+namespace widget {
   class QMessageBoxAsync
 }
 
@@ -15,4 +20,3 @@ TabDefault <|-- TabDiagnostics
 TabDiagnostics --> SignalUtility : connect()
 TabDiagnostics --> SignalDetailedForce : connect()
 TabDiagnostics ..> QMessageBoxAsync
-@enduml

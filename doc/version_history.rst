@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.5:
+
+-------------
+0.7.5
+-------------
+
+* Use the **mermaid** to replace the **PlantUML**.
+
 .. _lsst.ts.m2gui-0.7.4:
 
 -------------

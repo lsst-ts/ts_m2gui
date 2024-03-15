@@ -1,12 +1,12 @@
-@startuml
-package "m2gui" #DDDDDD {
+classDiagram
+namespace m2gui {
+  class Model
   class SignalIlcStatus
-
-  Model *-- SignalIlcStatus : emit()
 }
+
+Model *-- SignalIlcStatus : emit()
 
 TabDefault *-- Model
 TabDefault <|-- TabIlcStatus
 
 TabIlcStatus --> SignalIlcStatus : connect()
-@enduml

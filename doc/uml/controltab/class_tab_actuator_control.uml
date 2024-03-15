@@ -1,13 +1,20 @@
-@startuml
-package "m2gui" #DDDDDD {
-  Model *-- UtilityMonitor
-  Model *-- SignalScript : emit()
-  UtilityMonitor *-- SignalDetailedForce : emit()
-  UtilityMonitor *-- ActuatorForceAxial
-  UtilityMonitor *-- ActuatorForceTangent
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalScript
+  class SignalDetailedForce
+  class ActuatorForceAxial
+  class ActuatorForceTangent
 }
 
-package "widget" #DDDDDD {
+Model *-- UtilityMonitor
+Model *-- SignalScript : emit()
+UtilityMonitor *-- SignalDetailedForce : emit()
+UtilityMonitor *-- ActuatorForceAxial
+UtilityMonitor *-- ActuatorForceTangent
+
+namespace widget {
   class QFileDialogAsync
 }
 
@@ -19,4 +26,3 @@ TabActuatorControl --> SignalDetailedForce : connect()
 TabActuatorControl ..> ActuatorForceAxial
 TabActuatorControl ..> ActuatorForceTangent
 TabActuatorControl ..> QFileDialogAsync
-@enduml

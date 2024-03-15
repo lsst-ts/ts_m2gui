@@ -1,10 +1,11 @@
-@startuml
-package "m2gui" #DDDDDD {
+classDiagram
+namespace m2gui {
+  class Model
   class SignalMessage
   class SignalControl
-
-  Model *-- SignalStatus : emit()
 }
+
+Model *-- SignalStatus : emit()
 
 TabDefault *-- Model
 TabDefault <|-- TabOverview
@@ -12,4 +13,3 @@ TabDefault <|-- TabOverview
 TabOverview --> SignalMessage : connect()
 TabOverview --> SignalControl : connect()
 TabOverview --> SignalStatus : connect()
-@enduml

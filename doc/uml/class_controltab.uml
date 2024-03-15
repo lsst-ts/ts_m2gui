@@ -1,4 +1,4 @@
-@startuml
+classDiagram
 TabDefault <|-- TabActuatorControl
 TabDefault <|-- TabAlarmWarn
 TabDefault <|-- TabCellStatus
@@ -14,4 +14,3 @@ TabDefault <|-- TabNetForceMoment
 TabDefault <|-- TabRealtimeNetForceMoment
 TabDefault <|-- TabLimitSwitchStatus
 TabDefault <|-- TabHardpointSelection
-@enduml

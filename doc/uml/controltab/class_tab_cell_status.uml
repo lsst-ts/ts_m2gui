@@ -1,16 +1,26 @@
-@startuml
-package "m2gui" #DDDDDD {
-  Model *-- UtilityMonitor
-  UtilityMonitor *-- SignalDetailedForce : emit()
-  UtilityMonitor *-- ActuatorForceAxial
-  UtilityMonitor *-- ActuatorForceTangent
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalDetailedForce
+  class ActuatorForceAxial
+  class ActuatorForceTangent
 }
 
-package "display" #DDDDDD {
+Model *-- UtilityMonitor
+UtilityMonitor *-- SignalDetailedForce : emit()
+UtilityMonitor *-- ActuatorForceAxial
+UtilityMonitor *-- ActuatorForceTangent
+
+namespace display {
   class FigureConstant
-  ViewMirror "1" *-- "n" ItemActuator
-  ItemActuator ..> Gauge
+  class ViewMirror
+  class ItemActuator
+  class Gauge
 }
+
+ViewMirror "1" *-- "n" ItemActuator
+ItemActuator ..> Gauge
 
 TabDefault *-- Model
 TabDefault <|-- TabCellStatus
@@ -23,4 +33,3 @@ TabCellStatus ..> ItemActuator
 TabCellStatus --> SignalDetailedForce : connect()
 TabCellStatus *-- ActuatorForceAxial
 TabCellStatus *-- ActuatorForceTangent
-@enduml

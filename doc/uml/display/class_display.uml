@@ -1,5 +1,4 @@
-@startuml
+classDiagram
 class FigureConstant
 ViewMirror "1" *-- "n" ItemActuator
 ItemActuator ..> Gauge
-@enduml
