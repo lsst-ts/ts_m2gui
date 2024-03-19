@@ -1,0 +1,14 @@
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalPosition
+}
+
+Model *-- UtilityMonitor
+UtilityMonitor *-- SignalPosition : emit()
+
+TabDefault *-- Model
+TabDefault <|-- TabRigidBodyPos
+
+TabRigidBodyPos --> SignalPosition : connect()

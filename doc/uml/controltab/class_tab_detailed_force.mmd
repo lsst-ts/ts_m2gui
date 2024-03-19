@@ -1,0 +1,20 @@
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalDetailedForce
+  class ActuatorForceAxial
+  class ActuatorForceTangent
+}
+
+Model *-- UtilityMonitor
+UtilityMonitor *-- SignalDetailedForce : emit()
+UtilityMonitor *-- ActuatorForceAxial
+UtilityMonitor *-- ActuatorForceTangent
+
+TabDefault *-- Model
+TabDefault <|-- TabDetailedForce
+
+TabDetailedForce --> SignalDetailedForce : connect()
+TabDetailedForce *-- ActuatorForceAxial
+TabDetailedForce *-- ActuatorForceTangent

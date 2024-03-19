@@ -28,8 +28,6 @@ pipeline {
         XML_REPORT = "jenkinsReport/report.xml"
         // Module name used in the pytest coverage analysis
         MODULE_NAME = "lsst.ts.m2gui"
-        // PlantUML url
-        PLANTUML_URL = "https://github.com/plantuml/plantuml/releases/download/v1.2021.13/plantuml-1.2021.13.jar"
         // Branch name. This is to deal with the condition that the env.BRANCH_NAME
         // will become "PR-X" at the pull request. When that happens, only the
         // env.CHANGE_BRANCH will give the expected name.
@@ -92,11 +90,6 @@ pipeline {
                 withEnv(["WORK_HOME=${env.WORKSPACE}"]) {
                     sh """
                         source ${env.SAL_SETUP_FILE}
-
-                        pip install sphinxcontrib-plantuml ltd-conveyor
-
-                        curl -L ${env.PLANTUML_URL} -o plantuml.jar
-                        export PATH_PLANTUML=${env.WORK_HOME}/plantuml.jar
 
                         cd ${WORK_HOME}/ts_m2com
                         setup -k -r .

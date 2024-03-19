@@ -1,0 +1,15 @@
+classDiagram
+namespace m2gui {
+  class Model
+  class SignalConfig
+  class Config
+}
+
+Model *-- SignalConfig : emit()
+Model ..> Config
+
+TabDefault *-- Model
+TabDefault <|-- TabConfigView
+
+TabConfigView --> SignalConfig : connect()
+TabConfigView ..> Config

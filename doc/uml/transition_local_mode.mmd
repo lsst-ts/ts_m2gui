@@ -1,4 +1,4 @@
-@startuml
+stateDiagram-v2
 [*] --> Standby
 Standby --> Diagnostic : enter_diagnostic()
 Diagnostic --> Enable : enter_enable()
@@ -9,4 +9,3 @@ Diagnostic --> Standby : exit_diagnostic()
 Standby --> Standby : fault()
 Diagnostic --> Diagnostic : fault()
 Enable --> Diagnostic : fault()
-@enduml

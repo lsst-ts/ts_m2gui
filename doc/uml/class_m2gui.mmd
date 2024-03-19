@@ -1,17 +1,20 @@
-@startuml
-package "layout" #DDDDDD {
+classDiagram
+namespace layout {
   class LayoutDefault
 }
 
-package "controltab" #DDDDDD {
-  TabDefault <|-- TabSettings
+namespace controltab {
+  class TabDefault
+  class TabSettings
 }
 
-package "m2com" #DDDDDD {
+TabDefault <|-- TabSettings
+
+namespace m2com {
   class ControllerCell
 }
 
-package "widget" #DDDDDD {
+namespace widget {
   class QMessageBoxAsync
 }
 
@@ -55,4 +58,3 @@ ControlTabs ..> Model
 ControlTabs "1" *-- "12" TabDefault
 
 TabDefault *-- Model
-@enduml

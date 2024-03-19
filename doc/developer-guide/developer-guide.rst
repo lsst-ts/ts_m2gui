@@ -22,7 +22,7 @@ State
 
 The state machine is listed below.
 
-.. uml:: ../uml/transition_local_mode.uml
+.. mermaid:: ../uml/transition_local_mode.mmd
     :caption: State diagram of local mode.
 
 It is noted that when the fault happens, the **Enable** local mode will transition to the **Diagnostic** local mode.
@@ -40,7 +40,7 @@ The classes in module are listed below.
 m2gui
 -----
 
-.. uml:: ../uml/class_m2gui.uml
+.. mermaid:: ../uml/class_m2gui.mmd
     :caption: Class diagram of M2 GUI
 
 * **MainWindow** is the main window of the application.
@@ -99,7 +99,7 @@ The available Qt signals are listed below:
 m2gui.layout
 ------------
 
-.. uml:: ../uml/class_layout.uml
+.. mermaid:: ../uml/class_layout.mmd
     :caption: Class diagram of layout module
 
 * **LayoutDefault** is the default parent panel of other child classes in this module.
@@ -112,7 +112,7 @@ m2gui.layout
 m2gui.display
 -------------
 
-.. uml:: ../uml/display/class_display.uml
+.. mermaid:: ../uml/display/class_display.mmd
     :caption: Class diagram of display module
 
 * **ViewMirror** is the view on the mirror populated by actuators.
@@ -125,7 +125,7 @@ m2gui.display
 m2gui.widget
 -------------
 
-.. uml:: ../uml/class_widget.uml
+.. mermaid:: ../uml/class_widget.mmd
     :caption: Class diagram of widget module
 
 * **QMessageBoxAsync** is an asynchronous wrapper for the `QMessageBox <https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QMessageBox.html>`_. 
@@ -140,7 +140,7 @@ Without those wrappers, the UI will be running for the duration of the method ca
 m2gui.controltab
 ----------------
 
-.. uml:: ../uml/class_controltab.uml
+.. mermaid:: ../uml/class_controltab.mmd
     :caption: Class diagram of controltab module
 
 * **TabDefault** is the default parent table of other child classes in this module.
@@ -167,7 +167,7 @@ The class diagrams for each table child class are listed below to give you the i
 m2gui.controltab.TabActuatorControl
 -----------------------------------
 
-.. uml:: ../uml/controltab/class_tab_actuator_control.uml
+.. mermaid:: ../uml/controltab/class_tab_actuator_control.mmd
     :caption: Class diagram of TabActuatorControl class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_alarm_warn:
@@ -175,7 +175,7 @@ m2gui.controltab.TabActuatorControl
 m2gui.controltab.TabAlarmWarn
 -----------------------------
 
-.. uml:: ../uml/controltab/class_tab_alarm_warn.uml
+.. mermaid:: ../uml/controltab/class_tab_alarm_warn.mmd
     :caption: Class diagram of TabAlarmWarn class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_cell_status:
@@ -183,7 +183,7 @@ m2gui.controltab.TabAlarmWarn
 m2gui.controltab.TabCellStatus
 ------------------------------
 
-.. uml:: ../uml/controltab/class_tab_cell_status.uml
+.. mermaid:: ../uml/controltab/class_tab_cell_status.mmd
     :caption: Class diagram of TabCellStatus class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_config_view:
@@ -191,7 +191,7 @@ m2gui.controltab.TabCellStatus
 m2gui.controltab.TabConfigView
 ------------------------------
 
-.. uml:: ../uml/controltab/class_tab_config_view.uml
+.. mermaid:: ../uml/controltab/class_tab_config_view.mmd
     :caption: Class diagram of TabConfigView class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_detailed_force:
@@ -199,7 +199,7 @@ m2gui.controltab.TabConfigView
 m2gui.controltab.TabDetailedForce
 ---------------------------------
 
-.. uml:: ../uml/controltab/class_tab_detailed_force.uml
+.. mermaid:: ../uml/controltab/class_tab_detailed_force.mmd
     :caption: Class diagram of TabDetailedForce class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_diagnostics:
@@ -207,7 +207,7 @@ m2gui.controltab.TabDetailedForce
 m2gui.controltab.TabDiagnostics
 -------------------------------
 
-.. uml:: ../uml/controltab/class_tab_diagnostics.uml
+.. mermaid:: ../uml/controltab/class_tab_diagnostics.mmd
     :caption: Class diagram of TabDiagnostics class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_overview:
@@ -215,7 +215,7 @@ m2gui.controltab.TabDiagnostics
 m2gui.controltab.TabOverview
 ----------------------------
 
-.. uml:: ../uml/controltab/class_tab_overview.uml
+.. mermaid:: ../uml/controltab/class_tab_overview.mmd
     :caption: Class diagram of TabOverview class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_rigid_body_pos:
@@ -223,7 +223,7 @@ m2gui.controltab.TabOverview
 m2gui.controltab.TabRigidBodyPos
 --------------------------------
 
-.. uml:: ../uml/controltab/class_tab_rigid_body_pos.uml
+.. mermaid:: ../uml/controltab/class_tab_rigid_body_pos.mmd
     :caption: Class diagram of TabRigidBodyPos class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_utility_view:
@@ -231,7 +231,7 @@ m2gui.controltab.TabRigidBodyPos
 m2gui.controltab.TabUtilityView
 -------------------------------
 
-.. uml:: ../uml/controltab/class_tab_utility_view.uml
+.. mermaid:: ../uml/controltab/class_tab_utility_view.mmd
     :caption: Class diagram of TabUtilityView class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_settings:
@@ -239,7 +239,7 @@ m2gui.controltab.TabUtilityView
 m2gui.controltab.TabSettings
 ----------------------------
 
-.. uml:: ../uml/controltab/class_tab_settings.uml
+.. mermaid:: ../uml/controltab/class_tab_settings.mmd
     :caption: Class diagram of TabSettings class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_ilc_status:
@@ -247,7 +247,7 @@ m2gui.controltab.TabSettings
 m2gui.controltab.TabIlcStatus
 -----------------------------
 
-.. uml:: ../uml/controltab/class_tab_ilc_status.uml
+.. mermaid:: ../uml/controltab/class_tab_ilc_status.mmd
     :caption: Class diagram of TabIlcStatus class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_net_force_moment:
@@ -255,7 +255,7 @@ m2gui.controltab.TabIlcStatus
 m2gui.controltab.TabNetForceMoment
 ----------------------------------
 
-.. uml:: ../uml/controltab/class_tab_net_force_moment.uml
+.. mermaid:: ../uml/controltab/class_tab_net_force_moment.mmd
     :caption: Class diagram of TabNetForceMoment class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_hardpoint_selection:
@@ -263,7 +263,7 @@ m2gui.controltab.TabNetForceMoment
 m2gui.controltab.TabHardpointSelection
 --------------------------------------
 
-.. uml:: ../uml/controltab/class_tab_hardpoint_selection.uml
+.. mermaid:: ../uml/controltab/class_tab_hardpoint_selection.mmd
     :caption: Class diagram of TabHardpointSelection class
 
 .. _API:

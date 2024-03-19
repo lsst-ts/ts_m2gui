@@ -1,0 +1,18 @@
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalPowerSystem
+  class SignalUtility
+}
+
+Model *-- SignalPowerSystem : emit()
+Model *-- UtilityMonitor
+
+UtilityMonitor *-- SignalUtility : emit()
+
+TabDefault *-- Model
+TabDefault <|-- TabUtilityView
+
+TabUtilityView --> SignalPowerSystem : connect()
+TabUtilityView --> SignalUtility : connect()

@@ -1,0 +1,28 @@
+classDiagram
+namespace m2gui {
+  class Model
+  class UtilityMonitor
+  class SignalScript
+  class SignalDetailedForce
+  class ActuatorForceAxial
+  class ActuatorForceTangent
+}
+
+Model *-- UtilityMonitor
+Model *-- SignalScript : emit()
+UtilityMonitor *-- SignalDetailedForce : emit()
+UtilityMonitor *-- ActuatorForceAxial
+UtilityMonitor *-- ActuatorForceTangent
+
+namespace widget {
+  class QFileDialogAsync
+}
+
+TabDefault *-- Model
+TabDefault <|-- TabActuatorControl
+
+TabActuatorControl --> SignalScript : connect()
+TabActuatorControl --> SignalDetailedForce : connect()
+TabActuatorControl ..> ActuatorForceAxial
+TabActuatorControl ..> ActuatorForceTangent
+TabActuatorControl ..> QFileDialogAsync
