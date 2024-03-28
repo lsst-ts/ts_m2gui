@@ -71,6 +71,20 @@ async def test_callback_signal_ilc_status(qtbot: QtBot, widget: TabIlcStatus) ->
     assert color == widget._get_indicator_color(mode)
 
 
+@pytest.mark.asyncio
+async def test_callback_signal_ilc_status_bypassed_ilcs(
+    qtbot: QtBot, widget: TabIlcStatus
+) -> None:
+
+    bypassed_ilcs = [1, 2, 3]
+    widget.model.signal_ilc_status.bypassed_ilcs.emit(bypassed_ilcs)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget._label_bypassed_ilcs.text() == str(bypassed_ilcs)
+
+
 def test_read_ilc_details_file(widget: TabIlcStatus) -> None:
     widget.read_ilc_details_file(get_ilc_details_file())
 
