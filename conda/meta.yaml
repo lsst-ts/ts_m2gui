@@ -25,7 +25,7 @@ test:
     - {{ cdt('libxxf86vm') }}  # [linux]
     - {{ cdt('libxext') }}     # [linux]
     - {{ cdt('xorg-x11-server-Xvfb')}}  # [linux]
-    - ts-conda-build =0.3
+    - ts-conda-build =0.4
     - pytest-qt
     - pytest-xvfb
     - ts-tcpip
@@ -56,7 +56,7 @@ requirements:
     - python {{ python }}
     - setuptools_scm
     - setuptools
-    - ts-conda-build =0.3
+    - ts-conda-build =0.4
   run:
     - python {{ python }}
     - setuptools
