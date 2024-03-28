@@ -47,6 +47,7 @@ def test_init(widget: TabSettings) -> None:
         widget._settings["timeout_connection"].value() == controller.timeout_connection
     )
 
+    assert widget._settings["enable_lut_temperature"].isChecked() is True
     assert widget._settings["use_external_elevation_angle"].isChecked() is False
     assert widget._settings["enable_angle_comparison"].isChecked() is False
     assert widget._settings["max_angle_difference"].value() == 2.0

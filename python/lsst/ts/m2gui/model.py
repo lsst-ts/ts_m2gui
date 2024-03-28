@@ -29,6 +29,7 @@ import typing
 import numpy as np
 from lsst.ts.m2com import (
     DEFAULT_ENABLED_FAULTS_MASK,
+    ILC_READ_WARNING_ERROR_CODES,
     LIMIT_FORCE_AXIAL_CLOSED_LOOP,
     LIMIT_FORCE_AXIAL_OPEN_LOOP,
     LIMIT_FORCE_TANGENT_CLOSED_LOOP,
@@ -685,6 +686,12 @@ class Model(object):
                 # are the tangent links.
                 self.utility_monitor.update_hard_points(hardpoints[:3], hardpoints[3:])
 
+            elif name == "bypassedActuatorILCs":
+                bypassed_ilcs = message["ilcs"]
+                self.signal_ilc_status.bypassed_ilcs.emit(bypassed_ilcs)
+
+                self.log.info(f"Bypassed ILCs are: {bypassed_ilcs}.")
+
             elif name == "forceBalanceSystemStatus":
                 self.is_closed_loop = message["status"]
                 self.report_control_status()
@@ -1287,14 +1294,15 @@ class Model(object):
         TODO: Remove this after the ILC is fixed.
         """
 
-        codes = {1000, 1001, 6052}
         (
             enabled_faults_mask,
             bits,
         ) = self.controller.error_handler.calc_enabled_faults_mask(
-            codes, DEFAULT_ENABLED_FAULTS_MASK
+            ILC_READ_WARNING_ERROR_CODES, DEFAULT_ENABLED_FAULTS_MASK
         )
-        self.log.info(f"Bypass the error codes: {codes}. Bits: {bits}.")
+        self.log.info(
+            f"Bypass the error codes: {ILC_READ_WARNING_ERROR_CODES}. Bits: {bits}."
+        )
 
         await self.controller.set_enabled_faults_mask(enabled_faults_mask)
 

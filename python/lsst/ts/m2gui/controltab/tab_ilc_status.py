@@ -32,7 +32,7 @@ from lsst.ts.m2com import (
 from lsst.ts.xml.enums import MTM2
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette
-from PySide2.QtWidgets import QGroupBox, QLabel, QPushButton, QVBoxLayout
+from PySide2.QtWidgets import QFormLayout, QGroupBox, QLabel, QPushButton, QVBoxLayout
 from qasync import asyncSlot
 
 from ..model import Model
@@ -67,6 +67,9 @@ class TabIlcStatus(TabDefault):
 
         # Indicators of the ILCs
         self._indicators_ilc = self._create_indicators_ilc(NUM_INNER_LOOP_CONTROLLER)
+
+        # Bypassed ILCs
+        self._label_bypassed_ilcs = create_label()
 
         self.set_widget_and_layout()
 
@@ -158,7 +161,9 @@ class TabIlcStatus(TabDefault):
         """
 
         layout = QVBoxLayout()
-        layout.addWidget(self._create_label_mode())
+
+        # ILC information
+        layout.addWidget(self._create_group_ilc_information())
 
         # Add the groups of grid layout
         num_column = 10
@@ -190,6 +195,21 @@ class TabIlcStatus(TabDefault):
 
         return layout
 
+    def _create_group_ilc_information(self) -> QGroupBox:
+        """Create the group of inner-loop controller (ILC) information.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QFormLayout()
+        layout.addRow("ILC Modes:", self._create_label_mode())
+        layout.addRow("Bypassed ILCs:", self._label_bypassed_ilcs)
+
+        return create_group_box("Inner-Loop Controller (ILC) Information", layout)
+
     def _create_label_mode(self) -> QLabel:
         """Create the label of inner-loop controller (ILC) mode.
 
@@ -215,7 +235,6 @@ class TabIlcStatus(TabDefault):
         # Create the label
         label = create_label("")
         label.setText(
-            "Inner-Loop Controller Mode: "
             f"<font color='{colors[0]}'>{states[0].name}</font>, "
             f"<font color='{colors[1]}'>{states[1].name}</font>, "
             f"<font color='{colors[2]}'>{states[2].name}</font>, "
@@ -257,11 +276,19 @@ class TabIlcStatus(TabDefault):
         signal_ilc_status : `SignalIlcStatus`
             Signal of the ILC status.
         """
-        signal_ilc_status.address_mode.connect(self._callback_signal_ilc_status)
+        signal_ilc_status.address_mode.connect(
+            self._callback_signal_ilc_status_address_mode
+        )
+        signal_ilc_status.bypassed_ilcs.connect(
+            self._callback_signal_ilc_status_bypassed_ilcs
+        )
 
     @asyncSlot()
-    async def _callback_signal_ilc_status(self, address_mode: tuple) -> None:
-        """Callback of the inner-loop controller (ILC) status signal.
+    async def _callback_signal_ilc_status_address_mode(
+        self, address_mode: tuple
+    ) -> None:
+        """Callback of the inner-loop controller (ILC) status signal for the
+        address and mode.
 
         Parameters
         ----------
@@ -274,6 +301,21 @@ class TabIlcStatus(TabDefault):
         address = address_mode[0]
         mode = MTM2.InnerLoopControlMode(address_mode[1])
         self._update_indicator_color(self._indicators_ilc[address], mode)
+
+    @asyncSlot()
+    async def _callback_signal_ilc_status_bypassed_ilcs(
+        self, bypassed_ilcs: list
+    ) -> None:
+        """Callback of the inner-loop controller (ILC) status signal for the
+        bypassed ILCs.
+
+        Parameters
+        ----------
+        bypassed_ilcs : `list`
+            Bypassed ILCs.
+        """
+
+        self._label_bypassed_ilcs.setText(f"{bypassed_ilcs}")
 
     def read_ilc_details_file(self, filepath: str | Path) -> None:
         """Read the file of inner-loop controller (ILC) details.

@@ -210,6 +210,9 @@ class SignalIlcStatus(QtCore.QObject):
     # (enum MTM2.InnerLoopControlMode in ts_xml).
     address_mode = QtCore.Signal(object)
 
+    # List of the bypassed ILCs.
+    bypassed_ilcs = QtCore.Signal(object)
+
 
 class SignalNetForceMoment(QtCore.QObject):
     """Net force/moment signal to send the net force and moment of total
