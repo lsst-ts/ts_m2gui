@@ -16,6 +16,7 @@ Version History
 * Use the **ILC_READ_WARNING_ERROR_CODES** from **ts_m2com**.
 * Show the bypassed ILCs.
 * Allow to enable or disable the temperature LUT.
+* Allow the set of hardpoints.
 
 .. _lsst.ts.m2gui-0.7.5:
 

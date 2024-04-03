@@ -133,15 +133,9 @@ async def test_set_hardpoint_list_error(widget: TabHardpointSelection) -> None:
     with pytest.raises(ValueError):
         await widget._set_hardpoint_list()
 
-    # Not in the Diagnostic state
+    # Not in the Standby state
     for idx in (5, 15, 25, 73, 75, 77):
         widget._buttons_hardpoint_selection[idx].setChecked(True)
-
-    with pytest.raises(RuntimeError):
-        await widget._set_hardpoint_list()
-
-    # Not in the simulation mode
-    assert widget.model._is_simulation_mode is False
 
     widget.model.local_mode = LocalMode.Diagnostic
     with pytest.raises(RuntimeError):
@@ -152,7 +146,6 @@ async def test_set_hardpoint_list_error(widget: TabHardpointSelection) -> None:
 async def test_callback_apply_hardpoints(
     qtbot: QtBot, widget_async: TabHardpointSelection
 ) -> None:
-    await widget_async.model.enter_diagnostic()
 
     assert widget_async._hardpoints == [5, 15, 25, 73, 75, 77]
 
@@ -167,5 +160,7 @@ async def test_callback_apply_hardpoints(
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(2)
+
+    await widget_async.model.enter_diagnostic()
 
     assert widget_async._hardpoints == hardpoints
