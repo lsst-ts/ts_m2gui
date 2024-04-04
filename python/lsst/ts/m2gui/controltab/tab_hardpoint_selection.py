@@ -133,7 +133,7 @@ class TabHardpointSelection(TabDefault):
         `ValueError`
             When do not select 6 hardpoints.
         `RuntimeError`
-            When not in the Diagnostic state.
+            When not in the Standby state.
         `RuntimeError`
             When not in the simulation mode.
         """
@@ -150,14 +150,9 @@ class TabHardpointSelection(TabDefault):
         )
 
         # Check the state
-        allowed_mode = LocalMode.Diagnostic
+        allowed_mode = LocalMode.Standby
         if self.model.local_mode != allowed_mode:
             raise RuntimeError(f"Only allowed in {allowed_mode!r}")
-
-        # Only support in the simulation mode at this moment.
-        # TODO: Remove this after the M2 cell LabVIEW code supports this.
-        if not self.model._is_simulation_mode:
-            raise RuntimeError("Only supported in the simulation mode.")
 
         # Set the hardpoints
         await self.model.controller.set_hardpoint_list(hardpoints)

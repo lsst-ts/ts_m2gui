@@ -311,6 +311,11 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
             message={"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]}
         )
 
+    with qtbot.waitSignal(model.signal_ilc_status.bypassed_ilcs, timeout=TIMEOUT):
+        await model._process_event(
+            message={"id": "bypassedActuatorILCs", "ilcs": [1, 2, 3]}
+        )
+
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
         await model._process_event(
             message={"id": "forceBalanceSystemStatus", "status": True}

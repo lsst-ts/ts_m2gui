@@ -157,6 +157,7 @@ class TabSettings(TabDefault):
             "port_command": QSpinBox(),
             "port_telemetry": QSpinBox(),
             "timeout_connection": QSpinBox(),
+            "enable_lut_temperature": QCheckBox("Enable the temperature LUT"),
             "use_external_elevation_angle": QCheckBox("Use external elevation angle"),
             "enable_angle_comparison": QCheckBox("Enable angle comparison"),
             "max_angle_difference": QSpinBox(),
@@ -175,6 +176,9 @@ class TabSettings(TabDefault):
         settings["timeout_connection"].setMinimum(self.TIMEOUT_MINIMUM)
         settings["timeout_connection"].setSuffix(" sec")
 
+        settings["enable_lut_temperature"].setToolTip(
+            "Enable the calculation of temperature look-up table (LUT) or not."
+        )
         settings["use_external_elevation_angle"].setToolTip(
             (
                 "Use the external elevation angle such as MTMount\n"
@@ -246,6 +250,9 @@ class TabSettings(TabDefault):
         settings["port_telemetry"].setValue(controller.port_telemetry)
         settings["timeout_connection"].setValue(controller.timeout_connection)
 
+        settings["enable_lut_temperature"].setChecked(
+            controller.control_parameters["enable_lut_temperature"]
+        )
         settings["use_external_elevation_angle"].setChecked(
             controller.control_parameters["use_external_elevation_angle"]
         )
@@ -336,8 +343,13 @@ class TabSettings(TabDefault):
     @asyncSlot()
     async def _callback_apply_control_parameters(self) -> None:
         """Callback of the apply-control-parameters button. The main target is
-        to set the elevation angle used in the look-up table (LUT) calculation.
+        to set the elevation angle used in the look-up table (LUT) calculation
+        and decide to calculate the temperature LUT or not.
         """
+
+        self.model.controller.control_parameters["enable_lut_temperature"] = (
+            self._settings["enable_lut_temperature"].isChecked()
+        )
 
         use_external_elevation_angle = self._settings[
             "use_external_elevation_angle"
@@ -462,6 +474,7 @@ class TabSettings(TabDefault):
         layout = QVBoxLayout()
 
         layout_control = QFormLayout()
+        layout_control.addRow(self._settings["enable_lut_temperature"])
         layout_control.addRow(self._settings["use_external_elevation_angle"])
         layout_control.addRow(self._settings["enable_angle_comparison"])
         layout_control.addRow(

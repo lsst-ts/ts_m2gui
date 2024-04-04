@@ -6,6 +6,18 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.6:
+
+-------------
+0.7.6
+-------------
+
+* Update the version of ts-conda-build to 0.4 in the conda recipe.
+* Use the **ILC_READ_WARNING_ERROR_CODES** from **ts_m2com**.
+* Show the bypassed ILCs.
+* Allow to enable or disable the temperature LUT.
+* Allow the set of hardpoints.
+
 .. _lsst.ts.m2gui-0.7.5:
 
 -------------
