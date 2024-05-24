@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.8:
+
+-------------
+0.7.8
+-------------
+
+* Bypass the actions if the CSC is connecting to the controller.
+* Update the ``LayoutControlMode._callback_signal_control()`` to show the open/closed loop control mode in the **Standby** state as well.
+This is to consider the case that the CSC might be using the M2 system at the same time.
+
 .. _lsst.ts.m2gui-0.7.7:
 
 -------------

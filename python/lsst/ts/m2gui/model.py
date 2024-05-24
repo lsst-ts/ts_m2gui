@@ -1256,6 +1256,12 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Standby!r}."
             )
 
+        # If the communication power is on already, that should be from CSC.
+        # Therefore, the GUI does not need to do anything.
+        if self.controller.is_powered_on_communication():
+            self.local_mode = LocalMode.Diagnostic
+            return
+
         await self._bypass_monitor_ilc_read_error()
 
         # Reset motor and communication power breakers bits and cRIO interlock
@@ -1320,7 +1326,20 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
             )
 
-        await self.controller.power(MTM2.PowerType.Communication, True)
+        if not self.controller.is_powered_on_communication():
+            await self.controller.power(MTM2.PowerType.Communication, True)
+
+        # If the motor power is on already, that should be from CSC.
+        # Therefore, the GUI does not need to do anything.
+        if self.controller.is_powered_on_motor():
+            self.log.info(
+                "The CSC should be controlling the M2 now. Skip the process "
+                "to check/assign the ILC states to avoid to interrupt the "
+                "actions of CSC."
+            )
+            self.local_mode = LocalMode.Enable
+            return
+
         await self.controller.power(MTM2.PowerType.Motor, True)
 
         if not self.controller.are_ilc_modes_enabled():
