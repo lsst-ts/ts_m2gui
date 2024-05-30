@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.7:
+
+-------------
+0.7.7
+-------------
+
+* Use the shared Jenkins library in **Jenkinsfile**.
+
 .. _lsst.ts.m2gui-0.7.6:
 
 -------------
