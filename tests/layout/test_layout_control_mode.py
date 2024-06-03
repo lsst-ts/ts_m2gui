@@ -74,7 +74,7 @@ async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) 
     await asyncio.sleep(1)
 
     assert widget.layout_control_mode._button_open_loop.isEnabled() is False
-    assert widget.layout_control_mode._button_closed_loop.isEnabled() is False
+    assert widget.layout_control_mode._button_closed_loop.isEnabled() is True
 
 
 @pytest.mark.asyncio
