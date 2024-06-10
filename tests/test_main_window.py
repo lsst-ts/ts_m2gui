@@ -22,6 +22,7 @@
 import asyncio
 
 import pytest
+from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.m2gui import MainWindow
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QToolBar
@@ -53,10 +54,16 @@ def test_init(widget: MainWindow) -> None:
     assert len(actions) == 4
 
     controller = widget.model.controller
-    assert controller.host == "m2-crio-controller01.cp.lsst.org"
-    assert controller.port_command == 50010
-    assert controller.port_telemetry == 50011
-    assert controller.timeout_connection == 10
+    configuration = _get_config()
+    assert controller.host == configuration["host"]
+    assert controller.port_command == configuration["port_command"]
+    assert controller.port_telemetry == configuration["port_telemetry"]
+    assert controller.timeout_connection == configuration["timeout_connection"]
+
+
+def _get_config() -> dict:
+    filepath = get_config_dir() / "default_gui.yaml"
+    return read_yaml_file(filepath)
 
 
 def test_set_model(widget: MainWindow) -> None:
@@ -64,7 +71,7 @@ def test_set_model(widget: MainWindow) -> None:
     assert model_local_host.controller.host == "127.0.0.1"
 
     model_crio_simulator = widget._set_model(False, True)
-    assert model_crio_simulator.controller.host == "m2-crio-controller02.cp.lsst.org"
+    assert model_crio_simulator.controller.host == _get_config()["host_crio_simulator"]
 
     with pytest.raises(ValueError):
         widget._set_model(True, True)

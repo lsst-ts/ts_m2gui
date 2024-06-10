@@ -68,6 +68,17 @@ def test_init(widget: MockWidget) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) -> None:
+
+    # Standby state
+    await _check_control_normal(qtbot, widget)
+
+    # Enable state
+    widget.layout_control.model.local_mode = LocalMode.Enable
+    await _check_control_normal(qtbot, widget)
+
+
+async def _check_control_normal(qtbot: QtBot, widget: MockWidget) -> None:
+
     widget.layout_control.model.report_control_status()
 
     # Sleep so the event loop can access CPU to handle the signal

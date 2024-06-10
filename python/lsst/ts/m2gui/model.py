@@ -1242,8 +1242,15 @@ class Model(object):
         self.update_system_status("isCrioConnected", False)
         self.update_system_status("isTelemetryActive", False)
 
-    async def enter_diagnostic(self) -> None:
+    async def enter_diagnostic(self) -> bool:
         """Transition from the Standby mode to the Diagnostic mode.
+
+        Returns
+        -------
+        `bool`
+            True if the communication power is on already, which implies the
+            commandable SAL component (CSC) is using the M2 now. Otherwise,
+            False.
 
         Raises
         ------
@@ -1260,7 +1267,8 @@ class Model(object):
         # Therefore, the GUI does not need to do anything.
         if self.controller.is_powered_on_communication():
             self.local_mode = LocalMode.Diagnostic
-            return
+
+            return True
 
         await self._bypass_monitor_ilc_read_error()
 
@@ -1293,6 +1301,8 @@ class Model(object):
 
         self.local_mode = LocalMode.Diagnostic
 
+        return False
+
     async def _bypass_monitor_ilc_read_error(self) -> None:
         """Bypass the error codes related to the monitoring inner-loop
         controller (ILC) read error before the fix.
@@ -1312,8 +1322,15 @@ class Model(object):
 
         await self.controller.set_enabled_faults_mask(enabled_faults_mask)
 
-    async def enter_enable(self) -> None:
+    async def enter_enable(self) -> bool:
         """Transition from the Diagnostic mode to the Enable mode.
+
+        Returns
+        -------
+        `bool`
+            True if the motor power is on already, which implies the
+            commandable SAL component (CSC) is using the M2 now. Otherwise,
+            False.
 
         Raises
         ------
@@ -1338,7 +1355,8 @@ class Model(object):
                 "actions of CSC."
             )
             self.local_mode = LocalMode.Enable
-            return
+
+            return True
 
         await self.controller.power(MTM2.PowerType.Motor, True)
 
@@ -1357,6 +1375,8 @@ class Model(object):
         )
 
         self.local_mode = LocalMode.Enable
+
+        return False
 
     async def exit_enable(self) -> None:
         """Transition from the Enable mode to the Diagnostic mode.
