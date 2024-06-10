@@ -6,6 +6,17 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-0.7.9:
+
+-------------
+0.7.9
+-------------
+
+* Update the ``TabIlcStatus`` class to reset, check, and enable the ILC states.
+* Update the ``LayoutControl._callback_signal_control()`` to switch the command source under the **Standby** and **Enable** states.
+* Add the return values to ``Model.enter_diagnostic()`` and ``Model.enter_enable()`` to judge the CSC is using the M2 or not.
+* Update the user documents.
+
 .. _lsst.ts.m2gui-0.7.8:
 
 -------------
