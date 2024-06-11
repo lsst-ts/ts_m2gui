@@ -29,7 +29,8 @@ from datetime import datetime
 from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.tcpip import LOCALHOST_IPV4
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QAction, QMainWindow, QToolBar, QVBoxLayout, QWidget
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
 from qasync import QApplication, asyncSlot
 
 from .control_tabs import ControlTabs

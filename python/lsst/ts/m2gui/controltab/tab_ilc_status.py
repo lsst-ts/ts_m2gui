@@ -339,7 +339,7 @@ class TabIlcStatus(TabDefault):
 
         colors = list()
         for state in states:
-            colors.append(self._get_indicator_color(state).name.decode())
+            colors.append(self._get_indicator_color(state).name)
 
         # Create the label
         label = create_label("")

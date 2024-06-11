@@ -48,9 +48,8 @@ import numpy as np
 from lsst.ts.m2com import NUM_ACTUATOR, is_coroutine
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette
+from PySide6.QtGui import QAction, QPalette
 from PySide6.QtWidgets import (
-    QAction,
     QGridLayout,
     QGroupBox,
     QLabel,

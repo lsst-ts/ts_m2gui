@@ -72,8 +72,8 @@ class TabDiagnostics(TabDefault):
     """
 
     # Colors used in the label's text
-    COLOR_BLACK = Qt.black.name.decode()
-    COLOR_RED = Qt.red.name.decode()
+    COLOR_BLACK = Qt.black.name
+    COLOR_RED = Qt.red.name
 
     def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
