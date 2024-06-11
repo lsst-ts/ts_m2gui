@@ -28,8 +28,8 @@ import pytest_asyncio
 from lsst.ts.m2com import DEFAULT_ENABLED_FAULTS_MASK, LimitSwitchType, get_config_dir
 from lsst.ts.m2gui import LocalMode, Model, Ring, Status
 from lsst.ts.m2gui.controltab import TabAlarmWarn
-from PySide2.QtCore import QPoint, Qt
-from PySide2.QtGui import QColor, QPalette
+from PySide6.QtCore import QPoint, Qt
+from PySide6.QtGui import QColor, QPalette
 from pytestqt.qtbot import QtBot
 
 SLEEP_TIME_SHORT = 1

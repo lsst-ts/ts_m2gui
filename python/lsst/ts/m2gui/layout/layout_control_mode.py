@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutControlMode"]
 
-from PySide2.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
@@ -42,7 +42,7 @@ class LayoutControlMode(LayoutDefault):
     ----------
     model : `Model`
         Model class.
-    layout : `PySide2.QtWidgets.QVBoxLayout`
+    layout : `PySide6.QtWidgets.QVBoxLayout`
         Layout.
     """
 

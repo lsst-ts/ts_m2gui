@@ -25,8 +25,8 @@ from pathlib import Path
 
 import numpy as np
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
 
 from ..actuator_force_axial import ActuatorForceAxial
@@ -100,7 +100,7 @@ class TabCellStatus(TabDefault):
 
         Returns
         -------
-        group_data_selection : `PySide2.QtWidgets.QComboBox`
+        group_data_selection : `PySide6.QtWidgets.QComboBox`
             Selection of the actuator group data.
         """
 
@@ -255,7 +255,7 @@ class TabCellStatus(TabDefault):
 
         Returns
         -------
-        actuator_data_selection : `PySide2.QtWidgets.QComboBox`
+        actuator_data_selection : `PySide6.QtWidgets.QComboBox`
             Selection of the actuator data.
         """
 
@@ -427,7 +427,7 @@ class TabCellStatus(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide6.QtWidgets.QHBoxLayout`
             Layout.
         """
 

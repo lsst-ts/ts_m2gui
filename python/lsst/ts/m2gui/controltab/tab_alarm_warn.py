@@ -29,8 +29,8 @@ from lsst.ts.m2com import (
     MINIMUM_ERROR_CODE,
     read_error_code_file,
 )
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -157,7 +157,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        table : `PySide2.QtWidgets.QTableWidget`
+        table : `PySide6.QtWidgets.QTableWidget`
             Table widget.
         """
 
@@ -189,7 +189,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        text_error_cause : `PySide2.QtWidgets.QPlainTextEdit`
+        text_error_cause : `PySide6.QtWidgets.QPlainTextEdit`
             Text of the possible error cause.
         """
 
@@ -208,7 +208,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide6.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -237,7 +237,7 @@ class TabAlarmWarn(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -455,7 +455,7 @@ class TabAlarmWarn(TabDefault):
 
         Parameters
         ----------
-        item : `PySide2.QtWidgets.QTableWidgetItem`
+        item : `PySide6.QtWidgets.QTableWidgetItem`
             Table widget item.
         status : `str`
             Error status.

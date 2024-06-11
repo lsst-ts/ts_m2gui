@@ -28,7 +28,7 @@ import pytest_asyncio
 from lsst.ts.m2com import NUM_ACTUATOR, get_config_dir
 from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabHardpointSelection
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
 

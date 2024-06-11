@@ -21,8 +21,8 @@
 
 __all__ = ["ControlTabs"]
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QVBoxLayout
 from qasync import asyncSlot
 
 from .controltab import (
@@ -53,7 +53,7 @@ class ControlTabs(object):
 
     Attributes
     ----------
-    layout : `PySide2.QtWidgets.QVBoxLayout`
+    layout : `PySide6.QtWidgets.QVBoxLayout`
         Layout.
     """
 
@@ -107,7 +107,7 @@ class ControlTabs(object):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -122,7 +122,7 @@ class ControlTabs(object):
 
         Parameters
         ----------
-        item : `PySide2.QtWidgets.QListWidgetItem`
+        item : `PySide6.QtWidgets.QListWidgetItem`
             Current item.
         """
 
@@ -141,7 +141,7 @@ class ControlTabs(object):
 
         Returns
         -------
-        item : `PySide2.QtWidgets.QListWidgetItem` or None
+        item : `PySide6.QtWidgets.QListWidgetItem` or None
             Table item object. None if nothing.
         control_tab : Child of `TabDefault` or None
             Control table object. None if nothing.

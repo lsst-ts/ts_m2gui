@@ -26,8 +26,8 @@ from lsst.ts.m2com import (
     NUM_TEMPERATURE_INTAKE,
     NUM_TEMPERATURE_RING,
 )
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
     QCheckBox,
     QDoubleSpinBox,
     QFormLayout,
@@ -310,7 +310,7 @@ class TabSettings(TabDefault):
 
         Parameters
         ----------
-        line_edit : `PySide2.QtWidgets.QLineEdit`
+        line_edit : `PySide6.QtWidgets.QLineEdit`
             Line edit.
         offset : `int`, optional
             Offset of the width. (the default is 20)
@@ -417,7 +417,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide6.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -445,7 +445,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -467,7 +467,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -491,7 +491,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -516,7 +516,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -536,7 +536,7 @@ class TabSettings(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

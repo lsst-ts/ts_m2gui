@@ -32,9 +32,9 @@ from lsst.ts.m2com import (
     read_yaml_file,
 )
 from lsst.ts.xml.enums import MTM2
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QColor, QPalette
-from PySide2.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QPalette
+from PySide6.QtWidgets import (
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -142,7 +142,7 @@ class TabIlcStatus(TabDefault):
 
         Parameters
         ----------
-        indicator : `PySide2.QtWidgets.QPushButton`
+        indicator : `PySide6.QtWidgets.QPushButton`
             Indicator.
         mode : enum `MTM2.InnerLoopControlMode`
             Mode of inner-loop controller (ILC).
@@ -163,7 +163,7 @@ class TabIlcStatus(TabDefault):
 
         Returns
         -------
-        `PySide2.QtCore.Qt.GlobalColor`
+        `PySide6.QtCore.Qt.GlobalColor`
             Indicator color.
         """
 
@@ -262,7 +262,7 @@ class TabIlcStatus(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -309,7 +309,7 @@ class TabIlcStatus(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -324,7 +324,7 @@ class TabIlcStatus(TabDefault):
 
         Returns
         -------
-        label : `PySide2.QtWidgets.QLabel`
+        label : `PySide6.QtWidgets.QLabel`
             Label of ILC mode.
         """
 
@@ -369,7 +369,7 @@ class TabIlcStatus(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -381,7 +381,7 @@ class TabIlcStatus(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

@@ -25,7 +25,7 @@ from pathlib import Path
 
 import numpy as np
 from lsst.ts.m2com import ActuatorDisplacementUnit, CommandActuator, CommandScript
-from PySide2.QtWidgets import (
+from PySide6.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
     QFormLayout,
@@ -260,7 +260,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        unit_selection : `PySide2.QtWidgets.QComboBox`
+        unit_selection : `PySide6.QtWidgets.QComboBox`
             Displacement unit selection.
         """
 
@@ -364,7 +364,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        applied_force : `PySide2.QtWidgets.QDoubleSpinBox`
+        applied_force : `PySide6.QtWidgets.QDoubleSpinBox`
             Applied force.
         """
 
@@ -397,7 +397,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide6.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -434,7 +434,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -456,7 +456,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -490,7 +490,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -518,7 +518,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -543,7 +543,7 @@ class TabActuatorControl(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

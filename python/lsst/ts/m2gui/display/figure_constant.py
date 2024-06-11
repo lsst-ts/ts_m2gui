@@ -22,9 +22,9 @@
 __all__ = ["FigureConstant"]
 
 import numpy as np
-from PySide2.QtCharts import QtCharts
-from PySide2.QtCore import QPointF, Qt
-from PySide2.QtGui import QPainter
+from PySide6.QtCharts import QtCharts
+from PySide6.QtCore import QPointF, Qt
+from PySide6.QtGui import QPainter
 
 
 class FigureConstant(QtCharts.QChartView):
@@ -60,9 +60,9 @@ class FigureConstant(QtCharts.QChartView):
 
     Attributes
     ----------
-    axis_x : `PySide2.QtCharts.QtCharts.QValueAxis`
+    axis_x : `PySide6.QtCharts.QtCharts.QValueAxis`
         X axis.
-    axis_y : `PySide2.QtCharts.QtCharts.QValueAxis`
+    axis_y : `PySide6.QtCharts.QtCharts.QValueAxis`
         Y axis.
     """
 
@@ -199,7 +199,7 @@ class FigureConstant(QtCharts.QChartView):
 
         Returns
         -------
-        `list` [`PySide2.QtCore.QPointF`]
+        `list` [`PySide6.QtCore.QPointF`]
             Points.
         """
         return self.get_series(idx).points()
@@ -214,7 +214,7 @@ class FigureConstant(QtCharts.QChartView):
 
         Returns
         -------
-        `PySide2.QtCharts.QtCharts.QLineSeries`
+        `PySide6.QtCharts.QtCharts.QLineSeries`
             Series.
         """
         return self.chart().series()[idx]
@@ -392,7 +392,7 @@ class FigureConstant(QtCharts.QChartView):
 
         Parameters
         ----------
-        points : `list` [`PySide2.QtCore.QPointF`]
+        points : `list` [`PySide6.QtCore.QPointF`]
             Points.
         value : `float`
             New coming data.

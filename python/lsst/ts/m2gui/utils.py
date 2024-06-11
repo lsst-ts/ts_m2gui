@@ -46,10 +46,10 @@ from pathlib import Path
 
 import numpy as np
 from lsst.ts.m2com import NUM_ACTUATOR, is_coroutine
-from PySide2 import QtWidgets
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import (
+from PySide6 import QtWidgets
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import (
     QAction,
     QGridLayout,
     QGroupBox,
@@ -96,7 +96,7 @@ def set_button(
 
     Returns
     -------
-    button : `PySide2.QtWidgets.QPushButton`
+    button : `PySide6.QtWidgets.QPushButton`
         button.
     """
 
@@ -139,7 +139,7 @@ def create_grid_layout_buttons(
 
     Returns
     -------
-    layout : `PySide2.QtWidgets.QGridLayout`
+    layout : `PySide6.QtWidgets.QGridLayout`
         Grid layout of buttons.
     """
 
@@ -187,7 +187,7 @@ def create_label(
 
     Returns
     -------
-    label : `PySide2.QtWidgets.QLabel`
+    label : `PySide6.QtWidgets.QLabel`
         label.
     """
     label = QLabel(name)
@@ -217,12 +217,12 @@ def create_group_box(name: str, layout: QtWidgets) -> QGroupBox:
     ----------
     name : `str`
         Name of the group box.
-    layout : Layout in `PySide2.QtWidgets`
+    layout : Layout in `PySide6.QtWidgets`
         Layout.
 
     Returns
     -------
-    group_box : `PySide2.QtWidgets.QGroupBox`
+    group_box : `PySide6.QtWidgets.QGroupBox`
         Group box.
     """
 
@@ -246,7 +246,7 @@ def create_table(
 
     Returns
     -------
-    table : `PySide2.QtWidgets.QTableWidget`
+    table : `PySide6.QtWidgets.QTableWidget`
         Table.
     """
 
@@ -473,14 +473,14 @@ def get_button_action(tool_bar: QToolBar, name: str) -> QAction:
 
     Parameters
     ----------
-    tool_bar : `PySide2.QtWidgets.QToolBar`
+    tool_bar : `PySide6.QtWidgets.QToolBar`
         Tool bar.
     name : `str`
         Action name.
 
     Returns
     -------
-    `PySide2.QtWidgets.QAction` or None
+    `PySide6.QtWidgets.QAction` or None
         Button widget of the action. None if does not exist.
     """
 

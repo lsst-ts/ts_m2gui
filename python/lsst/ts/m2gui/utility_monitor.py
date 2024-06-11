@@ -29,7 +29,7 @@ import numpy as np
 import numpy.typing
 from lsst.ts.m2com import DigitalInput
 from lsst.ts.xml.enums import MTM2
-from PySide2.QtCore import Signal
+from PySide6.QtCore import Signal
 
 from .actuator_force_axial import ActuatorForceAxial
 from .actuator_force_tangent import ActuatorForceTangent
@@ -639,7 +639,7 @@ class UtilityMonitor(object):
             Number of digits after the decimal. This should be greater than 0.
         data : `dict`
             Sensor data.
-        signal : `PySide2.QtCore.Signal`
+        signal : `PySide6.QtCore.Signal`
             Signal in QT framework.
         signal_item : `any`
             Item used in the signal's message.

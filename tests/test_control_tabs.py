@@ -24,8 +24,8 @@ import logging
 
 import pytest
 from lsst.ts.m2gui import ControlTabs, Model
-from PySide2 import QtCore
-from PySide2.QtWidgets import QWidget
+from PySide6 import QtCore
+from PySide6.QtWidgets import QWidget
 from pytestqt.qtbot import QtBot
 
 

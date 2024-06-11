@@ -21,7 +21,7 @@
 
 __all__ = ["LayoutDefault"]
 
-from PySide2.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
 
 from ..model import Model
@@ -39,7 +39,7 @@ class LayoutDefault(object):
     ----------
     model : `Model`
         Model class.
-    layout : `PySide2.QtWidgets.QVBoxLayout`
+    layout : `PySide6.QtWidgets.QVBoxLayout`
         Layout.
     """
 
@@ -67,7 +67,7 @@ class LayoutDefault(object):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
         raise NotImplementedError("Child class needs to realize this function.")
