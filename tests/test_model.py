@@ -719,10 +719,12 @@ async def test_process_lost_connection(model: Model) -> None:
 
 @pytest.mark.asyncio
 async def test_state_transition_normal(model_async: Model) -> None:
-    await model_async.enter_diagnostic()
+    is_csc_on = await model_async.enter_diagnostic()
+    assert is_csc_on is False
     assert model_async.local_mode == LocalMode.Diagnostic
 
-    await model_async.enter_enable()
+    is_csc_on = await model_async.enter_enable()
+    assert is_csc_on is False
     assert model_async.local_mode == LocalMode.Enable
 
     await model_async.exit_enable()
@@ -739,3 +741,36 @@ async def test_fault(model_async: Model) -> None:
 
     await model_async.fault()
     assert model_async.local_mode == LocalMode.Diagnostic
+
+
+@pytest.mark.asyncio
+async def test_enter_enable_power_on(model_async: Model) -> None:
+
+    # Fake the condition that the M2 CSC powered on the system already
+    mock_server = model_async.controller.mock_server
+    power_communication = mock_server.model.power_communication
+    power_motor = mock_server.model.power_motor
+
+    powers = [power_communication, power_motor]
+    power_types = [MTM2.PowerType.Communication, MTM2.PowerType.Motor]
+    for power, power_type in zip(powers, power_types):
+        await power.power_on()
+        await power.wait_power_fully_on()
+
+        await mock_server._message_event.write_power_system_state(
+            power_type,
+            power.is_power_on(),
+            power.state,
+        )
+
+    # Sleep a short time to handle the events
+    await asyncio.sleep(2)
+
+    # The M2 GUI should be able to enter the enable mode
+    is_csc_on = await model_async.enter_diagnostic()
+    assert is_csc_on is True
+
+    is_csc_on = await model_async.enter_enable()
+    assert is_csc_on is True
+
+    assert model_async.local_mode == LocalMode.Enable

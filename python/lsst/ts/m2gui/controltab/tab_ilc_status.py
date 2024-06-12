@@ -21,8 +21,10 @@
 
 __all__ = ["TabIlcStatus"]
 
+import asyncio
 from pathlib import Path
 
+import numpy as np
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_INNER_LOOP_CONTROLLER,
@@ -32,7 +34,14 @@ from lsst.ts.m2com import (
 from lsst.ts.xml.enums import MTM2
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette
-from PySide2.QtWidgets import QFormLayout, QGroupBox, QLabel, QPushButton, QVBoxLayout
+from PySide2.QtWidgets import (
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+)
 from qasync import asyncSlot
 
 from ..model import Model
@@ -41,6 +50,7 @@ from ..utils import (
     create_grid_layout_buttons,
     create_group_box,
     create_label,
+    run_command,
     set_button,
 )
 from .tab_default import TabDefault
@@ -70,6 +80,27 @@ class TabIlcStatus(TabDefault):
 
         # Bypassed ILCs
         self._label_bypassed_ilcs = create_label()
+
+        self._buttons_ilc = {
+            "reset": set_button(
+                "Reset ILC States",
+                self._callback_ilc_state_reset,
+                tool_tip=(
+                    "Reset the ILC states to NaN. This is recommanded before "
+                    "checking the current ILC states."
+                ),
+            ),
+            "check": set_button(
+                "Check ILC States",
+                self._callback_ilc_state_check,
+                tool_tip="Query the controller to get the current ILC states.",
+            ),
+            "enable": set_button(
+                "Enable ILC States",
+                self._callback_ilc_state_enable,
+                tool_tip="Transition the ILC states to be enabled.",
+            ),
+        }
 
         self.set_widget_and_layout()
 
@@ -151,6 +182,81 @@ class TabIlcStatus(TabDefault):
         else:
             return Qt.gray
 
+    @asyncSlot()
+    async def _callback_ilc_state_reset(self) -> None:
+        """Callback of the reset button to reset the inner-loop controller
+        (ILC) states to be NaN.
+        """
+
+        self._enable_ilc_commands(False)
+
+        self.model.controller.set_ilc_modes_to_nan()
+        for indicator in self._indicators_ilc:
+            self._update_indicator_color(indicator, MTM2.InnerLoopControlMode.Unknown)
+
+        self._enable_ilc_commands(True)
+
+    def _enable_ilc_commands(self, is_enabled: bool) -> None:
+        """Enable the inner-loop controller (ILC) commands or not.
+
+        Parameters
+        ----------
+        is_enabled : `bool`
+            True if enabled. False if disabled.
+        """
+
+        for button in self._buttons_ilc.values():
+            button.setEnabled(is_enabled)
+
+    @asyncSlot()
+    async def _callback_ilc_state_check(self, sleep_time_per_ilc: float = 0.12) -> None:
+        """Callback of the check button to check the current inner-loop
+        controller (ILC) states in controller.
+
+        Parameters
+        ----------
+        sleep_time_per_ilc : `float`, optional
+            Sleep time per ILC. (the default is 0.12)
+        """
+
+        self._enable_ilc_commands(False)
+
+        # Check the ILC states
+        addresses = list()
+        for idx, mode in enumerate(self.model.controller.ilc_modes):
+            if np.isnan(mode) or (mode == MTM2.InnerLoopControlMode.Unknown):
+                addresses.append(idx)
+
+        is_checking = False
+        num_ilc = len(addresses)
+        if num_ilc != 0:
+            is_checking = await run_command(
+                self.model.controller.get_ilc_modes, addresses
+            )
+
+        # Sleep some time when checking the ILC states
+        if is_checking:
+            await asyncio.sleep(num_ilc * sleep_time_per_ilc)
+
+        self._enable_ilc_commands(True)
+
+    @asyncSlot()
+    async def _callback_ilc_state_enable(self) -> None:
+        """Callback of the enable button to transition the inner-loop
+        controller (ILC) states to be enabled.
+        """
+
+        self._enable_ilc_commands(False)
+
+        await run_command(
+            self.model.controller.set_ilc_to_enabled,
+            reset_nan_first=False,  # type: ignore[arg-type]
+            retry_times=self.model.ilc_retry_times,  # type: ignore[arg-type]
+            timeout=self.model.ilc_timeout,  # type: ignore[arg-type]
+        )
+
+        self._enable_ilc_commands(True)
+
     def create_layout(self) -> QVBoxLayout:
         """Create the layout.
 
@@ -192,6 +298,9 @@ class TabIlcStatus(TabDefault):
                 num_column,
             )
         )
+
+        # ILC control
+        layout.addWidget(self._create_group_ilc_control())
 
         return layout
 
@@ -266,6 +375,21 @@ class TabIlcStatus(TabDefault):
 
         layout = create_grid_layout_buttons(indicators, num_column)
         return create_group_box(name, layout)
+
+    def _create_group_ilc_control(self) -> QGroupBox:
+        """Create the group of inner-loop controller (ILC) control.
+
+        Returns
+        -------
+        group : `PySide2.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QHBoxLayout()
+        for button in self._buttons_ilc.values():
+            layout.addWidget(button)
+
+        return create_group_box("Inner-Loop Controller Control", layout)
 
     def _set_signal_ilc_status(self, signal_ilc_status: SignalIlcStatus) -> None:
         """Set the inner-loop controller (ILC) status signal with callback

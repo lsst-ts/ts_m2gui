@@ -9,15 +9,13 @@ This GUI is supposed to be used by the hardware engineers or operators to have a
 If the GUI can not put the system into the closed-loop control, the M2 CSC will not be able to as well because they are using the same interface to the control system.
 Functionality of the GUI will be discussed in detail to provide the reader a comprehensive source for understanding the operation of GUI.
 
-It is noted that before the `DM_37422 <https://jira.lsstcorp.org/browse/DM-37422>`_ is fixed, you can only have the GUI or CSC connects to the M2 cell control system in a single time.
-Otherwise, you would get the TCP/IP connection error.
-In addition, there might be the inconsistency of internal data if you had used the deprecated M2 LabVIEW GUI to control the M2 already.
+It is noted that there might be the inconsistency of internal data if you had used the deprecated M2 LabVIEW GUI to control the M2 already.
 To fix the issue of internal error, the easierst way is to restart the cell control system (see :ref:`lsst.ts.m2gui-error_restart_control_system`).
 
 .. note::
   This GUI is to replace the original LabVIEW GUI: `ts_mtm2 <https://github.com/lsst-ts/ts_mtm2>`_, and the related executable is ``runM2Cntlr``.
   If the LabVIEW GUI was used to run the system with the opened- or closed-loop control, you may need to restart the control system (see the :ref:`lsst.ts.m2gui-error_restart_control_system`) before using the Python GUI or CSC to control the system.
-  This GUI will end the support once the `DM_37422 <https://jira.lsstcorp.org/browse/DM-37422>`_ is fixed.
+  This GUI will end the support soon (see `DM_43478 <https://rubinobs.atlassian.net/browse/DM-43478>`_).
   At this moment, it only plays the role to show the system status when the CSC is controlling the system when needed as the debug purpose.
 
 .. _Operation:
@@ -454,8 +452,13 @@ For the actuator ILC, the state machine starts in the **Standby** state, transit
 For the sensor ILC, the **Standby** state transitions to the **Enabled** state directly without the **Disabled** state in between.
 Both state machines transition to the **Fault** state when the fault happens.
 See the document of **MODBUS Protocol Interface Control Document for M2 Support System** for more details.
-
 Only when all ILCs are enabled, the system can transition to the **Enabled** state.
+
+Sometimes, you might want to have a more detailed control of ILCs.
+The **Reset ILC States** button resets all the current ILCs to NaN, which is recommanded before rechecking all the ILC states.
+The **Check ILC States** button queries all the **Unknown** ILCs to get the current states.
+The **Enable ILC States** button transitions all the ILCs to the **Enabled** state.
+These buttons can be used to debug or check the ILC states when the CSC is using the hardware at the same time.
 
 .. _lsst.ts.m2gui-user_net_force_moment:
 

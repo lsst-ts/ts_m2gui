@@ -63,7 +63,7 @@ class LayoutControl(LayoutDefault):
 
     @asyncSlot()
     async def _callback_signal_control(self, is_control_updated: bool) -> None:
-        if self.model.local_mode == LocalMode.Standby:
+        if self.model.local_mode in (LocalMode.Standby, LocalMode.Enable):
             self._update_buttons()
         else:
             self._prohibit_control()
