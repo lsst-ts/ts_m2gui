@@ -21,7 +21,7 @@
 
 __all__ = ["TabNetForceMoment"]
 
-from PySide2.QtWidgets import QFormLayout, QGroupBox, QVBoxLayout
+from PySide6.QtWidgets import QFormLayout, QGroupBox, QVBoxLayout
 
 from ..model import Model
 from ..signals import SignalNetForceMoment
@@ -98,7 +98,7 @@ class TabNetForceMoment(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -114,7 +114,7 @@ class TabNetForceMoment(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -134,7 +134,7 @@ class TabNetForceMoment(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

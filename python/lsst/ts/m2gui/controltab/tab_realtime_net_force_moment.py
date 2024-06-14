@@ -21,7 +21,7 @@
 
 __all__ = ["TabRealtimeNetForceMoment"]
 
-from PySide2.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QGridLayout
 from qasync import asyncSlot
 
 from ..display import FigureConstant
@@ -112,7 +112,7 @@ class TabRealtimeNetForceMoment(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QGridLayout`
+        layout : `PySide6.QtWidgets.QGridLayout`
             Layout.
         """
 

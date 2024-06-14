@@ -24,8 +24,8 @@ __all__ = ["TabDefault"]
 import types
 import typing
 
-from PySide2.QtCore import QTimer
-from PySide2.QtWidgets import (
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import (
     QComboBox,
     QDockWidget,
     QFormLayout,
@@ -91,7 +91,7 @@ class TabDefault(QDockWidget):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QLayout`
+        layout : `PySide6.QtWidgets.QLayout`
             Layout.
 
         Raises
@@ -106,14 +106,14 @@ class TabDefault(QDockWidget):
 
         Parameters
         ----------
-        widget : `PySide2.QtWidgets.QWidget`
+        widget : `PySide6.QtWidgets.QWidget`
             Widget.
         is_resizable : `bool`
             Is resizable or not.
 
         Returns
         -------
-        scroll_area : `PySide2.QtWidgets.QScrollArea`
+        scroll_area : `PySide6.QtWidgets.QScrollArea`
             Scrollable area.
         """
 
@@ -128,7 +128,7 @@ class TabDefault(QDockWidget):
 
         Parameters
         ----------
-        layout : `PySide2.QtWidgets.QFormLayout`
+        layout : `PySide6.QtWidgets.QFormLayout`
             Layout.
         """
         layout.addRow(" ", None)
@@ -146,7 +146,7 @@ class TabDefault(QDockWidget):
 
         Returns
         -------
-        ring_selection : `PySide2.QtWidgets.QComboBox`
+        ring_selection : `PySide6.QtWidgets.QComboBox`
             Ring selection.
         """
 
@@ -176,7 +176,7 @@ class TabDefault(QDockWidget):
 
         Returns
         -------
-        timer : `PySide2.QtCore.QTimer`
+        timer : `PySide6.QtCore.QTimer`
             Timer.
         """
 
@@ -192,7 +192,7 @@ class TabDefault(QDockWidget):
 
         Parameters
         ----------
-        timer : `PySide2.QtCore.QTimer`
+        timer : `PySide6.QtCore.QTimer`
             Timer.
         """
 

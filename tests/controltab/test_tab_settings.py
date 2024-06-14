@@ -25,7 +25,7 @@ import logging
 import pytest
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabSettings
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 from qasync import QApplication
 
@@ -95,7 +95,7 @@ def test_init(widget: TabSettings) -> None:
 @pytest.mark.asyncio
 async def test_callback_use_external_elevation_angle(widget: TabSettings) -> None:
     # Use the external elevation angle
-    await widget._callback_use_external_elevation_angle(int(Qt.CheckState.Checked))
+    await widget._callback_use_external_elevation_angle(Qt.CheckState.Checked.value)
 
     assert widget._settings["enable_angle_comparison"].isChecked() is True
     assert widget._settings["enable_angle_comparison"].isEnabled() is False
@@ -103,7 +103,7 @@ async def test_callback_use_external_elevation_angle(widget: TabSettings) -> Non
     assert widget._button_overwrite_external_elevation_angle.isEnabled() is True
 
     # Use the internal elevation angle
-    await widget._callback_use_external_elevation_angle(int(Qt.CheckState.Unchecked))
+    await widget._callback_use_external_elevation_angle(Qt.CheckState.Unchecked.value)
 
     assert widget._settings["enable_angle_comparison"].isEnabled() is True
     assert widget._button_overwrite_external_elevation_angle.isEnabled() is False

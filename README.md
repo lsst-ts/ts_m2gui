@@ -11,9 +11,10 @@
 
 - numpy (install by `conda`)
 - pyyaml (install by `conda`)
-- pyside2 (install by `conda`)
-- qt5-qtbase-devel (install by `yum`)
-- xorg-x11-server-Xvfb (optional, install by `yum`)
+- pyside6 (install by `conda`)
+- qt6-charts (install by `conda`)
+- qt5-qtbase-devel (install by `dnf`)
+- xorg-x11-server-Xvfb (optional, install by `dnf`)
 - qasync (install by `conda -c conda-forge`)
 - [black](https://github.com/psf/black) (optional)
 - [flake8](https://github.com/PyCQA/flake8) (optional)
@@ -41,8 +42,8 @@ See [Building single-package documentation locally](https://developer.lsst.io/st
 You need to set the QT environment variables:
 
 ```bash
-export QT_API="PySide2"
-export PYTEST_QT_API="PySide2"
+export QT_API="PySide6"
+export PYTEST_QT_API="PySide6"
 ```
 
 ### AlmaLinux
@@ -100,8 +101,6 @@ Note: If the variable of `PYTEST_QT_API` is not set, you might get the core dump
 ## Class Diagrams
 
 The class diagrams are in [here](doc/uml).
-You can use the [PlantUML](https://plantuml.com) to read them.
+You can use the [Mermaid](https://mermaid.live) to read them.
 QT is an event-based framework and the signal plays an important role among classes.
 The `emit()` and `connect()` in the class diagrams mean the class **emits** a specific siganl or **connects** it to a specific callback function.
-The environment variable **PATH_PLANTUML** is required to indicate the position of **plantuml.jar**.
-Otherwise, the default position will be used.

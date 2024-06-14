@@ -31,7 +31,7 @@ from lsst.ts.m2com import (
     read_yaml_file,
     select_axial_hardpoints,
 )
-from PySide2.QtWidgets import QGroupBox, QVBoxLayout
+from PySide6.QtWidgets import QGroupBox, QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import LocalMode
@@ -209,7 +209,7 @@ class TabHardpointSelection(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -237,7 +237,7 @@ class TabHardpointSelection(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 

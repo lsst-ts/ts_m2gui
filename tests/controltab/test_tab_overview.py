@@ -27,8 +27,8 @@ import pytest_asyncio
 from lsst.ts.m2gui import LocalMode, Model, SignalMessage
 from lsst.ts.m2gui.controltab import TabOverview
 from lsst.ts.xml.enums import MTM2
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QColor, QPalette
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QPalette
 from pytestqt.qtbot import QtBot
 
 

@@ -22,9 +22,9 @@
 __all__ = ["TabLimitSwitchStatus"]
 
 from lsst.ts.m2com import LimitSwitchType
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
-from PySide2.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout
 from qasync import asyncSlot
 
 from ..enums import Ring, Status
@@ -115,7 +115,7 @@ class TabLimitSwitchStatus(TabDefault):
 
         Parameters
         ----------
-        indicator : `PySide2.QtWidgets.QPushButton`
+        indicator : `PySide6.QtWidgets.QPushButton`
             Indicator.
         status : enum `Status`
             Status.
@@ -137,7 +137,7 @@ class TabLimitSwitchStatus(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QHBoxLayout`
+        layout : `PySide6.QtWidgets.QHBoxLayout`
             Layout.
         """
 
@@ -170,7 +170,7 @@ class TabLimitSwitchStatus(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout of limit switch.
 
         Raises

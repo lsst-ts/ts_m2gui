@@ -21,9 +21,9 @@
 
 __all__ = ["ItemActuator"]
 
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPen
-from PySide2.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPen
+from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem
 
 from .gauge import Gauge
 
@@ -53,7 +53,7 @@ class ItemActuator(QGraphicsEllipseItem):
         Actuator ID.
     magnitude : `float`
         Magnitude to decide the color of actuator on the mirror's view.
-    label_id : `PySide2.QtWidgets.QGraphicsTextItem`
+    label_id : `PySide6.QtWidgets.QGraphicsTextItem`
         Label of the actuator ID.
     """
 

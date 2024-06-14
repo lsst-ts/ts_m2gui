@@ -24,7 +24,7 @@ __all__ = ["connect_signal_to_future"]
 import asyncio
 import typing
 
-from PySide2.QtCore import Signal
+from PySide6.QtCore import Signal
 
 
 def connect_signal_to_future(signal: Signal, func: typing.Callable) -> asyncio.Future:
@@ -32,7 +32,7 @@ def connect_signal_to_future(signal: Signal, func: typing.Callable) -> asyncio.F
 
     Parameters
     ----------
-    signal : `PySide2.QtCore.Signal`
+    signal : `PySide6.QtCore.Signal`
         Signal.
     func : `func`
         Function to execute.

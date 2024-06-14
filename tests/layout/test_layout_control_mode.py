@@ -28,7 +28,7 @@ import pytest_asyncio
 from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutControlMode
-from PySide2 import QtCore
+from PySide6 import QtCore
 from pytestqt.qtbot import QtBot
 
 

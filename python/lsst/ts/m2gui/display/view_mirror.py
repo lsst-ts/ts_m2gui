@@ -21,8 +21,8 @@
 
 __all__ = ["ViewMirror"]
 
-from PySide2.QtGui import QFont
-from PySide2.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsView
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsView
 from qasync import asyncSlot
 
 from .item_actuator import ItemActuator
@@ -62,7 +62,7 @@ class ViewMirror(QGraphicsView):
 
         Returns
         -------
-        mirror : `PySide2.QtWidgets.QGraphicsScene`
+        mirror : `PySide6.QtWidgets.QGraphicsScene`
             Mirror scene.
         """
 
@@ -109,7 +109,7 @@ class ViewMirror(QGraphicsView):
 
         Returns
         -------
-        `PySide2.QtWidgets.QGraphicsTextItem` or None
+        `PySide6.QtWidgets.QGraphicsTextItem` or None
             Text item of the force actuator.
         """
 

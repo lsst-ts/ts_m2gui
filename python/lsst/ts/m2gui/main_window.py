@@ -28,8 +28,9 @@ from datetime import datetime
 
 from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.tcpip import LOCALHOST_IPV4
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QAction, QMainWindow, QToolBar, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
 from qasync import QApplication, asyncSlot
 
 from .control_tabs import ControlTabs
@@ -340,7 +341,7 @@ class MainWindow(QMainWindow):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -421,7 +422,7 @@ class MainWindow(QMainWindow):
 
         Returns
         -------
-        `PySide2.QtWidgets.QAction`
+        `PySide6.QtWidgets.QAction`
             Action.
         """
 

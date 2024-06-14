@@ -9,8 +9,8 @@ source:
 
 build:
   script_env:
-    - QT_API=PySide2
-    - PYTEST_QT_API=PySide2
+    - QT_API=PySide6
+    - PYTEST_QT_API=PySide6
   noarch: python
   script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
   entry_points:
@@ -26,6 +26,8 @@ test:
     - {{ cdt('libxext') }}     # [linux]
     - {{ cdt('xorg-x11-server-Xvfb')}}  # [linux]
     - ts-conda-build =0.4
+    - pyside6
+    - qt6-charts
     - pytest-qt
     - pytest-xvfb
     - ts-tcpip
@@ -46,6 +48,7 @@ requirements:
     - setuptools
     - pytest-runner
     - xorg-libxfixes # [linux]
+    - xcb-util-cursor # [linux]
   build:
     - {{ cdt('mesa-libgl-devel') }}  # [linux]
     - {{ cdt('mesa-dri-drivers') }}  # [linux]
@@ -62,7 +65,8 @@ requirements:
     - setuptools
     - setuptools_scm
     - pandas
-    - pyside2
+    - pyside6
+    - qt6-charts
     - qasync
     - ts-tcpip
     - ts-m2com

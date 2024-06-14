@@ -12,7 +12,7 @@ classifiers = [ "Programming Language :: Python :: 3" ]
 urls = {documentation = "https://jira.lsstcorp.org/secure/Dashboard.jspa", repository = "https://github.com/lsst-ts/ts_m2gui" }
 dynamic = [ "version" ]
 dependencies = [
-    "pyside2",
+    "pyside6",
     "pyyaml",
     "qasync",
     "ts_m2com",

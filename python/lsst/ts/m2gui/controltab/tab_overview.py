@@ -21,9 +21,9 @@
 
 __all__ = ["TabOverview"]
 
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QColor, QPalette
-from PySide2.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QPalette
+from PySide6.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
 from qasync import asyncSlot
 
 from ..model import Model
@@ -108,7 +108,7 @@ class TabOverview(TabDefault):
 
         Parameters
         ----------
-        indicator : `PySide2.QtWidgets.QPushButton`
+        indicator : `PySide6.QtWidgets.QPushButton`
             Indicator.
         is_status_on : `bool`
             The status is on or off.
@@ -133,12 +133,12 @@ class TabOverview(TabDefault):
 
         Parameters
         ----------
-        indicator : `PySide2.QtWidgets.QPushButton`
+        indicator : `PySide6.QtWidgets.QPushButton`
             Indicator.
 
         Returns
         -------
-        `PySide2.QtCore.Qt.GlobalColor`
+        `PySide6.QtCore.Qt.GlobalColor`
             Color of indicator.
         """
 
@@ -160,7 +160,7 @@ class TabOverview(TabDefault):
 
         Returns
         -------
-        window_log : `PySide2.QtWidgets.QPlainTextEdit`
+        window_log : `PySide6.QtWidgets.QPlainTextEdit`
             Log message(s) window/widget.
         """
 
@@ -175,7 +175,7 @@ class TabOverview(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 

@@ -24,7 +24,7 @@ import logging
 import pytest
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabDefault
-from PySide2.QtWidgets import QScrollArea, QWidget
+from PySide6.QtWidgets import QScrollArea, QWidget
 from pytestqt.qtbot import QtBot
 
 

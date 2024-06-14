@@ -30,8 +30,8 @@ from lsst.ts.m2com import NUM_INNER_LOOP_CONTROLLER, get_config_dir
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabIlcStatus
 from lsst.ts.xml.enums import MTM2
-from PySide2.QtCore import Qt
-from PySide2.QtGui import QPalette
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
 from pytestqt.qtbot import QtBot
 
 

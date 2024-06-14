@@ -25,7 +25,7 @@ import logging
 import pytest
 from lsst.ts.m2gui import Model, get_tol
 from lsst.ts.m2gui.controltab import TabRigidBodyPos
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
 

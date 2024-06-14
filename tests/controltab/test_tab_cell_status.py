@@ -34,7 +34,7 @@ from lsst.ts.m2gui import (
 )
 from lsst.ts.m2gui.controltab import TabCellStatus
 from lsst.ts.m2gui.display import ItemActuator
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
 TIMEOUT = 1000

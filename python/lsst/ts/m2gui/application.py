@@ -27,7 +27,7 @@ import os
 import sys
 
 import qasync
-from PySide2.QtCore import QCommandLineOption, QCommandLineParser
+from PySide6.QtCore import QCommandLineOption, QCommandLineParser
 
 from .main_window import MainWindow
 
@@ -36,8 +36,8 @@ def run_application() -> None:
     """Run the application."""
 
     if "QT_API" not in os.environ:
-        os.environ.setdefault("QT_API", "PySide2")
-        print("qasync: QT_API not set, defaulting to PySide2.")
+        os.environ.setdefault("QT_API", "PySide6")
+        print("qasync: QT_API not set, defaulting to PySide6.")
 
     # Workaround the Python 3.11 issue in 'qasync' module based on:
     # https://github.com/CabbageDevelopment/qasync/issues/68

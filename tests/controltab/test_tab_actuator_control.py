@@ -27,7 +27,7 @@ import pytest_asyncio
 from lsst.ts.m2com import ActuatorDisplacementUnit
 from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, LocalMode, Model
 from lsst.ts.m2gui.controltab import TabActuatorControl
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
 

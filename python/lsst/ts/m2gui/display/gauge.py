@@ -21,9 +21,9 @@
 
 __all__ = ["Gauge"]
 
-from PySide2.QtCore import QSize, Qt
-from PySide2.QtGui import QColor, QPainter, QPaintEvent
-from PySide2.QtWidgets import QWidget
+from PySide6.QtCore import QSize, Qt
+from PySide6.QtGui import QColor, QPainter, QPaintEvent
+from PySide6.QtWidgets import QWidget
 
 
 class Gauge(QWidget):
@@ -97,7 +97,7 @@ class Gauge(QWidget):
 
         Parameters
         ----------
-        event : `PySide2.QtGui.QPaintEvent`
+        event : `PySide6.QtGui.QPaintEvent`
             Paint event.
         """
 
@@ -153,7 +153,7 @@ class Gauge(QWidget):
 
         Returns
         -------
-        `PySide2.QtGui.QColor`
+        `PySide6.QtGui.QColor`
             Color.
         """
 

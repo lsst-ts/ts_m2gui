@@ -22,8 +22,8 @@
 __all__ = ["TabDetailedForce"]
 
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
     QAbstractItemView,
     QFormLayout,
     QGroupBox,
@@ -106,7 +106,7 @@ class TabDetailedForce(TabDefault):
         -------
         items_force : `dict`
             Items of the force. The value is the list of
-            `PySide2.QtWidgets.QTableWidgetItem`.
+            `PySide6.QtWidgets.QTableWidgetItem`.
         """
 
         actuator_id = list()
@@ -153,7 +153,7 @@ class TabDetailedForce(TabDefault):
 
         Returns
         -------
-        `PySide2.QtWidgets.QTableWidget`
+        `PySide6.QtWidgets.QTableWidget`
             Table widget.
         """
 
@@ -167,12 +167,12 @@ class TabDetailedForce(TabDefault):
 
         Parameters
         ----------
-        table : `PySide2.QtWidgets.QTableWidget`
+        table : `PySide6.QtWidgets.QTableWidget`
             Table widget without the items.
 
         Returns
         -------
-        table : `PySide2.QtWidgets.QTableWidget`
+        table : `PySide6.QtWidgets.QTableWidget`
             Table widget with the items.
         """
 
@@ -192,12 +192,12 @@ class TabDetailedForce(TabDefault):
 
         Parameters
         ----------
-        table : `PySide2.QtWidgets.QTableWidget`
+        table : `PySide6.QtWidgets.QTableWidget`
             Table widget.
 
         Returns
         -------
-        table : `PySide2.QtWidgets.QTableWidget`
+        table : `PySide6.QtWidgets.QTableWidget`
             Resized table widget.
         """
 
@@ -255,7 +255,7 @@ class TabDetailedForce(TabDefault):
 
         Returns
         -------
-        layout : `PySide2.QtWidgets.QVBoxLayout`
+        layout : `PySide6.QtWidgets.QVBoxLayout`
             Layout.
         """
 
@@ -276,7 +276,7 @@ class TabDetailedForce(TabDefault):
 
         Returns
         -------
-        group : `PySide2.QtWidgets.QGroupBox`
+        group : `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
