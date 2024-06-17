@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.0:
+
+-------------
+1.1.0
+-------------
+
+* Use the **PySide6.QtAsyncio** to replace the qasync.
+
 .. _lsst.ts.m2gui-1.0.0:
 
 -------------

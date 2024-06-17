@@ -21,13 +21,12 @@
 
 __all__ = ["run_application"]
 
-import asyncio
-import functools
 import os
 import sys
 
-import qasync
+from PySide6 import QtAsyncio
 from PySide6.QtCore import QCommandLineOption, QCommandLineParser
+from PySide6.QtWidgets import QApplication
 
 from .main_window import MainWindow
 
@@ -39,48 +38,7 @@ def run_application() -> None:
         os.environ.setdefault("QT_API", "PySide6")
         print("qasync: QT_API not set, defaulting to PySide6.")
 
-    # Workaround the Python 3.11 issue in 'qasync' module based on:
-    # https://github.com/CabbageDevelopment/qasync/issues/68
-    if (sys.version_info.major == 3) and (sys.version_info.minor >= 11):
-        with qasync._set_event_loop_policy(qasync.DefaultQEventLoopPolicy()):
-            runner = asyncio.runners.Runner()
-
-            try:
-                runner.run(main(sys.argv))
-
-            except asyncio.exceptions.CancelledError:
-                sys.exit(0)
-
-            finally:
-                runner.close()
-    else:
-        try:
-            qasync.run(main(sys.argv))
-        except asyncio.exceptions.CancelledError:
-            sys.exit(0)
-
-
-async def main(argv: list) -> bool:
-    """Main application.
-
-    Parameters
-    ----------
-    argv : `list`
-        Arguments from the command line.
-    """
-
-    # The set of "aboutToQuit" comes from "qasync/examples/aiohttp_fetch.py"
-    loop = asyncio.get_event_loop()
-    future: asyncio.Future = asyncio.Future()
-
-    # You need one (and only one) QApplication instance per application.
-    # There is one QApplication instance in "qasync" already.
-    app = qasync.QApplication.instance()
-    if hasattr(app, "aboutToQuit"):
-        getattr(app, "aboutToQuit").connect(
-            functools.partial(close_future, future, loop)
-        )
-
+    app = QApplication(sys.argv)
     app.setApplicationName("M2 EUI")
 
     # Set the parser
@@ -145,26 +103,4 @@ async def main(argv: list) -> bool:
     )
     window_main.show()
 
-    await future
-
-    # Your application won't reach here until you exit and the event
-    # loop has stopped.
-    return True
-
-
-def close_future(future: asyncio.Future, loop: asyncio.AbstractEventLoop) -> None:
-    """Close the future.
-
-    This is needed to ensure that all pre- and post-processing for the event
-    loop is done. See the source code in qasync library for the details.
-
-    Parameters
-    ----------
-    future : `asyncio.Future`
-        Future.
-    loop : `asyncio.unix_events._UnixSelectorEventLoop`
-        Event loop.
-    """
-
-    loop.call_later(10, future.cancel)
-    future.cancel()
+    QtAsyncio.run()
