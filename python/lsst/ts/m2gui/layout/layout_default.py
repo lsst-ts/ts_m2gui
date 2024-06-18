@@ -21,8 +21,8 @@
 
 __all__ = ["LayoutDefault"]
 
+from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QVBoxLayout
-from qasync import asyncSlot
 
 from ..model import Model
 
@@ -51,8 +51,8 @@ class LayoutDefault(object):
 
         self.layout = self._set_layout()
 
-    @asyncSlot()
-    async def _callback_signal_control(self, is_control_updated: bool) -> None:
+    @Slot()
+    def _callback_signal_control(self, is_control_updated: bool) -> None:
         """Callback of the control signal.
 
         Parameters

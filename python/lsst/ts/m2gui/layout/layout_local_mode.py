@@ -21,8 +21,8 @@
 
 __all__ = ["LayoutLocalMode"]
 
+from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QVBoxLayout
-from qasync import asyncSlot
 
 from ..enums import LocalMode
 from ..model import Model
@@ -69,8 +69,8 @@ class LayoutLocalMode(LayoutDefault):
 
         super().__init__(model)
 
-    @asyncSlot()
-    async def _callback_signal_control(self, is_control_updated: bool) -> None:
+    @Slot()
+    def _callback_signal_control(self, is_control_updated: bool) -> None:
         if (
             (not self.model.is_csc_commander)
             and (not self.model.is_closed_loop)
@@ -123,19 +123,19 @@ class LayoutLocalMode(LayoutDefault):
 
         return layout
 
-    @asyncSlot()
+    @Slot()
     async def _callback_standby(self) -> None:
         """Callback of the standby button. The system will transition to the
         standby state."""
         await self.set_local_mode(LocalMode.Standby)
 
-    @asyncSlot()
+    @Slot()
     async def _callback_diagnostic(self) -> None:
         """Callback of the diagnostic button. The system will transition to the
         diagnostic state."""
         await self.set_local_mode(LocalMode.Diagnostic)
 
-    @asyncSlot()
+    @Slot()
     async def _callback_enable(self) -> None:
         """Callback of the enable button. The system will transition to the
         enable state."""
