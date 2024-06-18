@@ -19,8 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
-
 __all__ = [
     "set_button",
     "create_grid_layout_buttons",
@@ -40,7 +38,9 @@ __all__ = [
 ]
 
 import ast
+import asyncio
 import re
+import typing
 from functools import partial
 from pathlib import Path
 
@@ -56,15 +56,15 @@ from PySide6.QtWidgets import (
     QPushButton,
     QTableWidget,
     QToolBar,
+    QMessageBox,
 )
 
 from .enums import Ring
-from .widget import QMessageBoxAsync
 
 
 def set_button(
     name: str,
-    callback: typing.Callable | None,
+    callback: typing.Callable | typing.Coroutine | None,
     *args: typing.Any,
     is_checkable: bool = False,
     is_indicator: bool = False,
@@ -77,7 +77,7 @@ def set_button(
     ----------
     name : `str`
         Button name.
-    callback : `func` or None
+    callback : `func` or `coroutine` or None
         Callback function object to use in future partial calls. Put None
         if you do not want to have the callback function connected.
     *args : `args`
@@ -104,7 +104,10 @@ def set_button(
         button.setCheckable(is_checkable)
 
     if callback is not None:
-        button.clicked.connect(partial(callback, *args))
+        if is_coroutine(callback):
+            button.clicked.connect(lambda: asyncio.create_task(callback(*args)))
+        else:
+            button.clicked.connect(partial(callback, *args))
 
     if is_indicator:
         button.setEnabled(False)
@@ -369,7 +372,7 @@ async def __prompt_dialog(
         shall not be the case when used in the real GUI. (the default is True)
     """
 
-    dialog = QMessageBoxAsync()
+    dialog = QMessageBox()
     dialog.setIcon(icon)
     dialog.setWindowTitle(title)
     dialog.setText(description)
@@ -399,7 +402,7 @@ async def prompt_dialog_critical(
         When False, dialog will not be executed. That is used for tests, which
         shall not be the case when used in the real GUI. (the default is True)
     """
-    await __prompt_dialog(title, description, QMessageBoxAsync.Critical, is_prompted)
+    await __prompt_dialog(title, description, QMessageBox.Critical, is_prompted)
 
 
 async def prompt_dialog_warning(
@@ -420,7 +423,7 @@ async def prompt_dialog_warning(
         When False, dialog will not be executed. That is used for tests, which
         shall not be the case when used in the real GUI. (the default is True)
     """
-    await __prompt_dialog(title, description, QMessageBoxAsync.Warning, is_prompted)
+    await __prompt_dialog(title, description, QMessageBox.Warning, is_prompted)
 
 
 async def run_command(
