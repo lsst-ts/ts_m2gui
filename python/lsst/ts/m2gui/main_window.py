@@ -21,6 +21,7 @@
 
 __all__ = ["MainWindow"]
 
+import asyncio
 import logging
 import pathlib
 import sys
@@ -28,10 +29,9 @@ from datetime import datetime
 
 from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.tcpip import LOCALHOST_IPV4
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
-from qasync import QApplication, asyncSlot
+from PySide6.QtWidgets import QApplication, QMainWindow, QToolBar, QVBoxLayout, QWidget
 
 from .control_tabs import ControlTabs
 from .controltab import TabSettings
@@ -364,13 +364,13 @@ class MainWindow(QMainWindow):
 
         tool_bar = self.addToolBar("ToolBar")
 
-        action_exit = tool_bar.addAction("Exit", self._callback_exit)
+        action_exit = tool_bar.addAction("Exit", lambda: asyncio.create_task(self._callback_exit()))
         action_exit.setToolTip("Exit the application (this might take some time)")
 
-        action_connect = tool_bar.addAction("Connect", self._callback_connect)
+        action_connect = tool_bar.addAction("Connect", lambda: asyncio.create_task(self._callback_connect()))
         action_connect.setToolTip("Connect to the M2 controller")
 
-        action_disconnect = tool_bar.addAction("Disconnect", self._callback_disconnect)
+        action_disconnect = tool_bar.addAction("Disconnect", lambda: asyncio.create_task(self._callback_disconnect()))
         action_disconnect.setToolTip(
             "Disconnect and close all tasks (this might take some time)"
         )
@@ -378,7 +378,7 @@ class MainWindow(QMainWindow):
         action_settings = tool_bar.addAction("Settings", self._callback_settings)
         action_settings.setToolTip("Show the application settings")
 
-    @asyncSlot()
+    @Slot()
     async def _callback_exit(self) -> None:
         """Exit the application.
 
@@ -455,7 +455,7 @@ class MainWindow(QMainWindow):
 
         return dialog
 
-    @asyncSlot()
+    @Slot()
     async def _callback_connect(self) -> None:
         """Callback function to connect to the M2 controller.
 
@@ -481,7 +481,7 @@ class MainWindow(QMainWindow):
 
         action_connect.setEnabled(True)
 
-    @asyncSlot()
+    @Slot()
     async def _callback_disconnect(self) -> None:
         """Callback function to disconnect from the M2 controller.
 
@@ -507,8 +507,8 @@ class MainWindow(QMainWindow):
         action_disconnect.setEnabled(True)
         action_exit.setEnabled(True)
 
-    @asyncSlot()
-    async def _callback_settings(self) -> None:
+    @Slot()
+    def _callback_settings(self) -> None:
         """Callback function to show the settings."""
         self._tab_settings.show()
 
