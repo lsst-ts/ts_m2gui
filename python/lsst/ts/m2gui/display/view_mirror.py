@@ -21,9 +21,9 @@
 
 __all__ = ["ViewMirror"]
 
+from PySide6.QtCore import Slot
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QGraphicsScene, QGraphicsTextItem, QGraphicsView
-from qasync import asyncSlot
 
 from .item_actuator import ItemActuator
 
@@ -79,8 +79,8 @@ class ViewMirror(QGraphicsView):
 
         return mirror
 
-    @asyncSlot()
-    async def _show_selected_actuator_force(self) -> None:
+    @Slot()
+    def _show_selected_actuator_force(self) -> None:
         """Show the selected actuator force."""
 
         selected_actuator = self.get_selected_actuator()
