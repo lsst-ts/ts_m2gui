@@ -117,13 +117,11 @@ class TabSettings(TabDefault):
         self._button_overwrite_external_elevation_angle = set_button(
             "Overwrite External Elevation Angle",
             self._callback_overwrite_external_elevation_angle,
+            is_checkable=True,
             tool_tip=(
                 "Overwrite the external elevation angle, which might affect\n"
                 "the LUT calculation. This is for the test purpose only."
             ),
-        )
-        self._button_overwrite_external_elevation_angle.setEnabled(
-            self._settings["use_external_elevation_angle"].isChecked()
         )
 
         self._button_apply_ilc = set_button(
@@ -138,6 +136,9 @@ class TabSettings(TabDefault):
         self._button_apply_general = set_button(
             "Apply General Settings", self._callback_apply_general
         )
+
+        # Timer to write the external elevation angle continuously
+        self._timer = self.create_and_start_timer(self._callback_time_out)
 
         self.set_widget_and_layout()
 
@@ -295,13 +296,9 @@ class TabSettings(TabDefault):
         if check_state == Qt.CheckState.Unchecked:
             check_box_enable_angle_comparison.setEnabled(True)
 
-            self._button_overwrite_external_elevation_angle.setEnabled(False)
-
         else:
             check_box_enable_angle_comparison.setChecked(True)
             check_box_enable_angle_comparison.setEnabled(False)
-
-            self._button_overwrite_external_elevation_angle.setEnabled(True)
 
     def _set_minimum_width_line_edit(
         self, line_edit: QLineEdit, offset: int = 20
@@ -383,8 +380,11 @@ class TabSettings(TabDefault):
         overwrite the current external elevation angle in controller.
         """
 
-        angle = self._settings["external_elevation_angle"].value()
-        await run_command(self.model.controller.set_external_elevation_angle, angle)
+        is_checked = self._button_overwrite_external_elevation_angle.isChecked()
+        if is_checked:
+            self.model.log.info("Overwrite the external elevation angle continuously.")
+        else:
+            self.model.log.info("Stop to overwrite the external elevation angle.")
 
     @asyncSlot()
     async def _callback_apply_ilc(self) -> None:
@@ -411,6 +411,16 @@ class TabSettings(TabDefault):
         font = app.font()
         font.setPointSize(self._settings["point_size"].value())
         app.setFont(font)
+
+    @asyncSlot()
+    async def _callback_time_out(self) -> None:
+        """Callback timeout function to write the external elevation angle."""
+
+        if self._button_overwrite_external_elevation_angle.isChecked():
+            angle = self._settings["external_elevation_angle"].value()
+            await run_command(self.model.controller.set_external_elevation_angle, angle)
+
+        self.check_duration_and_restart_timer(self._timer)
 
     def create_layout(self) -> QHBoxLayout:
         """Create the layout.
