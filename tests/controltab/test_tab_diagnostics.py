@@ -59,6 +59,21 @@ def test_init(widget_async: TabDiagnostics) -> None:
 
 
 @pytest.mark.asyncio
+async def test_callback_update_control_mode(
+    qtbot: QtBot, widget_async: TabDiagnostics
+) -> None:
+
+    mode = MTM2.ClosedLoopControlMode.TelemetryOnly
+    widget_async._control_mode_selection.setCurrentIndex(mode.value - 1)
+    qtbot.mouseClick(widget_async._button_update_control_mode, Qt.LeftButton)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget_async.model.controller.closed_loop_control_mode == mode
+
+
+@pytest.mark.asyncio
 async def test_callback_control_digital_status(
     qtbot: QtBot, widget_async: TabDiagnostics
 ) -> None:
@@ -206,3 +221,16 @@ async def test_callback_force_error_tangent(widget: TabDiagnostics) -> None:
         widget._force_error_tangent["tangent_sum"].text()
         == "<font color='red'>-1200.5 N</font>"
     )
+
+
+@pytest.mark.asyncio
+async def test_callback_closed_loop_control_mode(widget: TabDiagnostics) -> None:
+
+    mode = MTM2.ClosedLoopControlMode.TelemetryOnly
+    widget.model.controller.closed_loop_control_mode = mode
+    widget.model.signal_closed_loop_control_mode.is_updated.emit(True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget._control_mode_selection.currentIndex() == (mode.value - 1)

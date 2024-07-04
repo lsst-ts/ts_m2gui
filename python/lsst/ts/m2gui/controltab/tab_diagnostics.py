@@ -28,9 +28,11 @@ from lsst.ts.m2com import (
     TANGENT_LINK_TOTAL_WEIGHT_ERROR,
     DigitalOutputStatus,
 )
+from lsst.ts.xml.enums import MTM2
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import (
+    QComboBox,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -43,7 +45,7 @@ from qasync import asyncSlot
 from ..enums import LocalMode
 from ..force_error_tangent import ForceErrorTangent
 from ..model import Model
-from ..signals import SignalDetailedForce, SignalUtility
+from ..signals import SignalClosedLoopControlMode, SignalDetailedForce, SignalUtility
 from ..utils import (
     create_group_box,
     create_label,
@@ -113,6 +115,13 @@ class TabDiagnostics(TabDefault):
             "Reboot Controller", self._callback_reboot_controller
         )
 
+        self._button_update_control_mode = set_button(
+            "Update Control Mode",
+            self._callback_update_control_mode,
+            tool_tip="Update the closed-loop control mode.",
+        )
+        self._control_mode_selection = self._create_control_mode_selection()
+
         self._digital_status_input = self._create_indicators_digital_status(
             self._get_list_digital_status_input()
         )
@@ -129,6 +138,9 @@ class TabDiagnostics(TabDefault):
         self._set_signal_utility(self.model.utility_monitor.signal_utility)
         self._set_signal_detailed_force(
             self.model.utility_monitor.signal_detailed_force
+        )
+        self._set_signal_closed_loop_control_mode(
+            self.model.signal_closed_loop_control_mode
         )
 
     def _create_labels_power(self) -> dict[str, QLabel]:
@@ -166,6 +178,59 @@ class TabDiagnostics(TabDefault):
         decision = await dialog.show()
         if decision == QMessageBoxAsync.Ok:
             await run_command(self.model.reboot_controller)
+
+    @asyncSlot()
+    async def _callback_update_control_mode(self) -> None:
+        """Callback of the update-control-mode button. This will update the
+        closed-loop control mode in cell."""
+
+        # Index begins from 0 instead of 1 in QComboBox
+        mode = MTM2.ClosedLoopControlMode(
+            self._control_mode_selection.currentIndex() + 1
+        )
+        await run_command(
+            self.model.controller.set_closed_loop_control_mode,
+            mode,
+            timeout=20.0,  # type: ignore[arg-type]
+        )
+
+    def _create_control_mode_selection(self) -> QComboBox:
+        """Create the combo box of closed-loop control mode selection.
+
+        Returns
+        -------
+        `PySide6.QtWidgets.QComboBox`
+            Closed-loop control mode selection.
+        """
+
+        mode_selection = QComboBox()
+
+        for mode in MTM2.ClosedLoopControlMode:
+            mode_selection.addItem(mode.name)
+
+        return self._update_index_control_mode_selection(mode_selection)
+
+    def _update_index_control_mode_selection(
+        self, mode_selection: QComboBox
+    ) -> QComboBox:
+        """Update the index of closed-loop control mode selection.
+
+        Parameters
+        ----------
+        mode_selection : `PySide6.QtWidgets.QComboBox`
+            Closed-loop control mode selection.
+
+        Returns
+        -------
+        mode_selection : `PySide6.QtWidgets.QComboBox`
+            Updated closed-loop control mode selection.
+        """
+
+        # Index begins from 0 instead of 1 in QComboBox
+        index = self.model.controller.closed_loop_control_mode.value - 1
+        mode_selection.setCurrentIndex(index)
+
+        return mode_selection
 
     def _create_indicators_digital_status(
         self, list_digital_status: list
@@ -386,6 +451,7 @@ class TabDiagnostics(TabDefault):
         layout_digital_status_output.addWidget(
             self._create_group_digital_status_control()
         )
+        layout_digital_status_output.addWidget(self._create_group_control_mode())
 
         layout.addLayout(layout_digital_status_output)
 
@@ -420,7 +486,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -445,7 +511,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -472,7 +538,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -490,7 +556,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -506,7 +572,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -522,7 +588,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -538,7 +604,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -548,6 +614,24 @@ class TabDiagnostics(TabDefault):
             layout.addRow(f"(D{idx}) {status}:", self._digital_status_control[idx])
 
         return create_group_box("Digital Output Controls", layout)
+
+    def _create_group_control_mode(self) -> QGroupBox:
+        """Create the group of control of closed-loop control mode.
+
+        Returns
+        -------
+        `PySide6.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout_control_mode = QFormLayout()
+        layout_control_mode.addRow("Mode:", self._control_mode_selection)
+
+        layout = QVBoxLayout()
+        layout.addLayout(layout_control_mode)
+        layout.addWidget(self._button_update_control_mode)
+
+        return create_group_box("Control Loop", layout)
 
     def _create_group_digital_status_input(
         self, idx_start: int, idx_end: int, group_name: str
@@ -565,7 +649,7 @@ class TabDiagnostics(TabDefault):
 
         Returns
         -------
-        group : `PySide6.QtWidgets.QGroupBox`
+        `PySide6.QtWidgets.QGroupBox`
             Group.
         """
 
@@ -806,4 +890,33 @@ class TabDiagnostics(TabDefault):
             f"<font color='{self.COLOR_BLACK}'>{force_error_tangent.error_sum} N</font>"
             if abs(force_error_tangent.error_sum) < TANGENT_LINK_THETA_Z_MOMENT
             else f"<font color='{self.COLOR_RED}'>{force_error_tangent.error_sum} N</font>"
+        )
+
+    def _set_signal_closed_loop_control_mode(
+        self, signal_closed_loop_control_mode: SignalClosedLoopControlMode
+    ) -> None:
+        """Set the closed-loop control mode signal.
+
+        Parameters
+        ----------
+        signal_closed_loop_control_mode : `SignalClosedLoopControlMode`
+            Signal to know the closed-loop control mode is updated or not.
+        """
+
+        signal_closed_loop_control_mode.is_updated.connect(
+            self._callback_closed_loop_control_mode
+        )
+
+    @asyncSlot()
+    async def _callback_closed_loop_control_mode(self, is_updated: bool) -> None:
+        """Callback of the closed-loop control mode signal.
+
+        Parameters
+        ----------
+        is_updated : `bool`
+            Closed-loop control mode is updated or not.
+        """
+
+        self._control_mode_selection = self._update_index_control_mode_selection(
+            self._control_mode_selection
         )
