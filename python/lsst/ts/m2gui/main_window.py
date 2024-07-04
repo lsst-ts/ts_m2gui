@@ -434,7 +434,7 @@ class MainWindow(QMainWindow):
 
         Returns
         -------
-        `QMessageBoxAsync`
+        dialog : `QMessageBoxAsync`
             Exit dialog.
         """
 
@@ -492,6 +492,16 @@ class MainWindow(QMainWindow):
         unpredictable application behavior.
         """
 
+        # If the commander is not CSC, notify the user.
+        if self.model.system_status["isCrioConnected"] and (
+            not self.model.is_csc_commander
+        ):
+            dialog = self._create_dialog_disconnect()
+            result = await dialog.show()
+
+            if result == QMessageBoxAsync.Cancel:
+                return
+
         action_connect = self._get_action("Connect")
         action_connect.setEnabled(False)
 
@@ -506,6 +516,33 @@ class MainWindow(QMainWindow):
         action_connect.setEnabled(True)
         action_disconnect.setEnabled(True)
         action_exit.setEnabled(True)
+
+    def _create_dialog_disconnect(self) -> QMessageBoxAsync:
+        """Create the disconnect dialog.
+
+        Returns
+        -------
+        dialog : `QMessageBoxAsync`
+            Disconnect dialog.
+        """
+
+        dialog = QMessageBoxAsync()
+        dialog.setIcon(QMessageBoxAsync.Warning)
+        dialog.setWindowTitle("disconnect")
+
+        dialog.setText(
+            "The current commander is GUI. Please consider to switch to CSC "
+            "before the disconnection.\n\n"
+            "Do you want to continue the disconnection?"
+        )
+
+        dialog.addButton(QMessageBoxAsync.Ok)
+        dialog.addButton(QMessageBoxAsync.Cancel)
+
+        # Block the user to interact with other running widgets
+        dialog.setModal(True)
+
+        return dialog
 
     @asyncSlot()
     async def _callback_settings(self) -> None:
