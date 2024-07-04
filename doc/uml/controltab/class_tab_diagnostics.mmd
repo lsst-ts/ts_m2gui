@@ -2,9 +2,9 @@ classDiagram
 namespace m2gui {
   class Model
   class UtilityMonitor
+  class SignalClosedLoopControlMode
   class SignalUtility
   class SignalDetailedForce
-  class SignalClosedLoopControlMode
 }
 
 Model *-- UtilityMonitor
@@ -19,7 +19,7 @@ namespace widget {
 TabDefault *-- Model
 TabDefault <|-- TabDiagnostics
 
+TabDiagnostics --> SignalClosedLoopControlMode : connect()
 TabDiagnostics --> SignalUtility : connect()
 TabDiagnostics --> SignalDetailedForce : connect()
-TabDiagnostics --> SignalClosedLoopControlMode : connect()
 TabDiagnostics ..> QMessageBoxAsync
