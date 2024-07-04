@@ -33,6 +33,7 @@ __all__ = [
     "SignalScript",
     "SignalIlcStatus",
     "SignalNetForceMoment",
+    "SignalClosedLoopControlMode",
 ]
 
 from PySide6 import QtCore
@@ -230,3 +231,10 @@ class SignalNetForceMoment(QtCore.QObject):
     # corrections for x, y, and z dimensions.
     # The units of force and moment are Newton and Newton * meter.
     force_balance = QtCore.Signal(object)
+
+
+class SignalClosedLoopControlMode(QtCore.QObject):
+    """Closed-loop control mode signal to send the update status of current
+    control mode."""
+
+    is_updated = QtCore.Signal(bool)

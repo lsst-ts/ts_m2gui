@@ -64,6 +64,7 @@ from .enums import (
 from .fault_manager import FaultManager
 from .force_error_tangent import ForceErrorTangent
 from .signals import (
+    SignalClosedLoopControlMode,
     SignalConfig,
     SignalControl,
     SignalIlcStatus,
@@ -117,6 +118,8 @@ class Model(object):
         Signal to send the script progress.
     signal_ilc_status : `SignalIlcStatus`
         Signal to send the inner-loop controller (ILC) status.
+    signal_closed_loop_control_mode : `SignalClosedLoopControlMode`
+        Signal to send the update status of closed-loop control mode.
     system_status : `dict`
         System status.
     fault_manager : `FaultManager`
@@ -155,6 +158,7 @@ class Model(object):
         self.signal_config = SignalConfig()
         self.signal_script = SignalScript()
         self.signal_ilc_status = SignalIlcStatus()
+        self.signal_closed_loop_control_mode = SignalClosedLoopControlMode()
 
         self.system_status = self._set_system_status()
 
@@ -784,6 +788,7 @@ class Model(object):
                 self.log.info(
                     f"Closed-loop control mode: {self.controller.closed_loop_control_mode!r}."
                 )
+                self.signal_closed_loop_control_mode.is_updated.emit(True)
 
             elif name == "tcpIpConnected":
                 self.update_system_status("isCrioConnected", message["isConnected"])
