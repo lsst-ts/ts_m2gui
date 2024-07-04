@@ -81,6 +81,19 @@ def test_enable_ilc_commands(widget: TabIlcStatus) -> None:
 
 
 @pytest.mark.asyncio
+async def test_is_closed_loop_control_mode_in_idle(widget: TabIlcStatus) -> None:
+
+    is_idle = await widget._is_closed_loop_control_mode_in_idle("", is_prompted=False)
+    assert is_idle is True
+
+    widget.model.controller.closed_loop_control_mode = (
+        MTM2.ClosedLoopControlMode.TelemetryOnly
+    )
+    is_idle = await widget._is_closed_loop_control_mode_in_idle("", is_prompted=False)
+    assert is_idle is False
+
+
+@pytest.mark.asyncio
 async def test_callback_ilc_state_reset(qtbot: QtBot, widget: TabIlcStatus) -> None:
 
     mode = MTM2.InnerLoopControlMode.Disabled
