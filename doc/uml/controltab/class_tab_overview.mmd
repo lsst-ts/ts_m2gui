@@ -3,9 +3,13 @@ namespace m2gui {
   class Model
   class SignalMessage
   class SignalControl
+  class SignalStatus
+  class SignalClosedLoopControlMode
 }
 
+Model *-- SignalControl : emit()
 Model *-- SignalStatus : emit()
+Model *-- SignalClosedLoopControlMode : emit()
 
 TabDefault *-- Model
 TabDefault <|-- TabOverview
@@ -13,3 +17,4 @@ TabDefault <|-- TabOverview
 TabOverview --> SignalMessage : connect()
 TabOverview --> SignalControl : connect()
 TabOverview --> SignalStatus : connect()
+TabOverview --> SignalClosedLoopControlMode : connect()

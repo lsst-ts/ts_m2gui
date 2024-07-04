@@ -6,6 +6,21 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.0.1:
+
+-------------
+1.0.1
+-------------
+
+* Improve the **README.md**.
+* Update the ``MainWindow._callback_disconnect()`` to check the current commander.
+* Add the ``SignalClosedLoopControlMode`` and update ``Model._process_event()`` to send the signal.
+* Add the ``TabOverview._set_signal_closed_loop_control_mode()``. 
+* Add the ``TabIlcStatus._is_closed_loop_control_mode_in_idle()``.
+* Update the **TabDiagnostics** to support the control of closed-loop control mode.
+* Add the ``TabSettings._callback_time_out()`` to write the external elevation angle continuously.
+* Update the user manual and UML diagrams.
+
 .. _lsst.ts.m2gui-1.0.0:
 
 -------------
