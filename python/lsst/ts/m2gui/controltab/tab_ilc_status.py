@@ -50,6 +50,7 @@ from ..utils import (
     create_grid_layout_buttons,
     create_group_box,
     create_label,
+    prompt_dialog_warning,
     run_command,
     set_button,
 )
@@ -219,6 +220,13 @@ class TabIlcStatus(TabDefault):
             Sleep time per ILC. (the default is 0.12)
         """
 
+        # If the closed-loop control mode is not in Idle, return immediately.
+        is_idle = await self._is_closed_loop_control_mode_in_idle(
+            "_callback_ilc_state_check()"
+        )
+        if not is_idle:
+            return
+
         self._enable_ilc_commands(False)
 
         # Check the ILC states
@@ -240,11 +248,50 @@ class TabIlcStatus(TabDefault):
 
         self._enable_ilc_commands(True)
 
+    async def _is_closed_loop_control_mode_in_idle(
+        self, title: str, is_prompted: bool = True
+    ) -> bool:
+        """The closed-loop control mode is in idle or not.
+
+        Parameters
+        ----------
+        title : `str`
+            Title of the dialog.
+        is_prompted : `bool`, optional
+            When False, dialog will not be executed. That is used for tests,
+            which shall not be the case when used in the real GUI. (the default
+            is True)
+
+        Returns
+        -------
+        `bool`
+            True if the closed-loop control mode is in idle. False if not.
+        """
+
+        closed_loop_control_mode = self.model.controller.closed_loop_control_mode
+        if closed_loop_control_mode != MTM2.ClosedLoopControlMode.Idle:
+            await prompt_dialog_warning(
+                title,
+                f"Closed-loop control mode is {closed_loop_control_mode!r}. "
+                "Please set the closed-loop control mode to Idle first.",
+                is_prompted=is_prompted,
+            )
+            return False
+
+        return True
+
     @asyncSlot()
     async def _callback_ilc_state_enable(self) -> None:
         """Callback of the enable button to transition the inner-loop
         controller (ILC) states to be enabled.
         """
+
+        # If the closed-loop control mode is not in Idle, return immediately.
+        is_idle = await self._is_closed_loop_control_mode_in_idle(
+            "_callback_ilc_state_enable()"
+        )
+        if not is_idle:
+            return
 
         self._enable_ilc_commands(False)
 

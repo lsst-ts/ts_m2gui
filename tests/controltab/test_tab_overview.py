@@ -54,7 +54,7 @@ async def widget_async(qtbot: QtBot) -> TabOverview:
 def test_init(qtbot: QtBot, widget: TabOverview) -> None:
     assert widget._label_control.text() == "Commander is: EUI"
     assert widget._label_control_mode.text() == "Control Mode: Standby"
-    assert widget._label_local_mode.text() == "Control Loop: Open-Loop Control"
+    assert widget._label_local_mode.text() == "Control Loop: Idle"
     assert widget._label_inclination_source.text() == "Inclination Source: ONBOARD"
 
     assert widget._window_log.isReadOnly() is True
@@ -79,7 +79,6 @@ def test_update_control_status(qtbot: QtBot, widget: TabOverview) -> None:
 
     assert widget._label_control.text() == "Commander is: CSC"
     assert widget._label_control_mode.text() == "Control Mode: Enable"
-    assert widget._label_local_mode.text() == "Control Loop: Closed-Loop Control"
     assert widget._label_inclination_source.text() == "Inclination Source: MTMOUNT"
 
 
@@ -183,3 +182,17 @@ async def test_callback_signal_status_is_warning_on(
 def _get_color_is_warning_on(widget: TabOverview) -> QColor:
     palette = widget._indicators_status["isWarningOn"].palette()
     return palette.color(QPalette.Button)
+
+
+@pytest.mark.asyncio
+async def test_callback_closed_loop_control_mode(widget: TabOverview) -> None:
+
+    widget.model.controller.closed_loop_control_mode = (
+        MTM2.ClosedLoopControlMode.TelemetryOnly
+    )
+    widget.model.signal_closed_loop_control_mode.is_updated.emit(True)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    assert widget._label_local_mode.text() == "Control Loop: TelemetryOnly"

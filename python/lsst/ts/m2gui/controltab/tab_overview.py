@@ -27,7 +27,12 @@ from PySide6.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
 from qasync import asyncSlot
 
 from ..model import Model
-from ..signals import SignalControl, SignalMessage, SignalStatus
+from ..signals import (
+    SignalClosedLoopControlMode,
+    SignalControl,
+    SignalMessage,
+    SignalStatus,
+)
 from ..utils import create_label, set_button
 from .tab_default import TabDefault
 
@@ -54,7 +59,9 @@ class TabOverview(TabDefault):
         # Labels
         self._label_control = create_label()
         self._label_control_mode = create_label()
-        self._label_local_mode = create_label()
+        self._label_local_mode = create_label(
+            name=f"Control Loop: {self.model.controller.closed_loop_control_mode.name}"
+        )
         self._label_inclination_source = create_label()
 
         # Indicators of the system status
@@ -71,6 +78,9 @@ class TabOverview(TabDefault):
         self._update_control_status()
 
         self._set_signal_status(self.model.signal_status)
+        self._set_signal_closed_loop_control_mode(
+            self.model.signal_closed_loop_control_mode
+        )
 
     def _set_indicators_status(self) -> dict[str, QPushButton]:
         """Set the indicators of system status.
@@ -233,13 +243,6 @@ class TabOverview(TabDefault):
 
         self._label_control_mode.setText(f"Control Mode: {self.model.local_mode.name}")
 
-        text_local_mode = (
-            "Control Loop: Closed-Loop Control"
-            if self.model.is_closed_loop
-            else "Control Loop: Open-Loop Control"
-        )
-        self._label_local_mode.setText(text_local_mode)
-
         self._label_inclination_source.setText(
             f"Inclination Source: {self.model.inclination_source.name}"
         )
@@ -268,6 +271,35 @@ class TabOverview(TabDefault):
 
         self._update_indicator_color(
             self._indicators_status[name_status[0]], name_status[1]
+        )
+
+    def _set_signal_closed_loop_control_mode(
+        self, signal_closed_loop_control_mode: SignalClosedLoopControlMode
+    ) -> None:
+        """Set the closed-loop control mode signal.
+
+        Parameters
+        ----------
+        signal_closed_loop_control_mode : `SignalClosedLoopControlMode`
+            Signal to know the closed-loop control mode is updated or not.
+        """
+
+        signal_closed_loop_control_mode.is_updated.connect(
+            self._callback_closed_loop_control_mode
+        )
+
+    @asyncSlot()
+    async def _callback_closed_loop_control_mode(self, is_updated: bool) -> None:
+        """Callback of the closed-loop control mode signal.
+
+        Parameters
+        ----------
+        is_updated : `bool`
+            Closed-loop control mode is updated or not.
+        """
+
+        self._label_local_mode.setText(
+            f"Control Loop: {self.model.controller.closed_loop_control_mode.name}"
         )
 
     def set_signal_control(self, signal_control: SignalControl) -> None:

@@ -93,6 +93,7 @@ The available Qt signals are listed below:
 * **SignalPosition** sends the rigid body position.
 * **SignalScript** sends the status of script progress.
 * **SignalIlcStatus** sends the status of inner-loop controller (ILC).
+* **SignalClosedLoopControlMode** sends the update status of closed-loop control mode.
 
 .. _lsst.ts.m2gui-modules_m2gui_layout:
 

@@ -390,6 +390,11 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
             }
         )
 
+    with qtbot.waitSignal(
+        model.signal_closed_loop_control_mode.is_updated, timeout=TIMEOUT
+    ):
+        await model._process_event(message={"id": "closedLoopControlMode", "mode": 1})
+
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
         await model._process_event(
             message={"id": "tcpIpConnected", "isConnected": True}

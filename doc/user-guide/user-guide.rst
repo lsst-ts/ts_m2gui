@@ -377,6 +377,10 @@ It is noted that only when the D2 ("interlock enable" in digital output) and D31
 This implies that you could manually toggle on/off the D0 and D1 to check the interlock signal exists or not.
 If you do so, you always need to turn on the communication power first followed by the motor power, and turn off the motor power first followed by the communication power.
 
+You can use the **Update Control Mode** button to change the current mode (see **Mode** combo selection) in closed-loop control mode.
+You might need to use this function with caution because this might affect the use of hardware.
+If you want to check the ILC state, you would need to make sure the mode is in idle.
+
 The diagnostics table also contains a button to reboot the cell controller.
 
 .. _lsst.ts.m2gui-user_alarm_warn:
@@ -459,6 +463,7 @@ The **Reset ILC States** button resets all the current ILCs to NaN, which is rec
 The **Check ILC States** button queries all the **Unknown** ILCs to get the current states.
 The **Enable ILC States** button transitions all the ILCs to the **Enabled** state.
 These buttons can be used to debug or check the ILC states when the CSC is using the hardware at the same time.
+Note the control loop needs to be in idle to avoid the disruption with the reading of ILC data.
 
 .. _lsst.ts.m2gui-user_net_force_moment:
 

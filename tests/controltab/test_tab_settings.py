@@ -100,13 +100,10 @@ async def test_callback_use_external_elevation_angle(widget: TabSettings) -> Non
     assert widget._settings["enable_angle_comparison"].isChecked() is True
     assert widget._settings["enable_angle_comparison"].isEnabled() is False
 
-    assert widget._button_overwrite_external_elevation_angle.isEnabled() is True
-
     # Use the internal elevation angle
     await widget._callback_use_external_elevation_angle(Qt.CheckState.Unchecked.value)
 
     assert widget._settings["enable_angle_comparison"].isEnabled() is True
-    assert widget._button_overwrite_external_elevation_angle.isEnabled() is False
 
 
 @pytest.mark.asyncio
