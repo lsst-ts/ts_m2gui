@@ -63,7 +63,7 @@ async def widget_async(qtbot: QtBot) -> TabAlarmWarn:
 
 
 def test_init(widget: TabAlarmWarn) -> None:
-    assert len(widget._error_list) == 36
+    assert len(widget._error_list) == 37
     assert len(widget._error_list["6051"]) == 6
     assert list(widget._error_list.keys())[-1] == "6088"
 

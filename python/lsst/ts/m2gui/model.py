@@ -181,6 +181,9 @@ class Model(object):
             self._process_lost_connection
         )
 
+        # Do not calculate the temperature LUT by default
+        self.controller.control_parameters["enable_lut_temperature"] = False
+
         self._is_simulation_mode = is_simulation_mode
 
         self.duration_refresh = 100
