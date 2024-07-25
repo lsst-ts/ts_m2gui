@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.0.2:
+
+-------------
+1.0.2
+-------------
+
+* Do not calculate the temperature LUT by default.
+
 .. _lsst.ts.m2gui-1.0.1:
 
 -------------
