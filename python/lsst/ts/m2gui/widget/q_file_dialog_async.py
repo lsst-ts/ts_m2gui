@@ -53,7 +53,7 @@ class QFileDialogAsync(QFileDialog):
 
         result = await self.show()
 
-        if result == QFileDialog.AcceptSave:
+        if result == QFileDialog.AcceptSave.value:
             return self.selectedFiles()[0]
         else:
             return ""
