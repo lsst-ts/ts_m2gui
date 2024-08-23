@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.0.3:
+
+-------------
+1.0.3
+-------------
+
+* By default, bypass the ILC read warning codes.
+* Fix the bug of ``QFileDialogAsync.get_open_filename_async()``.
+
 .. _lsst.ts.m2gui-1.0.2:
 
 -------------

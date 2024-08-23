@@ -26,6 +26,7 @@ from pathlib import Path
 
 from lsst.ts.m2com import (
     DEFAULT_ENABLED_FAULTS_MASK,
+    ILC_READ_WARNING_ERROR_CODES,
     MINIMUM_ERROR_CODE,
     read_error_code_file,
 )
@@ -264,7 +265,12 @@ class TabAlarmWarn(TabDefault):
         """Callback of the bypass button to bypass the selected error codes."""
 
         codes = self._get_selected_error_codes()
-        dialog = self._create_dialog_bypass(codes)
+
+        # Bypass the ILC read warning error codes by default
+        # Note the union() will return a new set object
+        codes_to_bypass = codes.union(ILC_READ_WARNING_ERROR_CODES)
+
+        dialog = self._create_dialog_bypass(codes_to_bypass)
 
         result = await dialog.show()
         if result == QMessageBoxAsync.Ok:
@@ -274,7 +280,8 @@ class TabAlarmWarn(TabDefault):
                     enabled_faults_mask,
                     bits,
                 ) = self.model.controller.error_handler.calc_enabled_faults_mask(
-                    codes, int(self._label_enabled_faults_mask.text(), base=16)
+                    codes_to_bypass,
+                    int(self._label_enabled_faults_mask.text(), base=16),
                 )
                 self.model.log.debug(f"Bypass the error bits: {bits}.")
 
@@ -321,6 +328,7 @@ class TabAlarmWarn(TabDefault):
         else:
             dialog.setText(
                 f"Are you sure to bypass the error codes: {codes}?\n"
+                "Note we will bypass the ILC read warning by default.\n"
                 "This action might break the system."
             )
             dialog.addButton(QMessageBoxAsync.Ok)
