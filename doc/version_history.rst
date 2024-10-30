@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.0:
+
+-------------
+1.1.0
+-------------
+
+* Adapt the **ts_guitool**.
+
 .. _lsst.ts.m2gui-1.0.3:
 
 -------------
