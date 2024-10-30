@@ -43,4 +43,3 @@ from .model import *
 from .signals import *
 from .utility_monitor import *
 from .utils import *
-from .widget import *

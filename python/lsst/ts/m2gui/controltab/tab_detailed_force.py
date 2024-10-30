@@ -21,6 +21,7 @@
 
 __all__ = ["TabDetailedForce"]
 
+from lsst.ts.guitool import create_group_box, create_label, create_table
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -38,7 +39,7 @@ from ..actuator_force_tangent import ActuatorForceTangent
 from ..enums import Ring
 from ..model import Model
 from ..signals import SignalDetailedForce
-from ..utils import create_group_box, create_label, create_table, get_num_actuator_ring
+from ..utils import get_num_actuator_ring
 from .tab_default import TabDefault
 
 

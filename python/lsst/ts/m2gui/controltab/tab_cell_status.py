@@ -24,6 +24,7 @@ __all__ = ["TabCellStatus"]
 from pathlib import Path
 
 import numpy as np
+from lsst.ts.guitool import FigureConstant, Gauge, set_button
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
@@ -31,11 +32,10 @@ from qasync import asyncSlot
 
 from ..actuator_force_axial import ActuatorForceAxial
 from ..actuator_force_tangent import ActuatorForceTangent
-from ..display import FigureConstant, Gauge, ViewMirror
+from ..display import ViewMirror
 from ..enums import CellActuatorGroupData, FigureActuatorData
 from ..model import Model
 from ..signals import SignalDetailedForce
-from ..utils import set_button
 from .tab_default import TabDefault
 
 

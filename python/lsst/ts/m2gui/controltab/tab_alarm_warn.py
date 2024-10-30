@@ -24,6 +24,15 @@ __all__ = ["TabAlarmWarn"]
 from collections import OrderedDict
 from pathlib import Path
 
+from lsst.ts.guitool import (
+    QMessageBoxAsync,
+    create_group_box,
+    create_label,
+    create_table,
+    prompt_dialog_warning,
+    run_command,
+    set_button,
+)
 from lsst.ts.m2com import (
     DEFAULT_ENABLED_FAULTS_MASK,
     ILC_READ_WARNING_ERROR_CODES,
@@ -46,15 +55,6 @@ from qasync import asyncSlot
 from ..enums import LocalMode
 from ..model import Model
 from ..signals import SignalError
-from ..utils import (
-    create_group_box,
-    create_label,
-    create_table,
-    prompt_dialog_warning,
-    run_command,
-    set_button,
-)
-from ..widget import QMessageBoxAsync
 from .tab_default import TabDefault
 from .tab_limit_switch_status import TabLimitSwitchStatus
 

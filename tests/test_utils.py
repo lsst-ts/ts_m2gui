@@ -19,7 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import asyncio
 import tempfile
 from pathlib import Path
 
@@ -28,30 +27,10 @@ from lsst.ts.m2com import NUM_ACTUATOR
 from lsst.ts.m2gui import (
     Ring,
     get_num_actuator_ring,
-    get_tol,
     map_actuator_id_to_alias,
     read_ilc_status_from_log,
-    run_command,
     sum_ilc_lost_comm,
 )
-from pytestqt.qtbot import QtBot
-
-
-def command_normal(is_failed: bool) -> None:
-    if is_failed:
-        raise RuntimeError("Command is failed.")
-
-
-async def command_coroutine(is_failed: bool) -> None:
-    await asyncio.sleep(0.5)
-
-    if is_failed:
-        raise RuntimeError("Command is failed.")
-
-
-def test_get_tol() -> None:
-    assert get_tol(1) == 0.1
-    assert get_tol(2) == 0.01
 
 
 def test_get_num_actuator_ring() -> None:
@@ -75,18 +54,6 @@ def test_map_actuator_id_to_alias() -> None:
 
     with pytest.raises(ValueError):
         map_actuator_id_to_alias(78)
-
-
-@pytest.mark.asyncio
-async def test_run_command(qtbot: QtBot) -> None:
-    # Note that we need to add the "qtbot" here as the argument for the event
-    # loop or GUI to run
-
-    assert await run_command(command_normal, False) is True
-    assert await run_command(command_normal, True, is_prompted=False) is False
-
-    assert await run_command(command_coroutine, False) is True
-    assert await run_command(command_coroutine, True, is_prompted=False) is False
 
 
 def test_read_ilc_status_from_log() -> None:

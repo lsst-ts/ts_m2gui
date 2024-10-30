@@ -25,6 +25,14 @@ import asyncio
 from pathlib import Path
 
 import numpy as np
+from lsst.ts.guitool import (
+    create_grid_layout_buttons,
+    create_group_box,
+    create_label,
+    prompt_dialog_warning,
+    run_command,
+    set_button,
+)
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_INNER_LOOP_CONTROLLER,
@@ -46,14 +54,6 @@ from qasync import asyncSlot
 
 from ..model import Model
 from ..signals import SignalIlcStatus
-from ..utils import (
-    create_grid_layout_buttons,
-    create_group_box,
-    create_label,
-    prompt_dialog_warning,
-    run_command,
-    set_button,
-)
 from .tab_default import TabDefault
 
 

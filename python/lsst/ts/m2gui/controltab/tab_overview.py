@@ -21,6 +21,7 @@
 
 __all__ = ["TabOverview"]
 
+from lsst.ts.guitool import create_label, set_button
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
@@ -33,7 +34,6 @@ from ..signals import (
     SignalMessage,
     SignalStatus,
 )
-from ..utils import create_label, set_button
 from .tab_default import TabDefault
 
 

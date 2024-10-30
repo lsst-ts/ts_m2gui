@@ -21,6 +21,7 @@
 
 __all__ = ["TabUtilityView"]
 
+from lsst.ts.guitool import create_group_box, create_label, run_command, set_button
 from lsst.ts.xml.enums import MTM2
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
@@ -37,7 +38,6 @@ from qasync import asyncSlot
 from ..enums import DisplacementSensorDirection, TemperatureGroup
 from ..model import Model
 from ..signals import SignalPowerSystem, SignalUtility
-from ..utils import create_group_box, create_label, run_command, set_button
 from .tab_default import TabDefault
 
 

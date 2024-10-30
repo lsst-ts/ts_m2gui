@@ -21,6 +21,7 @@
 
 __all__ = ["TabSettings"]
 
+from lsst.ts.guitool import create_group_box, run_command, set_button
 from lsst.ts.m2com import (
     NUM_TEMPERATURE_EXHAUST,
     NUM_TEMPERATURE_INTAKE,
@@ -41,7 +42,6 @@ from qasync import QApplication, asyncSlot
 
 from ..model import Model
 from ..signals import SignalConfig
-from ..utils import create_group_box, run_command, set_button
 from .tab_default import TabDefault
 
 
