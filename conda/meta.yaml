@@ -32,6 +32,7 @@ test:
     - pytest-xvfb
     - ts-tcpip
     - ts-m2com
+    - ts-guitool
   source_files:
     - python
     - bin
@@ -70,3 +71,4 @@ requirements:
     - qasync
     - ts-tcpip
     - ts-m2com
+    - ts-guitool

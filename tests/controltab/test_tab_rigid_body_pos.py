@@ -23,7 +23,8 @@ import asyncio
 import logging
 
 import pytest
-from lsst.ts.m2gui import Model, get_tol
+from lsst.ts.guitool import get_tol
+from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabRigidBodyPos
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot

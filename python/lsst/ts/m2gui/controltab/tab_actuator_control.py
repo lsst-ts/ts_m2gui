@@ -24,6 +24,15 @@ __all__ = ["TabActuatorControl"]
 from pathlib import Path
 
 import numpy as np
+from lsst.ts.guitool import (
+    QFileDialogAsync,
+    create_grid_layout_buttons,
+    create_group_box,
+    create_label,
+    get_checked_buttons,
+    run_command,
+    set_button,
+)
 from lsst.ts.m2com import ActuatorDisplacementUnit, CommandActuator, CommandScript
 from PySide6.QtWidgets import (
     QComboBox,
@@ -41,15 +50,6 @@ from ..actuator_force_tangent import ActuatorForceTangent
 from ..enums import Ring
 from ..model import Model
 from ..signals import SignalDetailedForce, SignalScript
-from ..utils import (
-    create_grid_layout_buttons,
-    create_group_box,
-    create_label,
-    get_checked_buttons,
-    run_command,
-    set_button,
-)
-from ..widget import QFileDialogAsync
 from .tab_default import TabDefault
 
 

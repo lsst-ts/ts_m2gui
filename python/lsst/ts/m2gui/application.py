@@ -23,10 +23,10 @@ __all__ = ["run_application"]
 
 import asyncio
 import functools
-import os
 import sys
 
 import qasync
+from lsst.ts.guitool import base_frame_run_application
 from PySide6.QtCore import QCommandLineOption, QCommandLineParser
 
 from .main_window import MainWindow
@@ -34,30 +34,7 @@ from .main_window import MainWindow
 
 def run_application() -> None:
     """Run the application."""
-
-    if "QT_API" not in os.environ:
-        os.environ.setdefault("QT_API", "PySide6")
-        print("qasync: QT_API not set, defaulting to PySide6.")
-
-    # Workaround the Python 3.11 issue in 'qasync' module based on:
-    # https://github.com/CabbageDevelopment/qasync/issues/68
-    if (sys.version_info.major == 3) and (sys.version_info.minor >= 11):
-        with qasync._set_event_loop_policy(qasync.DefaultQEventLoopPolicy()):
-            runner = asyncio.runners.Runner()
-
-            try:
-                runner.run(main(sys.argv))
-
-            except asyncio.exceptions.CancelledError:
-                sys.exit(0)
-
-            finally:
-                runner.close()
-    else:
-        try:
-            qasync.run(main(sys.argv))
-        except asyncio.exceptions.CancelledError:
-            sys.exit(0)
+    base_frame_run_application(main)
 
 
 async def main(argv: list) -> bool:

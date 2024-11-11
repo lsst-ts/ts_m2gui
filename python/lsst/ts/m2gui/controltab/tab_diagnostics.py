@@ -21,6 +21,14 @@
 
 __all__ = ["TabDiagnostics"]
 
+from lsst.ts.guitool import (
+    QMessageBoxAsync,
+    create_group_box,
+    create_label,
+    prompt_dialog_warning,
+    run_command,
+    set_button,
+)
 from lsst.ts.m2com import (
     TANGENT_LINK_LOAD_BEARING_LINK,
     TANGENT_LINK_NON_LOAD_BEARING_LINK,
@@ -46,14 +54,6 @@ from ..enums import LocalMode
 from ..force_error_tangent import ForceErrorTangent
 from ..model import Model
 from ..signals import SignalClosedLoopControlMode, SignalDetailedForce, SignalUtility
-from ..utils import (
-    create_group_box,
-    create_label,
-    prompt_dialog_warning,
-    run_command,
-    set_button,
-)
-from ..widget import QMessageBoxAsync
 from .tab_default import TabDefault
 
 

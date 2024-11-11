@@ -14,6 +14,7 @@ Dependencies
 * `ts_idl <https://github.com/lsst-ts/ts_idl>`_
 * `ts_tcpip <https://github.com/lsst-ts/ts_tcpip>`_
 * `ts_m2com <https://github.com/lsst-ts/ts_m2com>`_
+* `ts_guitool <https://github.com/lsst-ts/ts_guitool>`_
 
 .. _State:
 

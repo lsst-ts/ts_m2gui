@@ -26,6 +26,13 @@ import pathlib
 import sys
 from datetime import datetime
 
+from lsst.ts.guitool import (
+    QMessageBoxAsync,
+    get_button_action,
+    prompt_dialog_critical,
+    prompt_dialog_warning,
+    run_command,
+)
 from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.tcpip import LOCALHOST_IPV4
 from PySide6.QtCore import Qt
@@ -39,13 +46,6 @@ from .layout import LayoutControl, LayoutControlMode, LayoutLocalMode
 from .log_window_handler import LogWindowHandler
 from .model import Model
 from .signals import SignalMessage
-from .utils import (
-    get_button_action,
-    prompt_dialog_critical,
-    prompt_dialog_warning,
-    run_command,
-)
-from .widget import QMessageBoxAsync
 
 
 class MainWindow(QMainWindow):

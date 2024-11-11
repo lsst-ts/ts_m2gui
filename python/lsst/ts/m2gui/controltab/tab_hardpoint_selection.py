@@ -23,6 +23,13 @@ __all__ = ["TabHardpointSelection"]
 
 from pathlib import Path
 
+from lsst.ts.guitool import (
+    create_grid_layout_buttons,
+    create_group_box,
+    get_checked_buttons,
+    run_command,
+    set_button,
+)
 from lsst.ts.m2com import (
     NUM_ACTUATOR,
     NUM_HARDPOINTS_AXIAL,
@@ -37,13 +44,6 @@ from qasync import asyncSlot
 from ..enums import LocalMode
 from ..model import Model
 from ..signals import SignalDetailedForce
-from ..utils import (
-    create_grid_layout_buttons,
-    create_group_box,
-    get_checked_buttons,
-    run_command,
-    set_button,
-)
 from .tab_default import TabDefault
 
 

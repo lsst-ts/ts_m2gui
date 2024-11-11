@@ -6,6 +6,7 @@ setupRequired(sconsUtils)
 setupRequired(ts_xml)
 setupRequired(ts_tcpip)
 setupRequired(ts_m2com)
+setupRequired(ts_guitool)
 
 envPrepend(PATH, ${PRODUCT_DIR}/bin)
 

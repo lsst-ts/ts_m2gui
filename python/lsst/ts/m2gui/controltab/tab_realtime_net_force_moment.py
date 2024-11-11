@@ -21,10 +21,10 @@
 
 __all__ = ["TabRealtimeNetForceMoment"]
 
+from lsst.ts.guitool import FigureConstant
 from PySide6.QtWidgets import QGridLayout
 from qasync import asyncSlot
 
-from ..display import FigureConstant
 from ..model import Model
 from .tab_default import TabDefault
 
