@@ -1,4 +1,10 @@
 classDiagram
+namespace guitool {
+  class TabTemplate
+}
+
+TabTemplate <|-- TabDefault
+
 TabDefault <|-- TabActuatorControl
 TabDefault <|-- TabAlarmWarn
 TabDefault <|-- TabCellStatus

@@ -59,7 +59,9 @@ class TabRealtimeNetForceMoment(TabDefault):
         self._figures = self._create_figures()
 
         # Timer to update the realtime figures
-        self._timer = self.create_and_start_timer(self._callback_time_out)
+        self._timer = self.create_and_start_timer(
+            self._callback_time_out, self.model.duration_refresh
+        )
 
         self.set_widget_and_layout()
 
@@ -105,7 +107,7 @@ class TabRealtimeNetForceMoment(TabDefault):
         for idx, figure in enumerate(self._figures.values()):
             figure.append_data(self.net_force_moment[idx])
 
-        self.check_duration_and_restart_timer(self._timer)
+        self.check_duration_and_restart_timer(self._timer, self.model.duration_refresh)
 
     def create_layout(self) -> QGridLayout:
         """Create the layout.

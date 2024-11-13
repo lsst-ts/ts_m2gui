@@ -23,6 +23,17 @@ import asyncio
 import logging
 
 import pytest
+from lsst.ts.guitool import (
+    LOG_LEVEL_MAXIMUM,
+    LOG_LEVEL_MINIMUM,
+    POINT_SIZE_MAXIMUM,
+    POINT_SIZE_MINIMUM,
+    PORT_MAXIMUM,
+    PORT_MINIMUM,
+    REFRESH_FREQUENCY_MAXIMUM,
+    REFRESH_FREQUENCY_MINIMUM,
+    TIMEOUT_MINIMUM,
+)
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabSettings
 from PySide6.QtCore import Qt
@@ -64,13 +75,13 @@ def test_init(widget: TabSettings) -> None:
     assert widget._settings["point_size"].value() == app.font().pointSize()
 
     for port in ("port_command", "port_telemetry"):
-        assert widget._settings[port].minimum() == widget.PORT_MINIMUM
-        assert widget._settings[port].maximum() == widget.PORT_MAXIMUM
+        assert widget._settings[port].minimum() == PORT_MINIMUM
+        assert widget._settings[port].maximum() == PORT_MAXIMUM
 
-    assert widget._settings["timeout_connection"].minimum() == widget.TIMEOUT_MINIMUM
+    assert widget._settings["timeout_connection"].minimum() == TIMEOUT_MINIMUM
 
-    assert widget._settings["log_level"].minimum() == widget.LOG_LEVEL_MINIMUM
-    assert widget._settings["log_level"].maximum() == widget.LOG_LEVEL_MAXIMUM
+    assert widget._settings["log_level"].minimum() == LOG_LEVEL_MINIMUM
+    assert widget._settings["log_level"].maximum() == LOG_LEVEL_MAXIMUM
 
     line_edit = widget._settings["host"]
     font_metrics = line_edit.fontMetrics()
@@ -79,17 +90,11 @@ def test_init(widget: TabSettings) -> None:
         == font_metrics.boundingRect(line_edit.text()).width() + 20
     )
 
-    assert (
-        widget._settings["refresh_frequency"].minimum()
-        == widget.REFRESH_FREQUENCY_MINIMUM
-    )
-    assert (
-        widget._settings["refresh_frequency"].maximum()
-        == widget.REFRESH_FREQUENCY_MAXIMUM
-    )
+    assert widget._settings["refresh_frequency"].minimum() == REFRESH_FREQUENCY_MINIMUM
+    assert widget._settings["refresh_frequency"].maximum() == REFRESH_FREQUENCY_MAXIMUM
 
-    assert widget._settings["point_size"].minimum() == widget.POINT_SIZE_MINIMUM
-    assert widget._settings["point_size"].maximum() == widget.POINT_SIZE_MAXIMUM
+    assert widget._settings["point_size"].minimum() == POINT_SIZE_MINIMUM
+    assert widget._settings["point_size"].maximum() == POINT_SIZE_MAXIMUM
 
 
 @pytest.mark.asyncio

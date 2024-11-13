@@ -27,6 +27,7 @@ import sys
 from datetime import datetime
 
 from lsst.ts.guitool import (
+    ControlTabs,
     QMessageBoxAsync,
     get_button_action,
     prompt_dialog_critical,
@@ -40,8 +41,21 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
 from qasync import QApplication, asyncSlot
 
-from .control_tabs import ControlTabs
-from .controltab import TabSettings
+from .controltab import (
+    TabActuatorControl,
+    TabAlarmWarn,
+    TabCellStatus,
+    TabConfigView,
+    TabDetailedForce,
+    TabDiagnostics,
+    TabHardpointSelection,
+    TabIlcStatus,
+    TabNetForceMoment,
+    TabOverview,
+    TabRigidBodyPos,
+    TabSettings,
+    TabUtilityView,
+)
 from .layout import LayoutControl, LayoutControlMode, LayoutLocalMode
 from .log_window_handler import LogWindowHandler
 from .model import Model
@@ -111,7 +125,21 @@ class MainWindow(QMainWindow):
         self._layout_control_mode = LayoutControlMode(self.model)
 
         # Control tables
-        self._control_tabs = ControlTabs(self.model)
+        tabs = [
+            TabOverview("Overview", self.model),
+            TabActuatorControl("Actuator Control", self.model),
+            TabConfigView("Configuration View", self.model),
+            TabCellStatus("Cell Status", self.model),
+            TabUtilityView("Utility View", self.model),
+            TabRigidBodyPos("Rigid Body Position", self.model),
+            TabDetailedForce("Detailed Force", self.model),
+            TabDiagnostics("Diagnostics", self.model),
+            TabAlarmWarn("Alarms/Warnings", self.model),
+            TabIlcStatus("ILC Status", self.model),
+            TabNetForceMoment("Net Force/Moment", self.model),
+            TabHardpointSelection("Hardpoints", self.model),
+        ]
+        self._control_tabs = ControlTabs(tabs)
         self._set_control_tabs()
 
         # Table to have the settings

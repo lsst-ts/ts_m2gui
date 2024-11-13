@@ -79,7 +79,9 @@ class TabCellStatus(TabDefault):
         self._actuator_data_selection = self._create_actuator_data_selection()
 
         # Timer to update cell status forces (and displays)
-        self._timer = self.create_and_start_timer(self._callback_time_out)
+        self._timer = self.create_and_start_timer(
+            self._callback_time_out, self.model.duration_refresh
+        )
 
         self.set_widget_and_layout()
 
@@ -409,7 +411,7 @@ class TabCellStatus(TabDefault):
         data_selected, is_displacement = self._get_data_selected()
         self._update_figures(data_selected, is_displacement)
 
-        self.check_duration_and_restart_timer(self._timer)
+        self.check_duration_and_restart_timer(self._timer, self.model.duration_refresh)
 
         # Selected actuator force
         selected_actuator = self._view_mirror.get_selected_actuator()

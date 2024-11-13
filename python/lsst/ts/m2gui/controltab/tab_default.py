@@ -24,21 +24,14 @@ __all__ = ["TabDefault"]
 import types
 import typing
 
-from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import (
-    QComboBox,
-    QDockWidget,
-    QFormLayout,
-    QLayout,
-    QScrollArea,
-    QWidget,
-)
+from lsst.ts.guitool import TabTemplate
+from PySide6.QtWidgets import QComboBox, QFormLayout
 
 from ..enums import Ring
 from ..model import Model
 
 
-class TabDefault(QDockWidget):
+class TabDefault(TabTemplate):
     """Default table.
 
     Parameters
@@ -55,73 +48,9 @@ class TabDefault(QDockWidget):
     """
 
     def __init__(self, title: str, model: Model) -> None:
-        super().__init__()
-        self.setWindowTitle(title)
-
-        self.setWidget(QWidget())
+        super().__init__(title)
 
         self.model = model
-
-        # Turn off the docker widget specific features
-        # Because the code reuse in this project is mainly based on the
-        # composition instead of inheritance in QT logic, these dock widget
-        # features bring more troubles than the benifits.
-        self.setFeatures(QDockWidget.NoDockWidgetFeatures)
-
-    def set_widget_and_layout(self, is_scrollable: bool = False) -> None:
-        """Set the widget and layout.
-
-        Parameters
-        ----------
-        is_scrollable : `bool`, optional
-            Is is_scrollable or not. (the default is False)
-        """
-
-        widget = self.widget()
-        widget.setLayout(self.create_layout())
-
-        # Resize the dock to have a similar size of layout
-        self.resize(widget.sizeHint())
-
-        if is_scrollable:
-            self.setWidget(self.set_widget_scrollable(widget, True))
-
-    def create_layout(self) -> QLayout:
-        """Create the layout.
-
-        Returns
-        -------
-        layout : `PySide6.QtWidgets.QLayout`
-            Layout.
-
-        Raises
-        ------
-        `NotImplementedError`
-            If the child class does not implement this function.
-        """
-        raise NotImplementedError("Child class should implemented this.")
-
-    def set_widget_scrollable(self, widget: QWidget, is_resizable: bool) -> QScrollArea:
-        """Set the widget to be scrollable.
-
-        Parameters
-        ----------
-        widget : `PySide6.QtWidgets.QWidget`
-            Widget.
-        is_resizable : `bool`
-            Is resizable or not.
-
-        Returns
-        -------
-        scroll_area : `PySide6.QtWidgets.QScrollArea`
-            Scrollable area.
-        """
-
-        scroll_area = QScrollArea()
-        scroll_area.setWidget(widget)
-        scroll_area.setWidgetResizable(is_resizable)
-
-        return scroll_area
 
     def add_empty_row_to_form_layout(self, layout: QFormLayout) -> None:
         """Add the empty row to the form layout.
@@ -162,47 +91,6 @@ class TabDefault(QDockWidget):
             ring_selection.currentIndexChanged.connect(callback_current_index_changed)
 
         return ring_selection
-
-    def create_and_start_timer(self, callback_time_out: typing.Callable) -> QTimer:
-        """Create and start the timer.
-
-        Parameters
-        ----------
-        callback_time_out : `func`
-            Callback function to handle the timeout. You may want to let the
-            "callback_time_out" call the
-            self.check_duration_and_restart_timer() to monitor the duration and
-            restart the timer when the duration is changed.
-
-        Returns
-        -------
-        timer : `PySide6.QtCore.QTimer`
-            Timer.
-        """
-
-        timer = QTimer(self)
-        timer.timeout.connect(callback_time_out)
-        timer.start(self.model.duration_refresh)
-
-        return timer
-
-    def check_duration_and_restart_timer(self, timer: QTimer) -> None:
-        """Check the duration and restart the timer if the duration has been
-        updated.
-
-        Parameters
-        ----------
-        timer : `PySide6.QtCore.QTimer`
-            Timer.
-        """
-
-        if timer.interval() != self.model.duration_refresh:
-            timer.start(self.model.duration_refresh)
-
-    async def __aenter__(self) -> QDockWidget:
-        """This is an overridden function to support the asynchronous context
-        manager."""
-        return self
 
     async def __aexit__(
         self,

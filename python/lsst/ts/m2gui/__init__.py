@@ -33,7 +33,6 @@ from .actuator_force_axial import *
 from .actuator_force_tangent import *
 from .application import *
 from .config import *
-from .control_tabs import *
 from .enums import *
 from .fault_manager import *
 from .force_error_tangent import *
