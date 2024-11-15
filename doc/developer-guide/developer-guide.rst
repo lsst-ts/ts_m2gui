@@ -52,7 +52,6 @@ m2gui
 * **ActuatorForceAxial** is a data class that has the axial force details contain the look-up table (LUT) information, force balance system, etc.
 * **ActuatorForceTangent** is a data class that has the tangent force details contain the look-up table (LUT) information, force balance system, etc.
 * **ForceErrorTangent** is a data class that is used to monitor the supporting force of mirror according to the tangential link force error.
-* **ControlTabs** has the control tables.
 * **LogWindowHandler** handles the log window.
 
 The model–view–controller (MVC) architecture is used in this module.
@@ -119,23 +118,6 @@ m2gui.display
 
 * **ViewMirror** is the view on the mirror populated by actuators.
 * **ItemActuator** is the actuator item used in the **ViewMirror** class to show the actuator information.
-* **Gauge** provides the color scale.
-* **FigureConstant** is the figure to show the constant line data in real-time.
-
-.. _lsst.ts.m2gui-modules_m2gui_widget:
-
-m2gui.widget
--------------
-
-.. mermaid:: ../uml/class_widget.mmd
-    :caption: Class diagram of widget module
-
-* **QMessageBoxAsync** is an asynchronous wrapper for the `QMessageBox <https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QMessageBox.html>`_. 
-* **QFileDialogAsync** is an asynchronous wrapper for the `QFileDialog <https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QFileDialog.html>`_.
-
-As the standard methods (such as `QDialog exec <https://doc.qt.io/qt-6/qdialog.html#exec>`_) provided by the **PySide2/QtWidgets** library aren't asynchronous (they are synchronous, forcing UI to wait for user action before redrawing UI content) and may spin an additional event loop when called, an asynchronous child is provided.
-That makes the `qasync <https://github.com/CabbageDevelopment/qasync>`_ library and its event loop switching trick perform as expected.
-Without those wrappers, the UI will be running for the duration of the method call synchronously, not waking up the `asynchronous tasks <https://docs.python.org/3/library/asyncio-task.html#task-object>`_ to react to incoming M2 messages and redrawing widget content.
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab:
 

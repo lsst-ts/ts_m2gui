@@ -14,7 +14,8 @@ namespace m2com {
   class ControllerCell
 }
 
-namespace widget {
+namespace guitool {
+  class ControlTabs
   class QMessageBoxAsync
 }
 
@@ -55,7 +56,6 @@ LayoutDefault --> SignalControl : connect()
 
 LogWindowHandler *-- SignalMessage : emit()
 
-ControlTabs ..> Model
 ControlTabs "1" *-- "12" TabDefault
 
 TabDefault *-- Model

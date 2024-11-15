@@ -21,7 +21,20 @@
 
 __all__ = ["TabSettings"]
 
-from lsst.ts.guitool import create_group_box, run_command, set_button
+from lsst.ts.guitool import (
+    LOG_LEVEL_MAXIMUM,
+    LOG_LEVEL_MINIMUM,
+    POINT_SIZE_MAXIMUM,
+    POINT_SIZE_MINIMUM,
+    PORT_MAXIMUM,
+    PORT_MINIMUM,
+    REFRESH_FREQUENCY_MAXIMUM,
+    REFRESH_FREQUENCY_MINIMUM,
+    TIMEOUT_MINIMUM,
+    create_group_box,
+    run_command,
+    set_button,
+)
 from lsst.ts.m2com import (
     NUM_TEMPERATURE_EXHAUST,
     NUM_TEMPERATURE_INTAKE,
@@ -61,9 +74,6 @@ class TabSettings(TabDefault):
         Model class.
     """
 
-    PORT_MINIMUM = 1
-    PORT_MAXIMUM = 65535
-
     # The unit is degree
     ANGLE_DIFFERENCE_MINIMUM = 1
     ANGLE_DIFFERENCE_MAXIMUM = 10
@@ -75,19 +85,6 @@ class TabSettings(TabDefault):
     # The unit is degree
     EXTERNAL_ELEVATION_ANGLE_MINIMUM = 0.0
     EXTERNAL_ELEVATION_ANGLE_MAXIMUM = 90.0
-
-    LOG_LEVEL_MINIMUM = 10
-    LOG_LEVEL_MAXIMUM = 50
-
-    # The unit is seconds
-    TIMEOUT_MINIMUM = 1
-
-    # The unit is Hz
-    REFRESH_FREQUENCY_MINIMUM = 1
-    REFRESH_FREQUENCY_MAXIMUM = 10
-
-    POINT_SIZE_MINIMUM = 9
-    POINT_SIZE_MAXIMUM = 14
 
     def __init__(self, title: str, model: Model) -> None:
         super().__init__(title, model)
@@ -138,7 +135,9 @@ class TabSettings(TabDefault):
         )
 
         # Timer to write the external elevation angle continuously
-        self._timer = self.create_and_start_timer(self._callback_time_out)
+        self._timer = self.create_and_start_timer(
+            self._callback_time_out, self.model.duration_refresh
+        )
 
         self.set_widget_and_layout()
 
@@ -172,9 +171,9 @@ class TabSettings(TabDefault):
         }
 
         for port in ("port_command", "port_telemetry"):
-            settings[port].setRange(self.PORT_MINIMUM, self.PORT_MAXIMUM)
+            settings[port].setRange(PORT_MINIMUM, PORT_MAXIMUM)
 
-        settings["timeout_connection"].setMinimum(self.TIMEOUT_MINIMUM)
+        settings["timeout_connection"].setMinimum(TIMEOUT_MINIMUM)
         settings["timeout_connection"].setSuffix(" sec")
 
         settings["enable_lut_temperature"].setToolTip(
@@ -226,22 +225,20 @@ class TabSettings(TabDefault):
             "Timeout to transtion the ILC to Enabled state."
         )
 
-        settings["log_level"].setRange(self.LOG_LEVEL_MINIMUM, self.LOG_LEVEL_MAXIMUM)
+        settings["log_level"].setRange(LOG_LEVEL_MINIMUM, LOG_LEVEL_MAXIMUM)
         settings["log_level"].setToolTip(
             "CRITICAL (50), ERROR (40), WARNING (30), INFO (20), DEBUG (10)"
         )
 
         settings["refresh_frequency"].setRange(
-            self.REFRESH_FREQUENCY_MINIMUM, self.REFRESH_FREQUENCY_MAXIMUM
+            REFRESH_FREQUENCY_MINIMUM, REFRESH_FREQUENCY_MAXIMUM
         )
         settings["refresh_frequency"].setSuffix(" Hz")
         settings["refresh_frequency"].setToolTip(
             "Frequency to refresh the data on tables"
         )
 
-        settings["point_size"].setRange(
-            self.POINT_SIZE_MINIMUM, self.POINT_SIZE_MAXIMUM
-        )
+        settings["point_size"].setRange(POINT_SIZE_MINIMUM, POINT_SIZE_MAXIMUM)
         settings["point_size"].setToolTip("Point size of the application.")
 
         # Set the default values
@@ -420,7 +417,7 @@ class TabSettings(TabDefault):
             angle = self._settings["external_elevation_angle"].value()
             await run_command(self.model.controller.set_external_elevation_angle, angle)
 
-        self.check_duration_and_restart_timer(self._timer)
+        self.check_duration_and_restart_timer(self._timer, self.model.duration_refresh)
 
     def create_layout(self) -> QHBoxLayout:
         """Create the layout.

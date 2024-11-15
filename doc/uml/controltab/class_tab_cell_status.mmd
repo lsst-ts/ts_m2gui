@@ -12,11 +12,14 @@ UtilityMonitor *-- SignalDetailedForce : emit()
 UtilityMonitor *-- ActuatorForceAxial
 UtilityMonitor *-- ActuatorForceTangent
 
-namespace display {
+namespace guitool {
   class FigureConstant
+  class Gauge
+}
+
+namespace display {
   class ViewMirror
   class ItemActuator
-  class Gauge
 }
 
 ViewMirror "1" *-- "n" ItemActuator

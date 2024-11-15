@@ -92,7 +92,9 @@ class TabDetailedForce(TabDefault):
         self._table_forces = self._create_table_forces()
 
         # Timer to update the forces on table
-        self._timer = self.create_and_start_timer(self._callback_time_out)
+        self._timer = self.create_and_start_timer(
+            self._callback_time_out, self.model.duration_refresh
+        )
 
         self.set_widget_and_layout(is_scrollable=True)
 
@@ -216,7 +218,7 @@ class TabDetailedForce(TabDefault):
         self._update_forces(self._forces_latest_axial, num_axial_actuator)
         self._update_forces(self._forces_latest_tangent, NUM_TANGENT_LINK)
 
-        self.check_duration_and_restart_timer(self._timer)
+        self.check_duration_and_restart_timer(self._timer, self.model.duration_refresh)
 
     def _update_forces(
         self,
