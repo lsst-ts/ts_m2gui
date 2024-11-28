@@ -22,9 +22,9 @@
 __all__ = ["TabRigidBodyPos"]
 
 from lsst.ts.guitool import (
+    create_double_spin_box,
     create_group_box,
     create_label,
-    get_tol,
     run_command,
     set_button,
 )
@@ -127,20 +127,14 @@ class TabRigidBodyPos(TabDefault):
 
         position = dict()
         for axis in self.AXES:
-            double_spin_box = QDoubleSpinBox()
-            double_spin_box.setDecimals(num_digit_after_decimal)
-            double_spin_box.setSingleStep(get_tol(num_digit_after_decimal))
-
-            if axis.startswith("r"):
-                double_spin_box.setRange(
-                    -self.MAX_ROTATION_IN_ARCSEC, self.MAX_ROTATION_IN_ARCSEC
-                )
-            else:
-                double_spin_box.setRange(
-                    -self.MAX_DISTANCE_IN_UM, self.MAX_DISTANCE_IN_UM
-                )
-
-            position[axis] = double_spin_box
+            limit = (
+                self.MAX_ROTATION_IN_ARCSEC
+                if axis.startswith("r")
+                else self.MAX_DISTANCE_IN_UM
+            )
+            position[axis] = create_double_spin_box(
+                "", num_digit_after_decimal, maximum=limit, minimum=-limit
+            )
 
         return position
 

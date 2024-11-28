@@ -22,12 +22,14 @@
 __all__ = ["TabDiagnostics"]
 
 from lsst.ts.guitool import (
+    ButtonStatus,
     QMessageBoxAsync,
     create_group_box,
     create_label,
     prompt_dialog_warning,
     run_command,
     set_button,
+    update_button_color,
 )
 from lsst.ts.m2com import (
     TANGENT_LINK_LOAD_BEARING_LINK,
@@ -270,14 +272,8 @@ class TabDiagnostics(TabDefault):
             The status is triggered or not.
         """
 
-        palette = indicator.palette()
-
-        if is_triggered:
-            palette.setColor(QPalette.Button, Qt.green)
-        else:
-            palette.setColor(QPalette.Button, Qt.gray)
-
-        indicator.setPalette(palette)
+        button_status = ButtonStatus.Normal if is_triggered else ButtonStatus.Default
+        update_button_color(indicator, QPalette.Button, button_status)
 
     def _get_list_digital_status_input(self) -> list:
         """Get the list of digital input status from the bit 0 to 31.

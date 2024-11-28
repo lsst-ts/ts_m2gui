@@ -21,7 +21,7 @@
 
 __all__ = ["TabLimitSwitchStatus"]
 
-from lsst.ts.guitool import create_label, set_button
+from lsst.ts.guitool import ButtonStatus, create_label, set_button, update_button_color
 from lsst.ts.m2com import LimitSwitchType
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
@@ -121,16 +121,14 @@ class TabLimitSwitchStatus(TabDefault):
             Status.
         """
 
-        palette = indicator.palette()
-
         if status == Status.Normal:
-            palette.setColor(QPalette.Button, Qt.green)
+            button_status = ButtonStatus.Normal
         elif status == Status.Alert:
-            palette.setColor(QPalette.Button, Qt.yellow)
+            button_status = ButtonStatus.Warn
         else:
-            palette.setColor(QPalette.Button, Qt.red)
+            button_status = ButtonStatus.Error
 
-        indicator.setPalette(palette)
+        update_button_color(indicator, QPalette.Button, button_status)
 
     def create_layout(self) -> QHBoxLayout:
         """Create the layout.

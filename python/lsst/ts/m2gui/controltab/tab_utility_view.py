@@ -21,9 +21,15 @@
 
 __all__ = ["TabUtilityView"]
 
-from lsst.ts.guitool import create_group_box, create_label, run_command, set_button
+from lsst.ts.guitool import (
+    ButtonStatus,
+    create_group_box,
+    create_label,
+    run_command,
+    set_button,
+    update_button_color,
+)
 from lsst.ts.xml.enums import MTM2
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import (
     QFormLayout,
@@ -131,14 +137,8 @@ class TabUtilityView(TabDefault):
             Is triggered or not.
         """
 
-        palette = indicator.palette()
-
-        if triggered:
-            palette.setColor(QPalette.Button, Qt.green)
-        else:
-            palette.setColor(QPalette.Button, Qt.gray)
-
-        indicator.setPalette(palette)
+        button_status = ButtonStatus.Normal if triggered else ButtonStatus.Default
+        update_button_color(indicator, QPalette.Button, button_status)
 
     @asyncSlot()
     async def _callback_reset_breakers(self, power_type: MTM2.PowerType) -> None:

@@ -31,6 +31,7 @@ from lsst.ts.guitool import (
     REFRESH_FREQUENCY_MAXIMUM,
     REFRESH_FREQUENCY_MINIMUM,
     TIMEOUT_MINIMUM,
+    create_double_spin_box,
     create_group_box,
     run_command,
     set_button,
@@ -43,7 +44,6 @@ from lsst.ts.m2com import (
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
-    QDoubleSpinBox,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -161,10 +161,22 @@ class TabSettings(TabDefault):
             "use_external_elevation_angle": QCheckBox("Use external elevation angle"),
             "enable_angle_comparison": QCheckBox("Enable angle comparison"),
             "max_angle_difference": QSpinBox(),
-            "lut_temperature_ref": QDoubleSpinBox(),
-            "external_elevation_angle": QDoubleSpinBox(),
+            "lut_temperature_ref": create_double_spin_box(
+                "degree C",
+                1,
+                maximum=self.TEMPERATURE_REFERENCE_MAXIMUM,
+                minimum=self.TEMPERATURE_REFERENCE_MINIMUM,
+            ),
+            "external_elevation_angle": create_double_spin_box(
+                "degree",
+                1,
+                maximum=self.EXTERNAL_ELEVATION_ANGLE_MAXIMUM,
+                minimum=self.EXTERNAL_ELEVATION_ANGLE_MINIMUM,
+            ),
             "ilc_retry_times": QSpinBox(),
-            "ilc_timeout": QDoubleSpinBox(),
+            "ilc_timeout": create_double_spin_box(
+                "sec", 2, tool_tip="Timeout to transtion the ILC to Enabled state."
+            ),
             "log_level": QSpinBox(),
             "refresh_frequency": QSpinBox(),
             "point_size": QSpinBox(),
@@ -206,23 +218,8 @@ class TabSettings(TabDefault):
         )
         settings["max_angle_difference"].setSuffix(" degree")
 
-        settings["lut_temperature_ref"].setRange(
-            self.TEMPERATURE_REFERENCE_MINIMUM, self.TEMPERATURE_REFERENCE_MAXIMUM
-        )
-        settings["lut_temperature_ref"].setSuffix(" degree C")
-
-        settings["external_elevation_angle"].setRange(
-            self.EXTERNAL_ELEVATION_ANGLE_MINIMUM, self.EXTERNAL_ELEVATION_ANGLE_MAXIMUM
-        )
-        settings["external_elevation_angle"].setSuffix(" degree")
-
         settings["ilc_retry_times"].setToolTip(
             "Retry times to transtion the ILC to Enabled state."
-        )
-
-        settings["ilc_timeout"].setSuffix(" sec")
-        settings["ilc_timeout"].setToolTip(
-            "Timeout to transtion the ILC to Enabled state."
         )
 
         settings["log_level"].setRange(LOG_LEVEL_MINIMUM, LOG_LEVEL_MAXIMUM)
