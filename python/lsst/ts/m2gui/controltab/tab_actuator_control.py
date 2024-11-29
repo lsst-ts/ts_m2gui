@@ -26,6 +26,7 @@ from pathlib import Path
 import numpy as np
 from lsst.ts.guitool import (
     QFileDialogAsync,
+    create_double_spin_box,
     create_grid_layout_buttons,
     create_group_box,
     create_label,
@@ -143,7 +144,9 @@ class TabActuatorControl(TabDefault):
             ),
         }
 
-        self._applied_force = self._create_applied_force()
+        self._applied_force = create_double_spin_box(
+            "N", 2, maximum=self.MAX_FORCE_N, minimum=-self.MAX_FORCE_N
+        )
 
         self._buttons_actuator_closed_loop = {
             "apply_force": set_button("Apply Force", self._callback_apply_force),
@@ -358,21 +361,6 @@ class TabActuatorControl(TabDefault):
             Actuator command.
         """
         await run_command(self.model.command_actuator, command)
-
-    def _create_applied_force(self) -> QDoubleSpinBox:
-        """Create the applied force.
-
-        Returns
-        -------
-        applied_force : `PySide6.QtWidgets.QDoubleSpinBox`
-            Applied force.
-        """
-
-        applied_force = QDoubleSpinBox()
-        applied_force.setRange(-self.MAX_FORCE_N, self.MAX_FORCE_N)
-        applied_force.setSuffix(" N")
-
-        return applied_force
 
     @asyncSlot()
     async def _callback_apply_force(self) -> None:

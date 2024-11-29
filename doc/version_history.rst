@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.2:
+
+-------------
+1.1.2
+-------------
+
+* Use the ``update_button_color()`` and ``create_double_spin_box()`` in **ts_guitool** v0.2.1.
+
 .. _lsst.ts.m2gui-1.1.1:
 
 -------------

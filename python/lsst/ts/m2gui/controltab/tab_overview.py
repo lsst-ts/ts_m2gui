@@ -21,9 +21,8 @@
 
 __all__ = ["TabOverview"]
 
-from lsst.ts.guitool import create_label, set_button
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QPalette
+from lsst.ts.guitool import ButtonStatus, create_label, set_button, update_button_color
+from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
 from qasync import asyncSlot
 
@@ -124,19 +123,15 @@ class TabOverview(TabDefault):
             The status is on or off.
         """
 
-        palette = indicator.palette()
+        button_statue = (
+            self._get_indicator_status_on(indicator)
+            if is_status_on
+            else ButtonStatus.Default
+        )
+        update_button_color(indicator, QPalette.Button, button_statue)
 
-        if is_status_on:
-            palette.setColor(
-                QPalette.Button, self._get_indicator_color_status_on(indicator)
-            )
-        else:
-            palette.setColor(QPalette.Button, Qt.gray)
-
-        indicator.setPalette(palette)
-
-    def _get_indicator_color_status_on(self, indicator: QPushButton) -> QColor:
-        """Get the indicator color of the "ON" status.
+    def _get_indicator_status_on(self, indicator: QPushButton) -> ButtonStatus:
+        """Get the indicator status of the "ON" status.
 
         This function is to handle the condition that some indicators need the
         different color than others.
@@ -148,8 +143,8 @@ class TabOverview(TabDefault):
 
         Returns
         -------
-        `PySide6.QtCore.Qt.GlobalColor`
-            Color of indicator.
+        `lsst.ts.guitool.ButtonStatus`
+            Button status.
         """
 
         if indicator.text() in (
@@ -157,13 +152,13 @@ class TabOverview(TabDefault):
             "isCellTemperatureHigh",
             "isInterlockEngaged",
         ):
-            return Qt.red
+            return ButtonStatus.Error
 
         elif indicator.text() == "isWarningOn":
-            return Qt.yellow
+            return ButtonStatus.Warn
 
         else:
-            return Qt.green
+            return ButtonStatus.Normal
 
     def _set_window_log(self) -> QPlainTextEdit:
         """Set the log window.
