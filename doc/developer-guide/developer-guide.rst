@@ -11,7 +11,7 @@ This GUI is constructed on the top of Qt framework (`Qt for Python <https://wiki
 Dependencies
 ============
 
-* `ts_idl <https://github.com/lsst-ts/ts_idl>`_
+* `ts_xml <https://github.com/lsst-ts/ts_xml>`_
 * `ts_tcpip <https://github.com/lsst-ts/ts_tcpip>`_
 * `ts_m2com <https://github.com/lsst-ts/ts_m2com>`_
 * `ts_guitool <https://github.com/lsst-ts/ts_guitool>`_
