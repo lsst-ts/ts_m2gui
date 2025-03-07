@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.4:
+
+-------------
+1.1.4
+-------------
+
+* Fix the failed unit test because of the update of **ts_guitool**.
+
 .. _lsst.ts.m2gui-1.1.3:
 
 -------------

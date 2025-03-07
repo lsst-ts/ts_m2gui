@@ -151,11 +151,11 @@ async def test_callback_selection_changed(widget: TabCellStatus) -> None:
     assert widget._figures["axial"].get_points(0)[0].y() == 3000
     assert widget._figures["tangent"].get_points(0)[-1].y() == -3000
 
-    assert widget._figures["axial"].axis_y.min() == -1
-    assert widget._figures["axial"].axis_y.max() == 3001
+    assert widget._figures["axial"].axis_y.min() == -300
+    assert widget._figures["axial"].axis_y.max() == 3300
 
-    assert widget._figures["tangent"].axis_y.min() == -3001
-    assert widget._figures["tangent"].axis_y.max() == 1
+    assert widget._figures["tangent"].axis_y.min() == -3300
+    assert widget._figures["tangent"].axis_y.max() == 300
 
     # Force
 
@@ -171,11 +171,11 @@ async def test_callback_selection_changed(widget: TabCellStatus) -> None:
     assert widget._figures["axial"].get_points(0)[0].y() == 2
     assert widget._figures["tangent"].get_points(0)[-1].y() == -2
 
-    assert widget._figures["axial"].axis_y.min() == -1
-    assert widget._figures["axial"].axis_y.max() == 3
+    assert widget._figures["axial"].axis_y.min() == -0.2
+    assert widget._figures["axial"].axis_y.max() == 2.2
 
-    assert widget._figures["tangent"].axis_y.min() == -3
-    assert widget._figures["tangent"].axis_y.max() == 1
+    assert widget._figures["tangent"].axis_y.min() == -2.2
+    assert widget._figures["tangent"].axis_y.max() == 0.2
 
 
 @pytest.mark.asyncio
