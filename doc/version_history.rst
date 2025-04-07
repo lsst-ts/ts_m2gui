@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.5:
+
+-------------
+1.1.5
+-------------
+
+* Improve the ``setup.py`` to support the version of Python 3.11 and 3.12.
+
 .. _lsst.ts.m2gui-1.1.4:
 
 -------------
