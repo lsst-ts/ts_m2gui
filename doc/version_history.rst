@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.6:
+
+-------------
+1.1.6
+-------------
+
+* Run the ``Model._basic_cleanup_and_power_off_motor()`` in ``Model.fault()`` as an asynchronous task to avoid the break of logic to turn off the motor power when there is the fault found in ``Model._process_event()``, which is a callback function.
+
 .. _lsst.ts.m2gui-1.1.5:
 
 -------------
