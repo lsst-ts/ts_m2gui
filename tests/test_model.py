@@ -744,8 +744,14 @@ async def test_fault(model_async: Model) -> None:
     await model_async.enter_diagnostic()
     await model_async.enter_enable()
 
+    assert model_async.controller.power_system_status["motor_power_is_on"]
+
     await model_async.fault()
     assert model_async.local_mode == LocalMode.Diagnostic
+
+    await model_async._task_fault
+
+    assert not model_async.controller.power_system_status["motor_power_is_on"]
 
 
 @pytest.mark.asyncio

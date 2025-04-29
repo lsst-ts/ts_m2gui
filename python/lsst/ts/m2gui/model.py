@@ -48,9 +48,11 @@ from lsst.ts.m2com import (
     DigitalOutputStatus,
     LimitSwitchType,
     MockErrorCode,
+    cancel_task_and_wait,
     check_limit_switches,
     get_config_dir,
 )
+from lsst.ts.utils import make_done_future
 from lsst.ts.xml.enums import MTM2
 
 from .config import Config
@@ -190,6 +192,8 @@ class Model(object):
 
         self.ilc_retry_times = 3
         self.ilc_timeout = 20.0
+
+        self._task_fault = make_done_future()
 
     def _set_system_status(self) -> dict[str, bool]:
         """Set the default system status.
@@ -1375,7 +1379,8 @@ class Model(object):
                 )
 
             except RuntimeError:
-                await self._basic_cleanup_and_power_off_motor()
+                if self._task_fault.done():
+                    await self._basic_cleanup_and_power_off_motor()
                 raise
 
         await self.controller.set_closed_loop_control_mode(
@@ -1400,7 +1405,8 @@ class Model(object):
                 f"System is in {self.local_mode!r} instead of {LocalMode.Enable!r}."
             )
 
-        await self._basic_cleanup_and_power_off_motor()
+        if self._task_fault.done():
+            await self._basic_cleanup_and_power_off_motor()
 
         self.local_mode = LocalMode.Diagnostic
 
@@ -1454,7 +1460,10 @@ class Model(object):
         system is in the Enable mode originally."""
 
         if self.local_mode == LocalMode.Enable:
-            await self._basic_cleanup_and_power_off_motor()
+            if self._task_fault.done():
+                self._task_fault = asyncio.create_task(
+                    self._basic_cleanup_and_power_off_motor()
+                )
 
             self.local_mode = LocalMode.Diagnostic
 
@@ -1462,6 +1471,8 @@ class Model(object):
 
     async def disconnect(self) -> None:
         """Disconnect from the M2 controller."""
+
+        await cancel_task_and_wait(self._task_fault)
 
         if self.controller.are_clients_connected():
             self.log.info("Disconnecting from the M2 controller...")
