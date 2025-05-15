@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.7:
+
+-------------
+1.1.7
+-------------
+
+* Add the **QT_QPA_PLATFORM** to ``meta.yaml`` to fix the test section of conda recipe.
+
 .. _lsst.ts.m2gui-1.1.6:
 
 -------------
