@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.8:
+
+-------------
+1.1.8
+-------------
+
+* Simplify the ``setup.py``.
+
 .. _lsst.ts.m2gui-1.1.7:
 
 -------------
