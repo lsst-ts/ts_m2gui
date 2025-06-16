@@ -19,15 +19,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import typing
-
-if typing.TYPE_CHECKING:
+try:
+    from .version import __version__
+except ImportError:
     __version__ = "?"
-else:
-    try:
-        from .version import *
-    except ImportError:
-        __version__ = "?"
 
 from .actuator_force_axial import *
 from .actuator_force_tangent import *
