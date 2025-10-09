@@ -26,21 +26,6 @@ import pytest
 
 
 @pytest.mark.asyncio
-async def close_process(process: asyncio.subprocess.Process) -> None:
-    if process.returncode is None:
-        process.terminate()
-        await asyncio.wait_for(process.wait(), timeout=5.0)
-    else:
-        print("Warning: subprocess had already quit.")
-        try:
-            assert process.stderr is not None  # make mypy happy
-            errbytes = await process.stderr.read()
-            print("Subprocess stderr: ", errbytes.decode())
-        except Exception as e:
-            print(f"Could not read subprocess stderr: {e}")
-
-
-@pytest.mark.asyncio
 async def test_run_m2gui() -> None:
     # Make sure this application exists
     application_name = "run_m2gui"
@@ -56,11 +41,7 @@ async def test_run_m2gui() -> None:
         stderr=asyncio.subprocess.PIPE,
     )
 
-    assert process.stdout is not None  # make mypy happy
-    stdout = await process.stdout.readline()
-
-    # Close the process first before the assertion
-    await close_process(process)
+    stdout, _ = await process.communicate()
 
     # If there is the error, the result will be empty
     assert stdout.decode() != ""
