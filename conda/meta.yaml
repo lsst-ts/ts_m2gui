@@ -14,6 +14,7 @@ build:
     - PYTEST_QT_API=PySide6
   noarch: python
   script: {{ PYTHON }} -m pip install --no-deps --ignore-installed .
+  string: "py{{ PY_VER | replace('.', '') }}{{ PKG_HASH }}_{{ PKG_BUILDNUM }}"
   entry_points:
     - run_m2gui = lsst.ts.m2gui.application:run_application
 
@@ -26,7 +27,7 @@ test:
     - {{ cdt('libxxf86vm') }}  # [linux]
     - {{ cdt('libxext') }}     # [linux]
     - {{ cdt('xorg-x11-server-Xvfb')}}  # [linux]
-    - ts-conda-build =0.4
+    - ts-conda-build =0.5
     - pyside6
     - qt6-charts
     - pytest-qt
@@ -61,7 +62,7 @@ requirements:
     - python {{ python }}
     - setuptools_scm
     - setuptools
-    - ts-conda-build =0.4
+    - ts-conda-build =0.5
   run:
     - python {{ python }}
     - setuptools

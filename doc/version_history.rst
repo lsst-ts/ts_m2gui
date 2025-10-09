@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.9:
+
+-------------
+1.1.9
+-------------
+
+* Update the **ts-conda-build**.
+
 .. _lsst.ts.m2gui-1.1.8:
 
 -------------
