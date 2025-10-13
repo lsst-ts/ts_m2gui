@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.9:
+
+-------------
+1.1.9
+-------------
+
+* Update the **ts-conda-build**.
+* Improve the ``test_application.py``.
+* Assign the qasync version in ``meta.yaml``.
+
 .. _lsst.ts.m2gui-1.1.8:
 
 -------------
