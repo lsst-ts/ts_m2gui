@@ -77,9 +77,7 @@ class TabOverview(TabDefault):
         self._update_control_status()
 
         self._set_signal_status(self.model.signal_status)
-        self._set_signal_closed_loop_control_mode(
-            self.model.signal_closed_loop_control_mode
-        )
+        self._set_signal_closed_loop_control_mode(self.model.signal_closed_loop_control_mode)
 
     def _set_indicators_status(self) -> dict[str, QPushButton]:
         """Set the indicators of system status.
@@ -92,9 +90,7 @@ class TabOverview(TabDefault):
 
         indicators_status = dict()
         for name in self.model.system_status.keys():
-            indicators_status[name] = set_button(
-                name, None, is_indicator=True, is_adjust_size=True
-            )
+            indicators_status[name] = set_button(name, None, is_indicator=True, is_adjust_size=True)
 
         # Adjust the width of indicators and fill the default color
         width_max = 0
@@ -110,9 +106,7 @@ class TabOverview(TabDefault):
 
         return indicators_status
 
-    def _update_indicator_color(
-        self, indicator: QPushButton, is_status_on: bool
-    ) -> None:
+    def _update_indicator_color(self, indicator: QPushButton, is_status_on: bool) -> None:
         """Update the color of indicator.
 
         Parameters
@@ -123,11 +117,7 @@ class TabOverview(TabDefault):
             The status is on or off.
         """
 
-        button_statue = (
-            self._get_indicator_status_on(indicator)
-            if is_status_on
-            else ButtonStatus.Default
-        )
+        button_statue = self._get_indicator_status_on(indicator) if is_status_on else ButtonStatus.Default
         update_button_color(indicator, QPalette.Button, button_statue)
 
     def _get_indicator_status_on(self, indicator: QPushButton) -> ButtonStatus:
@@ -231,16 +221,12 @@ class TabOverview(TabDefault):
     def _update_control_status(self) -> None:
         """Update the control status."""
 
-        text_control = (
-            "Commander is: CSC" if self.model.is_csc_commander else "Commander is: EUI"
-        )
+        text_control = "Commander is: CSC" if self.model.is_csc_commander else "Commander is: EUI"
         self._label_control.setText(text_control)
 
         self._label_control_mode.setText(f"Control Mode: {self.model.local_mode.name}")
 
-        self._label_inclination_source.setText(
-            f"Inclination Source: {self.model.inclination_source.name}"
-        )
+        self._label_inclination_source.setText(f"Inclination Source: {self.model.inclination_source.name}")
 
     def _set_signal_status(self, signal_status: SignalStatus) -> None:
         """Set the status signal.
@@ -264,9 +250,7 @@ class TabOverview(TabDefault):
             data type of status is bool.
         """
 
-        self._update_indicator_color(
-            self._indicators_status[name_status[0]], name_status[1]
-        )
+        self._update_indicator_color(self._indicators_status[name_status[0]], name_status[1])
 
     def _set_signal_closed_loop_control_mode(
         self, signal_closed_loop_control_mode: SignalClosedLoopControlMode
@@ -279,9 +263,7 @@ class TabOverview(TabDefault):
             Signal to know the closed-loop control mode is updated or not.
         """
 
-        signal_closed_loop_control_mode.is_updated.connect(
-            self._callback_closed_loop_control_mode
-        )
+        signal_closed_loop_control_mode.is_updated.connect(self._callback_closed_loop_control_mode)
 
     @asyncSlot()
     async def _callback_closed_loop_control_mode(self, is_updated: bool) -> None:
@@ -293,9 +275,7 @@ class TabOverview(TabDefault):
             Closed-loop control mode is updated or not.
         """
 
-        self._label_local_mode.setText(
-            f"Control Loop: {self.model.controller.closed_loop_control_mode.name}"
-        )
+        self._label_local_mode.setText(f"Control Loop: {self.model.controller.closed_loop_control_mode.name}")
 
     def set_signal_control(self, signal_control: SignalControl) -> None:
         """Set the control signal.

@@ -70,12 +70,8 @@ class TabNetForceMoment(TabDefault):
         }
 
         # Tables to show the realtime data
-        self._tab_realtime_net_force_moment_total = TabRealtimeNetForceMoment(
-            "Total Actuator Status", model
-        )
-        self._tab_realtime_force_balance = TabRealtimeNetForceMoment(
-            "Force Balance Status", model
-        )
+        self._tab_realtime_net_force_moment_total = TabRealtimeNetForceMoment("Total Actuator Status", model)
+        self._tab_realtime_force_balance = TabRealtimeNetForceMoment("Force Balance Status", model)
 
         # Buttons to show the realtime data
         self._button_realtime_net_force_moment_total = set_button(
@@ -89,9 +85,7 @@ class TabNetForceMoment(TabDefault):
 
         self.set_widget_and_layout()
 
-        self._set_signal_net_force_moment(
-            self.model.utility_monitor.signal_net_force_moment
-        )
+        self._set_signal_net_force_moment(self.model.utility_monitor.signal_net_force_moment)
 
     def create_layout(self) -> QVBoxLayout:
         """Create the layout.
@@ -163,16 +157,10 @@ class TabNetForceMoment(TabDefault):
             Signal of the net force and moment.
         """
 
-        signal_net_force_moment.net_force_total.connect(
-            self._callback_signal_net_force_total
-        )
-        signal_net_force_moment.net_moment_total.connect(
-            self._callback_signal_net_moment_total
-        )
+        signal_net_force_moment.net_force_total.connect(self._callback_signal_net_force_total)
+        signal_net_force_moment.net_moment_total.connect(self._callback_signal_net_moment_total)
 
-        signal_net_force_moment.force_balance.connect(
-            self._callback_signal_force_balance
-        )
+        signal_net_force_moment.force_balance.connect(self._callback_signal_force_balance)
 
     def _callback_signal_net_force_total(self, net_force_total: list[float]) -> None:
         """Callback of the net force/moment signal for the new total net force.

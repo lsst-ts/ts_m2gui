@@ -52,9 +52,7 @@ async def test_get_selected_file(qtbot: QtBot, widget: TabConfigView) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_config_files(
-    qtbot: QtBot, widget: TabConfigView
-) -> None:
+async def test_callback_signal_config_files(qtbot: QtBot, widget: TabConfigView) -> None:
     files = ["a", "b", "c"]
     widget.model.signal_config.files.emit(files)
 

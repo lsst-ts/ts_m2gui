@@ -70,7 +70,7 @@ requirements:
     - pandas
     - pyside6
     - qt6-charts
-    - qasync =0.27
+    - qasync
     - ts-tcpip
     - ts-m2com
     - ts-guitool

@@ -164,9 +164,7 @@ class Model(object):
 
         self.system_status = self._set_system_status()
 
-        self.fault_manager = FaultManager(
-            self.get_actuator_default_status(Status.Normal)
-        )
+        self.fault_manager = FaultManager(self.get_actuator_default_status(Status.Normal))
         self.utility_monitor = UtilityMonitor()
 
         self.controller = ControllerCell(
@@ -179,9 +177,7 @@ class Model(object):
         )
         self.controller.set_callback_process_event(self._process_event)
         self.controller.set_callback_process_telemetry(self._process_telemetry)
-        self.controller.set_callback_process_lost_connection(
-            self._process_lost_connection
-        )
+        self.controller.set_callback_process_lost_connection(self._process_lost_connection)
 
         # Do not calculate the temperature LUT by default
         self.controller.control_parameters["enable_lut_temperature"] = False
@@ -234,18 +230,10 @@ class Model(object):
         """
 
         collection: dict = dict()
-        collection = self._set_actuator_default_status_specific_ring(
-            Ring.B, collection, status
-        )
-        collection = self._set_actuator_default_status_specific_ring(
-            Ring.C, collection, status
-        )
-        collection = self._set_actuator_default_status_specific_ring(
-            Ring.D, collection, status
-        )
-        collection = self._set_actuator_default_status_specific_ring(
-            Ring.A, collection, status
-        )
+        collection = self._set_actuator_default_status_specific_ring(Ring.B, collection, status)
+        collection = self._set_actuator_default_status_specific_ring(Ring.C, collection, status)
+        collection = self._set_actuator_default_status_specific_ring(Ring.D, collection, status)
+        collection = self._set_actuator_default_status_specific_ring(Ring.A, collection, status)
 
         return collection
 
@@ -346,9 +334,7 @@ class Model(object):
                 self.system_status[status_name] = new_status
                 self.signal_status.name_status.emit((status_name, new_status))
         else:
-            raise ValueError(
-                f"{status_name} not in the {list(self.system_status.keys())}."
-            )
+            raise ValueError(f"{status_name} not in the {list(self.system_status.keys())}.")
 
     def report_config(self, **kwargs: dict[str, typing.Any]) -> Config:
         """Report the configuration defined in Config class.
@@ -391,9 +377,7 @@ class Model(object):
         """
         self.signal_script.progress.emit(int(progress))
 
-    async def go_to_position(
-        self, x: float, y: float, z: float, rx: float, ry: float, rz: float
-    ) -> None:
+    async def go_to_position(self, x: float, y: float, z: float, rx: float, ry: float, rz: float) -> None:
         """Go to the position.
 
         Parameters
@@ -456,9 +440,7 @@ class Model(object):
         if self.local_mode == LocalMode.Standby and not self.is_csc_commander:
             await self.controller.reboot_controller()
         else:
-            raise RuntimeError(
-                "Controller can only be rebooted at the standby state with local control."
-            )
+            raise RuntimeError("Controller can only be rebooted at the standby state with local control.")
 
     async def command_script(
         self,
@@ -490,9 +472,7 @@ class Model(object):
         if self.local_mode == LocalMode.Enable:
             await self.controller.command_script(command, script_name=script_name)
         else:
-            raise RuntimeError(
-                "Failed to run the script command. Only allowed in Enabled state."
-            )
+            raise RuntimeError("Failed to run the script command. Only allowed in Enabled state.")
 
     async def command_actuator(
         self,
@@ -687,9 +667,7 @@ class Model(object):
                 self.is_csc_commander = message["state"]
                 self.report_control_status()
 
-                self.log.info(
-                    f"M2 controller is commandable by CSC: {self.is_csc_commander}."
-                )
+                self.log.info(f"M2 controller is commandable by CSC: {self.is_csc_commander}.")
 
             elif name == "hardpointList":
                 hardpoints = message["actuators"]
@@ -707,9 +685,7 @@ class Model(object):
                 self.is_closed_loop = message["status"]
                 self.report_control_status()
 
-                self.log.info(
-                    f"Status of the force balance system: {self.is_closed_loop}."
-                )
+                self.log.info(f"Status of the force balance system: {self.is_closed_loop}.")
 
             elif name == "scriptExecutionStatus":
                 self.report_script_progress(int(message["percentage"]))
@@ -757,13 +733,9 @@ class Model(object):
 
             elif name == "openLoopMaxLimit":
                 isOpenLoopMaxLimitsEnabled = message["status"]
-                self.update_system_status(
-                    "isOpenLoopMaxLimitsEnabled", isOpenLoopMaxLimitsEnabled
-                )
+                self.update_system_status("isOpenLoopMaxLimitsEnabled", isOpenLoopMaxLimitsEnabled)
 
-                self.log.info(
-                    f"Open-loop maximum limit is enabled: {isOpenLoopMaxLimitsEnabled}."
-                )
+                self.log.info(f"Open-loop maximum limit is enabled: {isOpenLoopMaxLimitsEnabled}.")
 
             elif name == "limitSwitchStatus":
                 if len(message["retract"]) != 0:
@@ -792,9 +764,7 @@ class Model(object):
                 self.signal_power_system.is_state_updated.emit(True)
 
             elif name == "closedLoopControlMode":
-                self.log.info(
-                    f"Closed-loop control mode: {self.controller.closed_loop_control_mode!r}."
-                )
+                self.log.info(f"Closed-loop control mode: {self.controller.closed_loop_control_mode!r}.")
                 self.signal_closed_loop_control_mode.is_updated.emit(True)
 
             elif name == "tcpIpConnected":
@@ -807,9 +777,7 @@ class Model(object):
                 self.update_system_status("isCellTemperatureHigh", message["hiWarning"])
 
             elif name == "inclinationTelemetrySource":
-                self.inclination_source = MTM2.InclinationTelemetrySource(
-                    message["source"]
-                )
+                self.inclination_source = MTM2.InclinationTelemetrySource(message["source"])
                 self.report_control_status()
 
                 self.log.info(f"Inclination source: {self.inclination_source!r}.")
@@ -897,9 +865,7 @@ class Model(object):
                 enum_items.append(item)
 
         for item, enum_item in zip(self.utility_monitor.breakers.keys(), enum_items):
-            self.utility_monitor.update_breaker(
-                item, not (digital_input & enum_item.value)
-            )
+            self.utility_monitor.update_breaker(item, not (digital_input & enum_item.value))
 
     def _report_triggered_limit_switch(
         self,
@@ -937,9 +903,7 @@ class Model(object):
                     continue
 
                 # Update the new status
-                self.fault_manager.update_limit_switch_status(
-                    limit_switch_type, ring, number, status_new
-                )
+                self.fault_manager.update_limit_switch_status(limit_switch_type, ring, number, status_new)
 
         except ValueError:
             self.log.exception("Unknown limit switches encountered.")
@@ -1076,31 +1040,19 @@ class Model(object):
                 self._check_force_with_limit()
 
             elif name == "temperature":
-                self.utility_monitor.update_temperature(
-                    TemperatureGroup.Intake, message["intake"]
-                )
-                self.utility_monitor.update_temperature(
-                    TemperatureGroup.Exhaust, message["exhaust"]
-                )
+                self.utility_monitor.update_temperature(TemperatureGroup.Intake, message["intake"])
+                self.utility_monitor.update_temperature(TemperatureGroup.Exhaust, message["exhaust"])
 
                 ring_temperature = message["ring"]
-                self.utility_monitor.update_temperature(
-                    TemperatureGroup.LG2, ring_temperature[:4]
-                )
-                self.utility_monitor.update_temperature(
-                    TemperatureGroup.LG3, ring_temperature[4:8]
-                )
-                self.utility_monitor.update_temperature(
-                    TemperatureGroup.LG4, ring_temperature[8:]
-                )
+                self.utility_monitor.update_temperature(TemperatureGroup.LG2, ring_temperature[:4])
+                self.utility_monitor.update_temperature(TemperatureGroup.LG3, ring_temperature[4:8])
+                self.utility_monitor.update_temperature(TemperatureGroup.LG4, ring_temperature[8:])
 
             elif name == "zenithAngle":
                 # Filter the outlier from ILC
                 inclinometer_raw = message["inclinometerRaw"]
                 if int(inclinometer_raw) >= OUTLIER_INCLINOMETER_RAW:
-                    self.log.debug(
-                        f"Outlier of raw inclinometer: {inclinometer_raw} degree. Filering ..."
-                    )
+                    self.log.debug(f"Outlier of raw inclinometer: {inclinometer_raw} degree. Filering ...")
                     return
 
                 self.utility_monitor.update_inclinometer_angle(
@@ -1109,9 +1061,7 @@ class Model(object):
                 )
 
             elif name == "inclinometerAngleTma":
-                self.utility_monitor.update_inclinometer_angle(
-                    message["inclinometer"], is_internal=False
-                )
+                self.utility_monitor.update_inclinometer_angle(message["inclinometer"], is_internal=False)
 
             # If the step changes, the position will be changed as well.
             # We base on the change of position to send the "signal" to
@@ -1125,16 +1075,12 @@ class Model(object):
             elif name == "axialEncoderPositions":
                 # The received unit is um instead of mm.
                 position = message["position"]
-                self.utility_monitor.forces_axial.position_in_mm = [
-                    value * 1e-3 for value in position
-                ]
+                self.utility_monitor.forces_axial.position_in_mm = [value * 1e-3 for value in position]
 
             elif name == "tangentEncoderPositions":
                 # The received unit is um instead of mm.
                 position = message["position"]
-                self.utility_monitor.forces_tangent.position_in_mm = [
-                    value * 1e-3 for value in position
-                ]
+                self.utility_monitor.forces_tangent.position_in_mm = [value * 1e-3 for value in position]
 
             elif name == "displacementSensors":
                 self.utility_monitor.update_displacements(
@@ -1271,9 +1217,7 @@ class Model(object):
         """
 
         if self.local_mode != LocalMode.Standby:
-            raise RuntimeError(
-                f"System is in {self.local_mode!r} instead of {LocalMode.Standby!r}."
-            )
+            raise RuntimeError(f"System is in {self.local_mode!r} instead of {LocalMode.Standby!r}.")
 
         # If the communication power is on already, that should be from CSC.
         # Therefore, the GUI does not need to do anything.
@@ -1291,23 +1235,17 @@ class Model(object):
         # TODO: Check with electrical engineer that I need to reset the cRIO
         # interlock or not in a latter time.
         for idx in range(2, 5):
-            await self.controller.set_bit_digital_status(
-                idx, DigitalOutputStatus.BinaryHighLevel
-            )
+            await self.controller.set_bit_digital_status(idx, DigitalOutputStatus.BinaryHighLevel)
 
         # I don't understand why I need to put the CLC mode to be Idle twice.
         # This is translated from the ts_mtm2 and I need this to make the M2
         # cRIO simulator to work.
-        await self.controller.set_closed_loop_control_mode(
-            MTM2.ClosedLoopControlMode.Idle
-        )
+        await self.controller.set_closed_loop_control_mode(MTM2.ClosedLoopControlMode.Idle)
 
         await self.controller.load_configuration()
         await self.controller.set_control_parameters()
 
-        await self.controller.set_closed_loop_control_mode(
-            MTM2.ClosedLoopControlMode.Idle
-        )
+        await self.controller.set_closed_loop_control_mode(MTM2.ClosedLoopControlMode.Idle)
         await self.controller.reset_force_offsets()
         await self.controller.reset_actuator_steps()
 
@@ -1328,9 +1266,7 @@ class Model(object):
         ) = self.controller.error_handler.calc_enabled_faults_mask(
             ILC_READ_WARNING_ERROR_CODES, DEFAULT_ENABLED_FAULTS_MASK
         )
-        self.log.info(
-            f"Bypass the error codes: {ILC_READ_WARNING_ERROR_CODES}. Bits: {bits}."
-        )
+        self.log.info(f"Bypass the error codes: {ILC_READ_WARNING_ERROR_CODES}. Bits: {bits}.")
 
         await self.controller.set_enabled_faults_mask(enabled_faults_mask)
 
@@ -1351,9 +1287,7 @@ class Model(object):
         """
 
         if self.local_mode != LocalMode.Diagnostic:
-            raise RuntimeError(
-                f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
-            )
+            raise RuntimeError(f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}.")
 
         if not self.controller.is_powered_on_communication():
             await self.controller.power(MTM2.PowerType.Communication, True)
@@ -1383,9 +1317,7 @@ class Model(object):
                     await self._basic_cleanup_and_power_off_motor()
                 raise
 
-        await self.controller.set_closed_loop_control_mode(
-            MTM2.ClosedLoopControlMode.OpenLoop, timeout=30.0
-        )
+        await self.controller.set_closed_loop_control_mode(MTM2.ClosedLoopControlMode.OpenLoop, timeout=30.0)
 
         self.local_mode = LocalMode.Enable
 
@@ -1401,9 +1333,7 @@ class Model(object):
         """
 
         if self.local_mode != LocalMode.Enable:
-            raise RuntimeError(
-                f"System is in {self.local_mode!r} instead of {LocalMode.Enable!r}."
-            )
+            raise RuntimeError(f"System is in {self.local_mode!r} instead of {LocalMode.Enable!r}.")
 
         if self._task_fault.done():
             await self._basic_cleanup_and_power_off_motor()
@@ -1426,9 +1356,7 @@ class Model(object):
             await self.controller.power(MTM2.PowerType.Motor, False)
 
         except Exception:
-            self.log.exception(
-                "Error when doing the basic cleanup and power off the motor."
-            )
+            self.log.exception("Error when doing the basic cleanup and power off the motor.")
 
     async def exit_diagnostic(self) -> None:
         """Transition from the Diagnostic mode to the Standby mode.
@@ -1440,14 +1368,10 @@ class Model(object):
         """
 
         if self.local_mode != LocalMode.Diagnostic:
-            raise RuntimeError(
-                f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}."
-            )
+            raise RuntimeError(f"System is in {self.local_mode!r} instead of {LocalMode.Diagnostic!r}.")
 
         await self.controller.power(MTM2.PowerType.Communication, False)
-        await self.controller.set_closed_loop_control_mode(
-            MTM2.ClosedLoopControlMode.Idle, timeout=20.0
-        )
+        await self.controller.set_closed_loop_control_mode(MTM2.ClosedLoopControlMode.Idle, timeout=20.0)
 
         self.controller.set_ilc_modes_to_unknown()
         for address, status in enumerate(self.controller.ilc_modes):
@@ -1461,9 +1385,7 @@ class Model(object):
 
         if self.local_mode == LocalMode.Enable:
             if self._task_fault.done():
-                self._task_fault = asyncio.create_task(
-                    self._basic_cleanup_and_power_off_motor()
-                )
+                self._task_fault = asyncio.create_task(self._basic_cleanup_and_power_off_motor())
 
             self.local_mode = LocalMode.Diagnostic
 

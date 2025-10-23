@@ -97,18 +97,10 @@ class TabActuatorControl(TabDefault):
         self._buttons_script = {
             "load_script": set_button("Load Script", self._callback_script_load_script),
             "run": set_button("Run", self._callback_script_command, CommandScript.Run),
-            "stop": set_button(
-                "Stop", self._callback_script_command, CommandScript.Stop
-            ),
-            "pause": set_button(
-                "Pause", self._callback_script_command, CommandScript.Pause
-            ),
-            "resume": set_button(
-                "Resume", self._callback_script_command, CommandScript.Resume
-            ),
-            "clear": set_button(
-                "Clear", self._callback_script_command, CommandScript.Clear
-            ),
+            "stop": set_button("Stop", self._callback_script_command, CommandScript.Stop),
+            "pause": set_button("Pause", self._callback_script_command, CommandScript.Pause),
+            "resume": set_button("Resume", self._callback_script_command, CommandScript.Resume),
+            "clear": set_button("Clear", self._callback_script_command, CommandScript.Clear),
         }
 
         self._target_displacement = QDoubleSpinBox()
@@ -133,15 +125,9 @@ class TabActuatorControl(TabDefault):
 
         self._buttons_actuator_open_loop = {
             "start": set_button("Start", self._callback_actuator_start),
-            "stop": set_button(
-                "Stop", self._callback_actuator_command, CommandActuator.Stop
-            ),
-            "pause": set_button(
-                "Pause", self._callback_actuator_command, CommandActuator.Pause
-            ),
-            "resume": set_button(
-                "Resume", self._callback_actuator_command, CommandActuator.Resume
-            ),
+            "stop": set_button("Stop", self._callback_actuator_command, CommandActuator.Stop),
+            "pause": set_button("Pause", self._callback_actuator_command, CommandActuator.Pause),
+            "resume": set_button("Resume", self._callback_actuator_command, CommandActuator.Resume),
         }
 
         self._applied_force = create_double_spin_box(
@@ -156,9 +142,7 @@ class TabActuatorControl(TabDefault):
         self.set_widget_and_layout(is_scrollable=True)
 
         self._set_signal_script(self.model.signal_script)
-        self._set_signal_detailed_force(
-            self.model.utility_monitor.signal_detailed_force
-        )
+        self._set_signal_detailed_force(self.model.utility_monitor.signal_detailed_force)
 
     @asyncSlot()
     async def _callback_script_load_script(self, file_name: str = "") -> str:
@@ -214,9 +198,7 @@ class TabActuatorControl(TabDefault):
             self._info_script["file"].setText("")
             self._info_script["progress"].setValue(0)
 
-    def _set_target_displacement(
-        self, displacement_unit: ActuatorDisplacementUnit
-    ) -> None:
+    def _set_target_displacement(self, displacement_unit: ActuatorDisplacementUnit) -> None:
         """Set the target displacement.
 
         The available decimal, range, suffix, and single step in box will be
@@ -251,9 +233,7 @@ class TabActuatorControl(TabDefault):
         self._target_displacement.setSuffix(suffix)
         self._target_displacement.setSingleStep(10**-decimal)
 
-    def _create_displacement_unit_selection(
-        self, displacement_unit: ActuatorDisplacementUnit
-    ) -> QComboBox:
+    def _create_displacement_unit_selection(self, displacement_unit: ActuatorDisplacementUnit) -> QComboBox:
         """Create the combo box of displacement unit selection.
 
         Parameters
@@ -336,9 +316,7 @@ class TabActuatorControl(TabDefault):
         target_displacement = self._target_displacement.value()
 
         # Index begins from 0 instead of 1 in QComboBox
-        displacement_unit = ActuatorDisplacementUnit(
-            self._displacement_unit_selection.currentIndex() + 1
-        )
+        displacement_unit = ActuatorDisplacementUnit(self._displacement_unit_selection.currentIndex() + 1)
 
         await run_command(
             self.model.command_actuator,
@@ -393,24 +371,16 @@ class TabActuatorControl(TabDefault):
 
         # First column
         layout_script_control_force_summary = QVBoxLayout()
-        layout_script_control_force_summary.addWidget(
-            self._create_group_script_control()
-        )
-        layout_script_control_force_summary.addWidget(
-            self._create_group_force_summary()
-        )
+        layout_script_control_force_summary.addWidget(self._create_group_script_control())
+        layout_script_control_force_summary.addWidget(self._create_group_force_summary())
 
         layout.addLayout(layout_script_control_force_summary)
 
         # Second column
         layout_actuator_control = QVBoxLayout()
         layout_actuator_control.addWidget(self._create_group_actuator_selector())
-        layout_actuator_control.addWidget(
-            self._create_group_actuator_control_open_loop()
-        )
-        layout_actuator_control.addWidget(
-            self._create_group_actuator_control_closed_loop()
-        )
+        layout_actuator_control.addWidget(self._create_group_actuator_control_open_loop())
+        layout_actuator_control.addWidget(self._create_group_actuator_control_closed_loop())
 
         layout.addLayout(layout_actuator_control)
 
@@ -462,9 +432,7 @@ class TabActuatorControl(TabDefault):
 
         return create_group_box("Measured Force Summary", layout)
 
-    def _create_group_actuator_selector(
-        self, spacing: int = 1, num_column: int = 10
-    ) -> QGroupBox:
+    def _create_group_actuator_selector(self, spacing: int = 1, num_column: int = 10) -> QGroupBox:
         """Create the group of actuator selector to select single or multiple
         actuators to do the movements.
 
@@ -484,9 +452,7 @@ class TabActuatorControl(TabDefault):
 
         layout = QVBoxLayout()
 
-        layout_actuator_selection = create_grid_layout_buttons(
-            self._buttons_actuator_selection, num_column
-        )
+        layout_actuator_selection = create_grid_layout_buttons(self._buttons_actuator_selection, num_column)
         layout_actuator_selection.setSpacing(spacing)
 
         layout.addLayout(layout_actuator_selection)
@@ -568,9 +534,7 @@ class TabActuatorControl(TabDefault):
         """
         self._info_script["progress"].setValue(progress)
 
-    def _set_signal_detailed_force(
-        self, signal_detailed_force: SignalDetailedForce
-    ) -> None:
+    def _set_signal_detailed_force(self, signal_detailed_force: SignalDetailedForce) -> None:
         """Set the detailed force signal with callback functions. This signal
         provides the calculated and measured force details contains the look-up
         table (LUT).

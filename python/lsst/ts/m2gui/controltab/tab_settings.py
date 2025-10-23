@@ -91,9 +91,7 @@ class TabSettings(TabDefault):
 
         self._settings = self._create_settings()
 
-        self._button_apply_host = set_button(
-            "Apply Host Settings", self._callback_apply_host
-        )
+        self._button_apply_host = set_button("Apply Host Settings", self._callback_apply_host)
         self._button_apply_control_parameters = set_button(
             "Apply Control Parameters",
             self._callback_apply_control_parameters,
@@ -105,10 +103,7 @@ class TabSettings(TabDefault):
         self._button_apply_temperature_reference = set_button(
             "Apply Temperature Reference",
             self._callback_apply_temperature_reference,
-            tool_tip=(
-                "Apply the temperature reference value used in the look-up\n"
-                "table (LUT) calculation."
-            ),
+            tool_tip=("Apply the temperature reference value used in the look-up\ntable (LUT) calculation."),
         )
 
         self._button_overwrite_external_elevation_angle = set_button(
@@ -124,20 +119,13 @@ class TabSettings(TabDefault):
         self._button_apply_ilc = set_button(
             "Apply ILC Settings",
             self._callback_apply_ilc,
-            tool_tip=(
-                "Apply the inner-loop controller (ILC) settings used in the\n"
-                "state transtion."
-            ),
+            tool_tip=("Apply the inner-loop controller (ILC) settings used in the\nstate transtion."),
         )
 
-        self._button_apply_general = set_button(
-            "Apply General Settings", self._callback_apply_general
-        )
+        self._button_apply_general = set_button("Apply General Settings", self._callback_apply_general)
 
         # Timer to write the external elevation angle continuously
-        self._timer = self.create_and_start_timer(
-            self._callback_time_out, self.model.duration_refresh
-        )
+        self._timer = self.create_and_start_timer(self._callback_time_out, self.model.duration_refresh)
 
         self.set_widget_and_layout()
 
@@ -218,22 +206,14 @@ class TabSettings(TabDefault):
         )
         settings["max_angle_difference"].setSuffix(" degree")
 
-        settings["ilc_retry_times"].setToolTip(
-            "Retry times to transtion the ILC to Enabled state."
-        )
+        settings["ilc_retry_times"].setToolTip("Retry times to transtion the ILC to Enabled state.")
 
         settings["log_level"].setRange(LOG_LEVEL_MINIMUM, LOG_LEVEL_MAXIMUM)
-        settings["log_level"].setToolTip(
-            "CRITICAL (50), ERROR (40), WARNING (30), INFO (20), DEBUG (10)"
-        )
+        settings["log_level"].setToolTip("CRITICAL (50), ERROR (40), WARNING (30), INFO (20), DEBUG (10)")
 
-        settings["refresh_frequency"].setRange(
-            REFRESH_FREQUENCY_MINIMUM, REFRESH_FREQUENCY_MAXIMUM
-        )
+        settings["refresh_frequency"].setRange(REFRESH_FREQUENCY_MINIMUM, REFRESH_FREQUENCY_MAXIMUM)
         settings["refresh_frequency"].setSuffix(" Hz")
-        settings["refresh_frequency"].setToolTip(
-            "Frequency to refresh the data on tables"
-        )
+        settings["refresh_frequency"].setToolTip("Frequency to refresh the data on tables")
 
         settings["point_size"].setRange(POINT_SIZE_MINIMUM, POINT_SIZE_MAXIMUM)
         settings["point_size"].setToolTip("Point size of the application.")
@@ -245,18 +225,14 @@ class TabSettings(TabDefault):
         settings["port_telemetry"].setValue(controller.port_telemetry)
         settings["timeout_connection"].setValue(controller.timeout_connection)
 
-        settings["enable_lut_temperature"].setChecked(
-            controller.control_parameters["enable_lut_temperature"]
-        )
+        settings["enable_lut_temperature"].setChecked(controller.control_parameters["enable_lut_temperature"])
         settings["use_external_elevation_angle"].setChecked(
             controller.control_parameters["use_external_elevation_angle"]
         )
         settings["enable_angle_comparison"].setChecked(
             controller.control_parameters["enable_angle_comparison"]
         )
-        settings["max_angle_difference"].setValue(
-            controller.control_parameters["max_angle_difference"]
-        )
+        settings["max_angle_difference"].setValue(controller.control_parameters["max_angle_difference"])
 
         settings["ilc_retry_times"].setValue(self.model.ilc_retry_times)
         settings["ilc_timeout"].setValue(self.model.ilc_timeout)
@@ -294,9 +270,7 @@ class TabSettings(TabDefault):
             check_box_enable_angle_comparison.setChecked(True)
             check_box_enable_angle_comparison.setEnabled(False)
 
-    def _set_minimum_width_line_edit(
-        self, line_edit: QLineEdit, offset: int = 20
-    ) -> None:
+    def _set_minimum_width_line_edit(self, line_edit: QLineEdit, offset: int = 20) -> None:
         """Set the minimum width of line edit.
 
         Parameters
@@ -338,13 +312,11 @@ class TabSettings(TabDefault):
         and decide to calculate the temperature LUT or not.
         """
 
-        self.model.controller.control_parameters["enable_lut_temperature"] = (
-            self._settings["enable_lut_temperature"].isChecked()
-        )
-
-        use_external_elevation_angle = self._settings[
-            "use_external_elevation_angle"
+        self.model.controller.control_parameters["enable_lut_temperature"] = self._settings[
+            "enable_lut_temperature"
         ].isChecked()
+
+        use_external_elevation_angle = self._settings["use_external_elevation_angle"].isChecked()
         max_angle_difference = self._settings["max_angle_difference"].value()
         enable_angle_comparison = self._settings["enable_angle_comparison"].isChecked()
 
@@ -396,9 +368,7 @@ class TabSettings(TabDefault):
         self.model.log.setLevel(self._settings["log_level"].value())
 
         # The unit of self.model.duration_refresh is milliseconds
-        self.model.duration_refresh = int(
-            1000 / self._settings["refresh_frequency"].value()
-        )
+        self.model.duration_refresh = int(1000 / self._settings["refresh_frequency"].value())
 
         # Update the point size
         app = QApplication.instance()
@@ -481,9 +451,7 @@ class TabSettings(TabDefault):
         layout_control.addRow(self._settings["enable_lut_temperature"])
         layout_control.addRow(self._settings["use_external_elevation_angle"])
         layout_control.addRow(self._settings["enable_angle_comparison"])
-        layout_control.addRow(
-            "Maximum angle difference:", self._settings["max_angle_difference"]
-        )
+        layout_control.addRow("Maximum angle difference:", self._settings["max_angle_difference"])
 
         layout.addLayout(layout_control)
         layout.addWidget(self._button_apply_control_parameters)
@@ -502,12 +470,8 @@ class TabSettings(TabDefault):
         layout = QVBoxLayout()
 
         layout_lut = QFormLayout()
-        layout_lut.addRow(
-            "Temperature reference:", self._settings["lut_temperature_ref"]
-        )
-        layout_lut.addRow(
-            "External elevation angle", self._settings["external_elevation_angle"]
-        )
+        layout_lut.addRow("Temperature reference:", self._settings["lut_temperature_ref"])
+        layout_lut.addRow("External elevation angle", self._settings["external_elevation_angle"])
 
         layout.addLayout(layout_lut)
         layout.addWidget(self._button_apply_temperature_reference)
@@ -566,14 +530,10 @@ class TabSettings(TabDefault):
             Signal of the configuration.
         """
 
-        signal_config.temperature_offset.connect(
-            self._callback_signal_config_temperature_offset
-        )
+        signal_config.temperature_offset.connect(self._callback_signal_config_temperature_offset)
 
     @asyncSlot()
-    async def _callback_signal_config_temperature_offset(
-        self, temperature_offset: float
-    ) -> None:
+    async def _callback_signal_config_temperature_offset(self, temperature_offset: float) -> None:
         """Callback of the config signal for the temperature offset.
 
         Parameters

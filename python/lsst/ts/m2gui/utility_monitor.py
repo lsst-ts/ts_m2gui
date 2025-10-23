@@ -265,17 +265,13 @@ class UtilityMonitor(object):
     def _report_powers(self) -> None:
         """Report the powers."""
 
-        self.signal_utility.power_motor_calibrated.emit(
-            tuple(self.power_motor_calibrated.values())
-        )
+        self.signal_utility.power_motor_calibrated.emit(tuple(self.power_motor_calibrated.values()))
         self.signal_utility.power_communication_calibrated.emit(
             tuple(self.power_communication_calibrated.values())
         )
 
         self.signal_utility.power_motor_raw.emit(tuple(self.power_motor_raw.values()))
-        self.signal_utility.power_communication_raw.emit(
-            tuple(self.power_communication_raw.values())
-        )
+        self.signal_utility.power_communication_raw.emit(tuple(self.power_communication_raw.values()))
 
     def _report_temperatures(self) -> None:
         """Report the temperatures."""
@@ -307,9 +303,7 @@ class UtilityMonitor(object):
     def _report_forces(self) -> None:
         """Report the forces."""
 
-        self.signal_detailed_force.hard_points.emit(
-            self.hard_points["axial"] + self.hard_points["tangent"]
-        )
+        self.signal_detailed_force.hard_points.emit(self.hard_points["axial"] + self.hard_points["tangent"])
         self.signal_detailed_force.forces_axial.emit(self.forces_axial)
         self.signal_detailed_force.forces_tangent.emit(self.forces_tangent)
         self.signal_detailed_force.force_error_tangent.emit(self.force_error_tangent)
@@ -343,9 +337,7 @@ class UtilityMonitor(object):
 
         return sensors
 
-    def get_displacement_sensors(
-        self, direction: DisplacementSensorDirection
-    ) -> list[str]:
+    def get_displacement_sensors(self, direction: DisplacementSensorDirection) -> list[str]:
         """Get the displacement sensors in a specific direction.
 
         Parameters
@@ -398,9 +390,7 @@ class UtilityMonitor(object):
 
         self._update_power(power, new_voltage, new_current, signal_name)
 
-    def _update_power(
-        self, power: dict, new_voltage: float, new_current: float, signal_name: str
-    ) -> None:
+    def _update_power(self, power: dict, new_voltage: float, new_current: float, signal_name: str) -> None:
         """Update the power data.
 
         Parameters
@@ -422,9 +412,7 @@ class UtilityMonitor(object):
             power["voltage"] = round(new_voltage, self.NUM_DIGIT_AFTER_DECIMAL)
             power["current"] = round(new_current, self.NUM_DIGIT_AFTER_DECIMAL)
 
-            getattr(self.signal_utility, signal_name).emit(
-                (power["voltage"], power["current"])
-            )
+            getattr(self.signal_utility, signal_name).emit((power["voltage"], power["current"]))
 
     def _has_changed(
         self,
@@ -454,9 +442,7 @@ class UtilityMonitor(object):
 
         return np.max(np.abs(value_old - value_new)) >= tol
 
-    def update_power_raw(
-        self, power_type: MTM2.PowerType, new_voltage: float, new_current: float
-    ) -> None:
+    def update_power_raw(self, power_type: MTM2.PowerType, new_voltage: float, new_current: float) -> None:
         """Update the raw power data.
 
         Parameters
@@ -504,14 +490,8 @@ class UtilityMonitor(object):
             from the telescope mount assembly (TMA). (the default is True)
         """
 
-        original_angle = (
-            self.inclinometer_angle if is_internal else self.inclinometer_angle_tma
-        )
-        signal = (
-            self.signal_utility.inclinometer_raw
-            if is_internal
-            else self.signal_utility.inclinometer_tma
-        )
+        original_angle = self.inclinometer_angle if is_internal else self.inclinometer_angle_tma
+        signal = self.signal_utility.inclinometer_raw if is_internal else self.signal_utility.inclinometer_tma
 
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
         if self._has_changed(original_angle, new_angle, tol):
@@ -590,9 +570,7 @@ class UtilityMonitor(object):
 
         return breakers
 
-    def update_temperature(
-        self, temperature_group: TemperatureGroup, new_temperatures: list[float]
-    ) -> None:
+    def update_temperature(self, temperature_group: TemperatureGroup, new_temperatures: list[float]) -> None:
         """Update the temperature data.
 
         This function assumes the temperature's fluctuation is usually
@@ -653,9 +631,7 @@ class UtilityMonitor(object):
         size_sensors = len(sensors)
         size_values = len(new_values)
         if size_sensors != size_values:
-            raise ValueError(
-                f"Size of sensors (={size_sensors}) != size of values (={size_values})."
-            )
+            raise ValueError(f"Size of sensors (={size_sensors}) != size of values (={size_values}).")
 
         tol = get_tol(num_digit_after_decimal)
 
@@ -772,16 +748,12 @@ class UtilityMonitor(object):
         length_axial = len(self.hard_points["axial"])
         length_tangent = len(self.hard_points["tangent"])
         if len(axial) != length_axial or len(tangent) != length_tangent:
-            raise ValueError(
-                f"Length should be (axial, tangent) = ({length_axial}, {length_tangent})."
-            )
+            raise ValueError(f"Length should be (axial, tangent) = ({length_axial}, {length_tangent}).")
 
         self.hard_points["axial"] = axial
         self.hard_points["tangent"] = tangent
 
-        self.signal_detailed_force.hard_points.emit(
-            self.hard_points["axial"] + self.hard_points["tangent"]
-        )
+        self.signal_detailed_force.hard_points.emit(self.hard_points["axial"] + self.hard_points["tangent"])
 
     def update_forces_axial(self, actuator_force: ActuatorForceAxial) -> None:
         """Update the axial actuator forces.
@@ -823,9 +795,7 @@ class UtilityMonitor(object):
         self.forces_tangent = actuator_force
         self.signal_detailed_force.forces_tangent.emit(self.forces_tangent)
 
-    def update_force_error_tangent(
-        self, force_error_tangent: ForceErrorTangent
-    ) -> None:
+    def update_force_error_tangent(self, force_error_tangent: ForceErrorTangent) -> None:
         """Update the tangential force error that monitors the supporting
         force of mirror.
 
@@ -845,19 +815,14 @@ class UtilityMonitor(object):
             tol,
         ):
             self.force_error_tangent.error_force = [
-                round(force, num_digit_after_decimal)
-                for force in force_error_tangent.error_force
+                round(force, num_digit_after_decimal) for force in force_error_tangent.error_force
             ]
             self.force_error_tangent.error_weight = round(
                 force_error_tangent.error_weight, num_digit_after_decimal
             )
-            self.force_error_tangent.error_sum = round(
-                force_error_tangent.error_sum, num_digit_after_decimal
-            )
+            self.force_error_tangent.error_sum = round(force_error_tangent.error_sum, num_digit_after_decimal)
 
-            self.signal_detailed_force.force_error_tangent.emit(
-                self.force_error_tangent
-            )
+            self.signal_detailed_force.force_error_tangent.emit(self.force_error_tangent)
 
     def update_position(
         self,
@@ -892,11 +857,7 @@ class UtilityMonitor(object):
 
         # Decide the position and signal objects
         position = self.position_ims if is_ims else self.position
-        signal = (
-            self.signal_position.position_ims
-            if is_ims
-            else self.signal_position.position
-        )
+        signal = self.signal_position.position_ims if is_ims else self.signal_position.position
 
         tol = get_tol(self.NUM_DIGIT_AFTER_DECIMAL)
 

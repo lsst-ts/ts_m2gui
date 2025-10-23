@@ -93,9 +93,7 @@ class TabHardpointSelection(TabDefault):
 
         self.set_widget_and_layout()
 
-        self._set_signal_detailed_force(
-            self.model.utility_monitor.signal_detailed_force
-        )
+        self._set_signal_detailed_force(self.model.utility_monitor.signal_detailed_force)
 
     @asyncSlot()
     async def _callback_reset_default(self) -> None:
@@ -182,9 +180,7 @@ class TabHardpointSelection(TabDefault):
         if (len(selection) == 0) or (selection[0] >= num_axial):
             raise ValueError("Please select at least 1 axial hardpoint.")
 
-        suggest_axial = select_axial_hardpoints(
-            self._cell_geom["locAct_axial"], selection[0]
-        )
+        suggest_axial = select_axial_hardpoints(self._cell_geom["locAct_axial"], selection[0])
 
         # Check the tangent hardpoint
         hardpoint_tangent = list()
@@ -197,9 +193,7 @@ class TabHardpointSelection(TabDefault):
 
         option_one = [72, 74, 76]
         option_two = [73, 75, 77]
-        suggest_tangent = (
-            option_one if (hardpoint_tangent[0] in option_one) else option_two
-        )
+        suggest_tangent = option_one if (hardpoint_tangent[0] in option_one) else option_two
 
         # Set the hardpoints
         self._set_hardpoints(suggest_axial + suggest_tangent)
@@ -222,9 +216,7 @@ class TabHardpointSelection(TabDefault):
 
         return layout
 
-    def _create_group_hardpoint_selector(
-        self, spacing: int = 1, num_column: int = 10
-    ) -> QGroupBox:
+    def _create_group_hardpoint_selector(self, spacing: int = 1, num_column: int = 10) -> QGroupBox:
         """Create the group of hardpoint selector to select the hardpoints.
 
         Parameters
@@ -243,18 +235,14 @@ class TabHardpointSelection(TabDefault):
 
         layout = QVBoxLayout()
 
-        layout_hardpoint_selection = create_grid_layout_buttons(
-            self._buttons_hardpoint_selection, num_column
-        )
+        layout_hardpoint_selection = create_grid_layout_buttons(self._buttons_hardpoint_selection, num_column)
         layout_hardpoint_selection.setSpacing(spacing)
 
         layout.addLayout(layout_hardpoint_selection)
 
         return create_group_box("Hardpoint Selector", layout)
 
-    def _set_signal_detailed_force(
-        self, signal_detailed_force: SignalDetailedForce
-    ) -> None:
+    def _set_signal_detailed_force(self, signal_detailed_force: SignalDetailedForce) -> None:
         """Set the detailed force signal with callback function. This signal
         provides the current hardpoints.
 

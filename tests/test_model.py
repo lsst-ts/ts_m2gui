@@ -80,9 +80,7 @@ def test_clear_error(qtbot: QtBot, model: Model) -> None:
     error = 3
     model.report_error(error)
 
-    with qtbot.waitSignal(
-        model.fault_manager.signal_error.error_cleared, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.fault_manager.signal_error.error_cleared, timeout=TIMEOUT):
         model.clear_error(error)
 
     assert model.fault_manager.errors == set()
@@ -94,12 +92,8 @@ async def test_reset_errors(qtbot: QtBot, model_async: Model) -> None:
 
     model_async.controller.error_handler.add_new_error(3)
     model_async.report_error(3)
-    model_async.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Retract, Ring.B, 2, Status.Error
-    )
-    model_async.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.C, 3, Status.Error
-    )
+    model_async.fault_manager.update_limit_switch_status(LimitSwitchType.Retract, Ring.B, 2, Status.Error)
+    model_async.fault_manager.update_limit_switch_status(LimitSwitchType.Extend, Ring.C, 3, Status.Error)
 
     signals = [
         model_async.fault_manager.signal_error.error_cleared,
@@ -258,9 +252,7 @@ async def test_reset_breakers(qtbot: QtBot, model_async: Model) -> None:
 
     model_async.utility_monitor.update_breaker("J1-W9-1", True)
 
-    with qtbot.waitSignal(
-        model_async.utility_monitor.signal_utility.breaker_status, timeout=TIMEOUT_LONG
-    ):
+    with qtbot.waitSignal(model_async.utility_monitor.signal_utility.breaker_status, timeout=TIMEOUT_LONG):
         await model_async.reset_breakers(MTM2.PowerType.Motor)
 
 
@@ -293,9 +285,7 @@ async def test_connect_exception(model: Model) -> None:
 @pytest.mark.asyncio
 async def test_process_event(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "m2AssemblyInPosition", "inPosition": True}
-        )
+        await model._process_event(message={"id": "m2AssemblyInPosition", "inPosition": True})
 
     with qtbot.waitSignal(model.fault_manager.signal_error.error_new, timeout=TIMEOUT):
         await model._process_event(message={"id": "errorCode", "errorCode": 1})
@@ -304,28 +294,18 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
         await model._process_event(message={"id": "commandableByDDS", "state": True})
     assert model.is_csc_commander is True
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.hard_points, timeout=TIMEOUT
-    ):
-        await model._process_event(
-            message={"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]}
-        )
+    with qtbot.waitSignal(model.utility_monitor.signal_detailed_force.hard_points, timeout=TIMEOUT):
+        await model._process_event(message={"id": "hardpointList", "actuators": [1, 2, 3, 4, 5, 6]})
 
     with qtbot.waitSignal(model.signal_ilc_status.bypassed_ilcs, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "bypassedActuatorILCs", "ilcs": [1, 2, 3]}
-        )
+        await model._process_event(message={"id": "bypassedActuatorILCs", "ilcs": [1, 2, 3]})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "forceBalanceSystemStatus", "status": True}
-        )
+        await model._process_event(message={"id": "forceBalanceSystemStatus", "status": True})
     assert model.is_closed_loop is True
 
     with qtbot.waitSignal(model.signal_script.progress, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "scriptExecutionStatus", "percentage": 1}
-        )
+        await model._process_event(message={"id": "scriptExecutionStatus", "percentage": 1})
 
     with qtbot.waitSignals(
         [
@@ -339,9 +319,7 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
         assert model.system_status["isPowerCommunicationOn"] is True
         assert model.system_status["isPowerMotorOn"] is True
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_utility.digital_status_input, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_utility.digital_status_input, timeout=TIMEOUT):
         await model._process_event(message={"id": "digitalInput", "value": 1})
 
     with qtbot.waitSignal(model.signal_config.config, timeout=TIMEOUT):
@@ -373,12 +351,8 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
         await model._process_event(message={"id": "openLoopMaxLimit", "status": True})
 
-    with qtbot.waitSignal(
-        model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
-    ):
-        await model._process_event(
-            message={"id": "limitSwitchStatus", "retract": [1, 2], "extend": []}
-        )
+    with qtbot.waitSignal(model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT):
+        await model._process_event(message={"id": "limitSwitchStatus", "retract": [1, 2], "extend": []})
 
     with qtbot.waitSignal(model.signal_power_system.is_state_updated, timeout=TIMEOUT):
         await model._process_event(
@@ -390,49 +364,33 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.signal_closed_loop_control_mode.is_updated, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.signal_closed_loop_control_mode.is_updated, timeout=TIMEOUT):
         await model._process_event(message={"id": "closedLoopControlMode", "mode": 1})
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "tcpIpConnected", "isConnected": True}
-        )
+        await model._process_event(message={"id": "tcpIpConnected", "isConnected": True})
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
         await model._process_event(message={"id": "interlock", "state": True})
 
     with qtbot.waitSignal(model.signal_status.name_status, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "cellTemperatureHiWarning", "hiWarning": True}
-        )
+        await model._process_event(message={"id": "cellTemperatureHiWarning", "hiWarning": True})
 
     with qtbot.waitSignal(model.signal_control.is_control_updated, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "inclinationTelemetrySource", "source": 2}
-        )
+        await model._process_event(message={"id": "inclinationTelemetrySource", "source": 2})
     assert model.inclination_source == MTM2.InclinationTelemetrySource.MTMOUNT
 
     with qtbot.waitSignal(model.signal_ilc_status.address_mode, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "innerLoopControlMode", "address": 1, "mode": 2}
-        )
+        await model._process_event(message={"id": "innerLoopControlMode", "address": 1, "mode": 2})
 
-    with qtbot.waitSignal(
-        model.fault_manager.signal_error.summary_faults_status, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.fault_manager.signal_error.summary_faults_status, timeout=TIMEOUT):
         await model._process_event(message={"id": "summaryFaultsStatus", "status": 10})
 
-    with qtbot.waitSignal(
-        model.fault_manager.signal_error.enabled_faults_mask, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.fault_manager.signal_error.enabled_faults_mask, timeout=TIMEOUT):
         await model._process_event(message={"id": "enabledFaultsMask", "mask": 10})
 
     with qtbot.waitSignal(model.signal_config.files, timeout=TIMEOUT):
-        await model._process_event(
-            message={"id": "configurationFiles", "files": ["a", "b"]}
-        )
+        await model._process_event(message={"id": "configurationFiles", "files": ["a", "b"]})
 
     with qtbot.waitSignal(model.signal_config.temperature_offset, timeout=TIMEOUT):
         await model._process_event(
@@ -454,9 +412,7 @@ def test_get_message_name(model: Model) -> None:
 
 @pytest.mark.asyncio
 async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_position.position, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_position.position, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "position",
@@ -469,9 +425,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_position.position_ims, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_position.position_ims, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "positionIMS",
@@ -486,9 +440,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
 
     model.utility_monitor.hard_points["axial"] = [6, 16, 26]
     num_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.forces_axial, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_detailed_force.forces_axial, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "axialForce",
@@ -501,9 +453,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
         )
 
     model.utility_monitor.hard_points["tangent"] = [74, 76, 78]
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.forces_tangent, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_detailed_force.forces_tangent, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "tangentForce",
@@ -514,9 +464,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_utility.temperatures, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_utility.temperatures, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "temperature",
@@ -541,9 +489,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_utility.inclinometer_tma, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_utility.inclinometer_tma, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "inclinometerAngleTma",
@@ -565,13 +511,9 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             "position": [10000] * NUM_TANGENT_LINK,
         }
     )
-    assert (
-        model.utility_monitor.forces_tangent.position_in_mm == [10] * NUM_TANGENT_LINK
-    )
+    assert model.utility_monitor.forces_tangent.position_in_mm == [10] * NUM_TANGENT_LINK
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_utility.displacements, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_utility.displacements, timeout=TIMEOUT):
         num_sensor = 6
         await model._process_telemetry(
             message={
@@ -617,9 +559,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_detailed_force.force_error_tangent, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_detailed_force.force_error_tangent, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "forceErrorTangent",
@@ -629,9 +569,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_net_force_moment.net_force_total, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_net_force_moment.net_force_total, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "netForcesTotal",
@@ -641,9 +579,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_net_force_moment.net_moment_total, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_net_force_moment.net_moment_total, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "netMomentsTotal",
@@ -653,9 +589,7 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
             }
         )
 
-    with qtbot.waitSignal(
-        model.utility_monitor.signal_net_force_moment.force_balance, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.utility_monitor.signal_net_force_moment.force_balance, timeout=TIMEOUT):
         await model._process_telemetry(
             message={
                 "id": "forceBalance",
@@ -670,13 +604,9 @@ async def test_process_telemetry(qtbot: QtBot, model: Model) -> None:
 
 
 def test_check_force_with_limit(qtbot: QtBot, model: Model) -> None:
-    model.utility_monitor.forces_axial.f_cur = [1000.0] * (
-        NUM_ACTUATOR - NUM_TANGENT_LINK
-    )
+    model.utility_monitor.forces_axial.f_cur = [1000.0] * (NUM_ACTUATOR - NUM_TANGENT_LINK)
 
-    with qtbot.waitSignal(
-        model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(model.fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT):
         model._check_force_with_limit()
 
 
@@ -756,7 +686,6 @@ async def test_fault(model_async: Model) -> None:
 
 @pytest.mark.asyncio
 async def test_enter_enable_power_on(model_async: Model) -> None:
-
     # Fake the condition that the M2 CSC powered on the system already
     mock_server = model_async.controller.mock_server
     power_communication = mock_server.model.power_communication

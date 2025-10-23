@@ -149,9 +149,7 @@ class ViewMirror(QGraphicsView):
         pos_x = center + int(x * magnification) - offset_center
         pos_y = center + int(y * magnification) - offset_center
 
-        actuator = ItemActuator(
-            pos_x, pos_y, self.DIAMETER, actuator_id, alias, point_size
-        )
+        actuator = ItemActuator(pos_x, pos_y, self.DIAMETER, actuator_id, alias, point_size)
 
         # Set the label of actuator ID
         offset = self.DIAMETER // 2 - point_size
@@ -175,9 +173,7 @@ class ViewMirror(QGraphicsView):
         `int`
             Magnification.
         """
-        return (
-            self.SIZE_SCENE // 2 - self.DIAMETER // 2 - margin
-        ) // self.mirror_radius
+        return (self.SIZE_SCENE // 2 - self.DIAMETER // 2 - margin) // self.mirror_radius
 
     def show_alias(self, is_alias: bool) -> None:
         """Show the alias of actuator or not.

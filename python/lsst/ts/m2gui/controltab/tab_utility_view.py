@@ -93,13 +93,9 @@ class TabUtilityView(TabDefault):
             MTM2.PowerType.Communication,
         )
 
-        self._temperatures = self._create_labels_sensor_data(
-            self.model.utility_monitor.temperatures
-        )
+        self._temperatures = self._create_labels_sensor_data(self.model.utility_monitor.temperatures)
 
-        self._displacements = self._create_labels_sensor_data(
-            self.model.utility_monitor.displacements
-        )
+        self._displacements = self._create_labels_sensor_data(self.model.utility_monitor.displacements)
 
         self.set_widget_and_layout(is_scrollable=True)
 
@@ -119,9 +115,7 @@ class TabUtilityView(TabDefault):
 
         indicators = dict()
         for name in self.model.utility_monitor.breakers.keys():
-            indicators[name] = set_button(
-                name, None, is_indicator=True, is_adjust_size=True
-            )
+            indicators[name] = set_button(name, None, is_indicator=True, is_adjust_size=True)
             self._update_indicator_color(indicators[name], False)
 
         return indicators
@@ -208,9 +202,7 @@ class TabUtilityView(TabDefault):
         layout_breaker = QVBoxLayout()
         layout_breaker.addWidget(self._create_group_breakers(MTM2.PowerType.Motor))
         layout_breaker.addWidget(self._button_reset_breakers_motor)
-        layout_breaker.addWidget(
-            self._create_group_breakers(MTM2.PowerType.Communication)
-        )
+        layout_breaker.addWidget(self._create_group_breakers(MTM2.PowerType.Communication))
         layout_breaker.addWidget(self._button_reset_breakers_communication)
 
         layout.addLayout(layout_breaker)
@@ -231,9 +223,7 @@ class TabUtilityView(TabDefault):
         ]
         group_title_mirror = "Mirror Temperatures"
         layout_temperature.addWidget(
-            self._create_group_temperatures(
-                temperature_groups_mirror, group_title_mirror
-            )
+            self._create_group_temperatures(temperature_groups_mirror, group_title_mirror)
         )
 
         layout.addLayout(layout_temperature)
@@ -274,15 +264,9 @@ class TabUtilityView(TabDefault):
 
         layout = QFormLayout()
         layout.addRow("Power:", self._power_inclinometer["power_on_communication"])
-        layout.addRow(
-            "State:", self._power_inclinometer["power_system_state_communication"]
-        )
-        layout.addRow(
-            "Voltage:", self._power_inclinometer["power_voltage_communication"]
-        )
-        layout.addRow(
-            "Current:", self._power_inclinometer["power_current_communication"]
-        )
+        layout.addRow("State:", self._power_inclinometer["power_system_state_communication"])
+        layout.addRow("Voltage:", self._power_inclinometer["power_voltage_communication"])
+        layout.addRow("Current:", self._power_inclinometer["power_current_communication"])
 
         return create_group_box("Communication Power System", layout)
 
@@ -350,9 +334,7 @@ class TabUtilityView(TabDefault):
 
         layout = QFormLayout()
         for temperature_group in temperature_groups:
-            sensors = self.model.utility_monitor.get_temperature_sensors(
-                temperature_group
-            )
+            sensors = self.model.utility_monitor.get_temperature_sensors(temperature_group)
 
             for sensor in sensors:
                 layout.addRow(sensor + ":", self._temperatures[sensor])
@@ -372,12 +354,8 @@ class TabUtilityView(TabDefault):
 
         layout = QFormLayout()
 
-        sensors_theta = self.model.utility_monitor.get_displacement_sensors(
-            DisplacementSensorDirection.Theta
-        )
-        sensors_delta = self.model.utility_monitor.get_displacement_sensors(
-            DisplacementSensorDirection.Delta
-        )
+        sensors_theta = self.model.utility_monitor.get_displacement_sensors(DisplacementSensorDirection.Theta)
+        sensors_delta = self.model.utility_monitor.get_displacement_sensors(DisplacementSensorDirection.Delta)
 
         for sensor_theta, sensor_delta in zip(sensors_theta, sensors_delta):
             layout.addRow(sensor_theta + ":", self._displacements[sensor_theta])
@@ -393,25 +371,17 @@ class TabUtilityView(TabDefault):
 
         # Power
         power_motor = "On" if power_system_status["motor_power_is_on"] else "Off"
-        power_communication = (
-            "On" if power_system_status["communication_power_is_on"] else "Off"
-        )
+        power_communication = "On" if power_system_status["communication_power_is_on"] else "Off"
 
         self._power_inclinometer["power_on_motor"].setText(f"{power_motor}")
-        self._power_inclinometer["power_on_communication"].setText(
-            f"{power_communication}"
-        )
+        self._power_inclinometer["power_on_communication"].setText(f"{power_communication}")
 
         # State
         state_motor = power_system_status["motor_power_state"]
         state_communication = power_system_status["communication_power_state"]
 
-        self._power_inclinometer["power_system_state_motor"].setText(
-            f"{state_motor.name}"
-        )
-        self._power_inclinometer["power_system_state_communication"].setText(
-            f"{state_communication.name}"
-        )
+        self._power_inclinometer["power_system_state_motor"].setText(f"{state_motor.name}")
+        self._power_inclinometer["power_system_state_communication"].setText(f"{state_communication.name}")
 
     def _set_signal_power_system(self, signal_power_system: SignalPowerSystem) -> None:
         """Set the power system signal with callback function. This signal
@@ -422,14 +392,10 @@ class TabUtilityView(TabDefault):
         signal_power_system : `SignalPowerSystem`
             Signal of the power system.
         """
-        signal_power_system.is_state_updated.connect(
-            self._callback_update_power_system_status
-        )
+        signal_power_system.is_state_updated.connect(self._callback_update_power_system_status)
 
     @asyncSlot()
-    async def _callback_update_power_system_status(
-        self, is_state_updated: bool
-    ) -> None:
+    async def _callback_update_power_system_status(self, is_state_updated: bool) -> None:
         """Callback of the power system signal to update the power system
         status.
 
@@ -452,14 +418,10 @@ class TabUtilityView(TabDefault):
         """
 
         signal_utility.power_motor_calibrated.connect(self._callback_power_motor)
-        signal_utility.power_communication_calibrated.connect(
-            self._callback_power_communication
-        )
+        signal_utility.power_communication_calibrated.connect(self._callback_power_communication)
 
         signal_utility.inclinometer_raw.connect(self._callback_inclinometer_raw)
-        signal_utility.inclinometer_processed.connect(
-            self._callback_inclinometer_processed
-        )
+        signal_utility.inclinometer_processed.connect(self._callback_inclinometer_processed)
         signal_utility.inclinometer_tma.connect(self._callback_inclinometer_tma)
 
         signal_utility.breaker_status.connect(self._callback_breakers)
@@ -493,12 +455,8 @@ class TabUtilityView(TabDefault):
             The units are volt and ampere respectively.
         """
 
-        self._power_inclinometer["power_voltage_communication"].setText(
-            f"{power_communication[0]} V"
-        )
-        self._power_inclinometer["power_current_communication"].setText(
-            f"{power_communication[1]} A"
-        )
+        self._power_inclinometer["power_voltage_communication"].setText(f"{power_communication[0]} V")
+        self._power_inclinometer["power_current_communication"].setText(f"{power_communication[1]} A")
 
     @asyncSlot()
     async def _callback_inclinometer_raw(self, inclinometer_raw: float) -> None:
@@ -509,14 +467,10 @@ class TabUtilityView(TabDefault):
         inclinometer_raw : `float`
             Row inclinometer angle in degree.
         """
-        self._power_inclinometer["inclinometer_raw"].setText(
-            f"{inclinometer_raw} degree"
-        )
+        self._power_inclinometer["inclinometer_raw"].setText(f"{inclinometer_raw} degree")
 
     @asyncSlot()
-    async def _callback_inclinometer_processed(
-        self, inclinometer_processed: float
-    ) -> None:
+    async def _callback_inclinometer_processed(self, inclinometer_processed: float) -> None:
         """Callback of the utility signal for the processed inclinometer angle.
 
         Parameters
@@ -524,9 +478,7 @@ class TabUtilityView(TabDefault):
         inclinometer_processed : `float`
             Processed inclinometer angle in degree.
         """
-        self._power_inclinometer["inclinometer_processed"].setText(
-            f"{inclinometer_processed} degree"
-        )
+        self._power_inclinometer["inclinometer_processed"].setText(f"{inclinometer_processed} degree")
 
     @asyncSlot()
     async def _callback_inclinometer_tma(self, inclinometer_tma: float) -> None:
@@ -538,9 +490,7 @@ class TabUtilityView(TabDefault):
         inclinometer_tma : `float`
             Inclinometer angle of TMA in degree.
         """
-        self._power_inclinometer["inclinometer_tma"].setText(
-            f"{inclinometer_tma} degree"
-        )
+        self._power_inclinometer["inclinometer_tma"].setText(f"{inclinometer_tma} degree")
 
     @asyncSlot()
     async def _callback_breakers(self, breaker_status: tuple) -> None:

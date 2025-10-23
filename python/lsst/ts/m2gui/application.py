@@ -22,10 +22,8 @@
 __all__ = ["run_application"]
 
 import asyncio
-import functools
 import sys
 
-import qasync
 from lsst.ts.guitool import base_frame_run_application
 from PySide6.QtCore import QCommandLineOption, QCommandLineParser
 
@@ -34,45 +32,29 @@ from .main_window import MainWindow
 
 def run_application() -> None:
     """Run the application."""
-    base_frame_run_application(main)
+    parser, options = create_parser()
+    base_frame_run_application("M2 EUI", parser, options, main)
 
 
-async def main(argv: list) -> bool:
-    """Main application.
+def create_parser() -> tuple[QCommandLineParser, list[QCommandLineOption]]:
+    """Create the command line parser.
 
-    Parameters
-    ----------
-    argv : `list`
-        Arguments from the command line.
+    Returns
+    -------
+    parser : `PySide6.QtCore.QCommandLineParser`
+        Command line parser.
+    `list` [`PySide6.QtCore.QCommandLineOption`]
+        List of command line options.
     """
 
-    # The set of "aboutToQuit" comes from "qasync/examples/aiohttp_fetch.py"
-    loop = asyncio.get_event_loop()
-    future: asyncio.Future = asyncio.Future()
-
-    # You need one (and only one) QApplication instance per application.
-    # There is one QApplication instance in "qasync" already.
-    app = qasync.QApplication.instance()
-    if hasattr(app, "aboutToQuit"):
-        getattr(app, "aboutToQuit").connect(
-            functools.partial(close_future, future, loop)
-        )
-
-    app.setApplicationName("M2 EUI")
-
-    # Set the parser
     parser = QCommandLineParser()
     parser.setApplicationDescription("Run the M2 graphical user interface (GUI).")
     parser.addHelpOption()
 
-    option_verbose = QCommandLineOption(
-        ["v", "verbose"], "Print log messages to terminal."
-    )
+    option_verbose = QCommandLineOption(["v", "verbose"], "Print log messages to terminal.")
     parser.addOption(option_verbose)
 
-    option_simulation = QCommandLineOption(
-        ["s", "simulation"], "Run the simulation mode."
-    )
+    option_simulation = QCommandLineOption(["s", "simulation"], "Run the simulation mode.")
     parser.addOption(option_simulation)
 
     option_log_level = QCommandLineOption(
@@ -86,9 +68,7 @@ async def main(argv: list) -> bool:
     )
     parser.addOption(option_log_level)
 
-    option_no_log_file = QCommandLineOption(
-        ["no-logfile"], "Do not write log messages to file."
-    )
+    option_no_log_file = QCommandLineOption(["no-logfile"], "Do not write log messages to file.")
     parser.addOption(option_no_log_file)
 
     option_is_crio_simulator = QCommandLineOption(
@@ -97,20 +77,42 @@ async def main(argv: list) -> bool:
     )
     parser.addOption(option_is_crio_simulator)
 
-    parser.process(app)
+    return parser, [
+        option_verbose,
+        option_simulation,
+        option_log_level,
+        option_no_log_file,
+        option_is_crio_simulator,
+    ]
+
+
+async def main(
+    parser: QCommandLineParser,
+    options: list[QCommandLineOption],
+    app_close_event: asyncio.Event,
+) -> None:
+    """Main application.
+
+    Parameters
+    ----------
+    parser : `PySide6.QtCore.QCommandLineParser`
+        Command line parser.
+    options : `list` [`PySide6.QtCore.QCommandLineOption`]
+        List of command line options.
+    app_close_event : `asyncio.Event`
+        Event to be set when the application is closing.
+    """
 
     # Get the argument and check the values
-    is_output_log_to_file = not parser.isSet(option_no_log_file)
-    is_verbose = parser.isSet(option_verbose)
-    is_simulation_mode = parser.isSet(option_simulation)
-    log_level = int(parser.value(option_log_level))
-    is_crio_simulator = parser.isSet(option_is_crio_simulator)
+    is_verbose = parser.isSet(options[0])
+    is_simulation_mode = parser.isSet(options[1])
+    log_level = int(parser.value(options[2]))
+    is_output_log_to_file = not parser.isSet(options[3])
+    is_crio_simulator = parser.isSet(options[4])
 
     if is_simulation_mode and is_crio_simulator:
-        print(
-            "No simulation mode and cRIO simulator at the same time.", file=sys.stderr
-        )
-        sys.exit(1)
+        print("No simulation mode and cRIO simulator at the same time.", file=sys.stderr)
+        return
 
     # Create a Qt main window, which will be our window.
     window_main = MainWindow(
@@ -122,26 +124,4 @@ async def main(argv: list) -> bool:
     )
     window_main.show()
 
-    await future
-
-    # Your application won't reach here until you exit and the event
-    # loop has stopped.
-    return True
-
-
-def close_future(future: asyncio.Future, loop: asyncio.AbstractEventLoop) -> None:
-    """Close the future.
-
-    This is needed to ensure that all pre- and post-processing for the event
-    loop is done. See the source code in qasync library for the details.
-
-    Parameters
-    ----------
-    future : `asyncio.Future`
-        Future.
-    loop : `asyncio.unix_events._UnixSelectorEventLoop`
-        Event loop.
-    """
-
-    loop.call_later(10, future.cancel)
-    future.cancel()
+    await app_close_event.wait()

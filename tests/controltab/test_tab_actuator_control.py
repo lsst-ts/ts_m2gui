@@ -75,9 +75,7 @@ async def _transition_to_enable_state(widget_async: TabActuatorControl) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_script_command(
-    qtbot: QtBot, widget_async: TabActuatorControl
-) -> None:
+async def test_callback_script_command(qtbot: QtBot, widget_async: TabActuatorControl) -> None:
     await _transition_to_enable_state(widget_async)
 
     widget_async._callback_script_load_script(file_name="/a/b/c")
@@ -137,9 +135,7 @@ async def test_callback_selection_changed(widget: TabActuatorControl) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_select_ring(qtbot: QtBot, widget: TabActuatorControl) -> None:
-    qtbot.mouseClick(
-        widget._buttons_actuator_selection_support["select_ring"], Qt.LeftButton
-    )
+    qtbot.mouseClick(widget._buttons_actuator_selection_support["select_ring"], Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -164,9 +160,7 @@ async def test_callback_clear_all(qtbot: QtBot, widget: TabActuatorControl) -> N
     assert widget._buttons_actuator_selection[idx].isChecked() is True
 
     # Clear the selection
-    qtbot.mouseClick(
-        widget._buttons_actuator_selection_support["clear_all"], Qt.LeftButton
-    )
+    qtbot.mouseClick(widget._buttons_actuator_selection_support["clear_all"], Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -175,9 +169,7 @@ async def test_callback_clear_all(qtbot: QtBot, widget: TabActuatorControl) -> N
 
 
 @pytest.mark.asyncio
-async def test_callback_actuator_start(
-    qtbot: QtBot, widget_async: TabActuatorControl
-) -> None:
+async def test_callback_actuator_start(qtbot: QtBot, widget_async: TabActuatorControl) -> None:
     # Transition to the enabled state with the open-loop control
     await _transition_to_enable_state(widget_async)
 
@@ -187,9 +179,7 @@ async def test_callback_actuator_start(
     # Select the actuators
     selected_actuators = [0, 1, 3, 7, 76, 77]
     for selected_actuator in selected_actuators:
-        qtbot.mouseClick(
-            widget_async._buttons_actuator_selection[selected_actuator], Qt.LeftButton
-        )
+        qtbot.mouseClick(widget_async._buttons_actuator_selection[selected_actuator], Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -219,9 +209,7 @@ async def test_callback_actuator_start(
 
 
 @pytest.mark.asyncio
-async def test_callback_clear_force(
-    qtbot: QtBot, widget_async: TabActuatorControl
-) -> None:
+async def test_callback_clear_force(qtbot: QtBot, widget_async: TabActuatorControl) -> None:
     # Set the force
     widget_async._applied_force.setValue(10)
 

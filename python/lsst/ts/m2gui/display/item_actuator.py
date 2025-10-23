@@ -127,9 +127,7 @@ class ItemActuator(QGraphicsEllipseItem):
         else:
             self.label_id.setPlainText(str(self.acutator_id))
 
-    def update_magnitude(
-        self, magnitude: float, magnitude_min: float, magnitude_max: float
-    ) -> None:
+    def update_magnitude(self, magnitude: float, magnitude_min: float, magnitude_max: float) -> None:
         """Update the magnitude. This will update the color of actuator on the
         mirror's view. If the magnitude is out of range, the limit of range
         will be used to show the color of magnitude on the view of mirror.
@@ -163,8 +161,6 @@ class ItemActuator(QGraphicsEllipseItem):
         else:
             magnitude_color = magnitude
 
-        magnitude_ratio = (magnitude_color - magnitude_min) / (
-            magnitude_max - magnitude_min
-        )
+        magnitude_ratio = (magnitude_color - magnitude_min) / (magnitude_max - magnitude_min)
 
         self.setBrush(Gauge.get_color(magnitude_ratio))

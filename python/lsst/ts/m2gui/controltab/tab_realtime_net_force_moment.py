@@ -59,9 +59,7 @@ class TabRealtimeNetForceMoment(TabDefault):
         self._figures = self._create_figures()
 
         # Timer to update the realtime figures
-        self._timer = self.create_and_start_timer(
-            self._callback_time_out, self.model.duration_refresh
-        )
+        self._timer = self.create_and_start_timer(self._callback_time_out, self.model.duration_refresh)
 
         self.set_widget_and_layout()
 

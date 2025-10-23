@@ -51,9 +51,7 @@ def widget(qtbot: QtBot) -> MockWidget:
 
 @pytest_asyncio.fixture
 async def widget_async(qtbot: QtBot) -> typing.AsyncGenerator:
-    async with MockWidget(
-        "Mock", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
+    async with MockWidget("Mock", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
         qtbot.addWidget(widget_sim)
 
         await widget_sim.model.connect()
@@ -68,7 +66,6 @@ def test_init(widget: MockWidget) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) -> None:
-
     # Standby state
     await _check_control_normal(qtbot, widget)
 
@@ -78,7 +75,6 @@ async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) 
 
 
 async def _check_control_normal(qtbot: QtBot, widget: MockWidget) -> None:
-
     widget.layout_control.model.report_control_status()
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -89,9 +85,7 @@ async def _check_control_normal(qtbot: QtBot, widget: MockWidget) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_control_prohibit_control(
-    qtbot: QtBot, widget: MockWidget
-) -> None:
+async def test_callback_signal_control_prohibit_control(qtbot: QtBot, widget: MockWidget) -> None:
     widget.layout_control.model.local_mode = LocalMode.Diagnostic
 
     widget.layout_control.model.report_control_status()

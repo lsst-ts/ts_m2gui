@@ -54,21 +54,15 @@ class TabLimitSwitchStatus(TabDefault):
         super().__init__(title, model)
 
         # Indicators of the limit switch
-        self._indicators_limit_switch_retract = self._create_indicators_limit_switch(
-            LimitSwitchType.Retract
-        )
-        self._indicators_limit_switch_extend = self._create_indicators_limit_switch(
-            LimitSwitchType.Extend
-        )
+        self._indicators_limit_switch_retract = self._create_indicators_limit_switch(LimitSwitchType.Retract)
+        self._indicators_limit_switch_extend = self._create_indicators_limit_switch(LimitSwitchType.Extend)
 
         self.set_widget_and_layout(is_scrollable=True)
 
         # Set the callback of signal
         self._set_signal_limit_switch(self.model.fault_manager.signal_limit_switch)
 
-    def _create_indicators_limit_switch(
-        self, limit_switch_type: LimitSwitchType
-    ) -> dict[str, QPushButton]:
+    def _create_indicators_limit_switch(self, limit_switch_type: LimitSwitchType) -> dict[str, QPushButton]:
         """Creates indicators for limit switches.
 
         Parameters
@@ -141,16 +135,8 @@ class TabLimitSwitchStatus(TabDefault):
 
         layout = QHBoxLayout()
         for ring in (Ring.B, Ring.C, Ring.D, Ring.A):
-            layout.addLayout(
-                self._get_layout_limit_switch_specific_ring(
-                    LimitSwitchType.Retract, ring
-                )
-            )
-            layout.addLayout(
-                self._get_layout_limit_switch_specific_ring(
-                    LimitSwitchType.Extend, ring
-                )
-            )
+            layout.addLayout(self._get_layout_limit_switch_specific_ring(LimitSwitchType.Retract, ring))
+            layout.addLayout(self._get_layout_limit_switch_specific_ring(LimitSwitchType.Extend, ring))
 
         return layout
 

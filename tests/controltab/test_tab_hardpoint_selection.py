@@ -62,9 +62,7 @@ def test_init(widget: TabHardpointSelection) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_reset_default_no_hardpoints(
-    qtbot: QtBot, widget: TabHardpointSelection
-) -> None:
+async def test_callback_reset_default_no_hardpoints(qtbot: QtBot, widget: TabHardpointSelection) -> None:
     # Select an actuator
     idx = 2
     widget._buttons_hardpoint_selection[idx].setChecked(True)
@@ -78,9 +76,7 @@ async def test_callback_reset_default_no_hardpoints(
 
 
 @pytest.mark.asyncio
-async def test_callback_reset_default_with_hardpoints(
-    qtbot: QtBot, widget: TabHardpointSelection
-) -> None:
+async def test_callback_reset_default_with_hardpoints(qtbot: QtBot, widget: TabHardpointSelection) -> None:
     widget._hardpoints = [1, 2, 3]
 
     qtbot.mouseClick(widget._buttons_hardpoint["reset"], Qt.LeftButton)
@@ -109,9 +105,7 @@ async def test_suggest_hardpoints_error(widget: TabHardpointSelection) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_suggest_hardpoints(
-    qtbot: QtBot, widget: TabHardpointSelection
-) -> None:
+async def test_callback_suggest_hardpoints(qtbot: QtBot, widget: TabHardpointSelection) -> None:
     for idx in (0, 72):
         widget._buttons_hardpoint_selection[idx].setChecked(True)
 
@@ -143,10 +137,7 @@ async def test_set_hardpoint_list_error(widget: TabHardpointSelection) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_apply_hardpoints(
-    qtbot: QtBot, widget_async: TabHardpointSelection
-) -> None:
-
+async def test_callback_apply_hardpoints(qtbot: QtBot, widget_async: TabHardpointSelection) -> None:
     assert widget_async._hardpoints == [5, 15, 25, 73, 75, 77]
 
     hardpoints = [2, 12, 22, 72, 74, 76]

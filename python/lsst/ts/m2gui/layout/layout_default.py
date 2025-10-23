@@ -45,9 +45,7 @@ class LayoutDefault(object):
 
     def __init__(self, model: Model) -> None:
         self.model = model
-        self.model.signal_control.is_control_updated.connect(
-            self._callback_signal_control
-        )
+        self.model.signal_control.is_control_updated.connect(self._callback_signal_control)
 
         self.layout = self._set_layout()
 

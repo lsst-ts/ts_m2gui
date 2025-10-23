@@ -154,9 +154,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
         # Disable the Qt close button
-        self.setWindowFlags(
-            Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
-        )
+        self.setWindowFlags(Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)
 
         self._add_tool_bar()
 
@@ -222,9 +220,7 @@ class MainWindow(QMainWindow):
 
         return log
 
-    def _get_log_file_name(
-        self, default_log_dir: str = "/rubin/mtm2/log"
-    ) -> pathlib.Path:
+    def _get_log_file_name(self, default_log_dir: str = "/rubin/mtm2/log") -> pathlib.Path:
         """Get the log file name.
 
         Parameters
@@ -241,10 +237,7 @@ class MainWindow(QMainWindow):
         log_dir = pathlib.Path(default_log_dir)
         if not log_dir.is_dir():
             print(
-                (
-                    f"Default log directory: {default_log_dir} does not exist. "
-                    "Use the home directory instead."
-                )
+                (f"Default log directory: {default_log_dir} does not exist. Use the home directory instead.")
             )
             log_dir = pathlib.Path.home()
 
@@ -399,9 +392,7 @@ class MainWindow(QMainWindow):
         action_connect.setToolTip("Connect to the M2 controller")
 
         action_disconnect = tool_bar.addAction("Disconnect", self._callback_disconnect)
-        action_disconnect.setToolTip(
-            "Disconnect and close all tasks (this might take some time)"
-        )
+        action_disconnect.setToolTip("Disconnect and close all tasks (this might take some time)")
 
         action_settings = tool_bar.addAction("Settings", self._callback_settings)
         action_settings.setToolTip("Show the application settings")
@@ -495,9 +486,7 @@ class MainWindow(QMainWindow):
         action_connect.setEnabled(False)
 
         if self.model.system_status["isCrioConnected"]:
-            await prompt_dialog_warning(
-                "_callback_connect()", "The M2 cRIO controller is already connected."
-            )
+            await prompt_dialog_warning("_callback_connect()", "The M2 cRIO controller is already connected.")
         else:
             try:
                 await run_command(self.model.connect)
@@ -521,9 +510,7 @@ class MainWindow(QMainWindow):
         """
 
         # If the commander is not CSC, notify the user.
-        if self.model.system_status["isCrioConnected"] and (
-            not self.model.is_csc_commander
-        ):
+        if self.model.system_status["isCrioConnected"] and (not self.model.is_csc_commander):
             dialog = self._create_dialog_disconnect()
             result = await dialog.show()
 

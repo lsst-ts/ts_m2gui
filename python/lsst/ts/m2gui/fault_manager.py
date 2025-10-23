@@ -198,8 +198,6 @@ class FaultManager(object):
         if name in limit_switch_status.keys():
             if limit_switch_status[name] != new_status:
                 limit_switch_status[name] = new_status
-                self.signal_limit_switch.type_name_status.emit(
-                    (limit_switch_type, name, new_status)
-                )
+                self.signal_limit_switch.type_name_status.emit((limit_switch_type, name, new_status))
         else:
             raise ValueError(f"The limit switch: {name} is not in the list.")

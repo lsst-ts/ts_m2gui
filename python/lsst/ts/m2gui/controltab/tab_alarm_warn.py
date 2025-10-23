@@ -107,10 +107,7 @@ class TabAlarmWarn(TabDefault):
         # Label of the bypassed error code
         self._label_error_code_bypass = create_label(
             name="None",
-            tool_tip=(
-                "Bypassed error codes. If the value is not None,\n"
-                "the system might break."
-            ),
+            tool_tip=("Bypassed error codes. If the value is not None,\nthe system might break."),
         )
 
         # Table of the errors
@@ -120,9 +117,7 @@ class TabAlarmWarn(TabDefault):
         self._text_error_cause = self._create_text_error_cause()
 
         # Tab of the limit switch status
-        self._tab_limit_switch_status = TabLimitSwitchStatus(
-            "Limit Switch Status", model
-        )
+        self._tab_limit_switch_status = TabLimitSwitchStatus("Limit Switch Status", model)
 
         # Bypass the selected error codes
         self._button_bypass_selected_errors = set_button(
@@ -130,9 +125,7 @@ class TabAlarmWarn(TabDefault):
         )
 
         # Reset the enabled faults mask to default
-        self._button_reset_mask = set_button(
-            "Reset Enabled Faults Mask", self._callback_reset_mask
-        )
+        self._button_reset_mask = set_button("Reset Enabled Faults Mask", self._callback_reset_mask)
 
         # Show the widget of the limit switch status
         self._button_limit_switch_status = set_button(
@@ -243,15 +236,9 @@ class TabAlarmWarn(TabDefault):
         """
 
         layout_faults_status = QFormLayout()
-        layout_faults_status.addRow(
-            "Summary Faults Status:", self._label_summary_faults_status
-        )
-        layout_faults_status.addRow(
-            "Enabled Faults Mask:", self._label_enabled_faults_mask
-        )
-        layout_faults_status.addRow(
-            "Bypassed Error Codes:", self._label_error_code_bypass
-        )
+        layout_faults_status.addRow("Summary Faults Status:", self._label_summary_faults_status)
+        layout_faults_status.addRow("Enabled Faults Mask:", self._label_enabled_faults_mask)
+        layout_faults_status.addRow("Bypassed Error Codes:", self._label_error_code_bypass)
 
         layout = QVBoxLayout()
         layout.addLayout(layout_faults_status)
@@ -285,9 +272,7 @@ class TabAlarmWarn(TabDefault):
                 )
                 self.model.log.debug(f"Bypass the error bits: {bits}.")
 
-                await run_command(
-                    self.model.controller.set_enabled_faults_mask, enabled_faults_mask
-                )
+                await run_command(self.model.controller.set_enabled_faults_mask, enabled_faults_mask)
 
     def _get_selected_error_codes(self) -> set:
         """Get the selected error codes.
@@ -389,12 +374,8 @@ class TabAlarmWarn(TabDefault):
             Signal of the error.
         """
 
-        signal_error.summary_faults_status.connect(
-            self._callback_signal_summary_faults_status
-        )
-        signal_error.enabled_faults_mask.connect(
-            self._callback_signal_enabled_faults_mask
-        )
+        signal_error.summary_faults_status.connect(self._callback_signal_summary_faults_status)
+        signal_error.enabled_faults_mask.connect(self._callback_signal_enabled_faults_mask)
         signal_error.error_new.connect(self._callback_signal_error_new)
         signal_error.error_cleared.connect(self._callback_signal_error_cleared)
 
@@ -427,9 +408,7 @@ class TabAlarmWarn(TabDefault):
         mask_diff = DEFAULT_ENABLED_FAULTS_MASK - mask
 
         codes = list()
-        for idx, error_code in enumerate(
-            self.model.controller.error_handler.list_code_total
-        ):
+        for idx, error_code in enumerate(self.model.controller.error_handler.list_code_total):
             if (mask_diff & (2**idx)) and (error_code >= MINIMUM_ERROR_CODE):
                 codes.append(error_code)
 
@@ -437,9 +416,7 @@ class TabAlarmWarn(TabDefault):
             self._label_error_code_bypass.setText("None")
         else:
             codes.sort()
-            self._label_error_code_bypass.setText(
-                f"<font color='{self.COLOR_RED}'>{codes}</font>"
-            )
+            self._label_error_code_bypass.setText(f"<font color='{self.COLOR_RED}'>{codes}</font>")
 
     @asyncSlot()
     async def _callback_signal_error_new(self, error_code: int) -> None:

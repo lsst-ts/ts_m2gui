@@ -42,27 +42,17 @@ def test_init(widget: TabRigidBodyPos) -> None:
     num_digit_after_decimal = widget.model.utility_monitor.NUM_DIGIT_AFTER_DECIMAL
     assert widget._target_position_relative["x"].decimals() == num_digit_after_decimal
 
-    assert widget._target_position_relative["y"].singleStep() == get_tol(
-        num_digit_after_decimal
-    )
+    assert widget._target_position_relative["y"].singleStep() == get_tol(num_digit_after_decimal)
 
     assert widget._target_position_relative["z"].maximum() == widget.MAX_DISTANCE_IN_UM
     assert widget._target_position_relative["z"].minimum() == -widget.MAX_DISTANCE_IN_UM
 
-    assert (
-        widget._target_position_relative["rx"].maximum()
-        == widget.MAX_ROTATION_IN_ARCSEC
-    )
-    assert (
-        widget._target_position_relative["ry"].minimum()
-        == -widget.MAX_ROTATION_IN_ARCSEC
-    )
+    assert widget._target_position_relative["rx"].maximum() == widget.MAX_ROTATION_IN_ARCSEC
+    assert widget._target_position_relative["ry"].minimum() == -widget.MAX_ROTATION_IN_ARCSEC
 
 
 @pytest.mark.asyncio
-async def test_callback_clear_values_relative(
-    qtbot: QtBot, widget: TabRigidBodyPos
-) -> None:
+async def test_callback_clear_values_relative(qtbot: QtBot, widget: TabRigidBodyPos) -> None:
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_relative[axis].setValue(idx)
 
@@ -76,9 +66,7 @@ async def test_callback_clear_values_relative(
 
 
 @pytest.mark.asyncio
-async def test_callback_clear_values_absolute(
-    qtbot: QtBot, widget: TabRigidBodyPos
-) -> None:
+async def test_callback_clear_values_absolute(qtbot: QtBot, widget: TabRigidBodyPos) -> None:
     for idx, axis in enumerate(widget.AXES):
         widget._target_position_absolute[axis].setValue(idx)
 
