@@ -67,9 +67,7 @@ class TabConfigView(TabDefault):
         self._list_files = QListWidget()
 
         # Button to set the configuration file
-        self._button_set_file = set_button(
-            "Set Configuration File", self._callback_set_configuration_file
-        )
+        self._button_set_file = set_button("Set Configuration File", self._callback_set_configuration_file)
 
         # Configuration parameters
         self._config_parameters = {
@@ -188,16 +186,10 @@ class TabConfigView(TabDefault):
         """
 
         layout = QFormLayout()
-        layout.addRow(
-            "Configuration File:", self._config_parameters["file_configuration"]
-        )
+        layout.addRow("Configuration File:", self._config_parameters["file_configuration"])
         layout.addRow("Configuration Version:", self._config_parameters["file_version"])
-        layout.addRow(
-            "Control Parameters:", self._config_parameters["file_control_parameters"]
-        )
-        layout.addRow(
-            "Look-Up Table Parameters:", self._config_parameters["file_lut_parameters"]
-        )
+        layout.addRow("Control Parameters:", self._config_parameters["file_control_parameters"])
+        layout.addRow("Look-Up Table Parameters:", self._config_parameters["file_lut_parameters"])
 
         return create_group_box("File Paths and Version", layout)
 
@@ -211,15 +203,9 @@ class TabConfigView(TabDefault):
         """
 
         layout = QFormLayout()
-        layout.addRow(
-            "24V Accuracy Warning:", self._config_parameters["power_warning_motor"]
-        )
-        layout.addRow(
-            "24V Accuracy Fault:", self._config_parameters["power_fault_motor"]
-        )
-        layout.addRow(
-            "Current Threshold:", self._config_parameters["power_threshold_motor"]
-        )
+        layout.addRow("24V Accuracy Warning:", self._config_parameters["power_warning_motor"])
+        layout.addRow("24V Accuracy Fault:", self._config_parameters["power_fault_motor"])
+        layout.addRow("Current Threshold:", self._config_parameters["power_threshold_motor"])
 
         return create_group_box("Motor Power Supply Monitoring", layout)
 
@@ -237,9 +223,7 @@ class TabConfigView(TabDefault):
             "24V Accuracy Warning:",
             self._config_parameters["power_warning_communication"],
         )
-        layout.addRow(
-            "24V Accuracy Fault:", self._config_parameters["power_fault_communication"]
-        )
+        layout.addRow("24V Accuracy Fault:", self._config_parameters["power_fault_communication"])
         layout.addRow(
             "Current Threshold:",
             self._config_parameters["power_threshold_communication"],
@@ -258,9 +242,7 @@ class TabConfigView(TabDefault):
 
         layout = QFormLayout()
         layout.addRow("Axial Threshold:", self._config_parameters["in_position_axial"])
-        layout.addRow(
-            "Tangent Threshold:", self._config_parameters["in_position_tangent"]
-        )
+        layout.addRow("Tangent Threshold:", self._config_parameters["in_position_tangent"])
         layout.addRow("Sample Window:", self._config_parameters["in_position_sample"])
 
         return create_group_box("In-Position Flag", layout)
@@ -275,12 +257,8 @@ class TabConfigView(TabDefault):
         """
 
         layout = QFormLayout()
-        layout.addRow(
-            "SAL Communication Timeout:", self._config_parameters["timeout_sal"]
-        )
-        layout.addRow(
-            "cRIO Communication Timeout:", self._config_parameters["timeout_crio"]
-        )
+        layout.addRow("SAL Communication Timeout:", self._config_parameters["timeout_sal"])
+        layout.addRow("cRIO Communication Timeout:", self._config_parameters["timeout_crio"])
         layout.addRow(
             "ILC Telemetry Receipt Error Persistance:",
             self._config_parameters["timeout_ilc"],
@@ -299,9 +277,7 @@ class TabConfigView(TabDefault):
 
         layout = QFormLayout()
         layout.addRow("Delta Range:", self._config_parameters["misc_range_angle"])
-        layout.addRow(
-            "Difference Enabled:", self._config_parameters["misc_diff_enabled"]
-        )
+        layout.addRow("Difference Enabled:", self._config_parameters["misc_diff_enabled"])
 
         return create_group_box("Miscellaneous (Inclinometer)", layout)
 
@@ -359,60 +335,32 @@ class TabConfigView(TabDefault):
             New configuration.
         """
 
-        self._config_parameters["file_configuration"].setText(
-            f"{config.file_configuration}"
-        )
+        self._config_parameters["file_configuration"].setText(f"{config.file_configuration}")
         self._config_parameters["file_version"].setText(f"{config.file_version}")
-        self._config_parameters["file_control_parameters"].setText(
-            f"{config.file_control_parameters}"
-        )
-        self._config_parameters["file_lut_parameters"].setText(
-            f"{config.file_lut_parameters}"
-        )
+        self._config_parameters["file_control_parameters"].setText(f"{config.file_control_parameters}")
+        self._config_parameters["file_lut_parameters"].setText(f"{config.file_lut_parameters}")
 
-        self._config_parameters["power_warning_motor"].setText(
-            f"{config.power_warning_motor} %"
-        )
-        self._config_parameters["power_fault_motor"].setText(
-            f"{config.power_fault_motor} %"
-        )
-        self._config_parameters["power_threshold_motor"].setText(
-            f"{config.power_threshold_motor} A"
-        )
+        self._config_parameters["power_warning_motor"].setText(f"{config.power_warning_motor} %")
+        self._config_parameters["power_fault_motor"].setText(f"{config.power_fault_motor} %")
+        self._config_parameters["power_threshold_motor"].setText(f"{config.power_threshold_motor} A")
 
         self._config_parameters["power_warning_communication"].setText(
             f"{config.power_warning_communication} %"
         )
-        self._config_parameters["power_fault_communication"].setText(
-            f"{config.power_fault_communication} %"
-        )
+        self._config_parameters["power_fault_communication"].setText(f"{config.power_fault_communication} %")
         self._config_parameters["power_threshold_communication"].setText(
             f"{config.power_threshold_communication} A"
         )
 
-        self._config_parameters["in_position_axial"].setText(
-            f"{config.in_position_axial} N"
-        )
-        self._config_parameters["in_position_tangent"].setText(
-            f"{config.in_position_tangent} N"
-        )
-        self._config_parameters["in_position_sample"].setText(
-            f"{config.in_position_sample} s"
-        )
+        self._config_parameters["in_position_axial"].setText(f"{config.in_position_axial} N")
+        self._config_parameters["in_position_tangent"].setText(f"{config.in_position_tangent} N")
+        self._config_parameters["in_position_sample"].setText(f"{config.in_position_sample} s")
 
         self._config_parameters["timeout_sal"].setText(f"{config.timeout_sal} s")
         self._config_parameters["timeout_crio"].setText(f"{config.timeout_crio} s")
-        self._config_parameters["timeout_ilc"].setText(
-            f"{int(config.timeout_ilc)} counts"
-        )
+        self._config_parameters["timeout_ilc"].setText(f"{int(config.timeout_ilc)} counts")
 
-        self._config_parameters["misc_range_angle"].setText(
-            f"{config.misc_range_angle} degree"
-        )
-        self._config_parameters["misc_diff_enabled"].setText(
-            f"{config.misc_diff_enabled}"
-        )
+        self._config_parameters["misc_range_angle"].setText(f"{config.misc_range_angle} degree")
+        self._config_parameters["misc_diff_enabled"].setText(f"{config.misc_diff_enabled}")
 
-        self._config_parameters["misc_range_temperature"].setText(
-            f"{config.misc_range_temperature} degree C"
-        )
+        self._config_parameters["misc_range_temperature"].setText(f"{config.misc_range_temperature} degree C")

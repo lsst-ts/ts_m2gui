@@ -49,9 +49,7 @@ async def test_callback_button_realtime_net_force_moment_total(
 
 
 @pytest.mark.asyncio
-async def test_callback_button_realtime_force_balance(
-    qtbot: QtBot, widget: TabNetForceMoment
-) -> None:
+async def test_callback_button_realtime_force_balance(qtbot: QtBot, widget: TabNetForceMoment) -> None:
     assert widget._tab_realtime_force_balance.isVisible() is False
 
     qtbot.mouseClick(widget._button_realtime_force_balance, Qt.LeftButton)
@@ -61,9 +59,7 @@ async def test_callback_button_realtime_force_balance(
 
 @pytest.mark.asyncio
 async def test_callback_signal_net_force_total(widget: TabNetForceMoment) -> None:
-    widget.model.utility_monitor.update_net_force_moment_total(
-        [1.11, -2.22, 3.56], is_force=True
-    )
+    widget.model.utility_monitor.update_net_force_moment_total([1.11, -2.22, 3.56], is_force=True)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -81,9 +77,7 @@ async def test_callback_signal_net_force_total(widget: TabNetForceMoment) -> Non
 
 @pytest.mark.asyncio
 async def test_callback_signal_net_moment_total(widget: TabNetForceMoment) -> None:
-    widget.model.utility_monitor.update_net_force_moment_total(
-        [1.11, -2.22, 3.56], is_force=False
-    )
+    widget.model.utility_monitor.update_net_force_moment_total([1.11, -2.22, 3.56], is_force=False)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -101,9 +95,7 @@ async def test_callback_signal_net_moment_total(widget: TabNetForceMoment) -> No
 
 @pytest.mark.asyncio
 async def test_callback_signal_force_balance(widget: TabNetForceMoment) -> None:
-    widget.model.utility_monitor.update_force_balance(
-        [1.11, -2.22, 3.56, 4.41, -5.41, -6.78]
-    )
+    widget.model.utility_monitor.update_force_balance([1.11, -2.22, 3.56, 4.41, -5.41, -6.78])
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)

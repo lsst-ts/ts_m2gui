@@ -51,9 +51,7 @@ def widget(qtbot: QtBot) -> MockWidget:
 
 @pytest_asyncio.fixture
 async def widget_async(qtbot: QtBot) -> typing.AsyncGenerator:
-    async with MockWidget(
-        "Mock", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
+    async with MockWidget("Mock", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
         qtbot.addWidget(widget_sim)
 
         await widget_sim.model.connect()
@@ -79,9 +77,7 @@ async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) 
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_control_prohibit_control(
-    qtbot: QtBot, widget: MockWidget
-) -> None:
+async def test_callback_signal_control_prohibit_control(qtbot: QtBot, widget: MockWidget) -> None:
     # CSC has the control
     widget.layout_local_mode.model.is_csc_commander = True
 
@@ -119,9 +115,7 @@ async def test_set_local_mode(qtbot: QtBot, widget_async: MockWidget) -> None:
     assert widget_async.layout_local_mode._button_diagnostic.isEnabled() is True
     assert widget_async.layout_local_mode._button_enable.isEnabled() is False
 
-    qtbot.mouseClick(
-        widget_async.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton
-    )
+    qtbot.mouseClick(widget_async.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(15)
@@ -132,9 +126,7 @@ async def test_set_local_mode(qtbot: QtBot, widget_async: MockWidget) -> None:
     assert widget_async.layout_local_mode._button_diagnostic.isEnabled() is False
     assert widget_async.layout_local_mode._button_enable.isEnabled() is True
 
-    qtbot.mouseClick(
-        widget_async.layout_local_mode._button_enable, QtCore.Qt.LeftButton
-    )
+    qtbot.mouseClick(widget_async.layout_local_mode._button_enable, QtCore.Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(20)
@@ -152,16 +144,12 @@ async def test_set_local_mode(qtbot: QtBot, widget_async: MockWidget) -> None:
 
     assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
-    qtbot.mouseClick(
-        widget_async.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton
-    )
+    qtbot.mouseClick(widget_async.layout_local_mode._button_diagnostic, QtCore.Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(5)
 
-    qtbot.mouseClick(
-        widget_async.layout_local_mode._button_standby, QtCore.Qt.LeftButton
-    )
+    qtbot.mouseClick(widget_async.layout_local_mode._button_standby, QtCore.Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(5)

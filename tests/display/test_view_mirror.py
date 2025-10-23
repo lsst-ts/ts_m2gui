@@ -86,10 +86,7 @@ def test_item_actuator(widget: ViewMirror) -> None:
 
     assert actuator.pen().width() == 1
 
-    assert (
-        actuator.label_id.x()
-        == widget.SIZE_SCENE // 2 - actuator.label_id.font().pointSize()
-    )
+    assert actuator.label_id.x() == widget.SIZE_SCENE // 2 - actuator.label_id.font().pointSize()
     assert actuator.label_id.y() == actuator.rect().y()
 
 

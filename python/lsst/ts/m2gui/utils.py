@@ -104,9 +104,7 @@ def map_actuator_id_to_alias(actuator_id: int) -> tuple[Ring, int]:
     raise ValueError(f"Unknown actuator ID ({actuator_id}) encountered.")
 
 
-def read_ilc_status_from_log(
-    filepath: Path | str, keyword: str = "ILC status"
-) -> list[list[int]]:
+def read_ilc_status_from_log(filepath: Path | str, keyword: str = "ILC status") -> list[list[int]]:
     """Read the inner-loop controller (ILC) status from the log file.
 
     Parameters

@@ -42,9 +42,7 @@ def widget(qtbot: QtBot) -> TabOverview:
 
 @pytest_asyncio.fixture
 async def widget_async(qtbot: QtBot) -> TabOverview:
-    async with TabOverview(
-        "Overview", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
+    async with TabOverview("Overview", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
         qtbot.addWidget(widget_sim)
 
         await widget_sim.model.connect()
@@ -125,9 +123,7 @@ async def test_callback_signal_status(qtbot: QtBot, widget: TabOverview) -> None
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_status_is_alarm_on(
-    qtbot: QtBot, widget_async: TabOverview
-) -> None:
+async def test_callback_signal_status_is_alarm_on(qtbot: QtBot, widget_async: TabOverview) -> None:
     # Default color
     assert _get_color_is_alarm_on(widget_async) == Qt.gray
 
@@ -155,9 +151,7 @@ def _get_color_is_alarm_on(widget: TabOverview) -> QColor:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_status_is_warning_on(
-    qtbot: QtBot, widget_async: TabOverview
-) -> None:
+async def test_callback_signal_status_is_warning_on(qtbot: QtBot, widget_async: TabOverview) -> None:
     # Default color
     assert _get_color_is_warning_on(widget_async) == Qt.gray
 
@@ -186,10 +180,7 @@ def _get_color_is_warning_on(widget: TabOverview) -> QColor:
 
 @pytest.mark.asyncio
 async def test_callback_closed_loop_control_mode(widget: TabOverview) -> None:
-
-    widget.model.controller.closed_loop_control_mode = (
-        MTM2.ClosedLoopControlMode.TelemetryOnly
-    )
+    widget.model.controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.TelemetryOnly
     widget.model.signal_closed_loop_control_mode.is_updated.emit(True)
 
     # Sleep so the event loop can access CPU to handle the signal

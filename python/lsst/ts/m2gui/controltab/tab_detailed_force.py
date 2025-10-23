@@ -84,23 +84,17 @@ class TabDetailedForce(TabDefault):
         self._list_force_details = list(self._forces.keys())
 
         # Select the ring to show the detailed force
-        self._ring_selection = self.create_combo_box_ring_selection(
-            self._callback_selection_changed
-        )
+        self._ring_selection = self.create_combo_box_ring_selection(self._callback_selection_changed)
 
         # Table of the detailed force
         self._table_forces = self._create_table_forces()
 
         # Timer to update the forces on table
-        self._timer = self.create_and_start_timer(
-            self._callback_time_out, self.model.duration_refresh
-        )
+        self._timer = self.create_and_start_timer(self._callback_time_out, self.model.duration_refresh)
 
         self.set_widget_and_layout(is_scrollable=True)
 
-        self._set_signal_detailed_force(
-            self.model.utility_monitor.signal_detailed_force
-        )
+        self._set_signal_detailed_force(self.model.utility_monitor.signal_detailed_force)
 
     def _create_items_force(self) -> dict[str, list[QTableWidgetItem]]:
         """Create the items of force.
@@ -115,10 +109,7 @@ class TabDetailedForce(TabDefault):
         actuator_id = list()
         for ring in (Ring.B, Ring.C, Ring.D, Ring.A):
             num_actuator = get_num_actuator_ring(ring)
-            actuator_id += [
-                QTableWidgetItem(ring.name + str(idx))
-                for idx in range(1, num_actuator + 1)
-            ]
+            actuator_id += [QTableWidgetItem(ring.name + str(idx)) for idx in range(1, num_actuator + 1)]
 
         items_force = dict()
         items_force["id"] = actuator_id
@@ -147,9 +138,7 @@ class TabDetailedForce(TabDefault):
 
         items = self._table_forces.findItems(name_first_actuator, Qt.MatchExactly)
         if len(items) != 0:
-            self._table_forces.scrollToItem(
-                items[0], hint=QAbstractItemView.PositionAtTop
-            )
+            self._table_forces.scrollToItem(items[0], hint=QAbstractItemView.PositionAtTop)
 
     def _create_table_forces(self) -> QTableWidget:
         """Create the table widget of detailed forces.
@@ -184,9 +173,7 @@ class TabDetailedForce(TabDefault):
         num_items = len(self._list_force_details)
         for row in range(NUM_ACTUATOR):
             for column in range(num_items):
-                table.setItem(
-                    row, column, self._forces[self._list_force_details[column]][row]
-                )
+                table.setItem(row, column, self._forces[self._list_force_details[column]][row])
 
         return table
 
@@ -289,9 +276,7 @@ class TabDetailedForce(TabDefault):
 
         return create_group_box("Hard Points", layout)
 
-    def _set_signal_detailed_force(
-        self, signal_detailed_force: SignalDetailedForce
-    ) -> None:
+    def _set_signal_detailed_force(self, signal_detailed_force: SignalDetailedForce) -> None:
         """Set the detailed force signal with callback functions. This signal
         provides the calculated and measured force details contains the look-up
         table (LUT)

@@ -87,35 +87,17 @@ class TabDiagnostics(TabDefault):
         self._power_raw = self._create_labels_power()
 
         self._force_error_tangent = {
-            "a1": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_NON_LOAD_BEARING_LINK} N"
-            ),
-            "a2": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
-            ),
-            "a3": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
-            ),
-            "a4": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_NON_LOAD_BEARING_LINK} N"
-            ),
-            "a5": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
-            ),
-            "a6": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"
-            ),
-            "total_weight": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_TOTAL_WEIGHT_ERROR} N"
-            ),
-            "tangent_sum": create_label(
-                tool_tip=f"Threshold is {TANGENT_LINK_THETA_Z_MOMENT} N"
-            ),
+            "a1": create_label(tool_tip=f"Threshold is {TANGENT_LINK_NON_LOAD_BEARING_LINK} N"),
+            "a2": create_label(tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"),
+            "a3": create_label(tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"),
+            "a4": create_label(tool_tip=f"Threshold is {TANGENT_LINK_NON_LOAD_BEARING_LINK} N"),
+            "a5": create_label(tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"),
+            "a6": create_label(tool_tip=f"Threshold is {TANGENT_LINK_LOAD_BEARING_LINK} N"),
+            "total_weight": create_label(tool_tip=f"Threshold is {TANGENT_LINK_TOTAL_WEIGHT_ERROR} N"),
+            "tangent_sum": create_label(tool_tip=f"Threshold is {TANGENT_LINK_THETA_Z_MOMENT} N"),
         }
 
-        self._button_reboot = set_button(
-            "Reboot Controller", self._callback_reboot_controller
-        )
+        self._button_reboot = set_button("Reboot Controller", self._callback_reboot_controller)
 
         self._button_update_control_mode = set_button(
             "Update Control Mode",
@@ -138,12 +120,8 @@ class TabDiagnostics(TabDefault):
         self.set_widget_and_layout(is_scrollable=True)
 
         self._set_signal_utility(self.model.utility_monitor.signal_utility)
-        self._set_signal_detailed_force(
-            self.model.utility_monitor.signal_detailed_force
-        )
-        self._set_signal_closed_loop_control_mode(
-            self.model.signal_closed_loop_control_mode
-        )
+        self._set_signal_detailed_force(self.model.utility_monitor.signal_detailed_force)
+        self._set_signal_closed_loop_control_mode(self.model.signal_closed_loop_control_mode)
 
     def _create_labels_power(self) -> dict[str, QLabel]:
         """Create the labels of power.
@@ -187,9 +165,7 @@ class TabDiagnostics(TabDefault):
         closed-loop control mode in cell."""
 
         # Index begins from 0 instead of 1 in QComboBox
-        mode = MTM2.ClosedLoopControlMode(
-            self._control_mode_selection.currentIndex() + 1
-        )
+        mode = MTM2.ClosedLoopControlMode(self._control_mode_selection.currentIndex() + 1)
         await run_command(
             self.model.controller.set_closed_loop_control_mode,
             mode,
@@ -212,9 +188,7 @@ class TabDiagnostics(TabDefault):
 
         return self._update_index_control_mode_selection(mode_selection)
 
-    def _update_index_control_mode_selection(
-        self, mode_selection: QComboBox
-    ) -> QComboBox:
+    def _update_index_control_mode_selection(self, mode_selection: QComboBox) -> QComboBox:
         """Update the index of closed-loop control mode selection.
 
         Parameters
@@ -234,9 +208,7 @@ class TabDiagnostics(TabDefault):
 
         return mode_selection
 
-    def _create_indicators_digital_status(
-        self, list_digital_status: list
-    ) -> list[QPushButton]:
+    def _create_indicators_digital_status(self, list_digital_status: list) -> list[QPushButton]:
         """Create the indicators of digital status.
 
         Parameters
@@ -259,9 +231,7 @@ class TabDiagnostics(TabDefault):
 
         return indicators_status
 
-    def _update_indicator_color(
-        self, indicator: QPushButton, is_triggered: bool
-    ) -> None:
+    def _update_indicator_color(self, indicator: QPushButton, is_triggered: bool) -> None:
         """Update the color of indicator.
 
         Parameters
@@ -354,9 +324,7 @@ class TabDiagnostics(TabDefault):
 
         controls = list()
         for idx in range(number):
-            control = set_button(
-                "", self._callback_control_digital_status, idx, is_checkable=True
-            )
+            control = set_button("", self._callback_control_digital_status, idx, is_checkable=True)
             self._update_control_text(control, False)
 
             controls.append(control)
@@ -441,12 +409,8 @@ class TabDiagnostics(TabDefault):
 
         # Second column
         layout_digital_status_output = QVBoxLayout()
-        layout_digital_status_output.addWidget(
-            self._create_group_digital_status_output()
-        )
-        layout_digital_status_output.addWidget(
-            self._create_group_digital_status_control()
-        )
+        layout_digital_status_output.addWidget(self._create_group_digital_status_output())
+        layout_digital_status_output.addWidget(self._create_group_digital_status_control())
         layout_digital_status_output.addWidget(self._create_group_control_mode())
 
         layout.addLayout(layout_digital_status_output)
@@ -488,12 +452,8 @@ class TabDiagnostics(TabDefault):
 
         layout = QFormLayout()
 
-        layout.addRow(
-            "Voltage (Calibrated):", self._power_calibrated["power_voltage_motor"]
-        )
-        layout.addRow(
-            "Current (Calibrated):", self._power_calibrated["power_current_motor"]
-        )
+        layout.addRow("Voltage (Calibrated):", self._power_calibrated["power_voltage_motor"])
+        layout.addRow("Current (Calibrated):", self._power_calibrated["power_current_motor"])
 
         self.add_empty_row_to_form_layout(layout)
 
@@ -629,9 +589,7 @@ class TabDiagnostics(TabDefault):
 
         return create_group_box("Control Loop", layout)
 
-    def _create_group_digital_status_input(
-        self, idx_start: int, idx_end: int, group_name: str
-    ) -> QGroupBox:
+    def _create_group_digital_status_input(self, idx_start: int, idx_end: int, group_name: str) -> QGroupBox:
         """Create the group of digital input status.
 
         Parameters
@@ -651,9 +609,7 @@ class TabDiagnostics(TabDefault):
 
         layout = QFormLayout()
 
-        for idx, indicator in enumerate(
-            self._digital_status_input[idx_start : idx_end + 1]
-        ):
+        for idx, indicator in enumerate(self._digital_status_input[idx_start : idx_end + 1]):
             layout.addRow(f"(D{idx + idx_start})", indicator)
 
         return create_group_box(group_name, layout)
@@ -667,22 +623,14 @@ class TabDiagnostics(TabDefault):
             Signal of the utility.
         """
 
-        signal_utility.power_motor_calibrated.connect(
-            self._callback_power_motor_calibrated
-        )
-        signal_utility.power_communication_calibrated.connect(
-            self._callback_power_communication_calibrated
-        )
+        signal_utility.power_motor_calibrated.connect(self._callback_power_motor_calibrated)
+        signal_utility.power_communication_calibrated.connect(self._callback_power_communication_calibrated)
 
         signal_utility.power_motor_raw.connect(self._callback_power_motor_raw)
-        signal_utility.power_communication_raw.connect(
-            self._callback_power_communication_raw
-        )
+        signal_utility.power_communication_raw.connect(self._callback_power_communication_raw)
 
         signal_utility.digital_status_input.connect(self._callback_digital_status_input)
-        signal_utility.digital_status_output.connect(
-            self._callback_digital_status_output
-        )
+        signal_utility.digital_status_output.connect(self._callback_digital_status_output)
 
     @asyncSlot()
     async def _callback_power_motor_calibrated(self, power_motor: tuple) -> None:
@@ -697,9 +645,7 @@ class TabDiagnostics(TabDefault):
 
         self._update_power_motor(self._power_calibrated, power_motor[0], power_motor[1])
 
-    def _update_power_motor(
-        self, power: dict[str, QLabel], voltage: float, current: float
-    ) -> None:
+    def _update_power_motor(self, power: dict[str, QLabel], voltage: float, current: float) -> None:
         """Update the power of motor.
 
         Parameters
@@ -716,9 +662,7 @@ class TabDiagnostics(TabDefault):
         power["power_current_motor"].setText(f"{current} A")
 
     @asyncSlot()
-    async def _callback_power_communication_calibrated(
-        self, power_communication: tuple
-    ) -> None:
+    async def _callback_power_communication_calibrated(self, power_communication: tuple) -> None:
         """Callback of the utility signal for the communication power.
 
         Parameters
@@ -732,9 +676,7 @@ class TabDiagnostics(TabDefault):
             self._power_calibrated, power_communication[0], power_communication[1]
         )
 
-    def _update_power_communication(
-        self, power: dict[str, QLabel], voltage: float, current: float
-    ) -> None:
+    def _update_power_communication(self, power: dict[str, QLabel], voltage: float, current: float) -> None:
         """Update the power of communication.
 
         Parameters
@@ -764,9 +706,7 @@ class TabDiagnostics(TabDefault):
         self._update_power_motor(self._power_raw, power_motor[0], power_motor[1])
 
     @asyncSlot()
-    async def _callback_power_communication_raw(
-        self, power_communication: tuple
-    ) -> None:
+    async def _callback_power_communication_raw(self, power_communication: tuple) -> None:
         """Callback of the utility signal for the raw communication power.
 
         Parameters
@@ -776,9 +716,7 @@ class TabDiagnostics(TabDefault):
             The units are volt and ampere respectively.
         """
 
-        self._update_power_communication(
-            self._power_raw, power_communication[0], power_communication[1]
-        )
+        self._update_power_communication(self._power_raw, power_communication[0], power_communication[1])
 
     @asyncSlot()
     async def _callback_digital_status_input(self, digital_status_input: int) -> None:
@@ -836,9 +774,7 @@ class TabDiagnostics(TabDefault):
             is_digital_status_output=True,
         )
 
-    def _set_signal_detailed_force(
-        self, signal_detailed_force: SignalDetailedForce
-    ) -> None:
+    def _set_signal_detailed_force(self, signal_detailed_force: SignalDetailedForce) -> None:
         """Set the detailed force signal with callback function.
 
         Parameters
@@ -846,14 +782,10 @@ class TabDiagnostics(TabDefault):
         signal_detailed_force : `SignalDetailedForce`
             Signal of the detailed force.
         """
-        signal_detailed_force.force_error_tangent.connect(
-            self._callback_force_error_tangent
-        )
+        signal_detailed_force.force_error_tangent.connect(self._callback_force_error_tangent)
 
     @asyncSlot()
-    async def _callback_force_error_tangent(
-        self, force_error_tangent: ForceErrorTangent
-    ) -> None:
+    async def _callback_force_error_tangent(self, force_error_tangent: ForceErrorTangent) -> None:
         """Callback of the detailed force signal for tangential force error
         that monitors the supporting force of mirror.
 
@@ -871,7 +803,7 @@ class TabDiagnostics(TabDefault):
                 else TANGENT_LINK_LOAD_BEARING_LINK  # A2, A3, A5, A6
             )
 
-            self._force_error_tangent[f"a{idx+1}"].setText(
+            self._force_error_tangent[f"a{idx + 1}"].setText(
                 f"<font color='{self.COLOR_BLACK}'>{force_error_individual} N</font>"
                 if abs(force_error_individual) < threshold
                 else f"<font color='{self.COLOR_RED}'>{force_error_individual} N</font>"
@@ -899,9 +831,7 @@ class TabDiagnostics(TabDefault):
             Signal to know the closed-loop control mode is updated or not.
         """
 
-        signal_closed_loop_control_mode.is_updated.connect(
-            self._callback_closed_loop_control_mode
-        )
+        signal_closed_loop_control_mode.is_updated.connect(self._callback_closed_loop_control_mode)
 
     @asyncSlot()
     async def _callback_closed_loop_control_mode(self, is_updated: bool) -> None:
@@ -913,6 +843,4 @@ class TabDiagnostics(TabDefault):
             Closed-loop control mode is updated or not.
         """
 
-        self._control_mode_selection = self._update_index_control_mode_selection(
-            self._control_mode_selection
-        )
+        self._control_mode_selection = self._update_index_control_mode_selection(self._control_mode_selection)

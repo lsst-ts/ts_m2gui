@@ -59,10 +59,7 @@ def test_init(widget_async: TabDiagnostics) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_update_control_mode(
-    qtbot: QtBot, widget_async: TabDiagnostics
-) -> None:
-
+async def test_callback_update_control_mode(qtbot: QtBot, widget_async: TabDiagnostics) -> None:
     mode = MTM2.ClosedLoopControlMode.TelemetryOnly
     widget_async._control_mode_selection.setCurrentIndex(mode.value - 1)
     qtbot.mouseClick(widget_async._button_update_control_mode, Qt.LeftButton)
@@ -74,9 +71,7 @@ async def test_callback_update_control_mode(
 
 
 @pytest.mark.asyncio
-async def test_callback_control_digital_status(
-    qtbot: QtBot, widget_async: TabDiagnostics
-) -> None:
+async def test_callback_control_digital_status(qtbot: QtBot, widget_async: TabDiagnostics) -> None:
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
@@ -110,9 +105,7 @@ async def test_callback_power_motor_calibrated(widget: TabDiagnostics) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_power_communication_calibrated(widget: TabDiagnostics) -> None:
-    widget.model.utility_monitor.update_power_calibrated(
-        MTM2.PowerType.Communication, 0.3, 0.4
-    )
+    widget.model.utility_monitor.update_power_calibrated(MTM2.PowerType.Communication, 0.3, 0.4)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -134,9 +127,7 @@ async def test_callback_power_motor_raw(widget: TabDiagnostics) -> None:
 
 @pytest.mark.asyncio
 async def test_callback_power_communication_raw(widget: TabDiagnostics) -> None:
-    widget.model.utility_monitor.update_power_raw(
-        MTM2.PowerType.Communication, 0.7, 0.8
-    )
+    widget.model.utility_monitor.update_power_raw(MTM2.PowerType.Communication, 0.7, 0.8)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -196,36 +187,19 @@ async def test_callback_force_error_tangent(widget: TabDiagnostics) -> None:
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert (
-        widget._force_error_tangent["a1"].text() == "<font color='black'>1.2 N</font>"
-    )
-    assert (
-        widget._force_error_tangent["a2"].text() == "<font color='red'>-2000.2 N</font>"
-    )
-    assert (
-        widget._force_error_tangent["a3"].text() == "<font color='black'>-1.3 N</font>"
-    )
+    assert widget._force_error_tangent["a1"].text() == "<font color='black'>1.2 N</font>"
+    assert widget._force_error_tangent["a2"].text() == "<font color='red'>-2000.2 N</font>"
+    assert widget._force_error_tangent["a3"].text() == "<font color='black'>-1.3 N</font>"
     assert widget._force_error_tangent["a4"].text() == "<font color='black'>0 N</font>"
-    assert (
-        widget._force_error_tangent["a5"].text() == "<font color='black'>31.3 N</font>"
-    )
-    assert (
-        widget._force_error_tangent["a6"].text() == "<font color='black'>-2.3 N</font>"
-    )
+    assert widget._force_error_tangent["a5"].text() == "<font color='black'>31.3 N</font>"
+    assert widget._force_error_tangent["a6"].text() == "<font color='black'>-2.3 N</font>"
 
-    assert (
-        widget._force_error_tangent["total_weight"].text()
-        == "<font color='black'>13.3 N</font>"
-    )
-    assert (
-        widget._force_error_tangent["tangent_sum"].text()
-        == "<font color='red'>-1200.5 N</font>"
-    )
+    assert widget._force_error_tangent["total_weight"].text() == "<font color='black'>13.3 N</font>"
+    assert widget._force_error_tangent["tangent_sum"].text() == "<font color='red'>-1200.5 N</font>"
 
 
 @pytest.mark.asyncio
 async def test_callback_closed_loop_control_mode(widget: TabDiagnostics) -> None:
-
     mode = MTM2.ClosedLoopControlMode.TelemetryOnly
     widget.model.controller.closed_loop_control_mode = mode
     widget.model.signal_closed_loop_control_mode.is_updated.emit(True)

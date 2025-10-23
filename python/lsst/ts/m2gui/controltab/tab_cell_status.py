@@ -79,15 +79,11 @@ class TabCellStatus(TabDefault):
         self._actuator_data_selection = self._create_actuator_data_selection()
 
         # Timer to update cell status forces (and displays)
-        self._timer = self.create_and_start_timer(
-            self._callback_time_out, self.model.duration_refresh
-        )
+        self._timer = self.create_and_start_timer(self._callback_time_out, self.model.duration_refresh)
 
         self.set_widget_and_layout()
 
-        self._set_signal_detailed_force(
-            self.model.utility_monitor.signal_detailed_force
-        )
+        self._set_signal_detailed_force(self.model.utility_monitor.signal_detailed_force)
 
     @asyncSlot()
     async def _callback_show_alias(self) -> None:
@@ -123,9 +119,7 @@ class TabCellStatus(TabDefault):
         index_all = CellActuatorGroupData.All.value - 1
         group_data_selection.setCurrentIndex(index_all)
 
-        group_data_selection.currentIndexChanged.connect(
-            self._callback_selection_changed_group
-        )
+        group_data_selection.currentIndexChanged.connect(self._callback_selection_changed_group)
 
         return group_data_selection
 
@@ -144,9 +138,7 @@ class TabCellStatus(TabDefault):
         for actuator in self._view_mirror.actuators:
             actuator.setVisible(actuator.acutator_id in self._visible_actuator_ids)
 
-    def get_visible_actuator_ids(
-        self, index_group_data_selector: int | None = None
-    ) -> range:
+    def get_visible_actuator_ids(self, index_group_data_selector: int | None = None) -> range:
         """Get the IDs of visible actuators.
 
         Parameters
@@ -173,14 +165,10 @@ class TabCellStatus(TabDefault):
         start_acutator_id = 1
         visible_actuators = range(0)
         if group_data == CellActuatorGroupData.All:
-            visible_actuators = range(
-                start_acutator_id, NUM_ACTUATOR + start_acutator_id
-            )
+            visible_actuators = range(start_acutator_id, NUM_ACTUATOR + start_acutator_id)
 
         elif group_data == CellActuatorGroupData.Axial:
-            visible_actuators = range(
-                start_acutator_id, NUM_ACTUATOR - NUM_TANGENT_LINK + start_acutator_id
-            )
+            visible_actuators = range(start_acutator_id, NUM_ACTUATOR - NUM_TANGENT_LINK + start_acutator_id)
 
         elif group_data == CellActuatorGroupData.Tangent:
             visible_actuators = range(
@@ -272,17 +260,13 @@ class TabCellStatus(TabDefault):
         ]
         for specific_data, tip in zip(FigureActuatorData, tips):
             actuator_data_selection.addItem(specific_data.name)
-            actuator_data_selection.setItemData(
-                specific_data.value - 1, tip, Qt.ToolTipRole
-            )
+            actuator_data_selection.setItemData(specific_data.value - 1, tip, Qt.ToolTipRole)
 
         # Index begins from 0 instead of 1 in QComboBox
         index_force_measured = FigureActuatorData.ForceMeasured.value - 1
         actuator_data_selection.setCurrentIndex(index_force_measured)
 
-        actuator_data_selection.currentIndexChanged.connect(
-            self._callback_selection_changed
-        )
+        actuator_data_selection.currentIndexChanged.connect(self._callback_selection_changed)
 
         return actuator_data_selection
 
@@ -321,9 +305,7 @@ class TabCellStatus(TabDefault):
         """
 
         # Index begins from 0 instead of 1 in QComboBox
-        selected_index = (
-            self._actuator_data_selection.currentIndex() if index is None else index
-        )
+        selected_index = self._actuator_data_selection.currentIndex() if index is None else index
         actuator_data = FigureActuatorData(selected_index + 1)
 
         if actuator_data == FigureActuatorData.ForceMeasured:
@@ -383,9 +365,7 @@ class TabCellStatus(TabDefault):
         force_current_max = 1.0
         for actuator, force_current in zip(self._view_mirror.actuators, forces_current):
             if actuator.acutator_id in self._visible_actuator_ids:
-                actuator.update_magnitude(
-                    force_current, self._gauge.min, self._gauge.max
-                )
+                actuator.update_magnitude(force_current, self._gauge.min, self._gauge.max)
 
                 # Check the range of current forces
                 if force_current < force_current_min:
@@ -401,12 +381,8 @@ class TabCellStatus(TabDefault):
             self._gauge.set_magnitude_range(force_current_min, force_current_max)
 
         # Figures
-        self._figures["realtime"].append_data(
-            np.mean(np.abs(self._forces_axial.f_error)), idx=0
-        )
-        self._figures["realtime"].append_data(
-            np.mean(np.abs(self._forces_tangent.f_error)), idx=1
-        )
+        self._figures["realtime"].append_data(np.mean(np.abs(self._forces_axial.f_error)), idx=0)
+        self._figures["realtime"].append_data(np.mean(np.abs(self._forces_tangent.f_error)), idx=1)
 
         data_selected, is_displacement = self._get_data_selected()
         self._update_figures(data_selected, is_displacement)
@@ -478,9 +454,7 @@ class TabCellStatus(TabDefault):
         # Axial actuators
         idx_alias = 0
         for id_axial, location in enumerate(cell_geometry["locAct_axial"]):
-            self._view_mirror.add_item_actuator(
-                id_axial + 1, aliases[idx_alias], location[0], location[1]
-            )
+            self._view_mirror.add_item_actuator(id_axial + 1, aliases[idx_alias], location[0], location[1])
             idx_alias += 1
 
         # Tangential actuators
@@ -496,9 +470,7 @@ class TabCellStatus(TabDefault):
             self._view_mirror.add_item_actuator(id_tangent, aliases[idx_alias], x, y)
             idx_alias += 1
 
-    def _set_signal_detailed_force(
-        self, signal_detailed_force: SignalDetailedForce
-    ) -> None:
+    def _set_signal_detailed_force(self, signal_detailed_force: SignalDetailedForce) -> None:
         """Set the detailed force signal with callback functions. This signal
         provides the calculated and measured force details contains the look-up
         table (LUT)

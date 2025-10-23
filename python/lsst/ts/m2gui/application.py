@@ -51,14 +51,10 @@ def create_parser() -> tuple[QCommandLineParser, list[QCommandLineOption]]:
     parser.setApplicationDescription("Run the M2 graphical user interface (GUI).")
     parser.addHelpOption()
 
-    option_verbose = QCommandLineOption(
-        ["v", "verbose"], "Print log messages to terminal."
-    )
+    option_verbose = QCommandLineOption(["v", "verbose"], "Print log messages to terminal.")
     parser.addOption(option_verbose)
 
-    option_simulation = QCommandLineOption(
-        ["s", "simulation"], "Run the simulation mode."
-    )
+    option_simulation = QCommandLineOption(["s", "simulation"], "Run the simulation mode.")
     parser.addOption(option_simulation)
 
     option_log_level = QCommandLineOption(
@@ -72,9 +68,7 @@ def create_parser() -> tuple[QCommandLineParser, list[QCommandLineOption]]:
     )
     parser.addOption(option_log_level)
 
-    option_no_log_file = QCommandLineOption(
-        ["no-logfile"], "Do not write log messages to file."
-    )
+    option_no_log_file = QCommandLineOption(["no-logfile"], "Do not write log messages to file.")
     parser.addOption(option_no_log_file)
 
     option_is_crio_simulator = QCommandLineOption(
@@ -117,9 +111,7 @@ async def main(
     is_crio_simulator = parser.isSet(options[4])
 
     if is_simulation_mode and is_crio_simulator:
-        print(
-            "No simulation mode and cRIO simulator at the same time.", file=sys.stderr
-        )
+        print("No simulation mode and cRIO simulator at the same time.", file=sys.stderr)
         return
 
     # Create a Qt main window, which will be our window.

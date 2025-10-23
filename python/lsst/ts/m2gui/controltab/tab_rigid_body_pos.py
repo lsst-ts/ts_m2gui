@@ -93,9 +93,7 @@ class TabRigidBodyPos(TabDefault):
                 self._callback_clear_values,
                 self._target_position_relative,
             ),
-            "go_to_position": set_button(
-                "Go to Position", self._callback_go_to_position
-            ),
+            "go_to_position": set_button("Go to Position", self._callback_go_to_position),
             "clear_values_absolute": set_button(
                 "Clear Values",
                 self._callback_clear_values,
@@ -127,11 +125,7 @@ class TabRigidBodyPos(TabDefault):
 
         position = dict()
         for axis in self.AXES:
-            limit = (
-                self.MAX_ROTATION_IN_ARCSEC
-                if axis.startswith("r")
-                else self.MAX_DISTANCE_IN_UM
-            )
+            limit = self.MAX_ROTATION_IN_ARCSEC if axis.startswith("r") else self.MAX_DISTANCE_IN_UM
             position[axis] = create_double_spin_box(
                 "", num_digit_after_decimal, maximum=limit, minimum=-limit
             )
@@ -173,9 +167,7 @@ class TabRigidBodyPos(TabDefault):
         )
 
     @asyncSlot()
-    async def _callback_clear_values(
-        self, target_positions: dict[str, QDoubleSpinBox]
-    ) -> None:
+    async def _callback_clear_values(self, target_positions: dict[str, QDoubleSpinBox]) -> None:
         """Callback of the clear-values button. This will clear the values of
         new target positions.
 
@@ -265,20 +257,14 @@ class TabRigidBodyPos(TabDefault):
         layout_position = QFormLayout()
         for axis in self.AXES:
             if axis.startswith("r"):
-                layout_position.addRow(
-                    f"Rotation {axis} (arcsec):", self._position_ims[axis]
-                )
+                layout_position.addRow(f"Rotation {axis} (arcsec):", self._position_ims[axis])
             else:
-                layout_position.addRow(
-                    f"Position {axis} (um):", self._position_ims[axis]
-                )
+                layout_position.addRow(f"Position {axis} (um):", self._position_ims[axis])
 
         layout = QVBoxLayout()
         layout.addLayout(layout_position)
 
-        return create_group_box(
-            "Position Based on Independent Measurement System", layout
-        )
+        return create_group_box("Position Based on Independent Measurement System", layout)
 
     def _create_group_current_position(self) -> QGroupBox:
         """Create the group of current position.
@@ -292,9 +278,7 @@ class TabRigidBodyPos(TabDefault):
         layout_position = QFormLayout()
         for axis in self.AXES:
             if axis.startswith("r"):
-                layout_position.addRow(
-                    f"Rotation {axis} (arcsec):", self._position[axis]
-                )
+                layout_position.addRow(f"Rotation {axis} (arcsec):", self._position[axis])
             else:
                 layout_position.addRow(f"Position {axis} (um):", self._position[axis])
 
@@ -331,13 +315,9 @@ class TabRigidBodyPos(TabDefault):
         layout_position = QFormLayout()
         for axis in self.AXES:
             if axis.startswith("r"):
-                layout_position.addRow(
-                    f"Offset {axis} (arcsec):", self._target_position_relative[axis]
-                )
+                layout_position.addRow(f"Offset {axis} (arcsec):", self._target_position_relative[axis])
             else:
-                layout_position.addRow(
-                    f"Offset {axis} (um):", self._target_position_relative[axis]
-                )
+                layout_position.addRow(f"Offset {axis} (um):", self._target_position_relative[axis])
 
         layout = QVBoxLayout()
         layout.addLayout(layout_position)
@@ -358,13 +338,9 @@ class TabRigidBodyPos(TabDefault):
         layout_position = QFormLayout()
         for axis in self.AXES:
             if axis.startswith("r"):
-                layout_position.addRow(
-                    f"Rotation {axis} (arcsec):", self._target_position_absolute[axis]
-                )
+                layout_position.addRow(f"Rotation {axis} (arcsec):", self._target_position_absolute[axis])
             else:
-                layout_position.addRow(
-                    f"Position {axis} (um):", self._target_position_absolute[axis]
-                )
+                layout_position.addRow(f"Position {axis} (um):", self._target_position_absolute[axis])
 
         layout = QVBoxLayout()
         layout.addLayout(layout_position)

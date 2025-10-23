@@ -72,9 +72,7 @@ def test_init(widget: TabAlarmWarn) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_button_limit_switch_status(
-    qtbot: QtBot, widget: TabAlarmWarn
-) -> None:
+async def test_callback_button_limit_switch_status(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     assert widget._tab_limit_switch_status.isVisible() is False
 
     qtbot.mouseClick(widget._button_limit_switch_status, Qt.LeftButton)
@@ -97,10 +95,7 @@ async def test_callback_selection_changed(qtbot: QtBot, widget: TabAlarmWarn) ->
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_SHORT)
 
-    assert (
-        widget._text_error_cause.toPlainText()
-        == "Internal ILC issue. ILC did not change state"
-    )
+    assert widget._text_error_cause.toPlainText() == "Internal ILC issue. ILC did not change state"
 
     # Select the second error code
     center = _get_widget_item_center(widget, "6052")
@@ -163,9 +158,7 @@ async def test_is_diagnostic_mode(widget: TabAlarmWarn) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_summary_faults_status(
-    qtbot: QtBot, widget: TabAlarmWarn
-) -> None:
+async def test_callback_signal_summary_faults_status(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     # Test the maximum value of U64
     widget.model.fault_manager.update_summary_faults_status(18446744073709551615)
 
@@ -176,9 +169,7 @@ async def test_callback_signal_summary_faults_status(
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_enabled_faults_mask_default(
-    qtbot: QtBot, widget: TabAlarmWarn
-) -> None:
+async def test_callback_signal_enabled_faults_mask_default(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     # Test the maximum value of U64
     widget.model.fault_manager.report_enabled_faults_mask(DEFAULT_ENABLED_FAULTS_MASK)
 
@@ -190,9 +181,7 @@ async def test_callback_signal_enabled_faults_mask_default(
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_enabled_faults_mask_bypassed(
-    qtbot: QtBot, widget: TabAlarmWarn
-) -> None:
+async def test_callback_signal_enabled_faults_mask_bypassed(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     # Test the maximum value of U64
     # bit 5: 6057, bit 6: 6056
     mask = DEFAULT_ENABLED_FAULTS_MASK - 2**5 - 2**6
@@ -202,10 +191,7 @@ async def test_callback_signal_enabled_faults_mask_bypassed(
     await asyncio.sleep(SLEEP_TIME_SHORT)
 
     assert widget._label_enabled_faults_mask.text() == hex(mask)
-    assert (
-        widget._label_error_code_bypass.text()
-        == "<font color='red'>[6056, 6057]</font>"
-    )
+    assert widget._label_error_code_bypass.text() == "<font color='red'>[6056, 6057]</font>"
 
 
 @pytest.mark.asyncio
@@ -233,9 +219,7 @@ def _get_widget_item_color(widget: TabAlarmWarn, item_text: str) -> QColor:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_error_cleared(
-    qtbot: QtBot, widget: TabAlarmWarn
-) -> None:
+async def test_callback_signal_error_cleared(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     widget.model.report_error(6051)
 
     widget.model.clear_error(6051)
@@ -285,9 +269,7 @@ async def test_callback_reset(qtbot: QtBot, widget_async: TabAlarmWarn) -> None:
     assert widget_async.model.fault_manager.errors == set()
 
     # Check the color of limit switch should be default
-    indicator = widget_async._tab_limit_switch_status._indicators_limit_switch_extend[
-        "C3"
-    ]
+    indicator = widget_async._tab_limit_switch_status._indicators_limit_switch_extend["C3"]
     palette = indicator.palette()
     color = palette.color(QPalette.Button)
 

@@ -164,11 +164,7 @@ class LayoutLocalMode(LayoutDefault):
             command = "exit_diagnostic"
 
         elif local_mode == LocalMode.Diagnostic:
-            command = (
-                "enter_diagnostic"
-                if self.model.local_mode == LocalMode.Standby
-                else "exit_enable"
-            )
+            command = "enter_diagnostic" if self.model.local_mode == LocalMode.Standby else "exit_enable"
 
         elif local_mode == LocalMode.Enable:
             command = "enter_enable"

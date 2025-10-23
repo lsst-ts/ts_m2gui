@@ -42,23 +42,17 @@ def test_init(fault_manager: FaultManager) -> None:
     assert len(fault_manager.limit_switch_status_extend) == 78
 
 
-def test_update_summary_faults_status(
-    qtbot: QtBot, fault_manager: FaultManager
-) -> None:
+def test_update_summary_faults_status(qtbot: QtBot, fault_manager: FaultManager) -> None:
     status = 10
 
-    with qtbot.waitSignal(
-        fault_manager.signal_error.summary_faults_status, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(fault_manager.signal_error.summary_faults_status, timeout=TIMEOUT):
         fault_manager.update_summary_faults_status(status)
 
     assert fault_manager.summary_faults_status == status
 
 
 def test_report_enabled_faults_mask(qtbot: QtBot, fault_manager: FaultManager) -> None:
-    with qtbot.waitSignal(
-        fault_manager.signal_error.enabled_faults_mask, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(fault_manager.signal_error.enabled_faults_mask, timeout=TIMEOUT):
         fault_manager.report_enabled_faults_mask(10)
 
 
@@ -123,43 +117,27 @@ def test_has_error(fault_manager: FaultManager) -> None:
     assert fault_manager.has_error() is True
 
 
-def test_reset_limit_switch_status_retract(
-    qtbot: QtBot, fault_manager: FaultManager
-) -> None:
-    fault_manager.update_limit_switch_status(
-        LimitSwitchType.Retract, Ring.B, 2, Status.Error
-    )
+def test_reset_limit_switch_status_retract(qtbot: QtBot, fault_manager: FaultManager) -> None:
+    fault_manager.update_limit_switch_status(LimitSwitchType.Retract, Ring.B, 2, Status.Error)
 
-    with qtbot.waitSignal(
-        fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT):
         fault_manager.reset_limit_switch_status(LimitSwitchType.Retract)
 
     assert fault_manager.limit_switch_status_retract["B2"] == Status.Normal
 
 
-def test_reset_limit_switch_status_extend(
-    qtbot: QtBot, fault_manager: FaultManager
-) -> None:
-    fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.C, 3, Status.Alert
-    )
+def test_reset_limit_switch_status_extend(qtbot: QtBot, fault_manager: FaultManager) -> None:
+    fault_manager.update_limit_switch_status(LimitSwitchType.Extend, Ring.C, 3, Status.Alert)
 
-    with qtbot.waitSignal(
-        fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
-    ):
+    with qtbot.waitSignal(fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT):
         fault_manager.reset_limit_switch_status(LimitSwitchType.Extend)
 
     assert fault_manager.limit_switch_status_extend["C3"] == Status.Normal
 
 
 def test_update_limit_switch_status(qtbot: QtBot, fault_manager: FaultManager) -> None:
-    with qtbot.waitSignal(
-        fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT
-    ):
-        fault_manager.update_limit_switch_status(
-            LimitSwitchType.Extend, Ring.C, 3, Status.Error
-        )
+    with qtbot.waitSignal(fault_manager.signal_limit_switch.type_name_status, timeout=TIMEOUT):
+        fault_manager.update_limit_switch_status(LimitSwitchType.Extend, Ring.C, 3, Status.Error)
 
     assert fault_manager.limit_switch_status_extend["C3"] == Status.Error
 
@@ -169,6 +147,4 @@ def test_update_limit_switch_status_exception(fault_manager: FaultManager) -> No
         fault_manager.update_limit_switch_status("wrong_type", Ring.B, 1, Status.Alert)
 
     with pytest.raises(ValueError):
-        fault_manager.update_limit_switch_status(
-            LimitSwitchType.Retract, Ring.B, 100, Status.Alert
-        )
+        fault_manager.update_limit_switch_status(LimitSwitchType.Retract, Ring.B, 100, Status.Alert)

@@ -51,6 +51,4 @@ class ActuatorForceTangent:
     step: List[int] = field(default_factory=lambda: [0] * NUM_TANGENT_LINK)
 
     # Actuator position in millimeter
-    position_in_mm: List[float] = field(
-        default_factory=lambda: [0.0] * NUM_TANGENT_LINK
-    )
+    position_in_mm: List[float] = field(default_factory=lambda: [0.0] * NUM_TANGENT_LINK)

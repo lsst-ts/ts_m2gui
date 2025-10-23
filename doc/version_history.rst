@@ -13,6 +13,7 @@ Version History
 -------------
 
 * Adapt the qasync v0.28.0.
+* Reformat by ruff.
 
 .. _lsst.ts.m2gui-1.1.9:
 

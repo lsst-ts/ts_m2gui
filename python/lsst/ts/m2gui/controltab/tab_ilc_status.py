@@ -87,8 +87,7 @@ class TabIlcStatus(TabDefault):
                 "Reset ILC States",
                 self._callback_ilc_state_reset,
                 tool_tip=(
-                    "Reset the ILC states to NaN. This is recommanded before "
-                    "checking the current ILC states."
+                    "Reset the ILC states to NaN. This is recommanded before checking the current ILC states."
                 ),
             ),
             "check": set_button(
@@ -126,9 +125,7 @@ class TabIlcStatus(TabDefault):
 
         # ModBUS ID begins from 1 instead of 0
         for specific_id in range(1, number + 1):
-            indicator = set_button(
-                str(specific_id), None, is_indicator=True, is_adjust_size=True
-            )
+            indicator = set_button(str(specific_id), None, is_indicator=True, is_adjust_size=True)
 
             self._update_indicator_color(indicator, MTM2.InnerLoopControlMode.Unknown)
 
@@ -136,9 +133,7 @@ class TabIlcStatus(TabDefault):
 
         return indicators
 
-    def _update_indicator_color(
-        self, indicator: QPushButton, mode: MTM2.InnerLoopControlMode
-    ) -> None:
+    def _update_indicator_color(self, indicator: QPushButton, mode: MTM2.InnerLoopControlMode) -> None:
         """Update the color of indicator.
 
         Parameters
@@ -221,9 +216,7 @@ class TabIlcStatus(TabDefault):
         """
 
         # If the closed-loop control mode is not in Idle, return immediately.
-        is_idle = await self._is_closed_loop_control_mode_in_idle(
-            "_callback_ilc_state_check()"
-        )
+        is_idle = await self._is_closed_loop_control_mode_in_idle("_callback_ilc_state_check()")
         if not is_idle:
             return
 
@@ -238,9 +231,7 @@ class TabIlcStatus(TabDefault):
         is_checking = False
         num_ilc = len(addresses)
         if num_ilc != 0:
-            is_checking = await run_command(
-                self.model.controller.get_ilc_modes, addresses
-            )
+            is_checking = await run_command(self.model.controller.get_ilc_modes, addresses)
 
         # Sleep some time when checking the ILC states
         if is_checking:
@@ -248,9 +239,7 @@ class TabIlcStatus(TabDefault):
 
         self._enable_ilc_commands(True)
 
-    async def _is_closed_loop_control_mode_in_idle(
-        self, title: str, is_prompted: bool = True
-    ) -> bool:
+    async def _is_closed_loop_control_mode_in_idle(self, title: str, is_prompted: bool = True) -> bool:
         """The closed-loop control mode is in idle or not.
 
         Parameters
@@ -287,9 +276,7 @@ class TabIlcStatus(TabDefault):
         """
 
         # If the closed-loop control mode is not in Idle, return immediately.
-        is_idle = await self._is_closed_loop_control_mode_in_idle(
-            "_callback_ilc_state_enable()"
-        )
+        is_idle = await self._is_closed_loop_control_mode_in_idle("_callback_ilc_state_enable()")
         if not is_idle:
             return
 
@@ -447,17 +434,11 @@ class TabIlcStatus(TabDefault):
         signal_ilc_status : `SignalIlcStatus`
             Signal of the ILC status.
         """
-        signal_ilc_status.address_mode.connect(
-            self._callback_signal_ilc_status_address_mode
-        )
-        signal_ilc_status.bypassed_ilcs.connect(
-            self._callback_signal_ilc_status_bypassed_ilcs
-        )
+        signal_ilc_status.address_mode.connect(self._callback_signal_ilc_status_address_mode)
+        signal_ilc_status.bypassed_ilcs.connect(self._callback_signal_ilc_status_bypassed_ilcs)
 
     @asyncSlot()
-    async def _callback_signal_ilc_status_address_mode(
-        self, address_mode: tuple
-    ) -> None:
+    async def _callback_signal_ilc_status_address_mode(self, address_mode: tuple) -> None:
         """Callback of the inner-loop controller (ILC) status signal for the
         address and mode.
 
@@ -474,9 +455,7 @@ class TabIlcStatus(TabDefault):
         self._update_indicator_color(self._indicators_ilc[address], mode)
 
     @asyncSlot()
-    async def _callback_signal_ilc_status_bypassed_ilcs(
-        self, bypassed_ilcs: list
-    ) -> None:
+    async def _callback_signal_ilc_status_bypassed_ilcs(self, bypassed_ilcs: list) -> None:
         """Callback of the inner-loop controller (ILC) status signal for the
         bypassed ILCs.
 

@@ -51,9 +51,7 @@ def widget(qtbot: QtBot) -> MockWidget:
 
 @pytest_asyncio.fixture
 async def widget_async(qtbot: QtBot) -> typing.AsyncGenerator:
-    async with MockWidget(
-        "Mock", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
+    async with MockWidget("Mock", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
         qtbot.addWidget(widget_sim)
 
         await widget_sim.model.connect()
@@ -78,9 +76,7 @@ async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) 
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_control_prohibit_control(
-    qtbot: QtBot, widget: MockWidget
-) -> None:
+async def test_callback_signal_control_prohibit_control(qtbot: QtBot, widget: MockWidget) -> None:
     widget.layout_control_mode.model.local_mode = LocalMode.Enable
 
     widget.layout_control_mode.model.report_control_status()
@@ -93,9 +89,7 @@ async def test_callback_signal_control_prohibit_control(
 
 
 @pytest.mark.asyncio
-async def test_switch_force_balance_system(
-    qtbot: QtBot, widget_async: MockWidget
-) -> None:
+async def test_switch_force_balance_system(qtbot: QtBot, widget_async: MockWidget) -> None:
     await widget_async.model.enter_diagnostic()
     await widget_async.model.enter_enable()
 
@@ -119,9 +113,7 @@ async def test_switch_force_balance_system(
 
     assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
 
-    qtbot.mouseClick(
-        widget_async.layout_control_mode._button_closed_loop, QtCore.Qt.LeftButton
-    )
+    qtbot.mouseClick(widget_async.layout_control_mode._button_closed_loop, QtCore.Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(5)

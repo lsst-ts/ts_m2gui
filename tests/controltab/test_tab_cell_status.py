@@ -101,18 +101,14 @@ def test_get_visible_actuator_ids(widget: TabCellStatus) -> None:
     assert min(visible_actuators_all) == 1
     assert max(visible_actuators_all) == NUM_ACTUATOR
 
-    visible_actuators_axial = widget.get_visible_actuator_ids(
-        index_group_data_selector=1
-    )
+    visible_actuators_axial = widget.get_visible_actuator_ids(index_group_data_selector=1)
 
     num_actuators_axial = NUM_ACTUATOR - NUM_TANGENT_LINK
     assert len(visible_actuators_axial) == num_actuators_axial
     assert min(visible_actuators_axial) == 1
     assert max(visible_actuators_axial) == num_actuators_axial
 
-    visible_actuators_tangent = widget.get_visible_actuator_ids(
-        index_group_data_selector=2
-    )
+    visible_actuators_tangent = widget.get_visible_actuator_ids(index_group_data_selector=2)
     assert len(visible_actuators_tangent) == NUM_TANGENT_LINK
     assert min(visible_actuators_tangent) == num_actuators_axial + 1
     assert max(visible_actuators_tangent) == NUM_ACTUATOR

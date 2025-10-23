@@ -58,12 +58,8 @@ def test_init(widget: TabLimitSwitchStatus) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_limit_switch_alert(
-    qtbot: QtBot, widget: TabLimitSwitchStatus
-) -> None:
-    widget.model.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.B, 2, Status.Alert
-    )
+async def test_callback_signal_limit_switch_alert(qtbot: QtBot, widget: TabLimitSwitchStatus) -> None:
+    widget.model.fault_manager.update_limit_switch_status(LimitSwitchType.Extend, Ring.B, 2, Status.Alert)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_SHORT)
@@ -76,12 +72,8 @@ async def test_callback_signal_limit_switch_alert(
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_limit_switch_error(
-    qtbot: QtBot, widget: TabLimitSwitchStatus
-) -> None:
-    widget.model.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.C, 3, Status.Error
-    )
+async def test_callback_signal_limit_switch_error(qtbot: QtBot, widget: TabLimitSwitchStatus) -> None:
+    widget.model.fault_manager.update_limit_switch_status(LimitSwitchType.Extend, Ring.C, 3, Status.Error)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_SHORT)

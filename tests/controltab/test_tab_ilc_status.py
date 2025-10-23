@@ -49,9 +49,7 @@ def widget(qtbot: QtBot) -> TabIlcStatus:
 
 @pytest_asyncio.fixture
 async def widget_async(qtbot: QtBot) -> TabIlcStatus:
-    async with TabIlcStatus(
-        "ILC Status", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
+    async with TabIlcStatus("ILC Status", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
         qtbot.addWidget(widget_sim)
 
         await widget_sim.model.connect()
@@ -82,20 +80,16 @@ def test_enable_ilc_commands(widget: TabIlcStatus) -> None:
 
 @pytest.mark.asyncio
 async def test_is_closed_loop_control_mode_in_idle(widget: TabIlcStatus) -> None:
-
     is_idle = await widget._is_closed_loop_control_mode_in_idle("", is_prompted=False)
     assert is_idle is True
 
-    widget.model.controller.closed_loop_control_mode = (
-        MTM2.ClosedLoopControlMode.TelemetryOnly
-    )
+    widget.model.controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.TelemetryOnly
     is_idle = await widget._is_closed_loop_control_mode_in_idle("", is_prompted=False)
     assert is_idle is False
 
 
 @pytest.mark.asyncio
 async def test_callback_ilc_state_reset(qtbot: QtBot, widget: TabIlcStatus) -> None:
-
     mode = MTM2.InnerLoopControlMode.Disabled
     widget.model.controller.ilc_modes[0] = mode
     widget.model._report_ilc_status(0, mode.value)
@@ -115,10 +109,7 @@ async def test_callback_ilc_state_reset(qtbot: QtBot, widget: TabIlcStatus) -> N
 
 
 @pytest.mark.asyncio
-async def test_callback_ilc_state_check(
-    qtbot: QtBot, widget_async: TabIlcStatus
-) -> None:
-
+async def test_callback_ilc_state_check(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
     controller = widget_async.model.controller
     controller.ilc_modes[:-1] = MTM2.InnerLoopControlMode.Enabled
 
@@ -136,10 +127,7 @@ async def test_callback_ilc_state_check(
 
 
 @pytest.mark.asyncio
-async def test_callback_ilc_state_enable(
-    qtbot: QtBot, widget_async: TabIlcStatus
-) -> None:
-
+async def test_callback_ilc_state_enable(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
     controller = widget_async.model.controller
     await controller.mock_server.model.power_communication.power_on()
 
@@ -166,10 +154,7 @@ async def test_callback_signal_ilc_status(qtbot: QtBot, widget: TabIlcStatus) ->
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_ilc_status_bypassed_ilcs(
-    qtbot: QtBot, widget: TabIlcStatus
-) -> None:
-
+async def test_callback_signal_ilc_status_bypassed_ilcs(qtbot: QtBot, widget: TabIlcStatus) -> None:
     bypassed_ilcs = [1, 2, 3]
     widget.model.signal_ilc_status.bypassed_ilcs.emit(bypassed_ilcs)
 

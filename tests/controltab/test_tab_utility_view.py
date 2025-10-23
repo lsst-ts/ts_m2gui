@@ -61,9 +61,7 @@ def test_init(widget: TabUtilityView) -> None:
     assert widget._power_inclinometer["power_on_communication"].text() == "Off"
 
     assert widget._power_inclinometer["power_system_state_motor"].text() == "Init"
-    assert (
-        widget._power_inclinometer["power_system_state_communication"].text() == "Init"
-    )
+    assert widget._power_inclinometer["power_system_state_communication"].text() == "Init"
 
 
 @pytest.mark.asyncio
@@ -97,12 +95,8 @@ async def test_callback_power_motor(qtbot: QtBot, widget: TabUtilityView) -> Non
 
 
 @pytest.mark.asyncio
-async def test_callback_power_communication(
-    qtbot: QtBot, widget: TabUtilityView
-) -> None:
-    widget.model.utility_monitor.update_power_calibrated(
-        MTM2.PowerType.Communication, 0.1, 0.2
-    )
+async def test_callback_power_communication(qtbot: QtBot, widget: TabUtilityView) -> None:
+    widget.model.utility_monitor.update_power_calibrated(MTM2.PowerType.Communication, 0.1, 0.2)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -113,9 +107,7 @@ async def test_callback_power_communication(
 
 @pytest.mark.asyncio
 async def test_callback_inclinometer(widget: TabUtilityView) -> None:
-    widget.model.utility_monitor.update_inclinometer_angle(
-        0.1, new_angle_processed=0.55
-    )
+    widget.model.utility_monitor.update_inclinometer_angle(0.1, new_angle_processed=0.55)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)

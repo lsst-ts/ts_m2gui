@@ -111,9 +111,7 @@ class LayoutControlMode(LayoutDefault):
         """
 
         self._prohibit_control_mode()
-        is_successful = await run_command(
-            self.model.controller.switch_force_balance_system, status
-        )
+        is_successful = await run_command(self.model.controller.switch_force_balance_system, status)
 
         if not is_successful:
             self._update_buttons()
