@@ -6,6 +6,15 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.11:
+
+-------------
+1.1.11
+-------------
+
+* Fix the ruff format.
+* Add the **documenteer.toml**.
+
 .. _lsst.ts.m2gui-1.1.10:
 
 -------------
