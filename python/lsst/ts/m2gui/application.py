@@ -24,8 +24,9 @@ __all__ = ["run_application"]
 import asyncio
 import sys
 
-from lsst.ts.guitool import base_frame_run_application
 from PySide6.QtCore import QCommandLineOption, QCommandLineParser
+
+from lsst.ts.guitool import base_frame_run_application
 
 from .main_window import MainWindow
 

@@ -21,9 +21,10 @@
 
 __all__ = ["LayoutLocalMode"]
 
-from lsst.ts.guitool import run_command, set_button
 from PySide6.QtWidgets import QVBoxLayout
 from qasync import asyncSlot
+
+from lsst.ts.guitool import run_command, set_button
 
 from ..enums import LocalMode
 from ..model import Model

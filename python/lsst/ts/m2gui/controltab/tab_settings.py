@@ -21,6 +21,18 @@
 
 __all__ = ["TabSettings"]
 
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLineEdit,
+    QSpinBox,
+    QVBoxLayout,
+)
+from qasync import QApplication, asyncSlot
+
 from lsst.ts.guitool import (
     LOG_LEVEL_MAXIMUM,
     LOG_LEVEL_MINIMUM,
@@ -41,17 +53,6 @@ from lsst.ts.m2com import (
     NUM_TEMPERATURE_INTAKE,
     NUM_TEMPERATURE_RING,
 )
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QFormLayout,
-    QGroupBox,
-    QHBoxLayout,
-    QLineEdit,
-    QSpinBox,
-    QVBoxLayout,
-)
-from qasync import QApplication, asyncSlot
 
 from ..model import Model
 from ..signals import SignalConfig

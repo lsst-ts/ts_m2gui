@@ -21,8 +21,9 @@
 
 __all__ = ["TabNetForceMoment"]
 
-from lsst.ts.guitool import create_group_box, create_label, set_button
 from PySide6.QtWidgets import QFormLayout, QGroupBox, QVBoxLayout
+
+from lsst.ts.guitool import create_group_box, create_label, set_button
 
 from ..model import Model
 from ..signals import SignalNetForceMoment

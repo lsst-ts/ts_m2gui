@@ -24,6 +24,8 @@ import logging
 
 import pytest
 import pytest_asyncio
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2com import (
     LIMIT_FORCE_AXIAL_CLOSED_LOOP,
     LIMIT_FORCE_AXIAL_OPEN_LOOP,
@@ -42,7 +44,6 @@ from lsst.ts.m2com import (
 )
 from lsst.ts.m2gui import LocalMode, Model, Ring, Status
 from lsst.ts.xml.enums import MTM2
-from pytestqt.qtbot import QtBot
 
 TIMEOUT = 1000
 TIMEOUT_LONG = 2000

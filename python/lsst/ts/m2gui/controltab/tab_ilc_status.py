@@ -25,6 +25,18 @@ import asyncio
 from pathlib import Path
 
 import numpy as np
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QPalette
+from PySide6.QtWidgets import (
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+)
+from qasync import asyncSlot
+
 from lsst.ts.guitool import (
     create_grid_layout_buttons,
     create_group_box,
@@ -40,17 +52,6 @@ from lsst.ts.m2com import (
     read_yaml_file,
 )
 from lsst.ts.xml.enums import MTM2
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QPalette
-from PySide6.QtWidgets import (
-    QFormLayout,
-    QGroupBox,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QVBoxLayout,
-)
-from qasync import asyncSlot
 
 from ..model import Model
 from ..signals import SignalIlcStatus

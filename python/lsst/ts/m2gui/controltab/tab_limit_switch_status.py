@@ -21,12 +21,13 @@
 
 __all__ = ["TabLimitSwitchStatus"]
 
-from lsst.ts.guitool import ButtonStatus, create_label, set_button, update_button_color
-from lsst.ts.m2com import LimitSwitchType
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QHBoxLayout, QPushButton, QVBoxLayout
 from qasync import asyncSlot
+
+from lsst.ts.guitool import ButtonStatus, create_label, set_button, update_button_color
+from lsst.ts.m2com import LimitSwitchType
 
 from ..enums import Ring, Status
 from ..model import Model

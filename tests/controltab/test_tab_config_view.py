@@ -23,9 +23,10 @@ import asyncio
 import logging
 
 import pytest
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabConfigView
-from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture

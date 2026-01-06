@@ -24,6 +24,9 @@ import logging
 from pathlib import Path
 
 import pytest
+from PySide6.QtCore import Qt
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, get_config_dir
 from lsst.ts.m2gui import (
     ActuatorForceAxial,
@@ -34,8 +37,6 @@ from lsst.ts.m2gui import (
 )
 from lsst.ts.m2gui.controltab import TabCellStatus
 from lsst.ts.m2gui.display import ItemActuator
-from PySide6.QtCore import Qt
-from pytestqt.qtbot import QtBot
 
 TIMEOUT = 1000
 

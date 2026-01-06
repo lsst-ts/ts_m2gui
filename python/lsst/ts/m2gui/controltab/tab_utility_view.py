@@ -21,15 +21,6 @@
 
 __all__ = ["TabUtilityView"]
 
-from lsst.ts.guitool import (
-    ButtonStatus,
-    create_group_box,
-    create_label,
-    run_command,
-    set_button,
-    update_button_color,
-)
-from lsst.ts.xml.enums import MTM2
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import (
     QFormLayout,
@@ -40,6 +31,16 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 from qasync import asyncSlot
+
+from lsst.ts.guitool import (
+    ButtonStatus,
+    create_group_box,
+    create_label,
+    run_command,
+    set_button,
+    update_button_color,
+)
+from lsst.ts.xml.enums import MTM2
 
 from ..enums import DisplacementSensorDirection, TemperatureGroup
 from ..model import Model

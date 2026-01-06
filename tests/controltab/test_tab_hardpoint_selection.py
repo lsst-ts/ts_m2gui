@@ -25,11 +25,12 @@ from pathlib import Path
 
 import pytest
 import pytest_asyncio
+from PySide6.QtCore import Qt
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2com import NUM_ACTUATOR, get_config_dir
 from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabHardpointSelection
-from PySide6.QtCore import Qt
-from pytestqt.qtbot import QtBot
 
 
 def get_cell_geometry_file() -> Path:

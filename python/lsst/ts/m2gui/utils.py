@@ -31,6 +31,7 @@ import re
 from pathlib import Path
 
 import numpy as np
+
 from lsst.ts.m2com import NUM_ACTUATOR
 
 from .enums import Ring

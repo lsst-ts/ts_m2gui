@@ -21,10 +21,11 @@
 
 __all__ = ["ItemActuator"]
 
-from lsst.ts.guitool import Gauge
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPen
 from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsTextItem
+
+from lsst.ts.guitool import Gauge
 
 
 class ItemActuator(QGraphicsEllipseItem):

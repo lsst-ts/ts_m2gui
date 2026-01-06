@@ -24,13 +24,14 @@ import logging
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2gui import ForceErrorTangent, Model
-from lsst.ts.m2gui.controltab import TabDiagnostics
-from lsst.ts.xml.enums import MTM2
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QPushButton
 from pytestqt.qtbot import QtBot
+
+from lsst.ts.m2gui import ForceErrorTangent, Model
+from lsst.ts.m2gui.controltab import TabDiagnostics
+from lsst.ts.xml.enums import MTM2
 
 
 @pytest.fixture

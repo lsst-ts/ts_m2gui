@@ -25,11 +25,12 @@ import typing
 
 import pytest
 import pytest_asyncio
+from PySide6 import QtCore
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2gui import LocalMode, Model
 from lsst.ts.m2gui.controltab import TabDefault
 from lsst.ts.m2gui.layout import LayoutControlMode
-from PySide6 import QtCore
-from pytestqt.qtbot import QtBot
 
 
 class MockWidget(TabDefault):
