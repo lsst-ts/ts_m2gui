@@ -22,9 +22,10 @@
 import logging
 
 import pytest
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2com import LimitSwitchType
 from lsst.ts.m2gui import FaultManager, Model, Ring, Status
-from pytestqt.qtbot import QtBot
 
 TIMEOUT = 1000
 

@@ -20,6 +20,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2com import DigitalInput
 from lsst.ts.m2gui import (
     DisplacementSensorDirection,
@@ -28,7 +30,6 @@ from lsst.ts.m2gui import (
     UtilityMonitor,
 )
 from lsst.ts.xml.enums import MTM2
-from pytestqt.qtbot import QtBot
 
 TIMEOUT = 1000
 

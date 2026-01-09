@@ -21,8 +21,6 @@
 
 __all__ = ["TabDetailedForce"]
 
-from lsst.ts.guitool import create_group_box, create_label, create_table
-from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -33,6 +31,9 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 from qasync import asyncSlot
+
+from lsst.ts.guitool import create_group_box, create_label, create_table
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK
 
 from ..actuator_force_axial import ActuatorForceAxial
 from ..actuator_force_tangent import ActuatorForceTangent

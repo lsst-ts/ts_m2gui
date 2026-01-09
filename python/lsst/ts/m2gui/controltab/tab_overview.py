@@ -21,10 +21,11 @@
 
 __all__ = ["TabOverview"]
 
-from lsst.ts.guitool import ButtonStatus, create_label, set_button, update_button_color
 from PySide6.QtGui import QPalette
 from PySide6.QtWidgets import QPlainTextEdit, QPushButton, QVBoxLayout
 from qasync import asyncSlot
+
+from lsst.ts.guitool import ButtonStatus, create_label, set_button, update_button_color
 
 from ..model import Model
 from ..signals import (

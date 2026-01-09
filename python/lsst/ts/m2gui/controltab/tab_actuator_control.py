@@ -24,6 +24,17 @@ __all__ = ["TabActuatorControl"]
 from pathlib import Path
 
 import numpy as np
+from PySide6.QtWidgets import (
+    QComboBox,
+    QDoubleSpinBox,
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QProgressBar,
+    QVBoxLayout,
+)
+from qasync import asyncSlot
+
 from lsst.ts.guitool import (
     QFileDialogAsync,
     create_double_spin_box,
@@ -35,16 +46,6 @@ from lsst.ts.guitool import (
     set_button,
 )
 from lsst.ts.m2com import ActuatorDisplacementUnit, CommandActuator, CommandScript
-from PySide6.QtWidgets import (
-    QComboBox,
-    QDoubleSpinBox,
-    QFormLayout,
-    QGroupBox,
-    QHBoxLayout,
-    QProgressBar,
-    QVBoxLayout,
-)
-from qasync import asyncSlot
 
 from ..actuator_force_axial import ActuatorForceAxial
 from ..actuator_force_tangent import ActuatorForceTangent

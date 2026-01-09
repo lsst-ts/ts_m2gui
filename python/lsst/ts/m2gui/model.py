@@ -27,6 +27,7 @@ import types
 import typing
 
 import numpy as np
+
 from lsst.ts.m2com import (
     DEFAULT_ENABLED_FAULTS_MASK,
     ILC_READ_WARNING_ERROR_CODES,

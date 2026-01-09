@@ -24,11 +24,12 @@ __all__ = ["TabCellStatus"]
 from pathlib import Path
 
 import numpy as np
-from lsst.ts.guitool import FigureConstant, Gauge, set_button
-from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QComboBox, QHBoxLayout, QVBoxLayout
 from qasync import asyncSlot
+
+from lsst.ts.guitool import FigureConstant, Gauge, set_button
+from lsst.ts.m2com import NUM_ACTUATOR, NUM_TANGENT_LINK, read_yaml_file
 
 from ..actuator_force_axial import ActuatorForceAxial
 from ..actuator_force_tangent import ActuatorForceTangent

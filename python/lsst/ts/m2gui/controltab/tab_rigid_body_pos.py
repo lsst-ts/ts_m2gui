@@ -21,13 +21,6 @@
 
 __all__ = ["TabRigidBodyPos"]
 
-from lsst.ts.guitool import (
-    create_double_spin_box,
-    create_group_box,
-    create_label,
-    run_command,
-    set_button,
-)
 from PySide6.QtWidgets import (
     QDoubleSpinBox,
     QFormLayout,
@@ -37,6 +30,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 from qasync import asyncSlot
+
+from lsst.ts.guitool import (
+    create_double_spin_box,
+    create_group_box,
+    create_label,
+    run_command,
+    set_button,
+)
 
 from ..model import Model
 from ..signals import SignalPosition

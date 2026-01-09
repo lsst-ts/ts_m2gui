@@ -23,12 +23,13 @@ import asyncio
 import logging
 
 import pytest
-from lsst.ts.m2com import LimitSwitchType
-from lsst.ts.m2gui import Model, Ring, Status
-from lsst.ts.m2gui.controltab import TabLimitSwitchStatus
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 from pytestqt.qtbot import QtBot
+
+from lsst.ts.m2com import LimitSwitchType
+from lsst.ts.m2gui import Model, Ring, Status
+from lsst.ts.m2gui.controltab import TabLimitSwitchStatus
 
 SLEEP_TIME_SHORT = 1
 

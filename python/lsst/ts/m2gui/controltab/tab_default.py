@@ -24,8 +24,9 @@ __all__ = ["TabDefault"]
 import types
 import typing
 
-from lsst.ts.guitool import TabTemplate
 from PySide6.QtWidgets import QComboBox, QFormLayout
+
+from lsst.ts.guitool import TabTemplate
 
 from ..enums import Ring
 from ..model import Model

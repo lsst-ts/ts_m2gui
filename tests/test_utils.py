@@ -23,6 +23,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+
 from lsst.ts.m2com import NUM_ACTUATOR
 from lsst.ts.m2gui import (
     Ring,

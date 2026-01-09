@@ -21,6 +21,19 @@
 
 __all__ = ["TabDiagnostics"]
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import (
+    QComboBox,
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+)
+from qasync import asyncSlot
+
 from lsst.ts.guitool import (
     ButtonStatus,
     QMessageBoxAsync,
@@ -39,18 +52,6 @@ from lsst.ts.m2com import (
     DigitalOutputStatus,
 )
 from lsst.ts.xml.enums import MTM2
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette
-from PySide6.QtWidgets import (
-    QComboBox,
-    QFormLayout,
-    QGroupBox,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QVBoxLayout,
-)
-from qasync import asyncSlot
 
 from ..enums import LocalMode
 from ..force_error_tangent import ForceErrorTangent

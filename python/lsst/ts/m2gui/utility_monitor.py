@@ -27,10 +27,11 @@ from copy import deepcopy
 
 import numpy as np
 import numpy.typing
+from PySide6.QtCore import Signal
+
 from lsst.ts.guitool import get_tol
 from lsst.ts.m2com import DigitalInput
 from lsst.ts.xml.enums import MTM2
-from PySide6.QtCore import Signal
 
 from .actuator_force_axial import ActuatorForceAxial
 from .actuator_force_tangent import ActuatorForceTangent

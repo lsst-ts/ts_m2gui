@@ -23,6 +23,10 @@ import asyncio
 import logging
 
 import pytest
+from PySide6.QtCore import Qt
+from pytestqt.qtbot import QtBot
+from qasync import QApplication
+
 from lsst.ts.guitool import (
     LOG_LEVEL_MAXIMUM,
     LOG_LEVEL_MINIMUM,
@@ -36,9 +40,6 @@ from lsst.ts.guitool import (
 )
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabSettings
-from PySide6.QtCore import Qt
-from pytestqt.qtbot import QtBot
-from qasync import QApplication
 
 
 @pytest.fixture

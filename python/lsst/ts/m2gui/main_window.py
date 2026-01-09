@@ -26,6 +26,11 @@ import pathlib
 import sys
 from datetime import datetime
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
+from qasync import QApplication, asyncSlot
+
 from lsst.ts.guitool import (
     ControlTabs,
     QMessageBoxAsync,
@@ -36,10 +41,6 @@ from lsst.ts.guitool import (
 )
 from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.tcpip import LOCALHOST_IPV4
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QMainWindow, QToolBar, QVBoxLayout, QWidget
-from qasync import QApplication, asyncSlot
 
 from .controltab import (
     TabActuatorControl,

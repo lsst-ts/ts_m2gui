@@ -26,13 +26,14 @@ from pathlib import Path
 import numpy as np
 import pytest
 import pytest_asyncio
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2com import NUM_INNER_LOOP_CONTROLLER, get_config_dir
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabIlcStatus
 from lsst.ts.xml.enums import MTM2
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette
-from pytestqt.qtbot import QtBot
 
 
 def get_ilc_details_file() -> Path:

@@ -25,12 +25,13 @@ from pathlib import Path
 
 import pytest
 import pytest_asyncio
-from lsst.ts.m2com import DEFAULT_ENABLED_FAULTS_MASK, LimitSwitchType, get_config_dir
-from lsst.ts.m2gui import LocalMode, Model, Ring, Status
-from lsst.ts.m2gui.controltab import TabAlarmWarn
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QColor, QPalette
 from pytestqt.qtbot import QtBot
+
+from lsst.ts.m2com import DEFAULT_ENABLED_FAULTS_MASK, LimitSwitchType, get_config_dir
+from lsst.ts.m2gui import LocalMode, Model, Ring, Status
+from lsst.ts.m2gui.controltab import TabAlarmWarn
 
 SLEEP_TIME_SHORT = 1
 SLEEP_TIME_LONG = 5

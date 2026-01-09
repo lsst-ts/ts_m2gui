@@ -21,13 +21,6 @@
 
 __all__ = ["TabConfigView"]
 
-from lsst.ts.guitool import (
-    create_group_box,
-    create_label,
-    prompt_dialog_warning,
-    run_command,
-    set_button,
-)
 from PySide6.QtWidgets import (
     QFormLayout,
     QGroupBox,
@@ -36,6 +29,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 from qasync import asyncSlot
+
+from lsst.ts.guitool import (
+    create_group_box,
+    create_label,
+    prompt_dialog_warning,
+    run_command,
+    set_button,
+)
 
 from ..config import Config
 from ..enums import LocalMode

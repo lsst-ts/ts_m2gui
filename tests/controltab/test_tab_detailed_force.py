@@ -23,9 +23,10 @@ import asyncio
 import logging
 
 import pytest
+from pytestqt.qtbot import QtBot
+
 from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, Model
 from lsst.ts.m2gui.controltab import TabDetailedForce
-from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture

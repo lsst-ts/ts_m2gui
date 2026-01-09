@@ -24,6 +24,19 @@ __all__ = ["TabAlarmWarn"]
 from collections import OrderedDict
 from pathlib import Path
 
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QPlainTextEdit,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+)
+from qasync import asyncSlot
+
 from lsst.ts.guitool import (
     QMessageBoxAsync,
     create_group_box,
@@ -39,18 +52,6 @@ from lsst.ts.m2com import (
     MINIMUM_ERROR_CODE,
     read_error_code_file,
 )
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
-    QFormLayout,
-    QGroupBox,
-    QHBoxLayout,
-    QHeaderView,
-    QPlainTextEdit,
-    QTableWidget,
-    QTableWidgetItem,
-    QVBoxLayout,
-)
-from qasync import asyncSlot
 
 from ..enums import LocalMode
 from ..model import Model

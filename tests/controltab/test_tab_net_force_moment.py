@@ -23,10 +23,11 @@ import asyncio
 import logging
 
 import pytest
-from lsst.ts.m2gui import Model
-from lsst.ts.m2gui.controltab import TabNetForceMoment
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
+
+from lsst.ts.m2gui import Model
+from lsst.ts.m2gui.controltab import TabNetForceMoment
 
 
 @pytest.fixture

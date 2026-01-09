@@ -23,6 +23,9 @@ __all__ = ["TabHardpointSelection"]
 
 from pathlib import Path
 
+from PySide6.QtWidgets import QGroupBox, QVBoxLayout
+from qasync import asyncSlot
+
 from lsst.ts.guitool import (
     create_grid_layout_buttons,
     create_group_box,
@@ -38,8 +41,6 @@ from lsst.ts.m2com import (
     read_yaml_file,
     select_axial_hardpoints,
 )
-from PySide6.QtWidgets import QGroupBox, QVBoxLayout
-from qasync import asyncSlot
 
 from ..enums import LocalMode
 from ..model import Model
