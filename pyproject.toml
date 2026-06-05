@@ -11,15 +11,6 @@ license = { text = "GPL" }
 classifiers = [ "Programming Language :: Python :: 3" ]
 urls = {documentation = "https://ts-m2gui.lsst.io", repository = "https://github.com/lsst-ts/ts_m2gui" }
 dynamic = [ "version" ]
-dependencies = [
-    "pyside6",
-    "pyyaml",
-    "qasync",
-    "ts_m2com",
-    "ts_xml",
-    "ts_tcpip",
-    "ts_guitool",
-]
 
 [tool.setuptools.dynamic]
 version = { attr = "setuptools_scm.get_version" }
