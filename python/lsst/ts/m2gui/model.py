@@ -429,8 +429,8 @@ class Model(object):
         """
         return self.local_mode == LocalMode.Enable and self.is_closed_loop
 
-    async def reboot_controller(self) -> None:
-        """Reboot the cell controller.
+    async def fault_controller(self) -> None:
+        """Fault the cell controller.
 
         Raises
         ------
@@ -438,10 +438,10 @@ class Model(object):
             Not in the standby state with local control.
         """
 
-        if self.local_mode == LocalMode.Standby and not self.is_csc_commander:
-            await self.controller.reboot_controller()
+        if not self.is_csc_commander:
+            await self.controller.fault_controller()
         else:
-            raise RuntimeError("Controller can only be rebooted at the standby state with local control.")
+            raise RuntimeError("Controller can only be faulted with local control.")
 
     async def command_script(
         self,

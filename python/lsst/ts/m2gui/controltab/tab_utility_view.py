@@ -540,7 +540,7 @@ class TabUtilityView(TabDefault):
             Displacements: (sensor_direction, [displacement_1, displacement_2,
             ...]). The data type of "sensor_direction" is the enum:
             `DisplacementSensorDirection`. The data type of displacement in
-            "[displacement_1, displacement_2, ...]" is float. The unit is mm.
+            "[displacement_1, displacement_2, ...]" is float. The unit is um.
             This list should have all the displacements in the direction.
         """
 
@@ -549,4 +549,4 @@ class TabUtilityView(TabDefault):
 
         sensors = self.model.utility_monitor.get_displacement_sensors(sensor_direction)
         for sensor, value in zip(sensors, values):
-            self._displacements[sensor].setText(f"{value} mm")
+            self._displacements[sensor].setText(f"{value} um")

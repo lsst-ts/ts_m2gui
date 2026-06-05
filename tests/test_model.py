@@ -196,14 +196,10 @@ async def test_go_to_position_exception(model: Model) -> None:
 
 
 @pytest.mark.asyncio
-async def test_reboot_controller_exception(model: Model) -> None:
-    with pytest.raises(RuntimeError):
-        model.local_mode = LocalMode.Diagnostic
-        await model.reboot_controller()
-
+async def test_fault_controller_exception(model: Model) -> None:
     with pytest.raises(RuntimeError):
         model.is_csc_commander = True
-        await model.reboot_controller()
+        await model.fault_controller()
 
 
 @pytest.mark.asyncio

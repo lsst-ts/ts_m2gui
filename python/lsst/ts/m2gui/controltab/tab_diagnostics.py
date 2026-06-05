@@ -98,7 +98,7 @@ class TabDiagnostics(TabDefault):
             "tangent_sum": create_label(tool_tip=f"Threshold is {TANGENT_LINK_THETA_Z_MOMENT} N"),
         }
 
-        self._button_reboot = set_button("Reboot Controller", self._callback_reboot_controller)
+        self._button_fault = set_button("Fault Controller", self._callback_fault_controller)
 
         self._button_update_control_mode = set_button(
             "Update Control Mode",
@@ -141,14 +141,14 @@ class TabDiagnostics(TabDefault):
         }
 
     @asyncSlot()
-    async def _callback_reboot_controller(self) -> None:
-        """Callback of the reboot-cell-controller button. This will ask the
+    async def _callback_fault_controller(self) -> None:
+        """Callback of the fault-cell-controller button. This will ask the
         user to confirm this command again."""
 
         dialog = QMessageBoxAsync()
 
-        dialog.setText("This will reboot the cell controller.")
-        dialog.setInformativeText("Are you sure to reboot the controller?")
+        dialog.setText("This will fault the cell controller.")
+        dialog.setInformativeText("Are you sure to fault the controller?")
 
         dialog.setStandardButtons(QMessageBoxAsync.Ok | QMessageBoxAsync.Cancel)
         dialog.setDefaultButton(QMessageBoxAsync.Cancel)
@@ -158,7 +158,7 @@ class TabDiagnostics(TabDefault):
 
         decision = await dialog.show()
         if decision == QMessageBoxAsync.Ok:
-            await run_command(self.model.reboot_controller)
+            await run_command(self.model.fault_controller)
 
     @asyncSlot()
     async def _callback_update_control_mode(self) -> None:
@@ -404,7 +404,7 @@ class TabDiagnostics(TabDefault):
         layout_power_force_error.addWidget(self._create_group_force_error_non_load())
         layout_power_force_error.addWidget(self._create_group_force_error_total())
 
-        layout_power_force_error.addWidget(self._button_reboot)
+        layout_power_force_error.addWidget(self._button_fault)
 
         layout.addLayout(layout_power_force_error)
 

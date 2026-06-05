@@ -169,4 +169,4 @@ async def test_callback_displacements(qtbot: QtBot, widget: TabUtilityView) -> N
 
     sensors = utility_monitor.get_displacement_sensors(direction)
     for sensor, displacement in zip(sensors, displacements):
-        assert widget._displacements[sensor].text() == f"{displacement} mm"
+        assert widget._displacements[sensor].text() == f"{displacement} um"

@@ -6,6 +6,16 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.12:
+
+-------------
+1.1.12
+-------------
+
+- Fix the ``TabUtilityView._callback_displacements()`` to use the unit of um for displacement sensors.
+- Remove the ``Model.reboot_controller()`` and add the ``Model.fault_controller()``.
+- Remove the ``TabDiagnostics._callback_reboot_controller()`` and add the ``TabDiagnostics._callback_fault_controller()``.
+
 .. _lsst.ts.m2gui-1.1.11:
 
 -------------
