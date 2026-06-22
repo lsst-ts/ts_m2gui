@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.1.13:
+
+-------------
+1.1.13
+-------------
+
+- Remove the **sconsUtils** in ``ts_m2gui.table``.
+
 .. _lsst.ts.m2gui-1.1.12:
 
 -------------
