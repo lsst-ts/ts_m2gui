@@ -41,7 +41,6 @@ from lsst.ts.guitool import (
     create_grid_layout_buttons,
     create_group_box,
     create_label,
-    prompt_dialog_warning,
     run_command,
     set_button,
 )
@@ -55,7 +54,9 @@ from lsst.ts.xml.enums import MTM2
 
 from ..model import Model
 from ..signals import SignalIlcStatus
+from ..utils import is_closed_loop_control_mode_in_idle
 from .tab_default import TabDefault
+from .tab_ilc import TabIlc
 
 
 class TabIlcStatus(TabDefault):
@@ -78,6 +79,7 @@ class TabIlcStatus(TabDefault):
         super().__init__(title, model)
 
         # Indicators of the ILCs
+        self._ilcs = self._create_tabs_ilc(NUM_INNER_LOOP_CONTROLLER)
         self._indicators_ilc = self._create_indicators_ilc(NUM_INNER_LOOP_CONTROLLER)
 
         # Bypassed ILCs
@@ -103,10 +105,46 @@ class TabIlcStatus(TabDefault):
             ),
         }
 
+        self._buttons_power = {
+            "power_on": set_button(
+                "Power On Communication",
+                self._callback_power_communication,
+                True,
+                tool_tip=("Power on the communication."),
+            ),
+            "power_off": set_button(
+                "Power Off Communication",
+                self._callback_power_communication,
+                False,
+                tool_tip=("Power off the communication."),
+            ),
+        }
+
         self.set_widget_and_layout()
 
         # Set the callback of signal
         self._set_signal_ilc_status(self.model.signal_ilc_status)
+
+    def _create_tabs_ilc(self, number: int) -> list[TabIlc]:
+        """Create tabs of the inner-loop controller (ILC).
+
+        Parameters
+        ----------
+        number : `int`
+            Total number of ILC.
+
+        Returns
+        -------
+        tabs : `list` [`TabIlc`]
+            Tabs of ILC.
+        """
+
+        tabs = list()
+        for idx in range(1, number + 1):
+            tab = TabIlc(f"ILC {idx}", self.model, idx)
+            tabs.append(tab)
+
+        return tabs
 
     def _create_indicators_ilc(self, number: int) -> list[QPushButton]:
         """Creates indicators for the inner-loop controller (ILC).
@@ -126,7 +164,11 @@ class TabIlcStatus(TabDefault):
 
         # ModBUS ID begins from 1 instead of 0
         for specific_id in range(1, number + 1):
-            indicator = set_button(str(specific_id), None, is_indicator=True, is_adjust_size=True)
+            indicator = set_button(
+                str(specific_id),
+                self._ilcs[specific_id - 1].show,
+                is_adjust_size=True,
+            )
 
             self._update_indicator_color(indicator, MTM2.InnerLoopControlMode.Unknown)
 
@@ -188,8 +230,9 @@ class TabIlcStatus(TabDefault):
         self._enable_ilc_commands(False)
 
         self.model.controller.set_ilc_modes_to_nan()
-        for indicator in self._indicators_ilc:
-            self._update_indicator_color(indicator, MTM2.InnerLoopControlMode.Unknown)
+        for indicator_ilc, ilc in zip(self._indicators_ilc, self._ilcs):
+            self._update_indicator_color(indicator_ilc, MTM2.InnerLoopControlMode.Unknown)
+            ilc.set_server_status(MTM2.InnerLoopControlMode.Unknown)
 
         self._enable_ilc_commands(True)
 
@@ -217,7 +260,10 @@ class TabIlcStatus(TabDefault):
         """
 
         # If the closed-loop control mode is not in Idle, return immediately.
-        is_idle = await self._is_closed_loop_control_mode_in_idle("_callback_ilc_state_check()")
+        is_idle = await is_closed_loop_control_mode_in_idle(
+            self.model.controller.closed_loop_control_mode,
+            "_callback_ilc_state_check()",
+        )
         if not is_idle:
             return
 
@@ -240,36 +286,6 @@ class TabIlcStatus(TabDefault):
 
         self._enable_ilc_commands(True)
 
-    async def _is_closed_loop_control_mode_in_idle(self, title: str, is_prompted: bool = True) -> bool:
-        """The closed-loop control mode is in idle or not.
-
-        Parameters
-        ----------
-        title : `str`
-            Title of the dialog.
-        is_prompted : `bool`, optional
-            When False, dialog will not be executed. That is used for tests,
-            which shall not be the case when used in the real GUI. (the default
-            is True)
-
-        Returns
-        -------
-        `bool`
-            True if the closed-loop control mode is in idle. False if not.
-        """
-
-        closed_loop_control_mode = self.model.controller.closed_loop_control_mode
-        if closed_loop_control_mode != MTM2.ClosedLoopControlMode.Idle:
-            await prompt_dialog_warning(
-                title,
-                f"Closed-loop control mode is {closed_loop_control_mode!r}. "
-                "Please set the closed-loop control mode to Idle first.",
-                is_prompted=is_prompted,
-            )
-            return False
-
-        return True
-
     @asyncSlot()
     async def _callback_ilc_state_enable(self) -> None:
         """Callback of the enable button to transition the inner-loop
@@ -277,7 +293,10 @@ class TabIlcStatus(TabDefault):
         """
 
         # If the closed-loop control mode is not in Idle, return immediately.
-        is_idle = await self._is_closed_loop_control_mode_in_idle("_callback_ilc_state_enable()")
+        is_idle = await is_closed_loop_control_mode_in_idle(
+            self.model.controller.closed_loop_control_mode,
+            "_callback_ilc_state_enable()",
+        )
         if not is_idle:
             return
 
@@ -291,6 +310,63 @@ class TabIlcStatus(TabDefault):
         )
 
         self._enable_ilc_commands(True)
+
+    @asyncSlot()
+    async def _callback_power_communication(self, is_power_on: bool) -> None:
+        """Callback of the power-on/off button to power on/off the
+        communication power.
+
+        Parameters
+        ----------
+        is_power_on : `bool`
+            True to power on the communication. False to power off the
+            communication.
+        """
+
+        # If the closed-loop control mode is not in Idle, return immediately.
+        is_idle = await is_closed_loop_control_mode_in_idle(
+            self.model.controller.closed_loop_control_mode,
+            "_callback_power_communication()",
+        )
+        if not is_idle:
+            return
+
+        self._enable_power_commands(False)
+
+        if is_power_on:
+            if not self.model.controller.is_powered_on_communication():
+                await run_command(
+                    self.model.controller.power,
+                    MTM2.PowerType.Communication,
+                    True,
+                )
+
+        else:
+            await run_command(
+                self.model.controller.power,
+                MTM2.PowerType.Communication,
+                False,
+            )
+
+            self.model.controller.set_ilc_modes_to_unknown()
+
+            for indicator_ilc, ilc in zip(self._indicators_ilc, self._ilcs):
+                self._update_indicator_color(indicator_ilc, MTM2.InnerLoopControlMode.Unknown)
+                ilc.set_server_status(MTM2.InnerLoopControlMode.Unknown)
+
+        self._enable_power_commands(True)
+
+    def _enable_power_commands(self, is_enabled: bool) -> None:
+        """Enable the power commands or not.
+
+        Parameters
+        ----------
+        is_enabled : `bool`
+            True if enabled. False if disabled.
+        """
+
+        for button in self._buttons_power.values():
+            button.setEnabled(is_enabled)
 
     def create_layout(self) -> QVBoxLayout:
         """Create the layout.
@@ -336,6 +412,9 @@ class TabIlcStatus(TabDefault):
 
         # ILC control
         layout.addWidget(self._create_group_ilc_control())
+
+        # Power control
+        layout.addWidget(self._create_group_ilc_power())
 
         return layout
 
@@ -426,6 +505,21 @@ class TabIlcStatus(TabDefault):
 
         return create_group_box("Inner-Loop Controller Control", layout)
 
+    def _create_group_ilc_power(self) -> QGroupBox:
+        """Create the group of inner-loop controller (ILC) power control.
+
+        Returns
+        -------
+        group : `PySide6.QtWidgets.QGroupBox`
+            Group.
+        """
+
+        layout = QHBoxLayout()
+        for button in self._buttons_power.values():
+            layout.addWidget(button)
+
+        return create_group_box("Communication Power Control", layout)
+
     def _set_signal_ilc_status(self, signal_ilc_status: SignalIlcStatus) -> None:
         """Set the inner-loop controller (ILC) status signal with callback
         function.
@@ -437,6 +531,10 @@ class TabIlcStatus(TabDefault):
         """
         signal_ilc_status.address_mode.connect(self._callback_signal_ilc_status_address_mode)
         signal_ilc_status.bypassed_ilcs.connect(self._callback_signal_ilc_status_bypassed_ilcs)
+        signal_ilc_status.server_id.connect(self._callback_signal_ilc_status_server_id)
+        signal_ilc_status.server_status.connect(self._callback_signal_ilc_status_server_status)
+        signal_ilc_status.address_rate.connect(self._callback_signal_ilc_status_scan_rate)
+        signal_ilc_status.calibration_data.connect(self._callback_signal_ilc_status_calibration_data)
 
     @asyncSlot()
     async def _callback_signal_ilc_status_address_mode(self, address_mode: tuple) -> None:
@@ -454,6 +552,86 @@ class TabIlcStatus(TabDefault):
         address = address_mode[0]
         mode = MTM2.InnerLoopControlMode(address_mode[1])
         self._update_indicator_color(self._indicators_ilc[address], mode)
+        self._ilcs[address].set_server_status(mode)
+
+    @asyncSlot()
+    async def _callback_signal_ilc_status_server_id(self, server_id: dict) -> None:
+        """Callback of the inner-loop controller (ILC) status signal for the
+        server identifier.
+
+        Parameters
+        ----------
+        server_id : `dict`
+            Server identifier.
+        """
+
+        address = server_id["address"]
+        self._ilcs[address].set_server_id(
+            server_id["uniqueId"],
+            server_id["applicationType"],
+            server_id["networkNodeType"],
+            server_id["selectedOptions"],
+            server_id["networkNodeOptions"],
+            server_id["firmwareRevision"],
+            server_id["firmwareName"],
+        )
+
+    @asyncSlot()
+    async def _callback_signal_ilc_status_server_status(self, server_status: dict) -> None:
+        """Callback of the inner-loop controller (ILC) status signal for the
+        server status.
+
+        Parameters
+        ----------
+        server_status : `dict`
+            Server status.
+        """
+
+        address = server_status["address"]
+        mode = MTM2.InnerLoopControlMode(server_status["mode"])
+        self._update_indicator_color(self._indicators_ilc[address], mode)
+        self._ilcs[address].set_server_status(
+            mode,
+            status=server_status["status"],
+            faults=server_status["faults"],
+        )
+
+    @asyncSlot()
+    async def _callback_signal_ilc_status_scan_rate(self, address_rate: tuple) -> None:
+        """Callback of the inner-loop controller (ILC) status signal for the
+        address and scan rate.
+
+        Parameters
+        ----------
+        address_rate : `tuple`
+            A tuple: (address, rate). The data type of both elements is
+            integer.
+        """
+
+        address = address_rate[0]
+        rate = address_rate[1]
+        self._ilcs[address].set_scan_rate(rate)
+
+    @asyncSlot()
+    async def _callback_signal_ilc_status_calibration_data(self, calibration_data: dict) -> None:
+        """Callback of the inner-loop controller (ILC) status signal for the
+        calibration data.
+
+        Parameters
+        ----------
+        calibration_data : `dict`
+            Calibration data.
+        """
+
+        address = calibration_data["address"]
+        self._ilcs[address].set_calibration_data(
+            calibration_data["mainGains"],
+            calibration_data["mainOffsets"],
+            calibration_data["mainSensitivities"],
+            calibration_data["backupGains"],
+            calibration_data["backupOffsets"],
+            calibration_data["backupSensitivities"],
+        )
 
     @asyncSlot()
     async def _callback_signal_ilc_status_bypassed_ilcs(self, bypassed_ilcs: list) -> None:
