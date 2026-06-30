@@ -24,6 +24,7 @@ __all__ = [
     "map_actuator_id_to_alias",
     "read_ilc_status_from_log",
     "sum_ilc_lost_comm",
+    "is_closed_loop_control_mode_in_idle",
 ]
 
 import ast
@@ -32,7 +33,9 @@ from pathlib import Path
 
 import numpy as np
 
+from lsst.ts.guitool import prompt_dialog_warning
 from lsst.ts.m2com import NUM_ACTUATOR
+from lsst.ts.xml.enums import MTM2
 
 from .enums import Ring
 
@@ -156,3 +159,39 @@ def sum_ilc_lost_comm(ilc_status: list[list[int]]) -> list[int]:
             ilc_lost_communication = ilc_lost_communication + lost_value
 
     return ilc_lost_communication.tolist()
+
+
+async def is_closed_loop_control_mode_in_idle(
+    current_closed_loop_control_mode: MTM2.ClosedLoopControlMode,
+    title: str,
+    is_prompted: bool = True,
+) -> bool:
+    """The closed-loop control mode is in idle or not.
+
+    Parameters
+    ----------
+    current_closed_loop_control_mode : enum `MTM2.ClosedLoopControlMode`
+        Current closed-loop control mode.
+    title : `str`
+        Title of the dialog.
+    is_prompted : `bool`, optional
+        When False, dialog will not be executed. That is used for tests,
+        which shall not be the case when used in the real GUI. (the default
+        is True)
+
+    Returns
+    -------
+    `bool`
+        True if the closed-loop control mode is in idle. False if not.
+    """
+
+    if current_closed_loop_control_mode != MTM2.ClosedLoopControlMode.Idle:
+        await prompt_dialog_warning(
+            title,
+            f"Closed-loop control mode is {current_closed_loop_control_mode!r}. "
+            "Please set the closed-loop control mode to Idle first.",
+            is_prompted=is_prompted,
+        )
+        return False
+
+    return True

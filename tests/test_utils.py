@@ -28,10 +28,12 @@ from lsst.ts.m2com import NUM_ACTUATOR
 from lsst.ts.m2gui import (
     Ring,
     get_num_actuator_ring,
+    is_closed_loop_control_mode_in_idle,
     map_actuator_id_to_alias,
     read_ilc_status_from_log,
     sum_ilc_lost_comm,
 )
+from lsst.ts.xml.enums import MTM2
 
 
 def test_get_num_actuator_ring() -> None:
@@ -88,3 +90,11 @@ def test_sum_ilc_lost_comm() -> None:
     lost_comm = sum_ilc_lost_comm(ilc_status)
 
     assert lost_comm == [2, 1] + [0] * (NUM_ACTUATOR - 2)
+
+
+@pytest.mark.asyncio
+async def test_is_closed_loop_control_mode_in_idle() -> None:
+    is_idle = await is_closed_loop_control_mode_in_idle(
+        MTM2.ClosedLoopControlMode.Idle, "", is_prompted=False
+    )
+    assert is_idle is True
