@@ -7,6 +7,9 @@ namespace m2gui {
 Model *-- SignalIlcStatus : emit()
 
 TabDefault *-- Model
+TabDefault <|-- TabIlc
 TabDefault <|-- TabIlcStatus
+
+TabIlcStatus "1" *-- "84" TabIlc
 
 TabIlcStatus --> SignalIlcStatus : connect()
