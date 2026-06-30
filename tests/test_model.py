@@ -380,6 +380,49 @@ async def test_process_event(qtbot: QtBot, model: Model) -> None:
     with qtbot.waitSignal(model.signal_ilc_status.address_mode, timeout=TIMEOUT):
         await model._process_event(message={"id": "innerLoopControlMode", "address": 1, "mode": 2})
 
+    with qtbot.waitSignal(model.signal_ilc_status.server_id, timeout=TIMEOUT):
+        await model._process_event(
+            message={
+                "id": "serverIdentifier",
+                "address": 1,
+                "uniqueId": 1001,
+                "applicationType": 1,
+                "networkNodeType": 1,
+                "selectedOptions": 1,
+                "networkNodeOptions": 1,
+                "firmwareRevision": "7.1",
+                "firmwareName": "Electromechanical ILC (c)2017 AURA-LSST",
+            },
+        )
+
+    with qtbot.waitSignal(model.signal_ilc_status.server_status, timeout=TIMEOUT):
+        await model._process_event(
+            message={
+                "id": "serverStatus",
+                "address": 1,
+                "mode": 1,
+                "status": 0,
+                "faults": 0,
+            },
+        )
+
+    with qtbot.waitSignal(model.signal_ilc_status.address_rate, timeout=TIMEOUT):
+        await model._process_event(message={"id": "scanRate", "address": 1, "rate": 2})
+
+    with qtbot.waitSignal(model.signal_ilc_status.calibration_data, timeout=TIMEOUT):
+        await model._process_event(
+            message={
+                "id": "calibrationData",
+                "address": 1,
+                "mainGains": [0.0] * 4,
+                "mainOffsets": [0.0] * 4,
+                "mainSensitivities": [0.0] * 4,
+                "backupGains": [0.0] * 4,
+                "backupOffsets": [0.0] * 4,
+                "backupSensitivities": [0.0] * 4,
+            },
+        )
+
     with qtbot.waitSignal(model.fault_manager.signal_error.summary_faults_status, timeout=TIMEOUT):
         await model._process_event(message={"id": "summaryFaultsStatus", "status": 10})
 

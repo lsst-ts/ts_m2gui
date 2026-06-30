@@ -813,6 +813,28 @@ class Model(object):
 
                 self.log.info(f"Ring temperature offset: {offset_ring}.")
 
+            elif name == "serverIdentifier":
+                self.signal_ilc_status.server_id.emit(message)
+
+                self.log.info(f"Received ILC server id: {message}.")
+
+            elif name == "serverStatus":
+                self.signal_ilc_status.server_status.emit(message)
+
+                self.log.info(f"Received ILC server status: {message}.")
+
+            elif name == "scanRate":
+                address = message["address"]
+                rate = message["rate"]
+                self.signal_ilc_status.address_rate.emit((address, rate))
+
+                self.log.info(f"Received ILC scan rate: {rate} for {address=}.")
+
+            elif name == "calibrationData":
+                self.signal_ilc_status.calibration_data.emit(message)
+
+                self.log.info(f"Received ILC calibration data: {message}.")
+
             # Ignore these messages because they are specific to CSC
             elif name in (
                 "summaryState",
