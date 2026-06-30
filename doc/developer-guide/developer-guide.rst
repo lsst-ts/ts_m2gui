@@ -138,6 +138,7 @@ m2gui.controltab
 * **TabRigidBodyPos** controls the rigid body position.
 * **TabUtilityView** shows the utility status.
 * **TabSettings** shows the settings of GUI.
+* **TabIlc** shows the single inner-loop controller (ILC) condition.
 * **TabIlcStatus** shows the inner-loop controller (ILC) status.
 * **TabNetForceMoment** shows the net force and moment of total actuators and force balance system status.
 * **TabRealtimeNetForceMoment** shows the realtime data of net force and moment of total actuators and force balance system status.
@@ -225,6 +226,14 @@ m2gui.controltab.TabSettings
 
 .. mermaid:: ../uml/controltab/class_tab_settings.mmd
     :caption: Class diagram of TabSettings class
+
+.. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_ilc:
+
+m2gui.controltab.TabIlc
+-----------------------
+
+.. mermaid:: ../uml/controltab/class_tab_ilc.mmd
+    :caption: Class diagram of TabIlc class
 
 .. _lsst.ts.m2gui-modules_m2gui_controbtab_tab_ilc_status:
 
