@@ -451,6 +451,7 @@ Inner-Loop Controller (ILC) Status
 The ILC status table provides the detailed mode of each ILC with the ModBUS ID.
 There are 84 ILCs: 72 for the axial actuators, 6 for the tangent links, and 6 for the inclinomemter/temperature/displacement sensors.
 Please note that the actuator ILC and sensor ILC have different state machines.
+You can click each ILC indicator to see the detailed information or do more specific ILC commands.
 
 For the actuator ILC, the state machine starts in the **Standby** state, transitions to **Disable** state, and then **Enable** state.
 For the sensor ILC, the **Standby** state transitions to the **Enabled** state directly without the **Disabled** state in between.
@@ -464,6 +465,29 @@ The **Check ILC States** button queries all the **Unknown** ILCs to get the curr
 The **Enable ILC States** button transitions all the ILCs to the **Enabled** state.
 These buttons can be used to debug or check the ILC states when the CSC is using the hardware at the same time.
 Note the control loop needs to be in idle to avoid the disruption with the reading of ILC data.
+
+You can use the power commands to power on/off the communication power.
+You can only operate the ILC when the communication power is on.
+In addition, the closed-loop control mode needs to be **Idle** as well.
+
+.. _lsst.ts.m2gui-user_ilc:
+
+Inner-Loop Controller (ILC)
+---------------------------
+
+.. figure:: ../screenshot/ilc.png
+  :width: 550
+
+  ILC
+
+The ILC table provides the detailed information of each ILC.
+You can use the specific ILC command to query the ILC server ID, status, scan rate, and calibration data.
+You can reset the ILC as well.
+
+You can update the scan rate, offset, and sensitivity for each actuator ILC.
+After changing the offset and sensitivity, you need to reset the ILC or do the power-cycle of communication to make them work.
+This is required if you replace the current actuator with another one, and you need to calibrate the new actuator and update the parameters here.
+Note the monitor ILC (temperature, displacement, and inclinometer) disables the above setting commands of parameters since they are specific to the actuator.
 
 .. _lsst.ts.m2gui-user_net_force_moment:
 
