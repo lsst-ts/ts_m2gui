@@ -6,6 +6,19 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.2.0:
+
+-------------
+1.2.0
+-------------
+
+- Move the ``TabIlcStatus._is_closed_loop_control_mode_in_idle()`` to the ``utils.py``.
+- Add the **TabIlc** class.
+- Add the fields to **SignalIlcStatus** in ``signals.py``.
+- Process the new events in **Model** class.
+- Update the **TabLlcStatus** to hold the instances of **TabIlc**.
+- Update the documents and class diagrams.
+
 .. _lsst.ts.m2gui-1.1.13:
 
 -------------
