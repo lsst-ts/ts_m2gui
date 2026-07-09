@@ -214,6 +214,19 @@ class SignalIlcStatus(QtCore.QObject):
     # List of the bypassed ILCs.
     bypassed_ilcs = QtCore.Signal(object)
 
+    # Server identifier as a dictionary.
+    server_id = QtCore.Signal(object)
+
+    # Server status as a dictionary.
+    server_status = QtCore.Signal(object)
+
+    # Scan rate as a tuple: (address, rate). The data type of both elements is
+    # integer.
+    address_rate = QtCore.Signal(object)
+
+    # Calibration data as a dictionary.
+    calibration_data = QtCore.Signal(object)
+
 
 class SignalNetForceMoment(QtCore.QObject):
     """Net force/moment signal to send the net force and moment of total
