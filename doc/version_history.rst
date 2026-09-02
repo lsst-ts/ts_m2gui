@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.2.1:
+
+-------------
+1.2.1
+-------------
+
+* Add and update the header license.
+
 .. _lsst.ts.m2gui-1.2.0:
 
 -------------
