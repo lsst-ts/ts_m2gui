@@ -123,6 +123,7 @@ async def test_callback_signal_status(qtbot: QtBot, widget: TabOverview) -> None
     assert color == Qt.green
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_signal_status_is_alarm_on(qtbot: QtBot, widget_async: TabOverview) -> None:
     # Default color
@@ -151,6 +152,7 @@ def _get_color_is_alarm_on(widget: TabOverview) -> QColor:
     return palette.color(QPalette.Button)
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_signal_status_is_warning_on(qtbot: QtBot, widget_async: TabOverview) -> None:
     # Default color

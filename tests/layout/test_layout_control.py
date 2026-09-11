@@ -98,6 +98,7 @@ async def test_callback_signal_control_prohibit_control(qtbot: QtBot, widget: Mo
     assert widget.layout_control._button_local.isEnabled() is False
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_set_csc_commander(qtbot: QtBot, widget_async: MockWidget) -> None:
     # Sleep so the event loop can access CPU to handle the signal

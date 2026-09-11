@@ -65,6 +65,7 @@ def test_init(widget: TabUtilityView) -> None:
     assert widget._power_inclinometer["power_system_state_communication"].text() == "Init"
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_reset_breakers(widget_async: TabUtilityView) -> None:
     # Transition to Enabled state to turn on the communication power

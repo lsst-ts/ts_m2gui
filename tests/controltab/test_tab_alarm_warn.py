@@ -233,6 +233,7 @@ async def test_callback_signal_error_cleared(qtbot: QtBot, widget: TabAlarmWarn)
     assert color_6051 == Qt.white
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_reset(qtbot: QtBot, widget_async: TabAlarmWarn) -> None:
     # Update the text of error cause

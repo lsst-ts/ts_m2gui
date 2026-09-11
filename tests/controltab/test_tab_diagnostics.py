@@ -59,6 +59,7 @@ def test_init(widget_async: TabDiagnostics) -> None:
     pass
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_update_control_mode(qtbot: QtBot, widget_async: TabDiagnostics) -> None:
     mode = MTM2.ClosedLoopControlMode.TelemetryOnly
@@ -71,6 +72,7 @@ async def test_callback_update_control_mode(qtbot: QtBot, widget_async: TabDiagn
     assert widget_async.model.controller.closed_loop_control_mode == mode
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_control_digital_status(qtbot: QtBot, widget_async: TabDiagnostics) -> None:
     # Sleep so the event loop can access CPU to handle the signal

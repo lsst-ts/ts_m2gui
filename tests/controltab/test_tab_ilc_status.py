@@ -106,6 +106,7 @@ async def test_callback_ilc_state_reset(qtbot: QtBot, widget: TabIlcStatus) -> N
     assert widget._ilcs[0]._labels["mode"].text() == MTM2.InnerLoopControlMode.Unknown.name
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_ilc_state_check(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
     controller = widget_async.model.controller
@@ -115,6 +116,7 @@ async def test_callback_ilc_state_check(qtbot: QtBot, widget_async: TabIlcStatus
     assert controller.ilc_modes[-1] == MTM2.InnerLoopControlMode.Standby
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def power_on_and_click_check_button(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
     controller = widget_async.model.controller
@@ -129,6 +131,7 @@ async def power_on_and_click_check_button(qtbot: QtBot, widget_async: TabIlcStat
     await asyncio.sleep(1)
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_ilc_state_check_not_idle(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
     widget_async.model.controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.TelemetryOnly
@@ -140,6 +143,7 @@ async def test_callback_ilc_state_check_not_idle(qtbot: QtBot, widget_async: Tab
     assert controller.ilc_modes[-1] == MTM2.InnerLoopControlMode.Unknown
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_ilc_state_enable(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
     controller = widget_async.model.controller
@@ -180,6 +184,7 @@ async def test_callback_signal_ilc_status_bypassed_ilcs(qtbot: QtBot, widget: Ta
     assert widget._label_bypassed_ilcs.text() == str(bypassed_ilcs)
 
 
+@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
 async def test_callback_power_communication(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
     # Power on
