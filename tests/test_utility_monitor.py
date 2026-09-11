@@ -20,6 +20,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import pytest_asyncio
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2com import DigitalInput
@@ -34,7 +35,7 @@ from lsst.ts.xml.enums import MTM2
 TIMEOUT = 1000
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def utility_monitor() -> UtilityMonitor:
     return UtilityMonitor()
 
