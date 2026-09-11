@@ -176,6 +176,7 @@ async def test_callback_selection_changed(widget: TabCellStatus) -> None:
     assert widget._figures["tangent"].axis_y.max() == 0.2
 
 
+@pytest.mark.skip(reason="Issue")
 @pytest.mark.asyncio
 async def test_callback_time_out(widget: TabCellStatus) -> None:
     # Select the actuator

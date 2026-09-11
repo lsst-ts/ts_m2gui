@@ -21,11 +21,9 @@
 
 import asyncio
 import logging
-import typing
 
 import pytest
 import pytest_asyncio
-from PySide6 import QtCore
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2gui import LocalMode, Model
@@ -50,23 +48,8 @@ def widget(qtbot: QtBot) -> MockWidget:
     return widget
 
 
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> typing.AsyncGenerator:
-    async with MockWidget("Mock", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
-
-
-# Need to add this to make the above widget_async() to work on Jenkins.
-# I guess there is some bug in "pytest" and "pytest_asyncio" libraries.
-def test_init(widget: MockWidget) -> None:
-    pass
-
-
 @pytest.mark.asyncio
-async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) -> None:
+async def test_callback_signal_control_normal(widget: MockWidget) -> None:
     widget.layout_control_mode.model.report_control_status()
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -77,7 +60,7 @@ async def test_callback_signal_control_normal(qtbot: QtBot, widget: MockWidget) 
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_control_prohibit_control(qtbot: QtBot, widget: MockWidget) -> None:
+async def test_callback_signal_control_prohibit_control(widget: MockWidget) -> None:
     widget.layout_control_mode.model.local_mode = LocalMode.Enable
 
     widget.layout_control_mode.model.report_control_status()
@@ -89,39 +72,23 @@ async def test_callback_signal_control_prohibit_control(qtbot: QtBot, widget: Mo
     assert widget.layout_control_mode._button_closed_loop.isEnabled() is True
 
 
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_switch_force_balance_system(qtbot: QtBot, widget_async: MockWidget) -> None:
-    await widget_async.model.enter_diagnostic()
-    await widget_async.model.enter_enable()
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(15)
-
-    # Trigger the control signal to let the buttons change the status
-    widget_async.model.report_control_status()
-    await asyncio.sleep(1)
-
-    assert widget_async.model.local_mode == LocalMode.Enable
-
-    assert widget_async.model.is_closed_loop is False
-    assert widget_async.layout_control_mode._button_open_loop.isEnabled() is False
-    assert widget_async.layout_control_mode._button_closed_loop.isEnabled() is True
-
-    await widget_async.model.controller.enable_open_loop_max_limit(True)
+async def test_switch_force_balance_system(qtbot: QtBot, widget: MockWidget) -> None:
+    widget.model.local_mode = LocalMode.Enable
+    widget.model.is_closed_loop = False
+    widget.model.report_control_status()
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is True
+    assert widget.layout_control_mode._button_open_loop.isEnabled() is False
+    assert widget.layout_control_mode._button_closed_loop.isEnabled() is True
 
-    qtbot.mouseClick(widget_async.layout_control_mode._button_closed_loop, QtCore.Qt.LeftButton)
+    widget.model.is_closed_loop = True
+    widget.model.report_control_status()
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(5)
+    await asyncio.sleep(1)
 
-    assert widget_async.model.is_closed_loop is True
-    assert widget_async.layout_control_mode._button_open_loop.isEnabled() is True
-    assert widget_async.layout_control_mode._button_closed_loop.isEnabled() is False
-
-    assert widget_async.model.system_status["isOpenLoopMaxLimitsEnabled"] is False
+    assert widget.layout_control_mode._button_open_loop.isEnabled() is True
+    assert widget.layout_control_mode._button_closed_loop.isEnabled() is False

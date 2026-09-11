@@ -41,16 +41,7 @@ def widget(qtbot: QtBot) -> TabOverview:
     return widget
 
 
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> TabOverview:
-    async with TabOverview("Overview", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
-
-
-def test_init(qtbot: QtBot, widget: TabOverview) -> None:
+def test_init(widget: TabOverview) -> None:
     assert widget._label_control.text() == "Commander is: EUI"
     assert widget._label_control_mode.text() == "Control Mode: Standby"
     assert widget._label_local_mode.text() == "Control Loop: Idle"
@@ -69,7 +60,7 @@ def test_init(qtbot: QtBot, widget: TabOverview) -> None:
         assert color == Qt.gray
 
 
-def test_update_control_status(qtbot: QtBot, widget: TabOverview) -> None:
+def test_update_control_status(widget: TabOverview) -> None:
     widget.model.is_csc_commander = True
     widget.model.local_mode = LocalMode.Enable
     widget.model.is_closed_loop = True
@@ -82,7 +73,7 @@ def test_update_control_status(qtbot: QtBot, widget: TabOverview) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_message(qtbot: QtBot, widget: TabOverview) -> None:
+async def test_callback_signal_message(widget: TabOverview) -> None:
     assert widget._window_log.toPlainText() == ""
 
     signal_message = SignalMessage()
@@ -110,7 +101,7 @@ def test_callback_clear(qtbot: QtBot, widget: TabOverview) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_status(qtbot: QtBot, widget: TabOverview) -> None:
+async def test_callback_signal_status(widget: TabOverview) -> None:
     name = "isTelemetryActive"
     widget.model.update_system_status(name, True)
 
@@ -123,28 +114,28 @@ async def test_callback_signal_status(qtbot: QtBot, widget: TabOverview) -> None
     assert color == Qt.green
 
 
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_signal_status_is_alarm_on(qtbot: QtBot, widget_async: TabOverview) -> None:
+async def test_callback_signal_status_is_alarm_on(widget: TabOverview) -> None:
     # Default color
-    assert _get_color_is_alarm_on(widget_async) == Qt.gray
+    assert _get_color_is_alarm_on(widget) == Qt.gray
 
     # There is the error
-    widget_async.model.controller.error_handler.add_new_error(3)
-    widget_async.model.report_error(3)
+    widget.model.controller.error_handler.add_new_error(3)
+    widget.model.report_error(3)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_alarm_on(widget_async) == Qt.red
+    assert _get_color_is_alarm_on(widget) == Qt.red
 
     # The error is cleared
-    await widget_async.model.reset_errors()
+    widget.model.controller.error_handler.clear()
+    widget.model._check_error_and_update_status()
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_alarm_on(widget_async) == Qt.gray
+    assert _get_color_is_alarm_on(widget) == Qt.gray
 
 
 def _get_color_is_alarm_on(widget: TabOverview) -> QColor:
@@ -152,28 +143,28 @@ def _get_color_is_alarm_on(widget: TabOverview) -> QColor:
     return palette.color(QPalette.Button)
 
 
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_signal_status_is_warning_on(qtbot: QtBot, widget_async: TabOverview) -> None:
+async def test_callback_signal_status_is_warning_on(widget: TabOverview) -> None:
     # Default color
-    assert _get_color_is_warning_on(widget_async) == Qt.gray
+    assert _get_color_is_warning_on(widget) == Qt.gray
 
     # There is the warning
-    widget_async.model.controller.error_handler.add_new_warning(3)
-    widget_async.model.report_error(3)
+    widget.model.controller.error_handler.add_new_warning(3)
+    widget.model.report_error(3)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_warning_on(widget_async) == Qt.yellow
+    assert _get_color_is_warning_on(widget) == Qt.yellow
 
     # The warning is cleared
-    await widget_async.model.reset_errors()
+    widget.model.controller.error_handler.clear()
+    widget.model._check_error_and_update_status()
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert _get_color_is_warning_on(widget_async) == Qt.gray
+    assert _get_color_is_warning_on(widget) == Qt.gray
 
 
 def _get_color_is_warning_on(widget: TabOverview) -> QColor:

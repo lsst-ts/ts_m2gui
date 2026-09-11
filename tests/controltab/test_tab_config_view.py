@@ -39,7 +39,7 @@ def widget(qtbot: QtBot) -> TabConfigView:
 
 
 @pytest.mark.asyncio
-async def test_get_selected_file(qtbot: QtBot, widget: TabConfigView) -> None:
+async def test_get_selected_file(widget: TabConfigView) -> None:
     widget.model.signal_config.files.emit(["a", "b", "c"])
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -54,7 +54,7 @@ async def test_get_selected_file(qtbot: QtBot, widget: TabConfigView) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_config_files(qtbot: QtBot, widget: TabConfigView) -> None:
+async def test_callback_signal_config_files(widget: TabConfigView) -> None:
     files = ["a", "b", "c"]
     widget.model.signal_config.files.emit(files)
 
@@ -65,7 +65,7 @@ async def test_callback_signal_config_files(qtbot: QtBot, widget: TabConfigView)
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_config(qtbot: QtBot, widget: TabConfigView) -> None:
+async def test_callback_signal_config(widget: TabConfigView) -> None:
     widget.model.report_config(
         file_configuration="a",
         file_version="b",

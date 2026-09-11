@@ -51,18 +51,6 @@ def widget(qtbot: QtBot) -> TabAlarmWarn:
     return widget
 
 
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> TabAlarmWarn:
-    async with TabAlarmWarn(
-        "Alarms/Warnings", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
-        widget_sim.read_error_list_file(get_error_list_file())
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
-
-
 def test_init(widget: TabAlarmWarn) -> None:
     assert len(widget._error_list) == 37
     assert len(widget._error_list["6051"]) == 6
@@ -159,7 +147,7 @@ async def test_is_diagnostic_mode(widget: TabAlarmWarn) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_summary_faults_status(qtbot: QtBot, widget: TabAlarmWarn) -> None:
+async def test_callback_signal_summary_faults_status(widget: TabAlarmWarn) -> None:
     # Test the maximum value of U64
     widget.model.fault_manager.update_summary_faults_status(18446744073709551615)
 
@@ -170,7 +158,7 @@ async def test_callback_signal_summary_faults_status(qtbot: QtBot, widget: TabAl
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_enabled_faults_mask_default(qtbot: QtBot, widget: TabAlarmWarn) -> None:
+async def test_callback_signal_enabled_faults_mask_default(widget: TabAlarmWarn) -> None:
     # Test the maximum value of U64
     widget.model.fault_manager.report_enabled_faults_mask(DEFAULT_ENABLED_FAULTS_MASK)
 
@@ -182,7 +170,7 @@ async def test_callback_signal_enabled_faults_mask_default(qtbot: QtBot, widget:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_enabled_faults_mask_bypassed(qtbot: QtBot, widget: TabAlarmWarn) -> None:
+async def test_callback_signal_enabled_faults_mask_bypassed(widget: TabAlarmWarn) -> None:
     # Test the maximum value of U64
     # bit 5: 6057, bit 6: 6056
     mask = DEFAULT_ENABLED_FAULTS_MASK - 2**5 - 2**6
@@ -196,7 +184,7 @@ async def test_callback_signal_enabled_faults_mask_bypassed(qtbot: QtBot, widget
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_error_new(qtbot: QtBot, widget: TabAlarmWarn) -> None:
+async def test_callback_signal_error_new(widget: TabAlarmWarn) -> None:
     widget.model.report_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
@@ -220,7 +208,7 @@ def _get_widget_item_color(widget: TabAlarmWarn, item_text: str) -> QColor:
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_error_cleared(qtbot: QtBot, widget: TabAlarmWarn) -> None:
+async def test_callback_signal_error_cleared(widget: TabAlarmWarn) -> None:
     widget.model.report_error(6051)
 
     widget.model.clear_error(6051)
@@ -233,51 +221,48 @@ async def test_callback_signal_error_cleared(qtbot: QtBot, widget: TabAlarmWarn)
     assert color_6051 == Qt.white
 
 
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_reset(qtbot: QtBot, widget_async: TabAlarmWarn) -> None:
+async def test_callback_reset(qtbot: QtBot, widget: TabAlarmWarn) -> None:
     # Update the text of error cause
-    center = _get_widget_item_center(widget_async, "6054")
+    center = _get_widget_item_center(widget, "6054")
     qtbot.mouseClick(
-        widget_async._table_error.viewport(),
+        widget._table_error.viewport(),
         Qt.LeftButton,
         pos=center,
     )
 
     # Highlight the error
-    widget_async.model.report_error(6051)
+    widget.model.report_error(6051)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_SHORT)
 
     # Trigger the limit switch
-    widget_async.model.fault_manager.update_limit_switch_status(
-        LimitSwitchType.Extend, Ring.C, 3, Status.Error
-    )
+    widget.model.fault_manager.update_limit_switch_status(LimitSwitchType.Extend, Ring.C, 3, Status.Error)
 
     # Click the reset button
-    qtbot.mouseClick(widget_async._button_reset, Qt.LeftButton)
+    qtbot.mouseClick(widget._button_reset, Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(SLEEP_TIME_LONG)
 
     # Check the text of error cause should be cleared
-    assert widget_async._text_error_cause.toPlainText() == ""
+    assert widget._text_error_cause.toPlainText() == ""
 
     # Check the color of error code should be default
-    color_6051 = _get_widget_item_color(widget_async, "6051")
+    color_6051 = _get_widget_item_color(widget, "6051")
     assert color_6051 == Qt.white
 
-    assert widget_async.model.fault_manager.errors == set()
+    assert widget.model.fault_manager.errors == set()
 
     # Check the color of limit switch should be default
-    indicator = widget_async._tab_limit_switch_status._indicators_limit_switch_extend["C3"]
+    indicator = widget._tab_limit_switch_status._indicators_limit_switch_extend["C3"]
     palette = indicator.palette()
     color = palette.color(QPalette.Button)
 
     assert color == Qt.green
 
 
-def test_set_error_item_color_error(qtbot: QtBot, widget: TabAlarmWarn) -> None:
+def test_set_error_item_color_error(widget: TabAlarmWarn) -> None:
     with pytest.raises(ValueError):
         widget._set_error_item_color(None, "wrong_status")

@@ -28,7 +28,7 @@ from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2com import ActuatorDisplacementUnit
-from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, LocalMode, Model
+from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, Model
 from lsst.ts.m2gui.controltab import TabActuatorControl
 
 
@@ -40,17 +40,6 @@ def widget(qtbot: QtBot) -> TabActuatorControl:
     return widget
 
 
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> TabActuatorControl:
-    async with TabActuatorControl(
-        "Actuator Control", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
-
-
 def test_init(widget: TabActuatorControl) -> None:
     progress = widget._info_script["progress"]
     assert progress.minimum() == 0
@@ -59,35 +48,24 @@ def test_init(widget: TabActuatorControl) -> None:
     assert progress.isTextVisible() is True
 
 
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_script_load_script(widget_async: TabActuatorControl) -> None:
-    await _transition_to_enable_state(widget_async)
-
+async def test_callback_script_load_script(widget: TabActuatorControl) -> None:
     file_name = "/a/b/c"
-    name = await widget_async._callback_script_load_script(file_name=file_name)
+    name = await widget._callback_script_load_script(file_name=file_name, bypass_load=True)
 
     assert name == "c"
-    assert widget_async._info_script["file"].text() == file_name
+    assert widget._info_script["file"].text() == file_name
 
 
-async def _transition_to_enable_state(widget_async: TabActuatorControl) -> None:
-    await widget_async.model.enter_diagnostic()
-    await widget_async.model.enter_enable()
-
-
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_script_command(qtbot: QtBot, widget_async: TabActuatorControl) -> None:
-    await _transition_to_enable_state(widget_async)
+async def test_callback_script_command(qtbot: QtBot, widget: TabActuatorControl) -> None:
+    widget._callback_script_load_script(file_name="/a/b/c", bypass_load=True)
+    widget.model.report_script_progress(30)
 
-    widget_async._callback_script_load_script(file_name="/a/b/c")
-    widget_async.model.report_script_progress(30)
+    qtbot.mouseClick(widget._buttons_script["clear"], Qt.LeftButton)
 
-    qtbot.mouseClick(widget_async._buttons_script["clear"], Qt.LeftButton)
-
-    assert widget_async._info_script["file"].text() == ""
-    assert widget_async._info_script["progress"].value() == 0
+    assert widget._info_script["file"].text() == ""
+    assert widget._info_script["progress"].value() == 0
 
 
 def test_set_target_displacement(widget: TabActuatorControl) -> None:
@@ -171,19 +149,14 @@ async def test_callback_clear_all(qtbot: QtBot, widget: TabActuatorControl) -> N
     assert widget._buttons_actuator_selection[idx].isChecked() is False
 
 
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_actuator_start(qtbot: QtBot, widget_async: TabActuatorControl) -> None:
-    # Transition to the enabled state with the open-loop control
-    await _transition_to_enable_state(widget_async)
-
-    controller = widget_async.model.controller
-    await controller.switch_force_balance_system(False)
-
+async def test_get_selected_actuators_and_displacement_and_unit(
+    qtbot: QtBot, widget: TabActuatorControl
+) -> None:
     # Select the actuators
     selected_actuators = [0, 1, 3, 7, 76, 77]
     for selected_actuator in selected_actuators:
-        qtbot.mouseClick(widget_async._buttons_actuator_selection[selected_actuator], Qt.LeftButton)
+        qtbot.mouseClick(widget._buttons_actuator_selection[selected_actuator], Qt.LeftButton)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
@@ -191,37 +164,32 @@ async def test_callback_actuator_start(qtbot: QtBot, widget_async: TabActuatorCo
     # Change the unit
     # Index begins from 0 instead of 1 in QComboBox
     index_step_unit = ActuatorDisplacementUnit.Step.value - 1
-    widget_async._displacement_unit_selection.setCurrentIndex(index_step_unit)
+    widget._displacement_unit_selection.setCurrentIndex(index_step_unit)
 
     # Change the displacement
-    widget_async._target_displacement.setValue(10)
+    widget._target_displacement.setValue(10)
 
-    # Start the movement
-    widget_async.model.local_mode = LocalMode.Enable
+    # Get the movement details
     (
         actuators,
         target_displacement,
         displacement_unit,
-    ) = await widget_async._callback_actuator_start()
+    ) = widget._get_selected_actuators_and_displacement_and_unit()
 
     assert actuators == selected_actuators
-    assert target_displacement == widget_async._target_displacement.value()
+    assert target_displacement == widget._target_displacement.value()
     assert displacement_unit == ActuatorDisplacementUnit.Step
 
-    # Sleep sometime to let the movement to be done
-    await asyncio.sleep(10)
 
-
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_clear_force(qtbot: QtBot, widget_async: TabActuatorControl) -> None:
+async def test_clear_applied_force(widget: TabActuatorControl) -> None:
     # Set the force
-    widget_async._applied_force.setValue(10)
+    widget._applied_force.setValue(10)
 
     # Clear the force
-    await widget_async._callback_clear_force()
+    widget._clear_applied_force()
 
-    assert widget_async._applied_force.value() == 0.0
+    assert widget._applied_force.value() == 0.0
 
 
 @pytest.mark.asyncio

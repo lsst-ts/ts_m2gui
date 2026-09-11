@@ -42,57 +42,37 @@ def widget(qtbot: QtBot) -> TabDiagnostics:
     return widget
 
 
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> TabDiagnostics:
-    async with TabDiagnostics(
-        "Diagnostics", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
+def test_init(widget: TabDiagnostics) -> None:
+    assert len(widget._force_error_tangent) == 8
 
 
-# Need to add this to make the above widget_async() to work on Jenkins.
-# I guess there is some bug in "pytest" and "pytest_asyncio" libraries.
-def test_init(widget_async: TabDiagnostics) -> None:
-    pass
-
-
-@pytest.mark.skip(reason="")
-@pytest.mark.asyncio
-async def test_callback_update_control_mode(qtbot: QtBot, widget_async: TabDiagnostics) -> None:
+def test_get_selected_control_mode(widget: TabDiagnostics) -> None:
     mode = MTM2.ClosedLoopControlMode.TelemetryOnly
-    widget_async._control_mode_selection.setCurrentIndex(mode.value - 1)
-    qtbot.mouseClick(widget_async._button_update_control_mode, Qt.LeftButton)
+    widget._control_mode_selection.setCurrentIndex(mode.value - 1)
 
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    selected_mode = widget._get_selected_control_mode()
 
-    assert widget_async.model.controller.closed_loop_control_mode == mode
+    assert selected_mode == mode
 
 
-@pytest.mark.skip(reason="")
 @pytest.mark.asyncio
-async def test_callback_control_digital_status(qtbot: QtBot, widget_async: TabDiagnostics) -> None:
+async def test_callback_control_digital_status_wrong_state(widget: TabDiagnostics) -> None:
+    widget.model.utility_monitor.update_digital_status_output(4)
+
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    # Should fail in the wrong state
-    control = widget_async._digital_status_control[2]
+    control = widget._digital_status_control[2]
     assert control.isChecked() is True
     assert control.text() == "ON"
 
-    # Go to the Diagnostic state
-    await widget_async.model.enter_diagnostic()
-
-    qtbot.mouseClick(control, Qt.LeftButton)
+    # Should fail in the wrong state
+    await widget._callback_control_digital_status(2, is_prompted=False)
 
     # Sleep so the event loop can access CPU to handle the signal
     await asyncio.sleep(1)
 
-    assert control.isChecked() is False
-    assert control.text() == "OFF"
+    assert control.text() == "ON"
 
 
 @pytest.mark.asyncio

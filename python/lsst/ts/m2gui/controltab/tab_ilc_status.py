@@ -249,7 +249,9 @@ class TabIlcStatus(TabDefault):
             button.setEnabled(is_enabled)
 
     @asyncSlot()
-    async def _callback_ilc_state_check(self, sleep_time_per_ilc: float = 0.12) -> None:
+    async def _callback_ilc_state_check(
+        self, sleep_time_per_ilc: float = 0.12, is_prompted: bool = True
+    ) -> None:
         """Callback of the check button to check the current inner-loop
         controller (ILC) states in controller.
 
@@ -257,12 +259,17 @@ class TabIlcStatus(TabDefault):
         ----------
         sleep_time_per_ilc : `float`, optional
             Sleep time per ILC. (the default is 0.12)
+        is_prompted : `bool`, optional
+            When False, dialog will not be executed. That is used for tests,
+            which shall not be the case when used in the real GUI. (the default
+            is True)
         """
 
         # If the closed-loop control mode is not in Idle, return immediately.
         is_idle = await is_closed_loop_control_mode_in_idle(
             self.model.controller.closed_loop_control_mode,
             "_callback_ilc_state_check()",
+            is_prompted=is_prompted,
         )
         if not is_idle:
             return
@@ -287,15 +294,23 @@ class TabIlcStatus(TabDefault):
         self._enable_ilc_commands(True)
 
     @asyncSlot()
-    async def _callback_ilc_state_enable(self) -> None:
+    async def _callback_ilc_state_enable(self, is_prompted: bool = True) -> None:
         """Callback of the enable button to transition the inner-loop
         controller (ILC) states to be enabled.
+
+        Parameters
+        ----------
+        is_prompted : `bool`, optional
+            When False, dialog will not be executed. That is used for tests,
+            which shall not be the case when used in the real GUI. (the default
+            is True)
         """
 
         # If the closed-loop control mode is not in Idle, return immediately.
         is_idle = await is_closed_loop_control_mode_in_idle(
             self.model.controller.closed_loop_control_mode,
             "_callback_ilc_state_enable()",
+            is_prompted=is_prompted,
         )
         if not is_idle:
             return
@@ -312,7 +327,7 @@ class TabIlcStatus(TabDefault):
         self._enable_ilc_commands(True)
 
     @asyncSlot()
-    async def _callback_power_communication(self, is_power_on: bool) -> None:
+    async def _callback_power_communication(self, is_power_on: bool, is_prompted: bool = True) -> None:
         """Callback of the power-on/off button to power on/off the
         communication power.
 
@@ -321,12 +336,17 @@ class TabIlcStatus(TabDefault):
         is_power_on : `bool`
             True to power on the communication. False to power off the
             communication.
+        is_prompted : `bool`, optional
+            When False, dialog will not be executed. That is used for tests,
+            which shall not be the case when used in the real GUI. (the default
+            is True)
         """
 
         # If the closed-loop control mode is not in Idle, return immediately.
         is_idle = await is_closed_loop_control_mode_in_idle(
             self.model.controller.closed_loop_control_mode,
             "_callback_power_communication()",
+            is_prompted=is_prompted,
         )
         if not is_idle:
             return
