@@ -22,13 +22,14 @@
 import logging
 
 import pytest
+import pytest_asyncio
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabRealtimeNetForceMoment
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabRealtimeNetForceMoment:
     widget = TabRealtimeNetForceMoment("Realtime Data", Model(logging.getLogger()))
     qtbot.addWidget(widget)

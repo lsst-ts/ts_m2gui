@@ -23,6 +23,7 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 from pytestqt.qtbot import QtBot
@@ -34,7 +35,7 @@ from lsst.ts.m2gui.controltab import TabLimitSwitchStatus
 SLEEP_TIME_SHORT = 1
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabLimitSwitchStatus:
     widget = TabLimitSwitchStatus("Limit Switch Status", Model(logging.getLogger()))
 

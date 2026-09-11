@@ -42,7 +42,7 @@ class MockWidget(TabDefault):
         self.widget().setLayout(self.layout_control_mode.layout)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> MockWidget:
     widget = MockWidget("Mock", Model(logging.getLogger()))
     qtbot.addWidget(widget)

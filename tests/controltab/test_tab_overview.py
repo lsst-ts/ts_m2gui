@@ -33,7 +33,7 @@ from lsst.ts.m2gui.controltab import TabOverview
 from lsst.ts.xml.enums import MTM2
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabOverview:
     widget = TabOverview("Overview", Model(logging.getLogger()))
     qtbot.addWidget(widget)

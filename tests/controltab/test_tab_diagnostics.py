@@ -34,7 +34,7 @@ from lsst.ts.m2gui.controltab import TabDiagnostics
 from lsst.ts.xml.enums import MTM2
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabDiagnostics:
     widget = TabDiagnostics("Diagnostics", Model(logging.getLogger()))
     qtbot.addWidget(widget)

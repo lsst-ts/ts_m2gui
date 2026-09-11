@@ -20,12 +20,13 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
+import pytest_asyncio
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2gui.display import ItemActuator, ViewMirror
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> ViewMirror:
     widget = ViewMirror()
     widget.add_item_actuator(1, "alias", 0, 0.5)

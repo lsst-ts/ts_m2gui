@@ -37,7 +37,7 @@ def get_cell_geometry_file() -> Path:
     return get_config_dir() / "harrisLUT" / "cell_geom.yaml"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabHardpointSelection:
     widget = TabHardpointSelection("Hardpoints", Model(logging.getLogger()))
     widget.read_cell_geometry_file(get_cell_geometry_file())

@@ -41,7 +41,7 @@ def get_error_list_file() -> Path:
     return get_config_dir() / "error_code.tsv"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabAlarmWarn:
     widget = TabAlarmWarn("Alarms/Warnings", Model(logging.getLogger()))
     widget.read_error_list_file(get_error_list_file())

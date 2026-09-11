@@ -40,7 +40,7 @@ def get_ilc_details_file() -> Path:
     return get_config_dir() / "ilc_details.yaml"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabIlcStatus:
     widget = TabIlcStatus("ILC Status", Model(logging.getLogger()))
     qtbot.addWidget(widget)

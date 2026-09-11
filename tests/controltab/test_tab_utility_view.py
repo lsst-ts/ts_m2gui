@@ -33,7 +33,7 @@ from lsst.ts.m2gui.controltab import TabUtilityView
 from lsst.ts.xml.enums import MTM2
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabUtilityView:
     widget = TabUtilityView("Utility View", Model(logging.getLogger()))
     qtbot.addWidget(widget)

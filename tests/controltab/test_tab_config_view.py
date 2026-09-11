@@ -23,13 +23,14 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabConfigView
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabConfigView:
     widget = TabConfigView("Configuration View", Model(logging.getLogger()))
     qtbot.addWidget(widget)

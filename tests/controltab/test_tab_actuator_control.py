@@ -32,7 +32,7 @@ from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, LocalMode, M
 from lsst.ts.m2gui.controltab import TabActuatorControl
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabActuatorControl:
     widget = TabActuatorControl("Actuator Control", Model(logging.getLogger()))
     qtbot.addWidget(widget)

@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.2.2:
+
+-------------
+1.2.2
+-------------
+
+* Workaround the issue of the Qt and asyncio event loops in Python 3.14.
+
 .. _lsst.ts.m2gui-1.2.1:
 
 -------------
