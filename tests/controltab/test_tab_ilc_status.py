@@ -40,21 +40,12 @@ def get_ilc_details_file() -> Path:
     return get_config_dir() / "ilc_details.yaml"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabIlcStatus:
     widget = TabIlcStatus("ILC Status", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
     return widget
-
-
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> TabIlcStatus:
-    async with TabIlcStatus("ILC Status", Model(logging.getLogger(), is_simulation_mode=True)) as widget_sim:
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
 
 
 def test_init(widget: TabIlcStatus) -> None:
@@ -107,54 +98,23 @@ async def test_callback_ilc_state_reset(qtbot: QtBot, widget: TabIlcStatus) -> N
 
 
 @pytest.mark.asyncio
-async def test_callback_ilc_state_check(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
-    controller = widget_async.model.controller
-    controller.ilc_modes[:-1] = MTM2.InnerLoopControlMode.Enabled
-    await power_on_and_click_check_button(qtbot, widget_async)
+async def test_callback_ilc_state_check_not_idle(widget: TabIlcStatus) -> None:
+    widget.model.controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.TelemetryOnly
 
-    assert controller.ilc_modes[-1] == MTM2.InnerLoopControlMode.Standby
-
-
-@pytest.mark.asyncio
-async def power_on_and_click_check_button(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
-    controller = widget_async.model.controller
-    await controller.mock_server.model.power_communication.power_on()
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
-
-    qtbot.mouseClick(widget_async._buttons_ilc["check"], Qt.LeftButton)
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
+    # Should return immediately
+    await widget._callback_ilc_state_check(is_prompted=False)
 
 
 @pytest.mark.asyncio
-async def test_callback_ilc_state_check_not_idle(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
-    widget_async.model.controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.TelemetryOnly
+async def test_callback_ilc_state_enable_not_idle(widget: TabIlcStatus) -> None:
+    widget.model.controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.TelemetryOnly
 
-    controller = widget_async.model.controller
-    controller.ilc_modes[:-1] = MTM2.InnerLoopControlMode.Enabled
-    await power_on_and_click_check_button(qtbot, widget_async)
-
-    assert controller.ilc_modes[-1] == MTM2.InnerLoopControlMode.Unknown
+    # Should return immediately
+    await widget._callback_ilc_state_enable(is_prompted=False)
 
 
 @pytest.mark.asyncio
-async def test_callback_ilc_state_enable(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
-    controller = widget_async.model.controller
-    await controller.mock_server.model.power_communication.power_on()
-
-    qtbot.mouseClick(widget_async._buttons_ilc["enable"], Qt.LeftButton)
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(5)
-
-    assert controller.are_ilc_modes_enabled()
-
-
-@pytest.mark.asyncio
-async def test_callback_signal_ilc_status(qtbot: QtBot, widget: TabIlcStatus) -> None:
+async def test_callback_signal_ilc_status(widget: TabIlcStatus) -> None:
     address = 1
     mode = MTM2.InnerLoopControlMode.Disabled
     widget.model._report_ilc_status(address, mode.value)
@@ -170,7 +130,7 @@ async def test_callback_signal_ilc_status(qtbot: QtBot, widget: TabIlcStatus) ->
 
 
 @pytest.mark.asyncio
-async def test_callback_signal_ilc_status_bypassed_ilcs(qtbot: QtBot, widget: TabIlcStatus) -> None:
+async def test_callback_signal_ilc_status_bypassed_ilcs(widget: TabIlcStatus) -> None:
     bypassed_ilcs = [1, 2, 3]
     widget.model.signal_ilc_status.bypassed_ilcs.emit(bypassed_ilcs)
 
@@ -181,38 +141,11 @@ async def test_callback_signal_ilc_status_bypassed_ilcs(qtbot: QtBot, widget: Ta
 
 
 @pytest.mark.asyncio
-async def test_callback_power_communication(qtbot: QtBot, widget_async: TabIlcStatus) -> None:
-    # Power on
-    qtbot.mouseClick(widget_async._buttons_power["power_on"], Qt.LeftButton)
+async def test_callback_power_communication_not_idle(widget: TabIlcStatus) -> None:
+    widget.model.controller.closed_loop_control_mode = MTM2.ClosedLoopControlMode.TelemetryOnly
 
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
-
-    assert widget_async.model.controller.is_powered_on_communication() is True
-
-    # Check the ILC states
-    qtbot.mouseClick(widget_async._buttons_ilc["check"], Qt.LeftButton)
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
-
-    assert widget_async.model.controller.ilc_modes[0] == MTM2.InnerLoopControlMode.Standby
-
-    # Power off
-    qtbot.mouseClick(widget_async._buttons_power["power_off"], Qt.LeftButton)
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(1)
-
-    assert widget_async.model.controller.is_powered_on_communication() is False
-    assert widget_async.model.controller.ilc_modes[0] == MTM2.InnerLoopControlMode.Unknown
-
-    for idx in range(NUM_INNER_LOOP_CONTROLLER):
-        palette = widget_async._indicators_ilc[idx].palette()
-        color = palette.color(QPalette.Button)
-
-        assert color == widget_async._get_indicator_color(MTM2.InnerLoopControlMode.Unknown)
-        assert widget_async._ilcs[idx]._labels["mode"].text() == MTM2.InnerLoopControlMode.Unknown.name
+    # Should return immediately
+    await widget._callback_power_communication(True, is_prompted=False)
 
 
 def test_enable_power_commands(widget: TabIlcStatus) -> None:

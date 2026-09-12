@@ -24,6 +24,7 @@ import logging
 from pathlib import Path
 
 import pytest
+import pytest_asyncio
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
@@ -45,9 +46,9 @@ def get_cell_geometry_file() -> Path:
     return get_config_dir() / "harrisLUT" / "cell_geom.yaml"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabCellStatus:
-    widget = TabCellStatus("Cell Status", Model(logging.getLogger()))
+    widget = TabCellStatus("Cell Status", Model(logging.getLogger()), bypass_signal=True)
     widget.read_cell_geometry_file(get_cell_geometry_file())
     qtbot.addWidget(widget)
 

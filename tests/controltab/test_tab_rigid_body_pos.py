@@ -23,6 +23,7 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
@@ -31,7 +32,7 @@ from lsst.ts.m2gui import Model
 from lsst.ts.m2gui.controltab import TabRigidBodyPos
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabRigidBodyPos:
     widget = TabRigidBodyPos("Rigid Body Position", Model(logging.getLogger()))
     qtbot.addWidget(widget)

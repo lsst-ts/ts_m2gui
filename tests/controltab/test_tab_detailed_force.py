@@ -23,13 +23,14 @@ import asyncio
 import logging
 
 import pytest
+import pytest_asyncio
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2gui import ActuatorForceAxial, ActuatorForceTangent, Model
 from lsst.ts.m2gui.controltab import TabDetailedForce
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabDetailedForce:
     widget = TabDetailedForce("Detailed Force", Model(logging.getLogger()))
     qtbot.addWidget(widget)

@@ -430,6 +430,12 @@ class MainWindow(QMainWindow):
 
                 QApplication.instance().quit()
 
+                # TODO: Remove this after we adapt to the PySide6.QtAsyncio
+                # totally. At the moment, in Python 3.14, the Qt event loop
+                # kills the asyncio event loop to send the event siganl to
+                # app_close_event.wait() in application.py.
+                sys.exit()
+
         action_exit.setEnabled(True)
 
     def _get_action(self, name: str) -> QAction:

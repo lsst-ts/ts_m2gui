@@ -22,6 +22,7 @@
 import asyncio
 
 import pytest
+import pytest_asyncio
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QToolBar
 from pytestqt.qtbot import QtBot
@@ -30,7 +31,7 @@ from lsst.ts.m2com import get_config_dir, read_yaml_file
 from lsst.ts.m2gui import MainWindow
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> MainWindow:
     widget = MainWindow(False, False, False, log_level=13)
     qtbot.addWidget(widget)
@@ -38,7 +39,7 @@ def widget(qtbot: QtBot) -> MainWindow:
     return widget
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget_sim(qtbot: QtBot) -> MainWindow:
     widget_sim = MainWindow(False, False, True)
     qtbot.addWidget(widget_sim)

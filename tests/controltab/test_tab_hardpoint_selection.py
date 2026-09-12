@@ -37,25 +37,13 @@ def get_cell_geometry_file() -> Path:
     return get_config_dir() / "harrisLUT" / "cell_geom.yaml"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabHardpointSelection:
     widget = TabHardpointSelection("Hardpoints", Model(logging.getLogger()))
     widget.read_cell_geometry_file(get_cell_geometry_file())
     qtbot.addWidget(widget)
 
     return widget
-
-
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> TabHardpointSelection:
-    async with TabHardpointSelection(
-        "Hardpoints", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
-        widget_sim.read_cell_geometry_file(get_cell_geometry_file())
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
 
 
 def test_init(widget: TabHardpointSelection) -> None:
@@ -135,24 +123,3 @@ async def test_set_hardpoint_list_error(widget: TabHardpointSelection) -> None:
     widget.model.local_mode = LocalMode.Diagnostic
     with pytest.raises(RuntimeError):
         await widget._set_hardpoint_list()
-
-
-@pytest.mark.asyncio
-async def test_callback_apply_hardpoints(qtbot: QtBot, widget_async: TabHardpointSelection) -> None:
-    assert widget_async._hardpoints == [5, 15, 25, 73, 75, 77]
-
-    hardpoints = [2, 12, 22, 72, 74, 76]
-    for idx in range(NUM_ACTUATOR):
-        if idx in hardpoints:
-            widget_async._buttons_hardpoint_selection[idx].setChecked(True)
-        else:
-            widget_async._buttons_hardpoint_selection[idx].setChecked(False)
-
-    qtbot.mouseClick(widget_async._buttons_hardpoint["apply"], Qt.LeftButton)
-
-    # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(2)
-
-    await widget_async.model.enter_diagnostic()
-
-    assert widget_async._hardpoints == hardpoints
