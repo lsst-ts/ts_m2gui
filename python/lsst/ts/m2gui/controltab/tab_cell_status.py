@@ -49,6 +49,9 @@ class TabCellStatus(TabDefault):
         Table's title.
     model : `Model`
         Model class.
+    bypass_signal : `bool`, optional
+        Bypass the signal connection of selectionChanged in ViewMirror. This is
+        for the unit test only. (the default is False)
 
     Attributes
     ----------
@@ -56,10 +59,10 @@ class TabCellStatus(TabDefault):
         Model class.
     """
 
-    def __init__(self, title: str, model: Model) -> None:
+    def __init__(self, title: str, model: Model, bypass_signal: bool = False) -> None:
         super().__init__(title, model)
 
-        self._view_mirror = ViewMirror()
+        self._view_mirror = ViewMirror(bypass_signal=bypass_signal)
         self._button_show_alias = set_button(
             "Show Actuator Alias", self._callback_show_alias, is_checkable=True
         )

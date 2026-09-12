@@ -48,7 +48,7 @@ def get_cell_geometry_file() -> Path:
 
 @pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabCellStatus:
-    widget = TabCellStatus("Cell Status", Model(logging.getLogger()))
+    widget = TabCellStatus("Cell Status", Model(logging.getLogger()), bypass_signal=True)
     widget.read_cell_geometry_file(get_cell_geometry_file())
     qtbot.addWidget(widget)
 
@@ -176,7 +176,6 @@ async def test_callback_selection_changed(widget: TabCellStatus) -> None:
     assert widget._figures["tangent"].axis_y.max() == 0.2
 
 
-@pytest.mark.skip(reason="Issue")
 @pytest.mark.asyncio
 async def test_callback_time_out(widget: TabCellStatus) -> None:
     # Select the actuator

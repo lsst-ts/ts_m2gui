@@ -28,7 +28,7 @@ from lsst.ts.m2gui.display import ItemActuator, ViewMirror
 
 @pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> ViewMirror:
-    widget = ViewMirror()
+    widget = ViewMirror(bypass_signal=True)
     widget.add_item_actuator(1, "alias", 0, 0.5)
 
     qtbot.addWidget(widget)
@@ -40,7 +40,6 @@ def test_init(widget: ViewMirror) -> None:
     assert len(widget.actuators) == 1
 
 
-@pytest.mark.skip(reason="Issue")
 @pytest.mark.asyncio
 async def test_show_selected_actuator_force(widget: ViewMirror) -> None:
     text_force = widget.get_text_force()
@@ -58,7 +57,6 @@ def select_actuator(widget: ViewMirror) -> None:
             item.setSelected(True)
 
 
-@pytest.mark.skip(reason="Issue")
 def test_get_selected_actuator(widget: ViewMirror) -> None:
     assert widget.get_selected_actuator() is None
 
