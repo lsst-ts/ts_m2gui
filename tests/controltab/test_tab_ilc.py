@@ -21,7 +21,7 @@
 
 import logging
 
-import pytest
+import pytest_asyncio
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 from pytestqt.qtbot import QtBot
@@ -32,7 +32,7 @@ from lsst.ts.m2gui.controltab import TabIlc
 from lsst.ts.xml.enums import MTM2
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabIlc:
     widget = TabIlc("ILC", Model(logging.getLogger()), NUM_ACTUATOR)
     qtbot.addWidget(widget)
@@ -40,7 +40,7 @@ def widget(qtbot: QtBot) -> TabIlc:
     return widget
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget_monitor(qtbot: QtBot) -> TabIlc:
     widget_monitor = TabIlc("ILC", Model(logging.getLogger()), NUM_ACTUATOR + 1)
     qtbot.addWidget(widget_monitor)

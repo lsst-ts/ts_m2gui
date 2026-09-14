@@ -22,6 +22,7 @@
 import logging
 
 import pytest
+import pytest_asyncio
 from pytestqt.qtbot import QtBot
 
 from lsst.ts.m2com import LimitSwitchType
@@ -30,7 +31,7 @@ from lsst.ts.m2gui import FaultManager, Model, Ring, Status
 TIMEOUT = 1000
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def fault_manager() -> FaultManager:
     model = Model(logging.getLogger())
     fault_manager = FaultManager(model.get_actuator_default_status(Status.Normal))
