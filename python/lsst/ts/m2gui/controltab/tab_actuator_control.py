@@ -146,7 +146,7 @@ class TabActuatorControl(TabDefault):
         self._set_signal_detailed_force(self.model.utility_monitor.signal_detailed_force)
 
     @asyncSlot()
-    async def _callback_script_load_script(self, file_name: str = "") -> str:
+    async def _callback_script_load_script(self, file_name: str = "", bypass_load: bool = False) -> str:
         """Callback of the load-script button in script control. The cell
         controller will load the script.
 
@@ -154,6 +154,9 @@ class TabActuatorControl(TabDefault):
         ----------
         file_name : `str`, optional
             File name. This is used for the unit test only. (the default is "")
+        bypass_load : `bool`, optional
+            Bypass the load script command. This is used for the unit test
+            only. (the default is False)
 
         Returns
         -------
@@ -171,11 +174,14 @@ class TabActuatorControl(TabDefault):
             file_path = Path(file_name)
             name = file_path.name
 
-            is_successful = await run_command(
-                self.model.command_script,
-                CommandScript.LoadScript,
-                script_name=name,  # type: ignore[arg-type]
-            )
+            if bypass_load:
+                is_successful = True
+            else:
+                is_successful = await run_command(
+                    self.model.command_script,
+                    CommandScript.LoadScript,
+                    script_name=name,  # type: ignore[arg-type]
+                )
 
             if is_successful:
                 self._info_script["file"].setText(file_name)
@@ -297,11 +303,27 @@ class TabActuatorControl(TabDefault):
             button.setChecked(False)
 
     @asyncSlot()
-    async def _callback_actuator_start(
+    async def _callback_actuator_start(self) -> None:
+        """Callback of the start button in actuator control. The cell
+        controller will start to move the actuators."""
+
+        actuators, target_displacement, displacement_unit = (
+            self._get_selected_actuators_and_displacement_and_unit()
+        )
+
+        await run_command(
+            self.model.command_actuator,
+            CommandActuator.Start,
+            actuators=actuators,  # type: ignore[arg-type]
+            target_displacement=target_displacement,
+            unit=displacement_unit,
+        )
+
+    def _get_selected_actuators_and_displacement_and_unit(
         self,
     ) -> tuple[list[int], float | int, ActuatorDisplacementUnit]:
-        """Callback of the start button in actuator control. The cell
-        controller will start to move the actuators.
+        """Get the selected actuators, target displacement, and displacement
+        unit.
 
         Returns
         -------
@@ -318,14 +340,6 @@ class TabActuatorControl(TabDefault):
 
         # Index begins from 0 instead of 1 in QComboBox
         displacement_unit = ActuatorDisplacementUnit(self._displacement_unit_selection.currentIndex() + 1)
-
-        await run_command(
-            self.model.command_actuator,
-            CommandActuator.Start,
-            actuators=actuators,  # type: ignore[arg-type]
-            target_displacement=target_displacement,
-            unit=displacement_unit,
-        )
 
         return actuators, target_displacement, displacement_unit
 
@@ -355,9 +369,13 @@ class TabActuatorControl(TabDefault):
         """Callback of the clear-force button in actuator control. This will
         clear the applied forces in controller."""
 
-        self._applied_force.setValue(0)
+        self._clear_applied_force()
 
         await run_command(self.model.controller.reset_force_offsets)
+
+    def _clear_applied_force(self) -> None:
+        """Clear the applied force."""
+        self._applied_force.setValue(0)
 
     def create_layout(self) -> QHBoxLayout:
         """Create the layout.

@@ -164,14 +164,23 @@ class TabDiagnostics(TabDefault):
     async def _callback_update_control_mode(self) -> None:
         """Callback of the update-control-mode button. This will update the
         closed-loop control mode in cell."""
-
-        # Index begins from 0 instead of 1 in QComboBox
-        mode = MTM2.ClosedLoopControlMode(self._control_mode_selection.currentIndex() + 1)
+        mode = self._get_selected_control_mode()
         await run_command(
             self.model.controller.set_closed_loop_control_mode,
             mode,
             timeout=20.0,  # type: ignore[arg-type]
         )
+
+    def _get_selected_control_mode(self) -> MTM2.ClosedLoopControlMode:
+        """Get the selected closed-loop control mode.
+
+        Returns
+        -------
+        enum `MTM2.ClosedLoopControlMode`
+            Selected closed loop control mode.
+        """
+        # Index begins from 0 instead of 1 in QComboBox
+        return MTM2.ClosedLoopControlMode(self._control_mode_selection.currentIndex() + 1)
 
     def _create_control_mode_selection(self) -> QComboBox:
         """Create the combo box of closed-loop control mode selection.
@@ -333,7 +342,7 @@ class TabDiagnostics(TabDefault):
         return controls
 
     @asyncSlot()
-    async def _callback_control_digital_status(self, idx: int) -> None:
+    async def _callback_control_digital_status(self, idx: int, is_prompted: bool = True) -> None:
         """Callback of the digital-status-control button.
 
         This allows the user to command individual binary signals to the cell
@@ -344,6 +353,10 @@ class TabDiagnostics(TabDefault):
         ----------
         idx : `int`
             Bit index.
+        is_prompted : `bool`, optional
+            When False, dialog will not be executed. That is used for tests,
+            which shall not be the case when used in the real GUI. (the default
+            is True)
         """
 
         control = self._digital_status_control[idx]
@@ -360,6 +373,7 @@ class TabDiagnostics(TabDefault):
             await prompt_dialog_warning(
                 "_callback_control_digital_status()",
                 f"Bit value of digital status can only be set in {allowed_mode!r}.",
+                is_prompted=is_prompted,
             )
             is_successful = False
 
