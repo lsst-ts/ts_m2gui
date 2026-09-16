@@ -33,23 +33,12 @@ from lsst.ts.m2gui.controltab import TabUtilityView
 from lsst.ts.xml.enums import MTM2
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def widget(qtbot: QtBot) -> TabUtilityView:
     widget = TabUtilityView("Utility View", Model(logging.getLogger()))
     qtbot.addWidget(widget)
 
     return widget
-
-
-@pytest_asyncio.fixture
-async def widget_async(qtbot: QtBot) -> TabUtilityView:
-    async with TabUtilityView(
-        "Utility View", Model(logging.getLogger(), is_simulation_mode=True)
-    ) as widget_sim:
-        qtbot.addWidget(widget_sim)
-
-        await widget_sim.model.connect()
-        yield widget_sim
 
 
 def test_init(widget: TabUtilityView) -> None:
@@ -66,22 +55,25 @@ def test_init(widget: TabUtilityView) -> None:
 
 
 @pytest.mark.asyncio
-async def test_callback_reset_breakers(widget_async: TabUtilityView) -> None:
-    # Transition to Enabled state to turn on the communication power
-    await widget_async.model.enter_diagnostic()
-    await widget_async.model.enter_enable()
-
+async def test_callback_reset_breakers(widget: TabUtilityView) -> None:
     name = "J3-W14-2"
-    widget_async.model.utility_monitor.update_breaker(name, True)
-
-    await widget_async._callback_reset_breakers(MTM2.PowerType.Communication)
+    widget.model.utility_monitor.update_breaker(name, True)
 
     # Sleep so the event loop can access CPU to handle the signal
-    await asyncio.sleep(8)
+    await asyncio.sleep(1)
 
-    palette = widget_async._breakers[name].palette()
+    palette = widget._breakers[name].palette()
     color = palette.color(QPalette.Button)
     assert color == Qt.green
+
+    widget.model.utility_monitor.reset_breakers(MTM2.PowerType.Communication)
+
+    # Sleep so the event loop can access CPU to handle the signal
+    await asyncio.sleep(1)
+
+    palette = widget._breakers[name].palette()
+    color = palette.color(QPalette.Button)
+    assert color == Qt.gray
 
 
 @pytest.mark.asyncio

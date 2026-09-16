@@ -21,7 +21,6 @@
 
 __all__ = ["TabDefault"]
 
-import types
 import typing
 
 from PySide6.QtWidgets import QComboBox, QFormLayout
@@ -92,13 +91,3 @@ class TabDefault(TabTemplate):
             ring_selection.currentIndexChanged.connect(callback_current_index_changed)
 
         return ring_selection
-
-    async def __aexit__(
-        self,
-        type: typing.Type[BaseException] | None,
-        value: BaseException | None,
-        traceback: types.TracebackType | None,
-    ) -> None:
-        """This is an overridden function to support the asynchronous context
-        manager."""
-        await self.model.controller.close_controller_and_mock_server()

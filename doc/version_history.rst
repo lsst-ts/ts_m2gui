@@ -6,6 +6,17 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.2.2:
+
+-------------
+1.2.2
+-------------
+
+* Workaround the issue of the Qt and asyncio event loops in Python 3.14.
+* Move ``tests/test_model.py`` to ``tests/amodel/test_model.py`` to make sure it is executed first to workaround the event loop issue in Python 3.14.
+* Avoid to trigger the signal in the unit tests.
+* Refactor the unit tests to workaround the event loop issue in Python 3.14.
+
 .. _lsst.ts.m2gui-1.2.1:
 
 -------------

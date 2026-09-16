@@ -31,6 +31,12 @@ from .item_actuator import ItemActuator
 class ViewMirror(QGraphicsView):
     """View on the mirror populated by actuators.
 
+    Parameters
+    ----------
+    bypass_signal : `bool`, optional
+        Bypass the signal connection of selectionChanged. This is for the
+        unit test only. (the default is False)
+
     Attributes
     ----------
     actuators : `list` [`ItemActuator`]
@@ -44,21 +50,24 @@ class ViewMirror(QGraphicsView):
     # Diameter of the actuator on the scene
     DIAMETER = 34
 
-    def __init__(self) -> None:
-        self._mirror = self._create_mirror()
+    def __init__(self, bypass_signal: bool = False) -> None:
+        self._mirror = self._create_mirror(bypass_signal=bypass_signal)
         super().__init__(self._mirror)
 
         self.actuators: list[ItemActuator] = list()
 
         self.mirror_radius = 1
 
-    def _create_mirror(self, point_size: int = 8) -> QGraphicsScene:
+    def _create_mirror(self, point_size: int = 8, bypass_signal: bool = False) -> QGraphicsScene:
         """Create the mirror scene.
 
         Parameters
         ----------
         point_size : `int`, optional
             Point size of the text. (the default is 8)
+        bypass_signal : `bool`, optional
+            Bypass the signal connection of selectionChanged. This is for the
+            unit test only. (the default is False)
 
         Returns
         -------
@@ -68,7 +77,8 @@ class ViewMirror(QGraphicsView):
 
         # Create the mirror
         mirror = QGraphicsScene(0, 0, self.SIZE_SCENE, self.SIZE_SCENE)
-        mirror.selectionChanged.connect(self._show_selected_actuator_force)
+        if not bypass_signal:
+            mirror.selectionChanged.connect(self._show_selected_actuator_force)
 
         # Add the text item to mirror
         font = QFont()

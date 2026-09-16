@@ -103,6 +103,8 @@ If you have the **Xvfb** and **pytest-xvfb** installed, you will not see the pro
 
 Note: If the variable of `PYTEST_QT_API` is not set, you might get the core dump error in the test.
 
+Note: The reason to have the `test_model.py` to be under the `tests/amodel` directory is to make sure it would be executed first under the `pytest` to workaround the issue of event loop selection among python 3.14, `pytest-qt`, `pyside6`, and `qasync`.
+
 ## Class Diagrams
 
 The class diagrams are in [here](doc/uml).

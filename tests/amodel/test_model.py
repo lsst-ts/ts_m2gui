@@ -49,7 +49,7 @@ TIMEOUT = 1000
 TIMEOUT_LONG = 2000
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 def model() -> Model:
     return Model(logging.getLogger())
 
