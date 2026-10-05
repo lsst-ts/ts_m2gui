@@ -6,6 +6,14 @@
 Version History
 ##################
 
+.. _lsst.ts.m2gui-1.2.3:
+
+-------------
+1.2.3
+-------------
+
+* Add the ``local_scheme="no-local-version"`` to the **setup.py**.
+
 .. _lsst.ts.m2gui-1.2.2:
 
 -------------
